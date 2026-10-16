@@ -1,0 +1,22 @@
+{
+  "name": "gemini-live-english-tutor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time Voice English Tutor using Gemini Live API and Ephemeral Tokens",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n \"server,client\" -c \"blue,green\" \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "build": "npm run build -w server && npm run build -w client",
+    "build:server": "npm run build -w server",
+    "build:client": "npm run build -w client",
+    "test": "npm run test -w client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

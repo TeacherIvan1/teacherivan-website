@@ -1,0 +1,254 @@
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Send,
+  Trash2,
+  Sparkles,
+  Radio,
+  User,
+  Bot,
+  Terminal,
+} from 'lucide-react';
+import { useConversationStore } from '../modules/conversation/conversationStore';
+
+export const ChatTranscript: React.FC = () => {
+  const {
+    status,
+    messages,
+    micLevel,
+    isTutorSpeaking,
+    isMuted,
+    toggleMute,
+    clearMessages,
+    sendUserTextMessage,
+  } = useConversationStore();
+
+  const [inputMessage, setInputMessage] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const isConnected = status === 'connected';
+
+  // Auto-scroll to the latest message as new transcription chunks arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isTutorSpeaking]);
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputMessage.trim() || !isConnected) return;
+    sendUserTextMessage(inputMessage);
+    setInputMessage('');
+  };
+
+  return (
+    <div className="glass-panel chat-transcript-panel" id="chat-transcript-panel">
+      {/* Panel Header */}
+      <div className="panel-header" style={{ marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="transcript-header-icon">
+            <Radio size={18} color="#818cf8" />
+          </div>
+          <div>
+            <h2 className="panel-title" style={{ fontSize: '1.05rem', margin: 0 }}>
+              Live Voice Transcript
+            </h2>
+            <div style={{ fontSize: '0.74rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>Bidirectional Audio Transcriptions</span>
+              {isConnected && (
+                <span className="live-pill">
+                  <span className="live-dot" /> LIVE
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Live Audio Status & Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {isConnected && (
+            <>
+              {/* Mic Level Meter */}
+              <div
+                className="mic-level-badge"
+                title={`Microphone Level: ${micLevel}%`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '4px 8px',
+                  borderRadius: 99,
+                  background: isMuted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(99, 102, 241, 0.15)',
+                  border: isMuted
+                    ? '1px solid rgba(239, 68, 68, 0.3)'
+                    : '1px solid rgba(99, 102, 241, 0.3)',
+                }}
+              >
+                {isMuted ? (
+                  <MicOff size={13} color="#f87171" />
+                ) : (
+                  <Mic size={13} color="#818cf8" />
+                )}
+                <div className="mic-bars">
+                  <span
+                    className="mic-bar"
+                    style={{ height: `${Math.max(4, Math.min(14, (micLevel / 100) * 14))}px` }}
+                  />
+                  <span
+                    className="mic-bar"
+                    style={{ height: `${Math.max(4, Math.min(14, (micLevel / 80) * 14))}px` }}
+                  />
+                  <span
+                    className="mic-bar"
+                    style={{ height: `${Math.max(4, Math.min(14, (micLevel / 60) * 14))}px` }}
+                  />
+                </div>
+              </div>
+
+              {/* Tutor Speaking Indicator */}
+              {isTutorSpeaking && (
+                <div
+                  className="tutor-speaking-badge"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    padding: '4px 9px',
+                    borderRadius: 99,
+                    background: 'rgba(52, 211, 153, 0.15)',
+                    border: '1px solid rgba(52, 211, 153, 0.35)',
+                    fontSize: '0.74rem',
+                    color: '#34d399',
+                  }}
+                >
+                  <Volume2 size={13} />
+                  <span>Emma Speaking</span>
+                  <div className="wave-animation">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+              )}
+
+              {/* Mute Toggle */}
+              <button
+                className={`icon-btn ${isMuted ? 'muted' : ''}`}
+                onClick={toggleMute}
+                title={isMuted ? 'Unmute Microphone' : 'Mute Microphone'}
+              >
+                {isMuted ? <MicOff size={15} color="#f87171" /> : <Mic size={15} />}
+              </button>
+            </>
+          )}
+
+          {/* Clear Messages */}
+          {messages.length > 0 && (
+            <button
+              className="icon-btn"
+              onClick={clearMessages}
+              title="Clear Transcript"
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Messages Stream */}
+      <div className="chat-messages-scroll" ref={scrollRef} id="chat-messages-container">
+        {messages.length === 0 ? (
+          <div className="chat-empty-state">
+            <div className="empty-icon-wrap">
+              <Sparkles size={28} color="#818cf8" />
+            </div>
+            <div style={{ fontWeight: 600, fontSize: '0.98rem', color: '#e2e8f0', marginBottom: 4 }}>
+              Spoken Transcript Awaiting Voice
+            </div>
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', maxWidth: 360, margin: '0 auto', lineHeight: 1.5 }}>
+              Click <strong>Start Practice Session</strong> to begin. As you and Emma speak, your words will be transcribed in real time.
+            </p>
+          </div>
+        ) : (
+          messages.map((item) => {
+            if (item.role === 'system') {
+              return (
+                <div key={item.id} className="transcript-system-msg">
+                  <Terminal size={13} style={{ flexShrink: 0, opacity: 0.8 }} />
+                  <span>{item.content}</span>
+                  <span className="system-time">{item.timestamp}</span>
+                </div>
+              );
+            }
+
+            const isUser = item.role === 'user';
+
+            return (
+              <div
+                key={item.id}
+                className={`transcript-bubble-row ${isUser ? 'user-row' : 'assistant-row'}`}
+              >
+                <div className={`avatar-badge ${isUser ? 'user-avatar' : 'tutor-avatar'}`}>
+                  {isUser ? <User size={14} /> : <Bot size={14} />}
+                </div>
+
+                <div className={`transcript-bubble ${isUser ? 'user-bubble' : 'assistant-bubble'} ${item.isInterrupted ? 'interrupted-bubble' : ''}`}>
+                  <div className="bubble-header">
+                    <span className={`bubble-author ${item.isInterrupted ? 'interrupted-author' : ''}`}>
+                      {isUser
+                        ? 'You'
+                        : item.isInterrupted
+                        ? 'Emma (interrupted)'
+                        : 'Emma (Tutor)'}
+                    </span>
+                    <span className="bubble-time">{item.timestamp}</span>
+                  </div>
+
+                  <div className="bubble-content">
+                    {item.content}
+                    {item.isInterrupted && (
+                      <span className="interrupted-pill" title="Tutor speech cut off by learner barge-in">
+                        ⚡ interrupted
+                      </span>
+                    )}
+                    {item.isInterim && !item.isInterrupted && <span className="typing-cursor" />}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Bottom Text/Voice Input Bar */}
+      <form onSubmit={handleSend} className="chat-input-bar">
+        <input
+          type="text"
+          id="chat-message-input"
+          placeholder={
+            isConnected
+              ? 'Speak into microphone or type a message to Emma...'
+              : 'Connect session to chat or practice speaking...'
+          }
+          value={inputMessage}
+          disabled={!isConnected}
+          onChange={(e) => setInputMessage(e.target.value)}
+          className="chat-text-input"
+        />
+        <button
+          type="submit"
+          id="send-message-btn"
+          disabled={!isConnected || !inputMessage.trim()}
+          className="chat-send-btn"
+          title="Send text turn to Gemini Live"
+        >
+          <Send size={15} />
+        </button>
+      </form>
+    </div>
+  );
+};
