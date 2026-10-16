@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
+import { HowToUseGuide } from './components/HowToUseGuide';
 import { TutorControls } from './components/TutorControls';
 import { SessionReportPanel } from './components/SessionReportPanel';
 import { TeachingCard } from './components/TeachingCard';
@@ -10,10 +11,13 @@ import { LiveDebugPanel } from './components/LiveDebugPanel';
 import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { HybridMethodSection } from './components/HybridMethodSection';
 import { LearningPathsSection } from './components/LearningPathsSection';
-import { Sparkles, Headphones, Shield, Heart } from 'lucide-react';
+import { Headphones } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
+import { useTranslation } from './modules/i18n/languageStore';
 
 export const App: React.FC = () => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     // Silently wake up the free Render backend instance immediately as page loads
     // so it is primed and ready when the student interacts with the voice tutor
@@ -47,19 +51,22 @@ export const App: React.FC = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 mb-2">
               <Headphones size={13} className="text-[#E09B30]" />
               <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-                Live AI Practice Center
+                {t.tutorConsole.badge}
               </span>
             </div>
             <h2 className="font-montserrat font-bold text-2xl sm:text-3xl text-[#FAFAFA]">
-              Interactive Voice Tutor Console
+              {t.tutorConsole.title}
             </h2>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-[#A7C7E7]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse" />
-            <span>Gemini Live API Ready • Native Audio PCM</span>
+            <span>{t.tutorConsole.statusReady}</span>
           </div>
         </div>
+
+        {/* 4-Step "How to Use the Simulator" Guide */}
+        <HowToUseGuide />
 
         {/* Tutor Console Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -96,32 +103,32 @@ export const App: React.FC = () => {
               className="min-w-[160px] w-48 h-auto object-contain"
             />
             <p className="font-inter text-xs text-[#A7C7E7] max-w-sm">
-              Official English teaching platform combining 1-on-1 pedagogical mentorship with Teacher Ivan and 24/7 Gemini Live voice immersion.
+              {t.footer.desc}
             </p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 text-xs text-[#A7C7E7]">
             <a href="#voice-tutor-showcase" className="hover:text-[#E09B30] transition-colors">
-              Voice Tutor
+              {t.nav.voiceTutor}
             </a>
             <a href="#hybrid-method-section" className="hover:text-[#E09B30] transition-colors">
-              The Hybrid Method
+              {t.nav.hybridMethod}
             </a>
             <a href="#learning-paths-section" className="hover:text-[#E09B30] transition-colors">
-              Learning Paths (A1–B2 &amp; IELTS)
+              {t.nav.learningPaths}
             </a>
             <a href="#session-report-panel" className="hover:text-[#E09B30] transition-colors">
-              Pedagogical Diagnostics
+              {t.nav.pedagogicalReports}
             </a>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto mt-8 pt-8 border-t border-[#A7C7E7]/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#A7C7E7]/70">
           <div>
-            © {new Date().getFullYear()} Teacher Ivan - English Classes. All rights reserved.
+            © {new Date().getFullYear()} {t.footer.copyright}
           </div>
           <div>
-            Powered by Gemini Live API Native Audio (16kHz in / 24kHz out) • Express Token Minting Server
+            {t.footer.poweredBy}
           </div>
         </div>
       </footer>

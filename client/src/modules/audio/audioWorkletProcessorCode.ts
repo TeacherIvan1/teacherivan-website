@@ -18,7 +18,7 @@ class GeminiAudioProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
     this.targetSampleRate = 16000;
-    this.bufferSize = 1024; // 1024 samples = 64ms at 16kHz
+    this.bufferSize = 2048; // 2048 samples = ~128ms at 16kHz
     this.outputBuffer = new Int16Array(this.bufferSize);
     this.outputIndex = 0;
     this.resampleRatio = sampleRate / this.targetSampleRate;

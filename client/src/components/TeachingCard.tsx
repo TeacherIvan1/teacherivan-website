@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useTeachingStore, buildSystemInstruction } from '../modules/teaching/teachingStore';
 import { LearnerLevel, CorrectionMode } from '../modules/teaching/types';
+import { useTranslation } from '../modules/i18n/languageStore';
 
 export const TeachingCard: React.FC = () => {
   const {
@@ -29,30 +30,15 @@ export const TeachingCard: React.FC = () => {
     getSettings,
   } = useTeachingStore();
 
+  const { t } = useTranslation();
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const activeScenario =
     availableScenarios.find((s) => s.id === selectedScenarioId) || availableScenarios[0];
 
-  const levels: { id: LearnerLevel; label: string; sub: string }[] = [
-    { id: 'beginner', label: 'Beginner', sub: 'A1–A2' },
-    { id: 'intermediate', label: 'Intermediate', sub: 'B1–B2' },
-    { id: 'advanced', label: 'Advanced', sub: 'C1–C2' },
-  ];
-
-  const correctionModes: { id: CorrectionMode; label: string; desc: string }[] = [
-    {
-      id: 'conversation',
-      label: 'Conversation Mode',
-      desc: 'Flow & immersion • No explicit corrections • Gentle modeling only',
-    },
-    {
-      id: 'coaching',
-      label: 'Coaching Mode',
-      desc: 'Targeted recasts • 1 fix per turn • Prioritizes grammar focus',
-    },
-  ];
+  const levels: LearnerLevel[] = ['beginner', 'intermediate', 'advanced'];
+  const correctionModes: CorrectionMode[] = ['conversation', 'coaching'];
 
   // The instruction currently in effect: locked active instruction, or preview of next session
   const currentInstruction = isLocked && activeInstruction
@@ -72,7 +58,7 @@ export const TeachingCard: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <BookOpen size={20} color="#E09B30" />
           <h2 className="panel-title" style={{ margin: 0 }}>
-            Tutor Pedagogical Config
+            {t.pedagogy.cardTitle}
           </h2>
         </div>
         {isLocked ? (
@@ -92,11 +78,11 @@ export const TeachingCard: React.FC = () => {
             title="Settings are locked while a practice session is active"
           >
             <Lock size={12} />
-            Session Locked
+            {t.pedagogy.lockedBadge}
           </span>
         ) : (
           <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-            Live Session Directives
+            {t.pedagogy.activeDirectives}
           </span>
         )}
       </div>
@@ -117,49 +103,53 @@ export const TeachingCard: React.FC = () => {
           }}
         >
           <Lock size={13} style={{ flexShrink: 0 }} />
-          <span>Settings locked during active call. Stop session to modify.</span>
+          <span>{t.pedagogy.lockedNotice}</span>
         </div>
       )}
 
       {/* 1. Learner Proficiency Level */}
       <div style={{ marginBottom: 8, fontSize: '0.8rem', color: '#A7C7E7', fontWeight: 600 }}>
-        Learner Proficiency Level (CEFR Alignment):
+        {t.pedagogy.levelHeading}
       </div>
       <div className="level-selector" style={{ marginBottom: 16 }}>
-        {levels.map((lvl) => (
-          <button
-            key={lvl.id}
-            id={`level-btn-${lvl.id}`}
-            disabled={isLocked}
-            className={`level-btn ${level === lvl.id ? 'active' : ''}`}
-            style={{
-              opacity: isLocked && level !== lvl.id ? 0.4 : 1,
-              cursor: isLocked ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              gap: 4,
-            }}
-            onClick={() => setLevel(lvl.id)}
-            title={isLocked ? 'Settings locked during session' : `Select ${lvl.label}`}
-          >
-            <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em]">{lvl.label}</span>
-            <span className="font-montserrat font-semibold text-[0.68rem] uppercase tracking-[0.15em] text-[#E09B30]">{lvl.sub}</span>
-          </button>
-        ))}
+        {levels.map((lvlId) => {
+          const lvlInfo = t.pedagogy.levels[lvlId];
+          return (
+            <button
+              key={lvlId}
+              id={`level-btn-${lvlId}`}
+              disabled={isLocked}
+              className={`level-btn ${level === lvlId ? 'active' : ''}`}
+              style={{
+                opacity: isLocked && level !== lvlId ? 0.4 : 1,
+                cursor: isLocked ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                gap: 4,
+              }}
+              onClick={() => setLevel(lvlId)}
+              title={isLocked ? t.pedagogy.lockedNotice : `Select ${lvlInfo.label}`}
+            >
+              <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em]">{lvlInfo.label}</span>
+              <span className="font-montserrat font-semibold text-[0.68rem] uppercase tracking-[0.15em] text-[#E09B30]">{lvlInfo.sub}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* 2. Error Correction Mode Toggle */}
       <div style={{ marginBottom: 8, fontSize: '0.8rem', color: '#A7C7E7', fontWeight: 600 }}>
-        Error Correction Mode:
+        {t.pedagogy.modeHeading}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-        {correctionModes.map((m) => {
-          const isActive = correctionMode === m.id;
+        {correctionModes.map((modeId) => {
+          const isActive = correctionMode === modeId;
+          const modeInfo = t.pedagogy.modes[modeId];
           return (
             <button
-              key={m.id}
-              id={`correction-mode-${m.id}-btn`}
+              key={modeId}
+              id={`correction-mode-${modeId}-btn`}
               disabled={isLocked}
-              onClick={() => setCorrectionMode(m.id)}
+              onClick={() => setCorrectionMode(modeId)}
               style={{
                 padding: '10px 12px',
                 borderRadius: 'var(--radius-sm)',
@@ -173,7 +163,7 @@ export const TeachingCard: React.FC = () => {
                 textAlign: 'left',
                 transition: 'var(--transition)',
               }}
-              title={isLocked ? 'Settings locked during session' : m.desc}
+              title={isLocked ? t.pedagogy.lockedNotice : modeInfo.desc}
             >
               <div
                 style={{
@@ -186,11 +176,11 @@ export const TeachingCard: React.FC = () => {
                   color: isActive ? '#E09B30' : '#FAFAFA',
                 }}
               >
-                {m.id === 'conversation' ? <MessageSquare size={13} /> : <Sparkles size={13} />}
-                <span>{m.label}</span>
+                {modeId === 'conversation' ? <MessageSquare size={13} /> : <Sparkles size={13} />}
+                <span>{modeInfo.label}</span>
               </div>
               <div style={{ fontSize: '0.68rem', color: '#A7C7E7', lineHeight: 1.35 }}>
-                {m.desc}
+                {modeInfo.desc}
               </div>
             </button>
           );
@@ -199,11 +189,16 @@ export const TeachingCard: React.FC = () => {
 
       {/* 3. Conversation Scenario */}
       <div style={{ marginBottom: 8, fontSize: '0.8rem', color: '#A7C7E7', fontWeight: 600 }}>
-        Select Conversation Scenario:
+        {t.pedagogy.scenarioHeading}
       </div>
       <div className="topic-list" style={{ marginBottom: 16 }}>
         {availableScenarios.map((scenario) => {
           const isSelected = scenario.id === selectedScenarioId;
+          const i18nScenario = (t.scenarios as Record<string, { title: string; category: string; desc: string }>)[scenario.id];
+          const displayTitle = i18nScenario ? i18nScenario.title : scenario.title;
+          const displayCategory = i18nScenario ? i18nScenario.category : scenario.category;
+          const displayDesc = i18nScenario ? i18nScenario.desc : scenario.description;
+
           return (
             <div
               key={scenario.id}
@@ -216,10 +211,10 @@ export const TeachingCard: React.FC = () => {
               onClick={() => selectScenario(scenario.id)}
             >
               <div className="topic-header">
-                <span className="topic-title">{scenario.title}</span>
-                <span className="topic-category font-montserrat font-bold text-[0.68rem] uppercase tracking-[0.15em] text-[#E09B30]">{scenario.category}</span>
+                <span className="topic-title">{displayTitle}</span>
+                <span className="topic-category font-montserrat font-bold text-[0.68rem] uppercase tracking-[0.15em] text-[#E09B30]">{displayCategory}</span>
               </div>
-              <p className="topic-desc">{scenario.description}</p>
+              <p className="topic-desc">{displayDesc}</p>
             </div>
           );
         })}
@@ -230,7 +225,7 @@ export const TeachingCard: React.FC = () => {
         <div style={{ marginTop: 14, borderTop: '1px solid rgba(167, 199, 231, 0.2)', paddingTop: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: '#FAFAFA', marginBottom: 8 }}>
             <Award size={14} color="#E09B30" />
-            <strong>Target Vocabulary Focus:</strong>
+            <strong>{t.pedagogy.targetVocab}</strong>
           </div>
           <div className="tag-cloud">
             {activeScenario.targetVocabulary.map((vocab) => (
@@ -242,7 +237,7 @@ export const TeachingCard: React.FC = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: '#FAFAFA', marginTop: 12, marginBottom: 8 }}>
             <CheckCircle size={14} color="#10b981" />
-            <strong>Target Grammar Focus:</strong>
+            <strong>{t.pedagogy.targetGrammar}</strong>
           </div>
           <ul style={{ paddingLeft: 18, fontSize: '0.78rem', color: '#A7C7E7', lineHeight: 1.5 }}>
             {activeScenario.targetGrammar.map((grammar) => (
@@ -252,7 +247,7 @@ export const TeachingCard: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Collapsible 'Active Tutor Instructions' Panel (Requirement 6) */}
+      {/* 5. Collapsible 'Active Tutor Instructions' Panel */}
       <div
         id="active-tutor-instructions-panel"
         style={{
@@ -274,7 +269,7 @@ export const TeachingCard: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <FileText size={15} color="#818cf8" />
             <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#e2e8f0' }}>
-              Active Tutor Instructions
+              {t.pedagogy.instructionsTitle}
             </span>
             <span
               style={{
@@ -285,7 +280,7 @@ export const TeachingCard: React.FC = () => {
                 borderRadius: 4,
               }}
             >
-              {isLocked ? 'Session Active' : 'Live Preview'}
+              {isLocked ? t.pedagogy.sessionActiveTag : t.pedagogy.previewTag}
             </span>
           </div>
 
@@ -306,7 +301,7 @@ export const TeachingCard: React.FC = () => {
                 color: '#94a3b8',
               }}
             >
-              <span>Exact systemInstruction payload sent to Live API setup frame:</span>
+              <span>{t.pedagogy.instructionsNotice}</span>
               <button
                 className="level-btn"
                 style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4 }}
@@ -314,7 +309,7 @@ export const TeachingCard: React.FC = () => {
                 title="Copy instructions to clipboard"
               >
                 {copied ? <Check size={12} color="#34d399" /> : <Copy size={12} />}
-                <span>{copied ? 'Copied' : 'Copy'}</span>
+                <span>{copied ? t.pedagogy.copiedBtn : t.pedagogy.copyBtn}</span>
               </button>
             </div>
 
@@ -343,3 +338,5 @@ export const TeachingCard: React.FC = () => {
     </div>
   );
 };
+
+export default TeachingCard;

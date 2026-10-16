@@ -839,6 +839,51 @@ body {
   border-top-right-radius: 4px;
 }
 
+.live-speaking-bubble {
+  border-color: #E09B30 !important;
+  box-shadow: 0 0 16px rgba(224, 155, 48, 0.35) !important;
+  background: rgba(224, 155, 48, 0.22) !important;
+  animation: pulseSpeaking 1.6s infinite ease-in-out;
+}
+
+@keyframes pulseSpeaking {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(224, 155, 48, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(224, 155, 48, 0.55);
+  }
+}
+
+.live-speaking-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(224, 155, 48, 0.25);
+  border: 1px solid #E09B30;
+  color: #E09B30;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 6px;
+}
+
+.live-speaking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E09B30;
+  animation: liveDotPulse 0.9s infinite alternate;
+}
+
+@keyframes liveDotPulse {
+  0% { opacity: 0.35; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
 .assistant-bubble {
   background: rgba(18, 34, 58, 0.7);
   border: 1px solid var(--border-subtle);

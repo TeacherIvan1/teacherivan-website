@@ -1,9 +1,11 @@
 import React from 'react';
-import { Mic, Sparkles, Award, ArrowRight, ShieldCheck, Headphones, Zap } from 'lucide-react';
+import { Mic, Sparkles, ArrowRight, ShieldCheck, Headphones, Zap } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { useTranslation } from '../modules/i18n/languageStore';
 
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
+  const { t } = useTranslation();
   const isConnected = status === 'connected';
 
   const handleStartPractice = () => {
@@ -42,41 +44,43 @@ export const HeroSection: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAFAFA]/10 border border-[#A7C7E7]/40 mb-6 backdrop-blur-sm">
             <Sparkles size={14} className="text-[#E09B30]" />
             <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#FAFAFA]">
-              Human Mentorship + 24/7 AI Voice Immersion
+              {t.hero.badge}
             </span>
           </div>
 
           {/* Main H1 Headline */}
           <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-5xl leading-tight mb-6 tracking-tight text-[#FAFAFA]">
-            Master Spoken English with{' '}
+            {t.hero.titlePart1}
             <span className="text-[#E09B30] relative inline-block">
-              Teacher Ivan
+              {t.hero.titleTeacher}
               <span className="absolute bottom-0 left-0 w-full h-1 bg-[#E09B30]/40 rounded-full" />
             </span>
-            <br className="hidden sm:inline" /> & Instant AI Voice Coaching
+            <br className="hidden sm:inline" /> {t.hero.titlePart2}
           </h1>
 
           {/* Subtitle / Value Proposition */}
           <p className="font-inter text-base sm:text-lg text-[#A7C7E7] max-width-xl mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-            Overcome speaking hesitation through the proven <strong className="text-[#FAFAFA]">Hybrid Method</strong>: personalized 1-on-1 pedagogical guidance from Teacher Ivan, combined with unlimited, real-time voice practice powered by Google Gemini Live native audio.
+            {t.hero.subtitle}
           </p>
 
           {/* High-Converting CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
             <button
+              id="hero-start-practice-btn"
               onClick={handleStartPractice}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/30 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50"
             >
               <Mic size={18} />
-              <span>{isConnected ? 'Session Active (View Tutor)' : 'Start AI Voice Practice'}</span>
+              <span>{isConnected ? t.hero.sessionActive : t.hero.startPractice}</span>
               <ArrowRight size={16} />
             </button>
 
             <button
+              id="hero-the-method-btn"
               onClick={handleLearnMore}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-montserrat font-semibold text-sm uppercase tracking-[0.15em] bg-transparent border border-[#A7C7E7] text-[#FAFAFA] hover:bg-[#FAFAFA]/10 hover:border-[#FAFAFA] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C7E7]"
             >
-              <span>The Hybrid Method</span>
+              <span>{t.hero.theMethod}</span>
             </button>
           </div>
 
@@ -84,15 +88,15 @@ export const HeroSection: React.FC = () => {
           <div className="pt-6 border-t border-[#A7C7E7]/20 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-[#A7C7E7]">
             <div className="flex items-center gap-2">
               <Headphones size={16} className="text-[#E09B30]" />
-              <span>Gemini Live Native Audio (16k in / 24k out)</span>
+              <span>{t.hero.metricAudio}</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap size={16} className="text-[#E09B30]" />
-              <span>Instant Recasts & Zero Latency Delay</span>
+              <span>{t.hero.metricLatency}</span>
             </div>
             <div className="flex items-center gap-2">
               <ShieldCheck size={16} className="text-[#E09B30]" />
-              <span>CEFR A1–B2 & IELTS Band 7+ Curriculum</span>
+              <span>{t.hero.metricCefr}</span>
             </div>
           </div>
         </div>
@@ -105,11 +109,11 @@ export const HeroSection: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse" />
                 <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#FAFAFA]">
-                  Live Voice Assistant
+                  {t.hero.cardBadge}
                 </span>
               </div>
               <span className="text-[11px] font-mono font-medium text-[#A7C7E7] px-2 py-0.5 rounded bg-[#1A3153] border border-[#A7C7E7]/30">
-                Emma • AI Coach
+                {t.hero.coachName}
               </span>
             </div>
 
@@ -123,22 +127,22 @@ export const HeroSection: React.FC = () => {
                 />
               </div>
               <p className="mt-3 font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-                English Mastery Platform
+                {t.hero.platformTag}
               </p>
             </div>
 
             {/* Quick Interactive Snippet */}
             <div className="space-y-3">
               <div className="p-3 rounded-lg bg-[#1A3153]/70 border border-[#A7C7E7]/25 text-xs text-[#FAFAFA] flex items-center justify-between">
-                <span className="text-[#A7C7E7]">Curriculum Mode:</span>
+                <span className="text-[#A7C7E7]">{t.hero.curriculumMode}</span>
                 <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#E09B30]">
-                  Conversational Recast
+                  {t.hero.curriculumVal}
                 </span>
               </div>
               <div className="p-3 rounded-lg bg-[#1A3153]/70 border border-[#A7C7E7]/25 text-xs text-[#FAFAFA] flex items-center justify-between">
-                <span className="text-[#A7C7E7]">CEFR Range:</span>
+                <span className="text-[#A7C7E7]">{t.hero.cefrRange}</span>
                 <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#FAFAFA]">
-                  A1 – B2 / IELTS Prep
+                  {t.hero.cefrVal}
                 </span>
               </div>
             </div>
@@ -148,3 +152,5 @@ export const HeroSection: React.FC = () => {
     </section>
   );
 };
+
+export default HeroSection;

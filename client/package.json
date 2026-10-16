@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "node --import tsx --test src/modules/audio/interruption.test.ts src/modules/latency/latency.test.ts src/modules/report/report.test.ts src/modules/teaching/teaching.test.ts"
+    "test": "node --import tsx --test src/modules/audio/interruption.test.ts src/modules/latency/latency.test.ts src/modules/report/report.test.ts src/modules/teaching/teaching.test.ts src/modules/i18n/i18n.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.475.0",

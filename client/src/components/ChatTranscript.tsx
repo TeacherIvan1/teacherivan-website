@@ -3,7 +3,6 @@ import {
   Mic,
   MicOff,
   Volume2,
-  VolumeX,
   Send,
   Trash2,
   Sparkles,
@@ -13,6 +12,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { useTranslation } from '../modules/i18n/languageStore';
 
 export const ChatTranscript: React.FC = () => {
   const {
@@ -26,6 +26,7 @@ export const ChatTranscript: React.FC = () => {
     sendUserTextMessage,
   } = useConversationStore();
 
+  const { t } = useTranslation();
   const [inputMessage, setInputMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -55,13 +56,13 @@ export const ChatTranscript: React.FC = () => {
           </div>
           <div>
             <h2 className="panel-title" style={{ fontSize: '1.05rem', margin: 0 }}>
-              Live Voice Transcript
+              {t.transcript.title}
             </h2>
             <div style={{ fontSize: '0.74rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span>Bidirectional Audio Transcriptions</span>
+              <span>{t.transcript.subtitle}</span>
               {isConnected && (
                 <span className="live-pill">
-                  <span className="live-dot" /> LIVE
+                  <span className="live-dot" /> {t.transcript.live}
                 </span>
               )}
             </div>
@@ -75,7 +76,7 @@ export const ChatTranscript: React.FC = () => {
               {/* Mic Level Meter */}
               <div
                 className="mic-level-badge"
-                title={`Microphone Level: ${micLevel}%`}
+                title={`${t.transcript.micLevel} ${micLevel}%`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -126,7 +127,7 @@ export const ChatTranscript: React.FC = () => {
                   }}
                 >
                   <Volume2 size={13} />
-                  <span>Emma Speaking</span>
+                  <span>{t.transcript.emmaSpeaking}</span>
                   <div className="wave-animation">
                     <span />
                     <span />
@@ -139,7 +140,7 @@ export const ChatTranscript: React.FC = () => {
               <button
                 className={`icon-btn ${isMuted ? 'muted' : ''}`}
                 onClick={toggleMute}
-                title={isMuted ? 'Unmute Microphone' : 'Mute Microphone'}
+                title={isMuted ? t.transcript.unmute : t.transcript.mute}
               >
                 {isMuted ? <MicOff size={15} color="#f87171" /> : <Mic size={15} />}
               </button>
@@ -151,7 +152,7 @@ export const ChatTranscript: React.FC = () => {
             <button
               className="icon-btn"
               onClick={clearMessages}
-              title="Clear Transcript"
+              title={t.transcript.clear}
             >
               <Trash2 size={15} />
             </button>
@@ -167,10 +168,10 @@ export const ChatTranscript: React.FC = () => {
               <Sparkles size={28} color="#818cf8" />
             </div>
             <div style={{ fontWeight: 600, fontSize: '0.98rem', color: '#e2e8f0', marginBottom: 4 }}>
-              Spoken Transcript Awaiting Voice
+              {t.transcript.emptyTitle}
             </div>
             <p style={{ fontSize: '0.82rem', color: '#94a3b8', maxWidth: 360, margin: '0 auto', lineHeight: 1.5 }}>
-              Click <strong>Start Practice Session</strong> to begin. As you and Emma speak, your words will be transcribed in real time.
+              {t.transcript.emptyDesc}
             </p>
           </div>
         ) : (
@@ -186,6 +187,7 @@ export const ChatTranscript: React.FC = () => {
             }
 
             const isUser = item.role === 'user';
+            const isUserSpeakingInterim = isUser && item.isInterim;
 
             return (
               <div
@@ -196,14 +198,30 @@ export const ChatTranscript: React.FC = () => {
                   {isUser ? <User size={14} /> : <Bot size={14} />}
                 </div>
 
-                <div className={`transcript-bubble ${isUser ? 'user-bubble' : 'assistant-bubble'} ${item.isInterrupted ? 'interrupted-bubble' : ''}`}>
+                <div
+                  className={`transcript-bubble ${
+                    isUser ? 'user-bubble' : 'assistant-bubble'
+                  } ${isUserSpeakingInterim ? 'live-speaking-bubble' : ''} ${
+                    item.isInterrupted ? 'interrupted-bubble' : ''
+                  }`}
+                >
                   <div className="bubble-header">
                     <span className={`bubble-author ${item.isInterrupted ? 'interrupted-author' : ''}`}>
-                      {isUser
-                        ? 'You'
-                        : item.isInterrupted
-                        ? 'Emma (interrupted)'
-                        : 'Emma (Tutor)'}
+                      {isUser ? (
+                        <>
+                          <span>{t.transcript.you}</span>
+                          {isUserSpeakingInterim && (
+                            <span className="live-speaking-pill">
+                              <span className="live-speaking-dot" />
+                              {t.transcript.speaking}
+                            </span>
+                          )}
+                        </>
+                      ) : item.isInterrupted ? (
+                        t.transcript.interruptedTutor
+                      ) : (
+                        t.transcript.tutor
+                      )}
                     </span>
                     <span className="bubble-time">{item.timestamp}</span>
                   </div>
@@ -212,7 +230,7 @@ export const ChatTranscript: React.FC = () => {
                     {item.content}
                     {item.isInterrupted && (
                       <span className="interrupted-pill" title="Tutor speech cut off by learner barge-in">
-                        ⚡ interrupted
+                        {t.transcript.interruptedPill}
                       </span>
                     )}
                     {item.isInterim && !item.isInterrupted && <span className="typing-cursor" />}
@@ -231,8 +249,8 @@ export const ChatTranscript: React.FC = () => {
           id="chat-message-input"
           placeholder={
             isConnected
-              ? 'Speak into microphone or type a message to Emma...'
-              : 'Connect session to chat or practice speaking...'
+              ? t.transcript.placeholderConnected
+              : t.transcript.placeholderDisconnected
           }
           value={inputMessage}
           disabled={!isConnected}
@@ -244,7 +262,7 @@ export const ChatTranscript: React.FC = () => {
           id="send-message-btn"
           disabled={!isConnected || !inputMessage.trim()}
           className="chat-send-btn"
-          title="Send text turn to Gemini Live"
+          title={t.transcript.sendTurn}
         >
           <Send size={15} />
         </button>
@@ -252,3 +270,5 @@ export const ChatTranscript: React.FC = () => {
     </div>
   );
 };
+
+export default ChatTranscript;

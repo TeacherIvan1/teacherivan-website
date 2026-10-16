@@ -130,10 +130,12 @@ export const useConversationStore = create<ConversationState>((set, get) => {
           },
 
           onOutputTranscription: (text: string) => {
+            get().finalizeTurn('user');
             get().appendInterimText('assistant', text);
           },
 
           onAudioChunk: (pcmBase64: string, turnId?: number) => {
+            get().finalizeTurn('user');
             audioManager.playChunk(pcmBase64, turnId).catch((err) => {
               console.warn('[Audio Playback Warning]:', err);
             });
@@ -287,9 +289,13 @@ export const useConversationStore = create<ConversationState>((set, get) => {
       const messages = [...state.messages];
       const lastMsg = messages[messages.length - 1];
 
-      // If the last message matches the role and is marked interim, append text
+      // If the last message matches the role and is marked interim, append/update text
       if (lastMsg && lastMsg.role === role && lastMsg.isInterim) {
-        lastMsg.content = lastMsg.content + textChunk;
+        if (textChunk.startsWith(lastMsg.content)) {
+          lastMsg.content = textChunk;
+        } else {
+          lastMsg.content = lastMsg.content + textChunk;
+        }
         return { messages };
       }
 

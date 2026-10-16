@@ -6,8 +6,6 @@ import {
   RefreshCw,
   CheckCircle2,
   BookOpen,
-  Clock,
-  MessageSquare,
   Trash2,
   X,
   Play,
@@ -18,7 +16,7 @@ import {
 import { useReportStore } from '../modules/report/reportStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
-import { SessionReport } from '../modules/report/types';
+import { useTranslation } from '../modules/i18n/languageStore';
 
 export const SessionReportPanel: React.FC = () => {
   const {
@@ -42,6 +40,7 @@ export const SessionReportPanel: React.FC = () => {
 
   const startSession = useConversationStore((s) => s.startSession);
   const setCustomExerciseScenario = useTeachingStore((s) => s.setCustomExerciseScenario);
+  const { t } = useTranslation();
 
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
 
@@ -49,16 +48,12 @@ export const SessionReportPanel: React.FC = () => {
     loadSavedReports();
   }, [loadSavedReports]);
 
-  // Handler for 'Practice this exercise' button (Requirement 5)
+  // Handler for 'Practice this exercise' button
   const handlePracticeExercise = (exerciseText: string) => {
     setCustomExerciseScenario(exerciseText);
     dismissReport();
     startSession();
   };
-
-  // If reports are disabled and no active report or notices, show simple setting toggle in panel
-  const hasActiveContent =
-    isGenerating || currentReport || error || tooShortNotice || isHistoryOpen;
 
   return (
     <div className="glass-panel" id="session-report-container" style={{ padding: '20px 24px' }}>
@@ -82,10 +77,10 @@ export const SessionReportPanel: React.FC = () => {
           </div>
           <div>
             <h2 className="panel-title" style={{ fontSize: '1.05rem', margin: 0 }}>
-              End-of-Session Pedagogical Report
+              {t.report.headerTitle}
             </h2>
             <div style={{ fontSize: '0.74rem', color: '#A7C7E7' }}>
-              Structured AI analysis via Gemini Flash with automated fallback (Server-Side)
+              {t.report.headerSubtitle}
             </div>
           </div>
         </div>
@@ -109,7 +104,7 @@ export const SessionReportPanel: React.FC = () => {
             title="View past session reports stored in IndexedDB"
           >
             <History size={14} />
-            <span>History ({savedReports.length})</span>
+            <span>{t.report.historyBtn} ({savedReports.length})</span>
           </button>
 
           {/* Dismiss button when report or notice is visible */}
@@ -266,10 +261,10 @@ export const SessionReportPanel: React.FC = () => {
         >
           <div className="spinner" style={{ margin: '0 auto 12px', width: 26, height: 26, border: '3px solid rgba(99, 102, 241, 0.2)', borderTopColor: '#818cf8', borderRadius: '50%' }} />
           <div style={{ fontSize: '0.92rem', fontWeight: 600, color: '#f3f4f6', marginBottom: 4 }}>
-            Analyzing Session Transcript...
+            {t.report.analyzingTitle}
           </div>
           <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0 }}>
-            Gemini Flash is identifying strengths, verbatim grammar feedback, and your next exercise.
+            {t.report.analyzingSubtitle}
           </p>
         </div>
       )}
@@ -294,7 +289,7 @@ export const SessionReportPanel: React.FC = () => {
         >
           <Info size={18} color="#fbbf24" style={{ flexShrink: 0, marginTop: 2 }} />
           <div>
-            <strong>Session Too Short for Pedagogical Analysis:</strong>
+            <strong>{t.report.tooShortTitle}</strong>
             <p style={{ margin: '4px 0 0', color: '#cbd5e1', fontSize: '0.8rem' }}>
               {tooShortNotice}
             </p>
@@ -323,7 +318,7 @@ export const SessionReportPanel: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <AlertCircle size={18} style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
-              <strong>{isRateLimited ? 'Rate Limit Reached' : 'Report Generation Error'}:</strong>
+              <strong>{isRateLimited ? t.report.rateLimitTitle : t.report.errorTitle}:</strong>
               <div style={{ marginTop: 2, color: 'var(--text-main)', fontSize: '0.8rem' }}>{error}</div>
             </div>
           </div>
@@ -341,7 +336,7 @@ export const SessionReportPanel: React.FC = () => {
             onClick={retryGeneration}
           >
             <RefreshCw size={13} />
-            <span>Retry</span>
+            <span>{t.report.retry}</span>
           </button>
         </div>
       )}
@@ -363,26 +358,26 @@ export const SessionReportPanel: React.FC = () => {
             }}
           >
             <div>
-              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Duration</div>
+              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>{t.report.duration}</div>
               <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f3f4f6' }}>{currentReport.stats.durationFormatted}</div>
             </div>
             <div>
-              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Learner Turns</div>
+              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>{t.report.turns}</div>
               <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#38bdf8' }}>{currentReport.stats.learnerTurns}</div>
             </div>
             <div>
-              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Words Spoken</div>
+              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>{t.report.words}</div>
               <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#34d399' }}>{currentReport.stats.learnerWords}</div>
             </div>
             <div>
-              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Est. Pace</div>
+              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>{t.report.pace}</div>
               <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fbbf24' }}>
-                ~{currentReport.stats.estimatedWpm} <span style={{ fontSize: '0.68rem', fontWeight: 400, color: '#94a3b8' }}>WPM (approx)</span>
+                ~{currentReport.stats.estimatedWpm} <span style={{ fontSize: '0.68rem', fontWeight: 400, color: '#94a3b8' }}>{t.report.wpmUnit}</span>
               </div>
             </div>
             {currentReport.modelUsed && (
               <div>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Model</div>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>{t.report.model}</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#a78bfa' }}>{currentReport.modelUsed}</div>
               </div>
             )}
@@ -399,7 +394,7 @@ export const SessionReportPanel: React.FC = () => {
             }}
           >
             <div style={{ fontSize: '0.74rem', color: '#818cf8', textTransform: 'uppercase', fontWeight: 700, marginBottom: 4 }}>
-              Pedagogical Evaluation
+              {t.report.summaryTitle}
             </div>
             <p style={{ fontSize: '0.86rem', color: '#f3f4f6', lineHeight: 1.5, margin: 0 }}>
               {currentReport.summary}
@@ -411,7 +406,7 @@ export const SessionReportPanel: React.FC = () => {
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, color: '#34d399', marginBottom: 8 }}>
                 <CheckCircle2 size={16} />
-                <span>Demonstrated Strengths</span>
+                <span>{t.report.strengthsTitle}</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {currentReport.strengths.map((str, idx) => (
@@ -438,7 +433,7 @@ export const SessionReportPanel: React.FC = () => {
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, color: '#f59e0b', marginBottom: 8 }}>
               <Award size={16} />
-              <span>Targeted Corrections &amp; Natural Usage</span>
+              <span>{t.report.correctionsTitle}</span>
             </div>
 
             {currentReport.topErrors.length === 0 ? (
@@ -452,7 +447,7 @@ export const SessionReportPanel: React.FC = () => {
                   color: '#a7f3d0',
                 }}
               >
-                No major grammatical errors detected in this session. Clean, accurate spoken execution!
+                {t.report.noErrors}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -467,10 +462,10 @@ export const SessionReportPanel: React.FC = () => {
                     }}
                   >
                     <div style={{ fontSize: '0.76rem', color: '#f87171', marginBottom: 3 }}>
-                      <strong>You said:</strong> "{err.original}"
+                      <strong>{t.report.youSaid}</strong> "{err.original}"
                     </div>
                     <div style={{ fontSize: '0.8rem', color: '#34d399', fontWeight: 600, marginBottom: 4 }}>
-                      <strong>More natural:</strong> "{err.corrected}"
+                      <strong>{t.report.moreNatural}</strong> "{err.corrected}"
                     </div>
                     <div style={{ fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.4 }}>
                       {err.explanation}
@@ -485,7 +480,7 @@ export const SessionReportPanel: React.FC = () => {
           {currentReport.vocabularyUsed.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600, marginBottom: 6 }}>
-                Target Vocabulary Successfully Applied:
+                {t.report.vocabTitle}
               </div>
               <div className="tag-cloud">
                 {currentReport.vocabularyUsed.map((vocab, idx) => (
@@ -497,7 +492,7 @@ export const SessionReportPanel: React.FC = () => {
             </div>
           )}
 
-          {/* Next Exercise & 'Practice This Exercise' Button (Requirement 5) */}
+          {/* Next Exercise & 'Practice This Exercise' Button */}
           <div
             style={{
               padding: '14px 16px',
@@ -509,7 +504,7 @@ export const SessionReportPanel: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: '#E09B30', fontWeight: 700, marginBottom: 4 }}>
               <Sparkles size={14} />
-              <span>Recommended Follow-Up Exercise</span>
+              <span>{t.report.exerciseTitle}</span>
             </div>
             <p style={{ fontSize: '0.82rem', color: '#FAFAFA', lineHeight: 1.45, marginBottom: 12 }}>
               {currentReport.nextExercise}
@@ -528,11 +523,11 @@ export const SessionReportPanel: React.FC = () => {
               onClick={() => handlePracticeExercise(currentReport.nextExercise)}
             >
               <Play size={15} fill="currentColor" />
-              <span>Practice this exercise now</span>
+              <span>{t.report.practiceBtn}</span>
             </button>
           </div>
 
-          {/* Pronunciation Note Disclaimer (Requirement 4) */}
+          {/* Pronunciation Note Disclaimer */}
           <div
             style={{
               fontSize: '0.72rem',
@@ -547,7 +542,7 @@ export const SessionReportPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Privacy Notice & Settings Toggle (Requirement 7) */}
+      {/* Privacy Notice & Settings Toggle */}
       <div
         style={{
           marginTop: currentReport || isGenerating ? 12 : 0,
@@ -565,11 +560,11 @@ export const SessionReportPanel: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Shield size={13} color="#94a3b8" />
           <span>
-            <strong>Privacy Guarantee:</strong> Only text transcripts are sent to Google Gemini (<code>Gemini Flash fallback chain</code>) for analysis. Raw audio is never stored.
+            {t.report.privacyNote}
           </span>
         </div>
 
-        {/* Setting Toggle: Generate Reports (Requirement 7) */}
+        {/* Setting Toggle: Generate Reports */}
         <label
           style={{
             display: 'flex',
@@ -588,9 +583,11 @@ export const SessionReportPanel: React.FC = () => {
             onChange={(e) => setReportsEnabled(e.target.checked)}
             style={{ cursor: 'pointer' }}
           />
-          <span>Generate AI reports on session end</span>
+          <span>{t.report.toggleReports}</span>
         </label>
       </div>
     </div>
   );
 };
+
+export default SessionReportPanel;

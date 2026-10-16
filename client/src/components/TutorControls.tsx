@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useDebugStore } from '../modules/debug/debugLogger';
+import { useTranslation } from '../modules/i18n/languageStore';
 
 export const TutorControls: React.FC = () => {
   const lastCloseCode = useDebugStore((s) => s.lastCloseCode);
@@ -29,6 +30,7 @@ export const TutorControls: React.FC = () => {
     clearError,
   } = useConversationStore();
 
+  const { t } = useTranslation();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Timer counter when session is active
@@ -57,10 +59,9 @@ export const TutorControls: React.FC = () => {
 
   return (
     <div className="glass-panel hero-controls-panel" id="tutor-controls-panel">
-      <h1 className="session-h1">Real-Time Voice Tutor</h1>
+      <h1 className="session-h1">{t.tutorConsole.sessionH1}</h1>
       <p className="session-tagline">
-        Interactive conversational English coaching powered by Gemini Live API native audio.
-        AudioWorklet captures your mic at 16kHz, model speaks at 24kHz, with real-time transcriptions.
+        {t.tutorConsole.sessionTagline}
       </p>
 
       <div className="button-stage">
@@ -76,17 +77,17 @@ export const TutorControls: React.FC = () => {
             {isRequesting ? (
               <>
                 <Loader2 className="spinner" size={20} />
-                <span>Minting Ephemeral Token...</span>
+                <span>{t.tutorConsole.mintingToken}</span>
               </>
             ) : isConnecting ? (
               <>
                 <Loader2 className="spinner" size={20} />
-                <span>Connecting to Live API...</span>
+                <span>{t.tutorConsole.connectingLive}</span>
               </>
             ) : (
               <>
                 <Play size={20} fill="currentColor" />
-                <span>Start Practice Session</span>
+                <span>{t.tutorConsole.startBtn}</span>
               </>
             )}
           </button>
@@ -97,7 +98,7 @@ export const TutorControls: React.FC = () => {
             onClick={() => stopSession()}
           >
             <Square size={20} fill="currentColor" />
-            <span>Stop Session</span>
+            <span>{t.tutorConsole.stopBtn}</span>
           </button>
         )}
       </div>
@@ -106,7 +107,7 @@ export const TutorControls: React.FC = () => {
       <div className="session-metrics" id="session-metrics-bar">
         <div className="metric-item">
           <Clock size={15} />
-          <span>Duration:</span>
+          <span>{t.tutorConsole.duration}</span>
           <span className="metric-value">{formatTimer(elapsedSeconds)}</span>
         </div>
 
@@ -114,7 +115,7 @@ export const TutorControls: React.FC = () => {
 
         <div className="metric-item">
           <Cpu size={15} />
-          <span>Model:</span>
+          <span>{t.tutorConsole.model}</span>
           <span className="metric-value truncate max-w-[140px] sm:max-w-none" title={tokenInfo?.model || 'gemini-2.5-flash-native-audio-latest'}>
             {tokenInfo?.model || 'gemini-2.5-flash-native-audio-latest'}
           </span>
@@ -124,9 +125,9 @@ export const TutorControls: React.FC = () => {
 
         <div className="metric-item">
           <Radio size={15} color={isConnected ? '#34d399' : '#94a3b8'} />
-          <span>Audio:</span>
+          <span>{t.tutorConsole.audio}</span>
           <span className="metric-value" style={{ color: isConnected ? '#34d399' : '#94a3b8' }}>
-            {isConnected ? '16k In / 24k Out' : 'Ready'}
+            {isConnected ? '16k In / 24k Out' : t.tutorConsole.ready}
           </span>
         </div>
       </div>
@@ -138,14 +139,14 @@ export const TutorControls: React.FC = () => {
             <div className={`status-indicator-dot ${micLevel > 5 ? 'active-pulse' : ''}`} />
             <Mic size={16} color="#818cf8" />
             <span>
-              Mic Stream: <strong>{micLevel > 5 ? 'Detecting Speech' : 'Listening...'}</strong>
+              {t.tutorConsole.micStream} <strong>{micLevel > 5 ? t.tutorConsole.micDetecting : t.tutorConsole.micListening}</strong>
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Volume2 size={16} color={isTutorSpeaking ? '#34d399' : '#94a3b8'} />
             <span>
-              Tutor Voice: <strong>{isTutorSpeaking ? 'Speaking' : 'Idle'}</strong>
+              {t.tutorConsole.tutorVoice} <strong>{isTutorSpeaking ? t.tutorConsole.tutorSpeaking : t.tutorConsole.tutorIdle}</strong>
             </span>
           </div>
         </div>
@@ -153,8 +154,7 @@ export const TutorControls: React.FC = () => {
         <div className="audio-phase-notice" style={{ marginTop: 20 }}>
           <Radio size={16} color="#38bdf8" />
           <span>
-            <strong>Gemini Live Native Audio:</strong> AudioWorklet mic streaming (16kHz linear PCM),
-            queued buffer player (24kHz PCM), and bidirectional speech transcriptions.
+            {t.tutorConsole.streamingNotice}
           </span>
         </div>
       )}
@@ -166,11 +166,11 @@ export const TutorControls: React.FC = () => {
             <AlertCircle size={20} style={{ flexShrink: 0, marginTop: 2, color: '#f87171' }} />
             <div style={{ flex: 1, fontSize: '0.85rem', lineHeight: 1.45 }}>
               <div>
-                <strong style={{ color: '#fca5a5' }}>Connection Error:</strong> {errorMessage}
+                <strong style={{ color: '#fca5a5' }}>{t.tutorConsole.connectionError}</strong> {errorMessage}
               </div>
               {lastCloseCode !== null && (
                 <div style={{ marginTop: 4, fontSize: '0.76rem', color: '#fecaca', opacity: 0.9 }}>
-                  WebSocket Close Code: <code>{lastCloseCode}</code> {lastCloseReason ? `— Reason: ${lastCloseReason}` : ''}
+                  {t.tutorConsole.wsCode} <code>{lastCloseCode}</code> {lastCloseReason ? `— Reason: ${lastCloseReason}` : ''}
                 </div>
               )}
             </div>
@@ -200,7 +200,7 @@ export const TutorControls: React.FC = () => {
               }}
             >
               <RotateCcw size={14} />
-              <span>Retry Connection (Mint New Token)</span>
+              <span>{t.tutorConsole.retryBtn}</span>
             </button>
           </div>
         </div>
@@ -208,3 +208,5 @@ export const TutorControls: React.FC = () => {
     </div>
   );
 };
+
+export default TutorControls;

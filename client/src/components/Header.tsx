@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Server, CheckCircle2, AlertTriangle, MessageCircle, Calendar } from 'lucide-react';
+import { Shield, Server, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
 import { checkServerHealth } from '../modules/auth/tokenService';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { useTranslation } from '../modules/i18n/languageStore';
+import { LanguageToggle } from './LanguageToggle';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
   const status = useConversationStore((s) => s.status);
+  const { t } = useTranslation();
 
   useEffect(() => {
     let mounted = true;
@@ -38,6 +41,14 @@ export const Header: React.FC = () => {
     };
   }, []);
 
+  const getSessionStatusLabel = (): string => {
+    if (status === 'requesting_token') return t.nav.sessionStatus.requesting_token;
+    if (status === 'connecting') return t.nav.sessionStatus.connecting;
+    if (status === 'connected') return t.nav.sessionStatus.connected;
+    if (status === 'error') return t.nav.sessionStatus.error;
+    return t.nav.sessionStatus.idle;
+  };
+
   return (
     <header className="app-header" id="app-header">
       <div className="flex items-center gap-6">
@@ -60,43 +71,46 @@ export const Header: React.FC = () => {
             href="#voice-tutor-showcase"
             className="text-[#FAFAFA] hover:text-[#E09B30] transition-colors"
           >
-            AI Voice Tutor
+            {t.nav.voiceTutor}
           </a>
           <a
             href="#hybrid-method-section"
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
-            The Hybrid Method
+            {t.nav.hybridMethod}
           </a>
           <a
             href="#learning-paths-section"
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
-            Learning Paths
+            {t.nav.learningPaths}
           </a>
           <a
             href="#session-report-panel"
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
-            Pedagogical Reports
+            {t.nav.pedagogicalReports}
           </a>
         </nav>
       </div>
 
       <div className="header-meta-group flex items-center gap-3">
+        {/* Language Switcher (EN | ES) */}
+        <LanguageToggle id="header-lang-toggle" />
+
         {/* Backend Status Badge */}
         <div className="status-badge hidden sm:inline-flex" title="Backend Server Status" id="backend-status-badge">
           <Server size={14} color="#A7C7E7" />
-          <span className="text-[#A7C7E7]">Server:</span>
+          <span className="text-[#A7C7E7]">{t.nav.server}</span>
           {serverOk === null ? (
-            <span style={{ color: '#94a3b8' }}>Checking...</span>
+            <span style={{ color: '#94a3b8' }}>{t.nav.checking}</span>
           ) : serverOk ? (
             <span style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <CheckCircle2 size={12} /> Online
+              <CheckCircle2 size={12} /> {t.nav.online}
             </span>
           ) : (
             <span style={{ color: '#f87171', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <AlertTriangle size={12} /> Offline
+              <AlertTriangle size={12} /> {t.nav.offline}
             </span>
           )}
         </div>
@@ -104,13 +118,13 @@ export const Header: React.FC = () => {
         {/* Master Key Security Badge */}
         <div className="status-badge hidden md:inline-flex" title="Master API Key is safely guarded on Express server" id="key-security-badge">
           <Shield size={14} color="#A7C7E7" />
-          <span className="text-[#A7C7E7]">Key:</span>
+          <span className="text-[#A7C7E7]">{t.nav.key}</span>
           {keyConfigured === null ? (
             <span style={{ color: '#94a3b8' }}>...</span>
           ) : keyConfigured ? (
-            <span style={{ color: '#A7C7E7' }}>Guarded</span>
+            <span style={{ color: '#A7C7E7' }}>{t.nav.guarded}</span>
           ) : (
-            <span style={{ color: '#E09B30' }}>Missing .env</span>
+            <span style={{ color: '#E09B30' }}>{t.nav.missingKey}</span>
           )}
         </div>
 
@@ -118,7 +132,7 @@ export const Header: React.FC = () => {
         <div className="status-badge" id="session-status-badge">
           <span className={`status-dot ${status === 'connected' ? 'connected' : status === 'requesting_token' ? 'connecting' : status === 'error' ? 'error' : 'idle'}`} />
           <span style={{ textTransform: 'capitalize' }}>
-            {status === 'requesting_token' ? 'Minting...' : status}
+            {getSessionStatusLabel()}
           </span>
         </div>
 
@@ -136,9 +150,11 @@ export const Header: React.FC = () => {
           className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full font-montserrat font-bold text-xs uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FAFAFA]"
         >
           <Calendar size={13} />
-          <span>Book Class</span>
+          <span>{t.nav.bookClass}</span>
         </a>
       </div>
     </header>
   );
 };
+
+export default Header;
