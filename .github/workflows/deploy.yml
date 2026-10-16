@@ -41,7 +41,7 @@ jobs:
       - name: Build client workspace
         run: npm run build -w client
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL || secrets.VITE_API_URL }}
+          VITE_API_URL: https://teacherivan-website.onrender.com
           VITE_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL }}
 
       - name: Setup Pages

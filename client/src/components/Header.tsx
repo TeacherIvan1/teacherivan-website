@@ -9,15 +9,33 @@ export const Header: React.FC = () => {
   const status = useConversationStore((s) => s.status);
 
   useEffect(() => {
-    checkServerHealth()
-      .then((data) => {
-        setServerOk(true);
-        setKeyConfigured(data.apiKeyConfigured);
-      })
-      .catch(() => {
-        setServerOk(false);
-        setKeyConfigured(false);
-      });
+    let mounted = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const check = () => {
+      checkServerHealth()
+        .then((data) => {
+          if (!mounted) return;
+          setServerOk(true);
+          setKeyConfigured(data.apiKeyConfigured);
+        })
+        .catch(() => {
+          if (!mounted) return;
+          setServerOk(false);
+          setKeyConfigured(false);
+          // If server is spinning up from cold sleep on Render, retry in 5s
+          timer = setTimeout(() => {
+            if (mounted) check();
+          }, 5000);
+        });
+    };
+
+    check();
+
+    return () => {
+      mounted = false;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   return (

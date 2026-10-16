@@ -17,8 +17,54 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const app = express();
 const port = parseInt(process.env.PORT || '3001', 10);
 
+// Allowed CORS origins
+const allowedOrigins = [
+  'https://teacherivan.com',
+  'http://teacherivan.com',
+  'https://www.teacherivan.com',
+  'http://www.teacherivan.com',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server, Render health checks)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Check explicitly permitted origins
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow any custom domain or environment override if configured
+      if (
+        process.env.ALLOWED_ORIGINS &&
+        process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).includes(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      // Also allow github.io preview domains or internal onrender domains
+      if (origin.endsWith('.github.io') || origin.endsWith('.onrender.com')) {
+        return callback(null, true);
+      }
+
+      // Allow origin reflection for development and non-listed clients
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  })
+);
+
 app.use(express.json());
 
 // Routes

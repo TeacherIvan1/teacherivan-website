@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { TutorControls } from './components/TutorControls';
@@ -11,8 +11,24 @@ import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { HybridMethodSection } from './components/HybridMethodSection';
 import { LearningPathsSection } from './components/LearningPathsSection';
 import { Sparkles, Headphones, Shield, Heart } from 'lucide-react';
+import { API_BASE_URL } from './config/api';
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Silently wake up the free Render backend instance immediately as page loads
+    // so it is primed and ready when the student interacts with the voice tutor
+    try {
+      fetch(`${API_BASE_URL}/api/health`, {
+        method: 'GET',
+        keepalive: true,
+      }).catch(() => {
+        // Non-blocking background warm-up: ignore transient network or cold-start errors
+      });
+    } catch {
+      // Non-blocking catch
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter">
       {/* 1. Official Platform Header */}
