@@ -3,6 +3,8 @@ import { Shield, Server, CheckCircle2, AlertTriangle, Calendar } from 'lucide-re
 import { checkServerHealth } from '../modules/auth/tokenService';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { useDevModeStore } from '../modules/dev/devModeStore';
+import { useReportStore } from '../modules/report/reportStore';
 import { LanguageToggle } from './LanguageToggle';
 
 export const Header: React.FC = () => {
@@ -49,6 +51,8 @@ export const Header: React.FC = () => {
     return t.nav.sessionStatus.idle;
   };
 
+  const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
+
   return (
     <header className="app-header" id="app-header">
       <div className="flex items-center gap-6">
@@ -87,6 +91,20 @@ export const Header: React.FC = () => {
           </a>
           <a
             href="#session-report-panel"
+            onClick={(e) => {
+              if (!isDeveloperMode) {
+                e.preventDefault();
+                const repStore = useReportStore.getState();
+                if (repStore.currentReport || repStore.savedReports.length > 0) {
+                  repStore.setModalOpen(true);
+                } else {
+                  const tutorEl = document.getElementById('start-session-btn');
+                  if (tutorEl) {
+                    tutorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }
+              }
+            }}
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
             {t.nav.pedagogicalReports}
@@ -98,43 +116,53 @@ export const Header: React.FC = () => {
         {/* Language Switcher (EN | ES) */}
         <LanguageToggle id="header-lang-toggle" />
 
-        {/* Backend Status Badge */}
-        <div className="status-badge hidden sm:inline-flex" title="Backend Server Status" id="backend-status-badge">
-          <Server size={14} color="#A7C7E7" />
-          <span className="text-[#A7C7E7]">{t.nav.server}</span>
-          {serverOk === null ? (
-            <span style={{ color: '#94a3b8' }}>{t.nav.checking}</span>
-          ) : serverOk ? (
-            <span style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <CheckCircle2 size={12} /> {t.nav.online}
-            </span>
-          ) : (
-            <span style={{ color: '#f87171', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <AlertTriangle size={12} /> {t.nav.offline}
-            </span>
-          )}
-        </div>
+        {/* Technical/Engineering UI — ONLY visible in Developer Mode */}
+        {isDeveloperMode && (
+          <>
+            {/* Backend Status Badge */}
+            <div className="status-badge hidden sm:inline-flex" title="Backend Server Status" id="backend-status-badge">
+              <Server size={14} color="#A7C7E7" />
+              <span className="text-[#A7C7E7]">{t.nav.server}</span>
+              {serverOk === null ? (
+                <span style={{ color: '#94a3b8' }}>{t.nav.checking}</span>
+              ) : serverOk ? (
+                <span style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <CheckCircle2 size={12} /> {t.nav.online}
+                </span>
+              ) : (
+                <span style={{ color: '#f87171', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <AlertTriangle size={12} /> {t.nav.offline}
+                </span>
+              )}
+            </div>
 
-        {/* Master Key Security Badge */}
-        <div className="status-badge hidden md:inline-flex" title="Master API Key is safely guarded on Express server" id="key-security-badge">
-          <Shield size={14} color="#A7C7E7" />
-          <span className="text-[#A7C7E7]">{t.nav.key}</span>
-          {keyConfigured === null ? (
-            <span style={{ color: '#94a3b8' }}>...</span>
-          ) : keyConfigured ? (
-            <span style={{ color: '#A7C7E7' }}>{t.nav.guarded}</span>
-          ) : (
-            <span style={{ color: '#E09B30' }}>{t.nav.missingKey}</span>
-          )}
-        </div>
+            {/* Master Key Security Badge */}
+            <div className="status-badge hidden md:inline-flex" title="Master API Key is safely guarded on Express server" id="key-security-badge">
+              <Shield size={14} color="#A7C7E7" />
+              <span className="text-[#A7C7E7]">{t.nav.key}</span>
+              {keyConfigured === null ? (
+                <span style={{ color: '#94a3b8' }}>...</span>
+              ) : keyConfigured ? (
+                <span style={{ color: '#A7C7E7' }}>{t.nav.guarded}</span>
+              ) : (
+                <span style={{ color: '#E09B30' }}>{t.nav.missingKey}</span>
+              )}
+            </div>
 
-        {/* Live Session Status Badge */}
-        <div className="status-badge" id="session-status-badge">
-          <span className={`status-dot ${status === 'connected' ? 'connected' : status === 'requesting_token' ? 'connecting' : status === 'error' ? 'error' : 'idle'}`} />
-          <span style={{ textTransform: 'capitalize' }}>
-            {getSessionStatusLabel()}
-          </span>
-        </div>
+            {/* Live Session Status Badge */}
+            <div className="status-badge" id="session-status-badge">
+              <span className={`status-dot ${status === 'connected' ? 'connected' : status === 'requesting_token' ? 'connecting' : status === 'error' ? 'error' : 'idle'}`} />
+              <span style={{ textTransform: 'capitalize' }}>
+                {getSessionStatusLabel()}
+              </span>
+            </div>
+
+            {/* Dev Mode Badge Indicator */}
+            <span className="hidden xl:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-[#E09B30]/20 border border-[#E09B30] text-[#E09B30]">
+              {t.devMode.activeBadge}
+            </span>
+          </>
+        )}
 
         {/* 1-on-1 Mentorship Booking CTA */}
         <a

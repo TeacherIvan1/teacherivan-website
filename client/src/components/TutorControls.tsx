@@ -14,6 +14,7 @@ import {
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useDebugStore } from '../modules/debug/debugLogger';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { useDevModeStore } from '../modules/dev/devModeStore';
 
 export const TutorControls: React.FC = () => {
   const lastCloseCode = useDebugStore((s) => s.lastCloseCode);
@@ -57,11 +58,13 @@ export const TutorControls: React.FC = () => {
   const isConnecting = status === 'connecting';
   const isPending = isRequesting || isConnecting;
 
+  const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
+
   return (
     <div className="glass-panel hero-controls-panel" id="tutor-controls-panel">
       <h1 className="session-h1">{t.tutorConsole.sessionH1}</h1>
       <p className="session-tagline">
-        {t.tutorConsole.sessionTagline}
+        {isDeveloperMode ? t.tutorConsole.sessionTagline : t.tutorConsole.sessionTaglineStudent}
       </p>
 
       <div className="button-stage">
@@ -111,25 +114,39 @@ export const TutorControls: React.FC = () => {
           <span className="metric-value">{formatTimer(elapsedSeconds)}</span>
         </div>
 
-        <div className="hidden sm:block" style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+        {/* Technical specs visible in Developer Mode */}
+        {isDeveloperMode ? (
+          <>
+            <div className="hidden sm:block" style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+            <div className="metric-item">
+              <Cpu size={15} />
+              <span>{t.tutorConsole.model}</span>
+              <span className="metric-value truncate max-w-[140px] sm:max-w-none" title={tokenInfo?.model || 'gemini-2.5-flash-native-audio-latest'}>
+                {tokenInfo?.model || 'gemini-2.5-flash-native-audio-latest'}
+              </span>
+            </div>
 
-        <div className="metric-item">
-          <Cpu size={15} />
-          <span>{t.tutorConsole.model}</span>
-          <span className="metric-value truncate max-w-[140px] sm:max-w-none" title={tokenInfo?.model || 'gemini-2.5-flash-native-audio-latest'}>
-            {tokenInfo?.model || 'gemini-2.5-flash-native-audio-latest'}
-          </span>
-        </div>
-
-        <div className="hidden sm:block" style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
-
-        <div className="metric-item">
-          <Radio size={15} color={isConnected ? '#34d399' : '#94a3b8'} />
-          <span>{t.tutorConsole.audio}</span>
-          <span className="metric-value" style={{ color: isConnected ? '#34d399' : '#94a3b8' }}>
-            {isConnected ? '16k In / 24k Out' : t.tutorConsole.ready}
-          </span>
-        </div>
+            <div className="hidden sm:block" style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+            <div className="metric-item">
+              <Radio size={15} color={isConnected ? '#34d399' : '#94a3b8'} />
+              <span>{t.tutorConsole.audio}</span>
+              <span className="metric-value" style={{ color: isConnected ? '#34d399' : '#94a3b8' }}>
+                {isConnected ? '16k In / 24k Out' : t.tutorConsole.ready}
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="hidden sm:block" style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+            <div className="metric-item">
+              <Radio size={15} color={isConnected ? '#34d399' : '#94a3b8'} />
+              <span>{t.tutorConsole.audio}</span>
+              <span className="metric-value" style={{ color: isConnected ? '#34d399' : '#94a3b8' }}>
+                {isConnected ? t.tutorConsole.readyStudent : t.tutorConsole.ready}
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Audio Status Banner */}
@@ -154,7 +171,7 @@ export const TutorControls: React.FC = () => {
         <div className="audio-phase-notice" style={{ marginTop: 20 }}>
           <Radio size={16} color="#38bdf8" />
           <span>
-            {t.tutorConsole.streamingNotice}
+            {isDeveloperMode ? t.tutorConsole.streamingNotice : t.tutorConsole.streamingNoticeStudent}
           </span>
         </div>
       )}
@@ -168,7 +185,7 @@ export const TutorControls: React.FC = () => {
               <div>
                 <strong style={{ color: '#fca5a5' }}>{t.tutorConsole.connectionError}</strong> {errorMessage}
               </div>
-              {lastCloseCode !== null && (
+              {isDeveloperMode && lastCloseCode !== null && (
                 <div style={{ marginTop: 4, fontSize: '0.76rem', color: '#fecaca', opacity: 0.9 }}>
                   {t.tutorConsole.wsCode} <code>{lastCloseCode}</code> {lastCloseReason ? `— Reason: ${lastCloseReason}` : ''}
                 </div>

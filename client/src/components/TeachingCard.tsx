@@ -15,6 +15,7 @@ import {
 import { useTeachingStore, buildSystemInstruction } from '../modules/teaching/teachingStore';
 import { LearnerLevel, CorrectionMode } from '../modules/teaching/types';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { useDevModeStore } from '../modules/dev/devModeStore';
 
 export const TeachingCard: React.FC = () => {
   const {
@@ -31,6 +32,7 @@ export const TeachingCard: React.FC = () => {
   } = useTeachingStore();
 
   const { t } = useTranslation();
+  const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -247,94 +249,96 @@ export const TeachingCard: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Collapsible 'Active Tutor Instructions' Panel */}
-      <div
-        id="active-tutor-instructions-panel"
-        style={{
-          marginTop: 18,
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingTop: 14,
-        }}
-      >
+      {/* 5. Collapsible 'Active Tutor Instructions' Panel (Visible ONLY in Developer Mode) */}
+      {isDeveloperMode && (
         <div
+          id="active-tutor-instructions-panel"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            padding: '4px 0',
+            marginTop: 18,
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            paddingTop: 14,
           }}
-          onClick={() => setIsPromptExpanded(!isPromptExpanded)}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <FileText size={15} color="#818cf8" />
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#e2e8f0' }}>
-              {t.pedagogy.instructionsTitle}
-            </span>
-            <span
-              style={{
-                fontSize: '0.7rem',
-                color: '#94a3b8',
-                background: 'rgba(255,255,255,0.05)',
-                padding: '1px 6px',
-                borderRadius: 4,
-              }}
-            >
-              {isLocked ? t.pedagogy.sessionActiveTag : t.pedagogy.previewTag}
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {isPromptExpanded ? <ChevronUp size={15} color="#94a3b8" /> : <ChevronDown size={15} color="#94a3b8" />}
-          </div>
-        </div>
-
-        {isPromptExpanded && (
-          <div style={{ marginTop: 10 }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 6,
-                fontSize: '0.72rem',
-                color: '#94a3b8',
-              }}
-            >
-              <span>{t.pedagogy.instructionsNotice}</span>
-              <button
-                className="level-btn"
-                style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4 }}
-                onClick={handleCopyInstruction}
-                title="Copy instructions to clipboard"
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              padding: '4px 0',
+            }}
+            onClick={() => setIsPromptExpanded(!isPromptExpanded)}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <FileText size={15} color="#818cf8" />
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#e2e8f0' }}>
+                {t.pedagogy.instructionsTitle}
+              </span>
+              <span
+                style={{
+                  fontSize: '0.7rem',
+                  color: '#94a3b8',
+                  background: 'rgba(255,255,255,0.05)',
+                  padding: '1px 6px',
+                  borderRadius: 4,
+                }}
               >
-                {copied ? <Check size={12} color="#34d399" /> : <Copy size={12} />}
-                <span>{copied ? t.pedagogy.copiedBtn : t.pedagogy.copyBtn}</span>
-              </button>
+                {isLocked ? t.pedagogy.sessionActiveTag : t.pedagogy.previewTag}
+              </span>
             </div>
 
-            <pre
-              id="active-instruction-text"
-              style={{
-                padding: '12px 14px',
-                background: '#04060d',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.72rem',
-                lineHeight: 1.5,
-                color: '#93c5fd',
-                maxHeight: 220,
-                overflowY: 'auto',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-              }}
-            >
-              {currentInstruction}
-            </pre>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {isPromptExpanded ? <ChevronUp size={15} color="#94a3b8" /> : <ChevronDown size={15} color="#94a3b8" />}
+            </div>
           </div>
-        )}
-      </div>
+
+          {isPromptExpanded && (
+            <div style={{ marginTop: 10 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 6,
+                  fontSize: '0.72rem',
+                  color: '#94a3b8',
+                }}
+              >
+                <span>{t.pedagogy.instructionsNotice}</span>
+                <button
+                  className="level-btn"
+                  style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4 }}
+                  onClick={handleCopyInstruction}
+                  title="Copy instructions to clipboard"
+                >
+                  {copied ? <Check size={12} color="#34d399" /> : <Copy size={12} />}
+                  <span>{copied ? t.pedagogy.copiedBtn : t.pedagogy.copyBtn}</span>
+                </button>
+              </div>
+
+              <pre
+                id="active-instruction-text"
+                style={{
+                  padding: '12px 14px',
+                  background: '#04060d',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.72rem',
+                  lineHeight: 1.5,
+                  color: '#93c5fd',
+                  maxHeight: 220,
+                  overflowY: 'auto',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                }}
+              >
+                {currentInstruction}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

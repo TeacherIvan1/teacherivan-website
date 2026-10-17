@@ -11,12 +11,15 @@ import { LiveDebugPanel } from './components/LiveDebugPanel';
 import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { HybridMethodSection } from './components/HybridMethodSection';
 import { LearningPathsSection } from './components/LearningPathsSection';
-import { Headphones } from 'lucide-react';
+import { StudentReportModal } from './components/StudentReportModal';
+import { Headphones, Terminal } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { useTranslation } from './modules/i18n/languageStore';
+import { useDevModeStore } from './modules/dev/devModeStore';
 
 export const App: React.FC = () => {
   const { t } = useTranslation();
+  const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
 
   useEffect(() => {
     // Silently wake up the free Render backend instance immediately as page loads
@@ -68,22 +71,61 @@ export const App: React.FC = () => {
         {/* 4-Step "How to Use the Simulator" Guide */}
         <HowToUseGuide />
 
+        {/* Developer Mode Banner Notification (if active) */}
+        {isDeveloperMode && (
+          <div
+            id="dev-mode-active-banner"
+            className="mb-6 p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 flex items-center justify-between gap-3 text-xs text-[#FAFAFA]"
+          >
+            <div className="flex items-center gap-2">
+              <Terminal size={15} className="text-[#E09B30]" />
+              <span className="font-semibold text-[#E09B30]">{t.devMode.activeBanner}:</span>
+              <span>{t.devMode.notice}</span>
+            </div>
+            <button
+              onClick={toggleDeveloperMode}
+              className="text-[#E09B30] hover:underline font-semibold"
+            >
+              {t.devMode.toggleStudent}
+            </button>
+          </div>
+        )}
+
         {/* Tutor Console Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Primary Column: Voice Controls, Pedagogical Report, Latency & Live Feed */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            <TutorControls />
-            <SessionReportPanel />
-            <LatencyMetricsPanel />
-            <SessionFeed />
-          </div>
+          {isDeveloperMode ? (
+            /* Developer View: Full diagnostics, latency metrics, token inspector, logs, and raw report */
+            <>
+              {/* Primary Column: Voice Controls, Pedagogical Report, Latency & Live Feed */}
+              <div className="lg:col-span-7 flex flex-col gap-6">
+                <TutorControls />
+                <SessionReportPanel />
+                <LatencyMetricsPanel />
+                <SessionFeed />
+              </div>
 
-          {/* Secondary Column: Pedagogical Settings, Token Inspector & Live Diagnostics */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            <TeachingCard />
-            <TokenInspector />
-            <LiveDebugPanel />
-          </div>
+              {/* Secondary Column: Pedagogical Settings, Token Inspector & Live Diagnostics */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                <TeachingCard />
+                <TokenInspector />
+                <LiveDebugPanel />
+              </div>
+            </>
+          ) : (
+            /* Student View: Streamlined, distraction-free workspace */
+            <>
+              {/* Primary Column: Voice Controls & Live Voice Transcript */}
+              <div className="lg:col-span-7 flex flex-col gap-6">
+                <TutorControls />
+                <SessionFeed />
+              </div>
+
+              {/* Secondary Column: Level & Mode Selector and Scenario Selector */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                <TeachingCard />
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -92,6 +134,9 @@ export const App: React.FC = () => {
 
       {/* 5. Learning Paths (General Fluency & IELTS Prep) Section */}
       <LearningPathsSection />
+
+      {/* Automatic End-of-Session Student Report Pop-Up Modal */}
+      <StudentReportModal />
 
       {/* 6. Official Institutional Footer */}
       <footer className="bg-[#12223a] border-t border-[#A7C7E7]/25 text-[#FAFAFA] py-12 px-6">
@@ -117,7 +162,16 @@ export const App: React.FC = () => {
             <a href="#learning-paths-section" className="hover:text-[#E09B30] transition-colors">
               {t.nav.learningPaths}
             </a>
-            <a href="#session-report-panel" className="hover:text-[#E09B30] transition-colors">
+            <a
+              href="#session-report-panel"
+              onClick={(e) => {
+                if (!isDeveloperMode) {
+                  e.preventDefault();
+                  useDevModeStore.getState().setDeveloperMode(true);
+                }
+              }}
+              className="hover:text-[#E09B30] transition-colors"
+            >
               {t.nav.pedagogicalReports}
             </a>
           </div>
@@ -127,8 +181,24 @@ export const App: React.FC = () => {
           <div>
             © {new Date().getFullYear()} {t.footer.copyright}
           </div>
-          <div>
-            {t.footer.poweredBy}
+
+          <div className="flex items-center gap-4">
+            <div>{t.footer.poweredBy}</div>
+
+            {/* Subtle Dev Mode Switcher in Footer */}
+            <button
+              id="footer-dev-mode-toggle"
+              onClick={toggleDeveloperMode}
+              aria-pressed={isDeveloperMode}
+              title={t.devMode.switchTitle}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono tracking-wider transition-all border ${
+                isDeveloperMode
+                  ? 'bg-[#E09B30]/20 border-[#E09B30] text-[#E09B30] font-bold'
+                  : 'bg-transparent border-[#A7C7E7]/25 text-[#A7C7E7]/60 hover:text-[#FAFAFA] hover:border-[#A7C7E7]'
+              }`}
+            >
+              {isDeveloperMode ? t.devMode.toggleDev : t.devMode.toggleStudent}
+            </button>
           </div>
         </div>
       </footer>

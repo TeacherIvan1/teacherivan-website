@@ -16,6 +16,7 @@ interface ReportState {
   reportsEnabled: boolean;
   currentReport: SessionReport | null;
   isGenerating: boolean;
+  isModalOpen: boolean;
   error: string | null;
   isRateLimited: boolean;
   tooShortNotice: string | null;
@@ -25,6 +26,7 @@ interface ReportState {
 
   // Actions
   setReportsEnabled: (enabled: boolean) => void;
+  setModalOpen: (open: boolean) => void;
   loadSavedReports: () => Promise<void>;
   generateReport: (payload: ReportRequestPayload) => Promise<void>;
   retryGeneration: () => Promise<void>;
@@ -51,6 +53,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
   reportsEnabled: getStoredReportsEnabled(),
   currentReport: null,
   isGenerating: false,
+  isModalOpen: false,
   error: null,
   isRateLimited: false,
   tooShortNotice: null,
@@ -63,6 +66,10 @@ export const useReportStore = create<ReportState>((set, get) => ({
       localStorage.setItem(SETTINGS_KEY, String(enabled));
     } catch {}
     set({ reportsEnabled: enabled });
+  },
+
+  setModalOpen: (open: boolean) => {
+    set({ isModalOpen: open });
   },
 
   loadSavedReports: async () => {
@@ -78,6 +85,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
     set({
       lastPayload: payload,
       isGenerating: true,
+      isModalOpen: true,
       error: null,
       isRateLimited: false,
       tooShortNotice: null,
@@ -146,6 +154,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
   dismissReport: () => {
     set({
+      isModalOpen: false,
       currentReport: null,
       error: null,
       tooShortNotice: null,
@@ -177,8 +186,13 @@ export const useReportStore = create<ReportState>((set, get) => ({
   viewReport: (report: SessionReport) => {
     set({
       currentReport: report,
+      isModalOpen: true,
       tooShortNotice: null,
       error: null,
     });
   },
 }));
+
+if (typeof window !== 'undefined') {
+  (window as unknown as { useReportStore: typeof useReportStore }).useReportStore = useReportStore;
+}

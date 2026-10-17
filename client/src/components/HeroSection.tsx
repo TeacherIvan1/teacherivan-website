@@ -2,10 +2,12 @@ import React from 'react';
 import { Mic, Sparkles, ArrowRight, ShieldCheck, Headphones, Zap } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { useDevModeStore } from '../modules/dev/devModeStore';
 
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const { t } = useTranslation();
+  const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
   const isConnected = status === 'connected';
 
   const handleStartPractice = () => {
@@ -88,7 +90,7 @@ export const HeroSection: React.FC = () => {
           <div className="pt-6 border-t border-[#A7C7E7]/20 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-[#A7C7E7]">
             <div className="flex items-center gap-2">
               <Headphones size={16} className="text-[#E09B30]" />
-              <span>{t.hero.metricAudio}</span>
+              <span>{isDeveloperMode ? t.hero.metricAudio : t.hero.metricAudioStudent}</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap size={16} className="text-[#E09B30]" />
