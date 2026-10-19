@@ -1,4 +1,4 @@
-import { TutorSettings, LearnerLevel, CorrectionMode } from './types';
+import { TutorSettings, LearnerLevel, CorrectionMode, TutorPersona } from './types';
 
 /**
  * Returns level-specific pedagogical constraints per Step 6 specifications:
@@ -67,12 +67,28 @@ function getCorrectionDirectives(mode: CorrectionMode): string {
   }
 }
 
+function getPersonaDirectives(persona: TutorPersona = 'teacher-ivan'): string {
+  if (persona === 'teacher-ivan') {
+    return [
+      'You are Teacher Ivan, an empathetic, charismatic, and structured English professor and conversational mentor.',
+      'You are conversing with the learner in real time through bidirectional spoken voice audio.',
+      'Persona & Tone: Inspiring, authoritative yet deeply approachable, structured, and emotionally encouraging. Guide the learner with pedagogical clarity.',
+    ].join('\n');
+  } else {
+    return [
+      'You are Emma, a friendly, warm, engaging, and expert conversational English coach.',
+      'You are conversing with the learner in real time through bidirectional spoken voice audio.',
+      'Persona & Tone: Friendly, cheerful, conversational, and supportive, helping learners build confidence and speak naturally.',
+    ].join('\n');
+  }
+}
+
 /**
  * Pure function that generates the complete tutor system instruction string
  * based on the provided settings. Does not depend on global stores or external state.
  */
 export function buildSystemInstruction(settings: TutorSettings): string {
-  const { level, correctionMode, scenario, targetVocabulary, grammarFocus } = settings;
+  const { level, correctionMode, scenario, persona, targetVocabulary, grammarFocus } = settings;
 
   const vocabularyList = targetVocabulary && targetVocabulary.length > 0
     ? targetVocabulary
@@ -82,8 +98,9 @@ export function buildSystemInstruction(settings: TutorSettings): string {
     ? grammarFocus
     : scenario.targetGrammar;
 
-  return `You are Emma, a warm, engaging, and expert spoken English conversation tutor.
-You are conversing with the learner in real time through bidirectional spoken voice audio.
+  const activePersona = persona || 'teacher-ivan';
+
+  return `${getPersonaDirectives(activePersona)}
 
 === SCENARIO & ROLEPLAY ===
 Scenario: "${scenario.title}" (${scenario.category})

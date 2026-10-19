@@ -71,6 +71,10 @@ export const useConversationStore = create<ConversationState>((set, get) => {
       const systemInstruction = buildSystemInstruction(teachingSettings);
       useTeachingStore.getState().lockSettings(systemInstruction);
 
+      // Determine voiceName from selected tutor persona: Puck for Teacher Ivan, Aoede for Emma
+      const voiceName = teachingSettings.persona === 'emma' ? 'Aoede' : 'Puck';
+      const tutorName = teachingSettings.persona === 'emma' ? 'Emma' : 'Teacher Ivan';
+
       // 4. Initialize audio playback pipeline
       await audioManager.initialize();
 
@@ -85,7 +89,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
             const initialMessage: ConversationMessage = {
               id: `sys-${startTimestamp}`,
               role: 'system',
-              content: `Connected to Gemini Live (${tokenData.model}). Microphone active (16kHz PCM), queued player ready (24kHz PCM), live transcriptions enabled.`,
+              content: `Connected to Gemini Live with ${tutorName} (${voiceName} voice). Microphone active (16kHz PCM), queued player ready (24kHz PCM), live transcriptions enabled.`,
               timestamp: new Date().toLocaleTimeString(),
             };
 
@@ -167,7 +171,8 @@ export const useConversationStore = create<ConversationState>((set, get) => {
               get().stopSession();
             }
           },
-        }
+        },
+        voiceName
       );
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to connect to Live session';

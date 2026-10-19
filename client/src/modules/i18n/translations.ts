@@ -102,6 +102,31 @@ export const translations = {
       wsCode: 'WebSocket Close Code:',
       retryBtn: 'Retry Connection (Mint New Token)',
     },
+    persona: {
+      heading: 'Choose Your AI Tutor & Voice Partner',
+      teacherIvan: {
+        id: 'teacher-ivan',
+        name: 'Teacher Ivan',
+        voiceLabel: 'Male Voice (Puck)',
+        role: 'Charismatic Pedagogical Mentor',
+        desc: 'Empathetic, charismatic, and structured pedagogical guidance.',
+      },
+      emma: {
+        id: 'emma',
+        name: 'Emma',
+        voiceLabel: 'Female Voice (Aoede)',
+        role: 'Friendly Conversational Coach',
+        desc: 'Warm, encouraging practice for spontaneous daily conversation.',
+      },
+    },
+    avatarStage: {
+      idle: 'Ready to Speak',
+      listening: 'Listening...',
+      speaking: 'Speaking...',
+      phraseBubbleTitle: 'Live Spoken Turn',
+      startPrompt: 'Start practice session to speak in real time',
+      avatarAria: 'Interactive 2D Chibi Tutor Avatar',
+    },
     pedagogy: {
       cardTitle: 'Tutor Pedagogical Config',
       lockedBadge: 'Session Locked',
@@ -425,6 +450,31 @@ export const translations = {
       connectionError: 'Error de Conexión:',
       wsCode: 'Código de Cierre WebSocket:',
       retryBtn: 'Reintentar Conexión (Generar Nuevo Token)',
+    },
+    persona: {
+      heading: 'Elige tu Tutor de IA y Compañero de Voz',
+      teacherIvan: {
+        id: 'teacher-ivan',
+        name: 'Teacher Ivan',
+        voiceLabel: 'Voz Masculina (Puck)',
+        role: 'Mentor Pedagógico Carismático',
+        desc: 'Orientación pedagógica empática, carismática y estructurada.',
+      },
+      emma: {
+        id: 'emma',
+        name: 'Emma',
+        voiceLabel: 'Voz Femenina (Aoede)',
+        role: 'Coach Conversacional Amigable',
+        desc: 'Práctica cálida y motivadora para conversación cotidiana espontánea.',
+      },
+    },
+    avatarStage: {
+      idle: 'Listo para Hablar',
+      listening: 'Escuchando...',
+      speaking: 'Hablando...',
+      phraseBubbleTitle: 'Turno de Voz en Vivo',
+      startPrompt: 'Inicia la sesión para conversar por voz',
+      avatarAria: 'Avatar Chibi 2D Interactivo',
     },
     pedagogy: {
       cardTitle: 'Configuración Pedagógica',

@@ -12,6 +12,7 @@ import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { HybridMethodSection } from './components/HybridMethodSection';
 import { LearningPathsSection } from './components/LearningPathsSection';
 import { StudentReportModal } from './components/StudentReportModal';
+import { BrandLockup } from './components/BrandLockup';
 import { Headphones, Terminal } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { useTranslation } from './modules/i18n/languageStore';
@@ -142,11 +143,7 @@ export const App: React.FC = () => {
       <footer className="bg-[#12223a] border-t border-[#A7C7E7]/25 text-[#FAFAFA] py-12 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3">
-            <img
-              src="/assets/logo.svg"
-              alt="Teacher Ivan Official Platform"
-              className="min-w-[160px] w-48 h-auto object-contain"
-            />
+            <BrandLockup size="lg" altText="Teacher Ivan Official Platform" />
             <p className="font-inter text-xs text-[#A7C7E7] max-w-sm">
               {t.footer.desc}
             </p>

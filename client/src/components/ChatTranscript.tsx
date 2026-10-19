@@ -12,6 +12,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 
 export const ChatTranscript: React.FC = () => {
@@ -27,10 +28,13 @@ export const ChatTranscript: React.FC = () => {
   } = useConversationStore();
 
   const { t } = useTranslation();
+  const persona = useTeachingStore((s) => s.persona);
   const [inputMessage, setInputMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const isConnected = status === 'connected';
+  const isIvan = persona === 'teacher-ivan';
+  const tutorName = isIvan ? t.persona.teacherIvan.name : t.persona.emma.name;
 
   // Auto-scroll to the latest message as new transcription chunks arrive
   useEffect(() => {
@@ -127,7 +131,7 @@ export const ChatTranscript: React.FC = () => {
                   }}
                 >
                   <Volume2 size={13} />
-                  <span>{t.transcript.emmaSpeaking}</span>
+                  <span>{isIvan ? `${tutorName} Speaking` : t.transcript.emmaSpeaking}</span>
                   <div className="wave-animation">
                     <span />
                     <span />
@@ -218,9 +222,9 @@ export const ChatTranscript: React.FC = () => {
                           )}
                         </>
                       ) : item.isInterrupted ? (
-                        t.transcript.interruptedTutor
+                        isIvan ? `${tutorName} (interrupted)` : t.transcript.interruptedTutor
                       ) : (
-                        t.transcript.tutor
+                        isIvan ? `${tutorName} (Tutor)` : t.transcript.tutor
                       )}
                     </span>
                     <span className="bubble-time">{item.timestamp}</span>

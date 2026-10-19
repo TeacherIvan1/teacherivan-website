@@ -45,7 +45,8 @@ export class GeminiLiveClient {
     token: string,
     model: string,
     systemPrompt: string,
-    callbacks: GeminiLiveCallbacks = {}
+    callbacks: GeminiLiveCallbacks = {},
+    voiceName: string = 'Puck'
   ): Promise<void> {
     if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
       debugLog('websocket', 'warn', 'connect() called while already connecting/connected. Disconnecting prior socket first.');
@@ -129,7 +130,7 @@ export class GeminiLiveClient {
               speechConfig: {
                 voiceConfig: {
                   prebuiltVoiceConfig: {
-                    voiceName: 'Aoede', // Aoede, Puck, Charon, Kore, Fenrir
+                    voiceName: voiceName || 'Puck', // Puck for Teacher Ivan (Male), Aoede for Emma (Female)
                   },
                 },
               },

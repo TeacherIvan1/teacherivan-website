@@ -1,5 +1,6 @@
 export type LearnerLevel = 'beginner' | 'intermediate' | 'advanced';
 export type CorrectionMode = 'conversation' | 'coaching';
+export type TutorPersona = 'teacher-ivan' | 'emma';
 
 export interface LessonScenario {
   id: string;
@@ -14,6 +15,7 @@ export interface TutorSettings {
   level: LearnerLevel;
   correctionMode: CorrectionMode;
   scenario: LessonScenario;
+  persona?: TutorPersona;
   targetVocabulary?: string[];
   grammarFocus?: string[];
 }
@@ -21,6 +23,7 @@ export interface TutorSettings {
 export interface TeachingState {
   level: LearnerLevel;
   correctionMode: CorrectionMode;
+  persona: TutorPersona;
   selectedScenarioId: string;
   availableScenarios: LessonScenario[];
   activeInstruction: string | null;
@@ -29,9 +32,11 @@ export interface TeachingState {
   // Actions
   setLevel: (level: LearnerLevel) => void;
   setCorrectionMode: (mode: CorrectionMode) => void;
+  setPersona: (persona: TutorPersona) => void;
   selectScenario: (scenarioId: string) => void;
   setCustomExerciseScenario: (exerciseText: string) => void;
   lockSettings: (instruction: string) => void;
   unlockSettings: () => void;
   getSettings: () => TutorSettings;
 }
+

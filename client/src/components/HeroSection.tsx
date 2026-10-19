@@ -1,14 +1,21 @@
 import React from 'react';
 import { Mic, Sparkles, ArrowRight, ShieldCheck, Headphones, Zap } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
 
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
+  const persona = useTeachingStore((s) => s.persona);
   const { t } = useTranslation();
   const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
   const isConnected = status === 'connected';
+
+  const isIvan = persona === 'teacher-ivan';
+  const heroCoachName = isIvan ? 'Teacher Ivan • AI Mentor' : t.hero.coachName;
+  const heroAvatarSrc = isIvan ? '/assets/logo.svg' : '/assets/emma.svg';
+  const heroAvatarAlt = isIvan ? 'Teacher Ivan Official Mascot' : 'Emma AI Tutor Mascot';
 
   const handleStartPractice = () => {
     const startBtn = document.getElementById('start-session-btn');
@@ -115,17 +122,17 @@ export const HeroSection: React.FC = () => {
                 </span>
               </div>
               <span className="text-[11px] font-mono font-medium text-[#A7C7E7] px-2 py-0.5 rounded bg-[#1A3153] border border-[#A7C7E7]/30">
-                {t.hero.coachName}
+                {heroCoachName}
               </span>
             </div>
 
             {/* Logo Graphic Display with Isolation Zone (Minimum 160px width guaranteed) */}
             <div className="bg-[#1A3153] rounded-xl p-6 flex flex-col items-center justify-center border border-[#A7C7E7]/30 mb-6 group transition-all">
-              <div className="relative py-2 px-4">
+              <div className="relative py-2 px-4 flex items-center justify-center min-h-[160px]">
                 <img
-                  src="/assets/logo.svg"
-                  alt="Teacher Ivan Official Mascot"
-                  className="min-w-[160px] w-56 sm:w-64 h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  src={heroAvatarSrc}
+                  alt={heroAvatarAlt}
+                  className="min-w-[160px] w-52 sm:w-60 h-auto max-h-56 object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
               <p className="mt-3 font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">

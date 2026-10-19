@@ -6,6 +6,7 @@ import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
 import { useReportStore } from '../modules/report/reportStore';
 import { LanguageToggle } from './LanguageToggle';
+import { BrandLockup } from './BrandLockup';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
@@ -56,17 +57,13 @@ export const Header: React.FC = () => {
   return (
     <header className="app-header" id="app-header">
       <div className="flex items-center gap-6">
-        {/* Official Brand Logo with 160px min-width and isolation clear space */}
+        {/* Official Brand Lockup with Chibi Mascot & Typography */}
         <a
           href="#app-header"
-          className="block py-2 px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30] rounded-lg transition-transform hover:scale-[1.01]"
+          className="block py-1.5 px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30] rounded-lg transition-transform hover:scale-[1.01]"
           title="Teacher Ivan - English Classes & AI Voice Tutor"
         >
-          <img
-            src="/assets/logo.svg"
-            alt="Teacher Ivan Logo"
-            className="min-w-[160px] w-44 md:w-52 h-auto object-contain"
-          />
+          <BrandLockup size="md" />
         </a>
 
         {/* Desktop Navigation Links */}

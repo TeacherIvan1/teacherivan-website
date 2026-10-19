@@ -1085,3 +1085,131 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #A7C7E7;
 }
+
+/* ==============================================================================
+   Interactive 2D Chibi Avatar Stage Animations
+   Real-Time Voice Session State: Idle, Listening, Speaking
+   ============================================================================== */
+
+@keyframes avatarFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.015);
+  }
+}
+
+@keyframes avatarAttentive {
+  0%, 100% {
+    transform: translateY(-2px) rotate(-2.5deg) scale(1.02);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-1.5deg) scale(1.03);
+  }
+}
+
+@keyframes avatarSpeaking {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  20% {
+    transform: translateY(-6px) rotate(1.5deg) scale(1.03);
+  }
+  40% {
+    transform: translateY(-2px) rotate(-1deg) scale(1.015);
+  }
+  60% {
+    transform: translateY(-7px) rotate(2deg) scale(1.035);
+  }
+  80% {
+    transform: translateY(-3px) rotate(-0.5deg) scale(1.02);
+  }
+}
+
+@keyframes pulseRingsDenim {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseRingsAmber {
+  0% {
+    transform: scale(0.88);
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+@keyframes soundwaveBar {
+  0%, 100% {
+    height: 6px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 24px;
+    opacity: 1;
+  }
+}
+
+@keyframes speechBubblePop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-float {
+  animation: avatarFloat 3.8s ease-in-out infinite;
+}
+
+.animate-attentive {
+  animation: avatarAttentive 2.2s ease-in-out infinite;
+}
+
+.animate-speaking {
+  animation: avatarSpeaking 1.3s ease-in-out infinite;
+}
+
+.ring-pulse-denim-1 {
+  animation: pulseRingsDenim 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.ring-pulse-denim-2 {
+  animation: pulseRingsDenim 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite 0.7s;
+}
+
+.ring-pulse-amber-1 {
+  animation: pulseRingsAmber 1.6s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.ring-pulse-amber-2 {
+  animation: pulseRingsAmber 1.6s cubic-bezier(0, 0.2, 0.8, 1) infinite 0.5s;
+}
+
+.ring-pulse-amber-3 {
+  animation: pulseRingsAmber 1.6s cubic-bezier(0, 0.2, 0.8, 1) infinite 1.0s;
+}
+
+.speech-bubble-pop {
+  animation: speechBubblePop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

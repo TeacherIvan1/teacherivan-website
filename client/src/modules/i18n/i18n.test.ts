@@ -43,4 +43,34 @@ describe('i18n Language Module', () => {
     assert.ok(translations.es.howToUse.step3.title);
     assert.ok(translations.es.howToUse.step4.title);
   });
+
+  it('contains parallel translations for tutor personas (Teacher Ivan & Emma) in en and es', () => {
+    // English persona checks
+    assert.ok(translations.en.persona.heading);
+    assert.ok(translations.en.persona.teacherIvan.name);
+    assert.ok(translations.en.persona.teacherIvan.voiceLabel.includes('Puck'));
+    assert.ok(translations.en.persona.teacherIvan.role);
+    assert.ok(translations.en.persona.emma.name);
+    assert.ok(translations.en.persona.emma.voiceLabel.includes('Aoede'));
+    assert.ok(translations.en.persona.emma.role);
+
+    // Spanish persona checks
+    assert.ok(translations.es.persona.heading);
+    assert.ok(translations.es.persona.teacherIvan.name);
+    assert.ok(translations.es.persona.teacherIvan.voiceLabel.includes('Puck'));
+    assert.ok(translations.es.persona.teacherIvan.role);
+    assert.ok(translations.es.persona.emma.name);
+    assert.ok(translations.es.persona.emma.voiceLabel.includes('Aoede'));
+    assert.ok(translations.es.persona.emma.role);
+  });
+
+  it('contains parallel translations for interactive 2D avatar stage in en and es', () => {
+    assert.ok(translations.en.avatarStage.idle);
+    assert.ok(translations.en.avatarStage.listening);
+    assert.ok(translations.en.avatarStage.speaking);
+
+    assert.ok(translations.es.avatarStage.idle);
+    assert.ok(translations.es.avatarStage.listening);
+    assert.ok(translations.es.avatarStage.speaking);
+  });
 });

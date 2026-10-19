@@ -16,6 +16,7 @@ import { useTeachingStore, buildSystemInstruction } from '../modules/teaching/te
 import { LearnerLevel, CorrectionMode } from '../modules/teaching/types';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
+import { TutorPersonaSelector } from './TutorPersonaSelector';
 
 export const TeachingCard: React.FC = () => {
   const {
@@ -108,6 +109,11 @@ export const TeachingCard: React.FC = () => {
           <span>{t.pedagogy.lockedNotice}</span>
         </div>
       )}
+
+      {/* Tutor Persona & Voice Partner Selector */}
+      <div className="mb-4">
+        <TutorPersonaSelector compact />
+      </div>
 
       {/* 1. Learner Proficiency Level */}
       <div style={{ marginBottom: 8, fontSize: '0.8rem', color: '#A7C7E7', fontWeight: 600 }}>

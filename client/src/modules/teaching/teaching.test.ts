@@ -192,3 +192,50 @@ describe('buildSystemInstruction - Guardrails & Pure Function Integrity', () => 
     assert.strictEqual(JSON.stringify(settings), initialSettingsSnapshot, 'Function must not mutate input settings');
   });
 });
+
+describe('buildSystemInstruction - Tutor Personas (Teacher Ivan vs Emma)', () => {
+  it('generates Teacher Ivan directives: empathetic, charismatic, structured pedagogical mentor', () => {
+    const settings: TutorSettings = {
+      level: 'intermediate',
+      correctionMode: 'coaching',
+      persona: 'teacher-ivan',
+      scenario: MOCK_SCENARIO,
+    };
+
+    const instruction = buildSystemInstruction(settings);
+
+    assert(instruction.includes('Teacher Ivan'), 'Must name Teacher Ivan in prompt');
+    assert(instruction.toLowerCase().includes('charismatic'), 'Must include charismatic persona directive');
+    assert(instruction.toLowerCase().includes('structured'), 'Must include structured persona directive');
+    assert(instruction.toLowerCase().includes('pedagogical'), 'Must include pedagogical clarity directive');
+    assert(!instruction.includes('You are Emma'), 'Must not identity as Emma when Teacher Ivan is chosen');
+  });
+
+  it('generates Emma directives: friendly conversational English coach', () => {
+    const settings: TutorSettings = {
+      level: 'intermediate',
+      correctionMode: 'coaching',
+      persona: 'emma',
+      scenario: MOCK_SCENARIO,
+    };
+
+    const instruction = buildSystemInstruction(settings);
+
+    assert(instruction.includes('Emma'), 'Must name Emma in prompt');
+    assert(instruction.toLowerCase().includes('conversational'), 'Must include conversational coach directive');
+    assert(instruction.toLowerCase().includes('friendly'), 'Must include friendly persona directive');
+    assert(!instruction.includes('You are Teacher Ivan'), 'Must not identify as Teacher Ivan when Emma is chosen');
+  });
+
+  it('defaults gracefully to Teacher Ivan when persona is omitted', () => {
+    const settings: TutorSettings = {
+      level: 'beginner',
+      correctionMode: 'conversation',
+      scenario: MOCK_SCENARIO,
+    };
+
+    const instruction = buildSystemInstruction(settings);
+    assert(instruction.includes('Teacher Ivan'), 'Defaults to Teacher Ivan persona');
+  });
+});
+

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { TeachingState, LearnerLevel, CorrectionMode, LessonScenario, TutorSettings } from './types';
+import { TeachingState, LearnerLevel, CorrectionMode, TutorPersona, LessonScenario, TutorSettings } from './types';
 import { buildSystemInstruction } from './instructionBuilder';
 
 export const INITIAL_SCENARIOS: LessonScenario[] = [
@@ -32,6 +32,7 @@ export const INITIAL_SCENARIOS: LessonScenario[] = [
 export const useTeachingStore = create<TeachingState>((set, get) => ({
   level: 'intermediate',
   correctionMode: 'coaching',
+  persona: 'teacher-ivan',
   selectedScenarioId: 'casual-coffee',
   availableScenarios: INITIAL_SCENARIOS,
   activeInstruction: null,
@@ -45,6 +46,11 @@ export const useTeachingStore = create<TeachingState>((set, get) => ({
   setCorrectionMode: (mode: CorrectionMode) => {
     if (get().isLocked) return;
     set({ correctionMode: mode });
+  },
+
+  setPersona: (persona: TutorPersona) => {
+    if (get().isLocked) return;
+    set({ persona });
   },
 
   selectScenario: (scenarioId: string) => {
@@ -87,13 +93,14 @@ export const useTeachingStore = create<TeachingState>((set, get) => ({
   },
 
   getSettings: (): TutorSettings => {
-    const { level, correctionMode, selectedScenarioId, availableScenarios } = get();
+    const { level, correctionMode, persona, selectedScenarioId, availableScenarios } = get();
     const scenario =
       availableScenarios.find((s) => s.id === selectedScenarioId) || availableScenarios[0];
 
     return {
       level,
       correctionMode,
+      persona,
       scenario,
     };
   },

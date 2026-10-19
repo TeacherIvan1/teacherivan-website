@@ -15,6 +15,8 @@ import { useConversationStore } from '../modules/conversation/conversationStore'
 import { useDebugStore } from '../modules/debug/debugLogger';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
+import { TutorPersonaSelector } from './TutorPersonaSelector';
+import { TutorAvatarStage } from './TutorAvatarStage';
 
 export const TutorControls: React.FC = () => {
   const lastCloseCode = useDebugStore((s) => s.lastCloseCode);
@@ -66,6 +68,16 @@ export const TutorControls: React.FC = () => {
       <p className="session-tagline">
         {isDeveloperMode ? t.tutorConsole.sessionTagline : t.tutorConsole.sessionTaglineStudent}
       </p>
+
+      {/* Tutor Persona & Voice Selector (Teacher Ivan vs Emma) */}
+      <div className="my-5 w-full">
+        <TutorPersonaSelector />
+      </div>
+
+      {/* Interactive 2D Chibi Avatar Stage */}
+      <div className="mb-6 w-full">
+        <TutorAvatarStage />
+      </div>
 
       <div className="button-stage">
         {isConnected && <div className="pulse-ring active" />}
