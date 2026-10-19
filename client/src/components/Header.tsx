@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Server, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
+import { Shield, Server, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 import { checkServerHealth } from '../modules/auth/tokenService';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
-import { useReportStore } from '../modules/report/reportStore';
+import { useAssessmentStore } from '../modules/assessment/assessmentStore';
+import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { LanguageToggle } from './LanguageToggle';
 import { BrandLockup } from './BrandLockup';
 
@@ -13,6 +14,8 @@ export const Header: React.FC = () => {
   const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
   const status = useConversationStore((s) => s.status);
   const { t } = useTranslation();
+  const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
+  const selectScenario = useTeachingStore((s) => s.selectScenario);
 
   useEffect(() => {
     let mounted = true;
@@ -54,6 +57,11 @@ export const Header: React.FC = () => {
 
   const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
 
+  const handleTakeAssessment = () => {
+    selectScenario('diagnostic-placement');
+    openAssessmentModal();
+  };
+
   return (
     <header className="app-header" id="app-header">
       <div className="flex items-center gap-6">
@@ -75,36 +83,22 @@ export const Header: React.FC = () => {
             {t.nav.voiceTutor}
           </a>
           <a
+            href="#market-comparison-section"
+            className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
+          >
+            {t.nav.bichronous}
+          </a>
+          <a
+            href="#pricing-plans-section"
+            className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
+          >
+            {t.nav.pricing}
+          </a>
+          <a
             href="#hybrid-method-section"
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
             {t.nav.hybridMethod}
-          </a>
-          <a
-            href="#learning-paths-section"
-            className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
-          >
-            {t.nav.learningPaths}
-          </a>
-          <a
-            href="#session-report-panel"
-            onClick={(e) => {
-              if (!isDeveloperMode) {
-                e.preventDefault();
-                const repStore = useReportStore.getState();
-                if (repStore.currentReport || repStore.savedReports.length > 0) {
-                  repStore.setModalOpen(true);
-                } else {
-                  const tutorEl = document.getElementById('start-session-btn');
-                  if (tutorEl) {
-                    tutorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }
-                }
-              }
-            }}
-            className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
-          >
-            {t.nav.pedagogicalReports}
           </a>
         </nav>
       </div>
@@ -161,22 +155,15 @@ export const Header: React.FC = () => {
           </>
         )}
 
-        {/* 1-on-1 Mentorship Booking CTA */}
-        <a
-          href="#book-class"
-          onClick={(e) => {
-            e.preventDefault();
-            const tutorEl = document.getElementById('start-session-btn');
-            if (tutorEl) {
-              tutorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              tutorEl.focus();
-            }
-          }}
-          className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full font-montserrat font-bold text-xs uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FAFAFA]"
+        {/* Take Spoken Assessment Button (Requirement 1) */}
+        <button
+          id="take-assessment-nav-btn"
+          onClick={handleTakeAssessment}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30]"
         >
-          <Calendar size={13} />
-          <span>{t.nav.bookClass}</span>
-        </a>
+          <Sparkles size={13} />
+          <span>{t.nav.takeAssessment}</span>
+        </button>
       </div>
     </header>
   );

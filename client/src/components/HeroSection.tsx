@@ -2,12 +2,15 @@ import React from 'react';
 import { Mic, Sparkles, ArrowRight, ShieldCheck, Headphones, Zap } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
+import { useAssessmentStore } from '../modules/assessment/assessmentStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
 
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const persona = useTeachingStore((s) => s.persona);
+  const selectScenario = useTeachingStore((s) => s.selectScenario);
+  const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
   const { t } = useTranslation();
   const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
   const isConnected = status === 'connected';
@@ -27,8 +30,13 @@ export const HeroSection: React.FC = () => {
     }
   };
 
+  const handleTakeAssessment = () => {
+    selectScenario('diagnostic-placement');
+    openAssessmentModal();
+  };
+
   const handleLearnMore = () => {
-    const el = document.getElementById('hybrid-method-section');
+    const el = document.getElementById('market-comparison-section');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -74,20 +82,32 @@ export const HeroSection: React.FC = () => {
 
           {/* High-Converting CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
+            {/* Primary: Take Spoken Assessment */}
             <button
-              id="hero-start-practice-btn"
-              onClick={handleStartPractice}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/30 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50"
+              id="hero-take-assessment-btn"
+              onClick={handleTakeAssessment}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/30 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50"
             >
-              <Mic size={18} />
-              <span>{isConnected ? t.hero.sessionActive : t.hero.startPractice}</span>
+              <Sparkles size={17} />
+              <span>{t.hero.takeAssessment}</span>
               <ArrowRight size={16} />
             </button>
 
+            {/* Secondary: Start AI Voice Practice */}
+            <button
+              id="hero-start-practice-btn"
+              onClick={handleStartPractice}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-montserrat font-semibold text-sm uppercase tracking-[0.15em] bg-[#FAFAFA]/10 border border-[#A7C7E7] text-[#FAFAFA] hover:bg-[#FAFAFA]/20 hover:border-[#FAFAFA] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C7E7]"
+            >
+              <Mic size={16} className="text-[#E09B30]" />
+              <span>{isConnected ? t.hero.sessionActive : t.hero.startPractice}</span>
+            </button>
+
+            {/* Tertiary: The Method */}
             <button
               id="hero-the-method-btn"
               onClick={handleLearnMore}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-montserrat font-semibold text-sm uppercase tracking-[0.15em] bg-transparent border border-[#A7C7E7] text-[#FAFAFA] hover:bg-[#FAFAFA]/10 hover:border-[#FAFAFA] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C7E7]"
+              className="w-full sm:w-auto text-xs text-[#A7C7E7] hover:text-[#FAFAFA] hover:underline font-medium py-2 px-3 transition-colors"
             >
               <span>{t.hero.theMethod}</span>
             </button>
@@ -140,19 +160,15 @@ export const HeroSection: React.FC = () => {
               </p>
             </div>
 
-            {/* Quick Interactive Snippet */}
-            <div className="space-y-3">
-              <div className="p-3 rounded-lg bg-[#1A3153]/70 border border-[#A7C7E7]/25 text-xs text-[#FAFAFA] flex items-center justify-between">
-                <span className="text-[#A7C7E7]">{t.hero.curriculumMode}</span>
-                <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#E09B30]">
-                  {t.hero.curriculumVal}
-                </span>
+            {/* Micro details */}
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between text-[#A7C7E7]">
+                <span>{t.hero.curriculumMode}</span>
+                <span className="text-[#FAFAFA] font-medium">{t.hero.curriculumVal}</span>
               </div>
-              <div className="p-3 rounded-lg bg-[#1A3153]/70 border border-[#A7C7E7]/25 text-xs text-[#FAFAFA] flex items-center justify-between">
-                <span className="text-[#A7C7E7]">{t.hero.cefrRange}</span>
-                <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#FAFAFA]">
-                  {t.hero.cefrVal}
-                </span>
+              <div className="flex justify-between text-[#A7C7E7]">
+                <span>{t.hero.cefrRange}</span>
+                <span className="text-[#FAFAFA] font-medium">{t.hero.cefrVal}</span>
               </div>
             </div>
           </div>

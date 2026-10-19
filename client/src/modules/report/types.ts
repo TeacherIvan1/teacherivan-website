@@ -12,6 +12,22 @@ export interface ReportTopError {
   explanation: string;
 }
 
+export interface CompetencyScores {
+  discourseFluency: number; // 0-100
+  syntacticControl: number; // 0-100
+  lexicalPrecision: number; // 0-100
+  phonologicalControl: number; // 0-100
+}
+
+export interface RecommendedPlan {
+  id: 'essential' | 'pro' | 'executive';
+  name: string;
+  priceBob: string;
+  priceUsd: string;
+  reason: string;
+  whatsappMessage?: string;
+}
+
 export interface SessionReport {
   id: string;
   createdAt: string;
@@ -27,6 +43,10 @@ export interface SessionReport {
   stats: ReportStats;
   pronunciationNote: string;
   modelUsed?: string;
+  overallScore?: number; // 0-100
+  cefrLevel?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | string;
+  competencies?: CompetencyScores;
+  recommendedPlan?: RecommendedPlan;
 }
 
 export interface ReportRequestPayload {

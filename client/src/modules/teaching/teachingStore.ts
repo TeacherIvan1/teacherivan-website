@@ -2,7 +2,17 @@ import { create } from 'zustand';
 import { TeachingState, LearnerLevel, CorrectionMode, TutorPersona, LessonScenario, TutorSettings } from './types';
 import { buildSystemInstruction } from './instructionBuilder';
 
+export const DIAGNOSTIC_SCENARIO: LessonScenario = {
+  id: 'diagnostic-placement',
+  title: 'Diagnostic Placement Test',
+  category: 'Spoken Assessment',
+  description: 'A 90–120 second diagnostic evaluation with 3 progressive questions to accurately measure CEFR spoken fluency.',
+  targetGrammar: ['Everyday introduction', 'Past/future narrative', 'Professional opinion & hypotheticals'],
+  targetVocabulary: ['Background', 'Experience', 'Perspective', 'Milestone', 'Collaboration'],
+};
+
 export const INITIAL_SCENARIOS: LessonScenario[] = [
+  DIAGNOSTIC_SCENARIO,
   {
     id: 'travel-airport',
     title: 'Airport Check-In & Customs',

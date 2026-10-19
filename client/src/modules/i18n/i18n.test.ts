@@ -73,4 +73,46 @@ describe('i18n Language Module', () => {
     assert.ok(translations.es.avatarStage.listening);
     assert.ok(translations.es.avatarStage.speaking);
   });
+
+  it('contains parallel translations for Bichronous Coaching sections and Assessment Modal', () => {
+    // Assessment Modal
+    assert.ok(translations.en.assessmentModal.title);
+    assert.ok(translations.es.assessmentModal.title);
+    assert.ok(translations.en.assessmentModal.skipBtn);
+    assert.ok(translations.es.assessmentModal.skipBtn);
+
+    // KPI Strip
+    assert.strictEqual(translations.en.kpiStrip.sttMetric, '>75%');
+    assert.strictEqual(translations.es.kpiStrip.sttMetric, '>75%');
+    assert.ok(translations.en.kpiStrip.planMetric);
+    assert.ok(translations.es.kpiStrip.planMetric);
+
+    // Market Comparison
+    assert.ok(translations.en.marketComparison.title);
+    assert.ok(translations.es.marketComparison.title);
+    assert.ok(translations.en.marketComparison.ivan.name);
+    assert.ok(translations.es.marketComparison.ivan.name);
+
+    // Session Architecture
+    assert.ok(translations.en.sessionArchitecture.title);
+    assert.ok(translations.es.sessionArchitecture.title);
+    assert.ok(translations.en.sessionArchitecture.phase1Title);
+    assert.ok(translations.es.sessionArchitecture.phase1Title);
+
+    // Async Sprint
+    assert.ok(translations.en.asyncSprint.title);
+    assert.ok(translations.es.asyncSprint.title);
+    assert.ok(translations.en.asyncSprint.day1Title);
+    assert.ok(translations.es.asyncSprint.day1Title);
+
+    // Pricing & Plans
+    assert.ok(translations.en.pricingPlans.title);
+    assert.ok(translations.es.pricingPlans.title);
+    assert.ok(translations.en.pricingPlans.pro.name);
+    assert.ok(translations.es.pricingPlans.pro.name);
+    assert.ok(translations.en.pricingPlans.essential.name);
+    assert.ok(translations.es.pricingPlans.essential.name);
+    assert.ok(translations.en.pricingPlans.executive.name);
+    assert.ok(translations.es.pricingPlans.executive.name);
+  });
 });

@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
+import { HeroKpiStrip } from './components/HeroKpiStrip';
+import { MarketComparisonSection } from './components/MarketComparisonSection';
+import { SessionArchitectureSection } from './components/SessionArchitectureSection';
+import { AsyncSprintSection } from './components/AsyncSprintSection';
+import { PricingPlansSection } from './components/PricingPlansSection';
 import { HowToUseGuide } from './components/HowToUseGuide';
 import { TutorControls } from './components/TutorControls';
 import { SessionReportPanel } from './components/SessionReportPanel';
@@ -12,6 +17,7 @@ import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { HybridMethodSection } from './components/HybridMethodSection';
 import { LearningPathsSection } from './components/LearningPathsSection';
 import { StudentReportModal } from './components/StudentReportModal';
+import { SpokenAssessmentModal } from './components/SpokenAssessmentModal';
 import { BrandLockup } from './components/BrandLockup';
 import { Headphones, Terminal } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
@@ -39,13 +45,31 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter">
+      {/* Auto-Pop-Up Spoken Assessment Modal on Website Entry (Requirement 1) */}
+      <SpokenAssessmentModal />
+
       {/* 1. Official Platform Header */}
       <Header />
 
       {/* 2. High-Converting Brand Hero Section */}
       <HeroSection />
 
-      {/* 3. Gemini Voice Tutor Centerpiece Showcase */}
+      {/* 3. Hero KPI Strip (Requirement 3.1) */}
+      <HeroKpiStrip />
+
+      {/* 4. Market Diagnosis Comparison: Why Bichronous Coaching Wins (Requirement 3.2) */}
+      <MarketComparisonSection />
+
+      {/* 5. 60-Minute Synchronous Session Architecture: >75% STT (Requirement 3.3) */}
+      <SessionArchitectureSection />
+
+      {/* 6. 5-Day Asynchronous Micro-Learning Sprint (Requirement 3.4) */}
+      <AsyncSprintSection />
+
+      {/* 7. Official Pricing & Plans Section with Currency Toggle (Requirement 3.5) */}
+      <PricingPlansSection />
+
+      {/* 8. Gemini Voice Tutor Centerpiece Showcase */}
       <section
         id="voice-tutor-showcase"
         className="py-12 md:py-16 px-4 sm:px-6 max-w-7xl mx-auto w-full"
@@ -130,16 +154,16 @@ export const App: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. The Hybrid Method Section */}
+      {/* 9. The Hybrid Method Section */}
       <HybridMethodSection />
 
-      {/* 5. Learning Paths (General Fluency & IELTS Prep) Section */}
+      {/* 10. Learning Paths (General Fluency & IELTS Prep) Section */}
       <LearningPathsSection />
 
-      {/* Automatic End-of-Session Student Report Pop-Up Modal */}
+      {/* Automatic End-of-Session Student Report Pop-Up Modal (Requirement 2) */}
       <StudentReportModal />
 
-      {/* 6. Official Institutional Footer */}
+      {/* 11. Official Institutional Footer */}
       <footer className="bg-[#12223a] border-t border-[#A7C7E7]/25 text-[#FAFAFA] py-12 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start text-center md:text-left gap-3">
@@ -153,50 +177,24 @@ export const App: React.FC = () => {
             <a href="#voice-tutor-showcase" className="hover:text-[#E09B30] transition-colors">
               {t.nav.voiceTutor}
             </a>
+            <a href="#market-comparison-section" className="hover:text-[#E09B30] transition-colors">
+              {t.nav.bichronous}
+            </a>
+            <a href="#pricing-plans-section" className="hover:text-[#E09B30] transition-colors">
+              {t.nav.pricing}
+            </a>
             <a href="#hybrid-method-section" className="hover:text-[#E09B30] transition-colors">
               {t.nav.hybridMethod}
             </a>
             <a href="#learning-paths-section" className="hover:text-[#E09B30] transition-colors">
               {t.nav.learningPaths}
             </a>
-            <a
-              href="#session-report-panel"
-              onClick={(e) => {
-                if (!isDeveloperMode) {
-                  e.preventDefault();
-                  useDevModeStore.getState().setDeveloperMode(true);
-                }
-              }}
-              className="hover:text-[#E09B30] transition-colors"
-            >
-              {t.nav.pedagogicalReports}
-            </a>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto mt-8 pt-8 border-t border-[#A7C7E7]/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#A7C7E7]/70">
-          <div>
-            © {new Date().getFullYear()} {t.footer.copyright}
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div>{t.footer.poweredBy}</div>
-
-            {/* Subtle Dev Mode Switcher in Footer */}
-            <button
-              id="footer-dev-mode-toggle"
-              onClick={toggleDeveloperMode}
-              aria-pressed={isDeveloperMode}
-              title={t.devMode.switchTitle}
-              className={`px-2.5 py-1 rounded text-[10px] font-mono tracking-wider transition-all border ${
-                isDeveloperMode
-                  ? 'bg-[#E09B30]/20 border-[#E09B30] text-[#E09B30] font-bold'
-                  : 'bg-transparent border-[#A7C7E7]/25 text-[#A7C7E7]/60 hover:text-[#FAFAFA] hover:border-[#A7C7E7]'
-              }`}
-            >
-              {isDeveloperMode ? t.devMode.toggleDev : t.devMode.toggleStudent}
-            </button>
-          </div>
+          <p>{t.footer.copyright}</p>
+          <p className="font-mono">{t.footer.poweredBy}</p>
         </div>
       </footer>
     </div>

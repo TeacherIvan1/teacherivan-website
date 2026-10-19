@@ -2,6 +2,8 @@ import test, { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { buildSystemInstruction } from './instructionBuilder';
 import { TutorSettings, LessonScenario } from './types';
+import { DIAGNOSTIC_SCENARIO } from './teachingStore';
+import { useAssessmentStore } from '../assessment/assessmentStore';
 
 const MOCK_SCENARIO: LessonScenario = {
   id: 'coffee-shop',
@@ -236,6 +238,42 @@ describe('buildSystemInstruction - Tutor Personas (Teacher Ivan vs Emma)', () =>
 
     const instruction = buildSystemInstruction(settings);
     assert(instruction.includes('Teacher Ivan'), 'Defaults to Teacher Ivan persona');
+  });
+});
+
+describe('Diagnostic Placement Test Scenario & Assessment Store', () => {
+  it('generates specialized 3-question diagnostic prompt for diagnostic-placement scenario', () => {
+    const settings: TutorSettings = {
+      level: 'intermediate',
+      correctionMode: 'coaching',
+      persona: 'teacher-ivan',
+      scenario: DIAGNOSTIC_SCENARIO,
+    };
+
+    const instruction = buildSystemInstruction(settings);
+
+    assert(instruction.includes('DIAGNOSTIC SPOKEN PLACEMENT TEST'), 'Must specify diagnostic header');
+    assert(instruction.includes('Question 1 (A1/A2 Everyday Intro)'), 'Must include Q1 A1/A2');
+    assert(instruction.includes('Question 2 (B1 Narrative / Experience)'), 'Must include Q2 B1');
+    assert(instruction.includes('Question 3 (B2/C1 Professional Opinion)'), 'Must include Q3 B2/C1');
+    assert(instruction.includes('90 to 120 seconds'), 'Must include 90-120 seconds duration target');
+  });
+
+  it('manages auto-open and user dismissal state in assessmentStore', () => {
+    const store = useAssessmentStore.getState();
+    assert.strictEqual(typeof store.isAssessmentModalOpen, 'boolean');
+    assert.strictEqual(typeof store.openAssessmentModal, 'function');
+    assert.strictEqual(typeof store.closeAssessmentModal, 'function');
+
+    store.openAssessmentModal();
+    assert.strictEqual(useAssessmentStore.getState().isAssessmentModalOpen, true);
+
+    store.closeAssessmentModal();
+    assert.strictEqual(useAssessmentStore.getState().isAssessmentModalOpen, false);
+    assert.strictEqual(useAssessmentStore.getState().hasUserDismissedModal, true);
+
+    store.openAssessmentModal();
+    assert.strictEqual(useAssessmentStore.getState().isAssessmentModalOpen, true);
   });
 });
 
