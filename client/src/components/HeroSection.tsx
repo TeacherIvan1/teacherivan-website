@@ -2,11 +2,13 @@ import React from 'react';
 import { Mic, MessageCircle, ArrowRight, CheckCircle2, Zap, Clock } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
+import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const persona = useTeachingStore((s) => s.persona);
+  const setActiveView = useNavigationStore((s) => s.setActiveView);
   const { t } = useTranslation();
   const isConnected = status === 'connected';
 
@@ -16,10 +18,7 @@ export const HeroSection: React.FC = () => {
   )}`;
 
   const handleStartPractice = () => {
-    const el = document.getElementById('voice-tutor-showcase');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    setActiveView('simulator');
     if (!isConnected) {
       startSession();
     }
@@ -29,7 +28,7 @@ export const HeroSection: React.FC = () => {
   const tutorName = isEmma ? 'Emma' : 'Teacher Ivan';
 
   return (
-    <section className="relative bg-[#1A3153] border-b border-[#A7C7E7]/25 text-[#FAFAFA] pt-14 pb-16 md:pt-20 md:pb-24 px-4 sm:px-6 overflow-hidden">
+    <section className="relative bg-[#1A3153] border-b border-[#A7C7E7]/25 text-[#FAFAFA] pt-12 pb-14 md:pt-20 md:pb-24 px-4 sm:px-6 overflow-hidden">
       {/* Decorative ambient background accents */}
       <div
         className="absolute top-0 right-1/4 w-96 h-96 bg-[#A7C7E7]/10 rounded-full blur-3xl pointer-events-none"
@@ -44,7 +43,7 @@ export const HeroSection: React.FC = () => {
         {/* Left Column: Value Proposition & High-Converting CTAs */}
         <div className="flex-1 text-center lg:text-left">
           {/* Institutional Trust Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12223a]/80 border border-[#A7C7E7]/40 mb-5 backdrop-blur-sm shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12223a]/80 border border-[#A7C7E7]/40 mb-4 backdrop-blur-sm shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
             <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#FAFAFA]">
               {t.heroRedesign.badge}
@@ -52,7 +51,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Main Outcome-Focused H1 (<=8 words) */}
-          <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.12] mb-5 tracking-tight text-[#FAFAFA]">
+          <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.12] mb-4 tracking-tight text-[#FAFAFA]">
             {t.heroRedesign.headlinePart1}
             <span className="text-[#E09B30] relative inline-block underline decoration-[#E09B30]/40 decoration-4 underline-offset-4">
               {t.heroRedesign.headlineHighlight}
@@ -60,57 +59,57 @@ export const HeroSection: React.FC = () => {
           </h1>
 
           {/* Subhead (<=20 words: Ivan + AI differentiator) */}
-          <p className="font-inter text-base sm:text-lg text-[#A7C7E7] mb-7 leading-relaxed max-w-xl mx-auto lg:mx-0">
+          <p className="font-inter text-base sm:text-lg text-[#A7C7E7] mb-5 leading-relaxed max-w-xl mx-auto lg:mx-0">
             {t.heroRedesign.subhead}
           </p>
 
-          {/* Primary CTA (Amber) + WhatsApp CTA */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-4 mb-4">
-            {/* Primary: Try AI Voice Tutor Free */}
+          {/* 3 KPI Pills (>75% STT, 10–15m Daily Micro-Learning, 24/7 AI Tutor) */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-7">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#12223a] border border-[#E09B30]/40 text-[#E09B30] text-xs font-montserrat font-bold">
+              <Clock size={13} />
+              <span>&gt;75% STT</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#12223a] border border-[#A7C7E7]/30 text-[#A7C7E7] text-xs font-montserrat font-bold">
+              <Zap size={13} />
+              <span>10–15m Daily Micro-Learning</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#12223a] border border-[#10b981]/30 text-[#10b981] text-xs font-montserrat font-bold">
+              <CheckCircle2 size={13} />
+              <span>24/7 AI Tutor</span>
+            </span>
+          </div>
+
+          {/* Single Clean Hero CTA + Subtle WhatsApp Link (No mobile clutter) */}
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-4">
+            {/* Primary: Try AI Voice Tutor */}
             <button
               id="hero-primary-cta-btn"
               onClick={handleStartPractice}
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/35 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50 cursor-pointer min-h-[48px]"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/35 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50 cursor-pointer min-h-[48px]"
             >
               <Mic size={18} className="text-[#1A3153]" />
               <span>{isConnected ? t.hero.sessionActive : t.heroRedesign.primaryCta}</span>
               <ArrowRight size={16} />
             </button>
 
-            {/* Secondary: WhatsApp with Ivan */}
+            {/* Subtle WhatsApp Link */}
             <a
-              id="hero-whatsapp-cta-link"
+              id="hero-whatsapp-subtle-link"
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full font-montserrat font-semibold text-sm uppercase tracking-[0.15em] bg-[#12223a] border border-[#A7C7E7]/60 text-[#FAFAFA] hover:bg-[#1A3153] hover:border-[#E09B30] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C7E7] min-h-[48px]"
+              className="text-xs text-[#A7C7E7] hover:text-[#FAFAFA] hover:underline font-semibold flex items-center gap-1.5 py-2 px-3 transition-colors"
             >
-              <MessageCircle size={18} className="text-[#25D366]" />
+              <MessageCircle size={15} className="text-[#25D366]" />
               <span>{t.heroRedesign.whatsappCta}</span>
             </a>
           </div>
 
           {/* Reassurance Microcopy */}
-          <p className="text-xs text-[#A7C7E7]/80 mb-8 flex items-center justify-center lg:justify-start gap-1.5 font-medium">
+          <p className="text-xs text-[#A7C7E7]/80 flex items-center justify-center lg:justify-start gap-1.5 font-medium">
             <CheckCircle2 size={13} className="text-[#10b981]" />
             <span>{t.heroRedesign.noSignup}</span>
           </p>
-
-          {/* Trust Metrics / Micro-proof */}
-          <div className="pt-6 border-t border-[#A7C7E7]/20 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-[#A7C7E7]">
-            <div className="flex items-center gap-2">
-              <Clock size={15} className="text-[#E09B30]" />
-              <span className="font-medium text-[#FAFAFA]">{t.heroRedesign.metricSpeaking}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap size={15} className="text-[#E09B30]" />
-              <span>{t.heroRedesign.metricInstant}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-[#10b981]" />
-              <span>{t.heroRedesign.metricPersonalized}</span>
-            </div>
-          </div>
         </div>
 
         {/* Right Column: Interactive Live Mic + Sound Wave Visual */}

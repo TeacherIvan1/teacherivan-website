@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, MessageSquare, Play, Sparkles, CheckCircle2, Flame, Wrench, Target } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { ChibiSceneShowcase } from './ChibiSceneShowcase';
 
 export const SessionArchitectureSection: React.FC = () => {
   const { t } = useTranslation();
@@ -56,12 +57,27 @@ export const SessionArchitectureSection: React.FC = () => {
         </p>
       </div>
 
-      {/* Horizontal STT vs TTT Comparison Bars */}
-      <div className="p-6 rounded-3xl bg-[#1A3153]/80 border border-[#A7C7E7]/30 shadow-xl mb-12 space-y-6">
-        <h3 className="font-montserrat font-bold text-sm uppercase tracking-wider text-[#FAFAFA] flex items-center gap-2">
-          <MessageSquare size={16} className="text-[#E09B30]" />
-          <span>{t.sessionArchitecture.comparisonTitle}</span>
-        </h3>
+      {/* Showcase Grid: Chibi Online Coach + STT vs TTT Comparison */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12">
+        <div className="lg:col-span-5 w-full">
+          <ChibiSceneShowcase
+            imageSrc="/assets/chibi-online-coach.png"
+            altText="Teacher Ivan Online Live Coaching Session"
+            badge1Text="Quick Recast! 💡"
+            badge1Icon="recast"
+            badge2Text="Active Speaking >75% 🗣️"
+            badge2Icon="cefr"
+            caption="60-Minute Synchronous Session: Real-time correction and personalized pronunciation modeling"
+          />
+        </div>
+
+        <div className="lg:col-span-7 w-full">
+          {/* Horizontal STT vs TTT Comparison Bars */}
+          <div className="p-6 rounded-3xl bg-[#1A3153]/80 border border-[#A7C7E7]/30 shadow-xl space-y-6">
+            <h3 className="font-montserrat font-bold text-sm uppercase tracking-wider text-[#FAFAFA] flex items-center gap-2">
+              <MessageSquare size={16} className="text-[#E09B30]" />
+              <span>{t.sessionArchitecture.comparisonTitle}</span>
+            </h3>
 
         {/* Bar 1: Teacher Ivan Bichronous Coaching (75% STT / 25% Coach) */}
         <div className="space-y-2">
@@ -110,8 +126,10 @@ export const SessionArchitectureSection: React.FC = () => {
               70% Teacher Lecture
             </div>
           </div>
+          </div>
         </div>
       </div>
+    </div>
 
       {/* 4-Phase Visual Timeline */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -1228,4 +1228,43 @@ body {
   }
 }
 
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+@keyframes floatDelayed {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-1.5deg);
+  }
+}
+
+@keyframes pulseGlowAmber {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(224, 155, 48, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(224, 155, 48, 0.65);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 3.8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatDelayed 4.4s ease-in-out infinite 1.2s;
+}
+
+.animate-pulse-glow-amber {
+  animation: pulseGlowAmber 2.5s ease-in-out infinite;
+}
+
 

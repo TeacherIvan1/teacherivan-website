@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Headphones, PenTool, Mic, Mail, Volume2, Sparkles, Clock, CheckCircle } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { ChibiSceneShowcase } from './ChibiSceneShowcase';
 
 export const AsyncSprintSection: React.FC = () => {
   const { t } = useTranslation();
@@ -71,6 +72,43 @@ export const AsyncSprintSection: React.FC = () => {
         <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
           {t.asyncSprint.subtitle}
         </p>
+      </div>
+
+      {/* Visual Showcase: Chibi Classroom & Asynchronous Habit Description */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-10">
+        <div className="lg:col-span-5 w-full">
+          <ChibiSceneShowcase
+            imageSrc="/assets/chibi-classroom.png"
+            altText="Teacher Ivan Interactive Classroom and Async Habit Sprint"
+            badge1Text="5-Day Voice Sprint 🚀"
+            badge1Icon="audio"
+            badge2Text="Daily 10–15m Micro-Habit ⏱️"
+            badge2Icon="star"
+            caption="Collaborative Asynchronous Sprints: Daily voice notes build lasting confidence"
+          />
+        </div>
+        <div className="lg:col-span-7 flex flex-col justify-center space-y-4">
+          <div className="p-6 rounded-3xl bg-[#1A3153]/80 border border-[#A7C7E7]/30 shadow-xl space-y-3">
+            <h3 className="font-montserrat font-bold text-lg text-[#FAFAFA] flex items-center gap-2">
+              <Sparkles size={18} className="text-[#E09B30]" />
+              <span>Micro-Learning That Fits Your Schedule</span>
+            </h3>
+            <p className="font-inter text-sm text-[#A7C7E7] leading-relaxed">
+              Fluency is not built in exhausting once-a-week marathons. Our 5-day asynchronous sprint embeds 10–15 minutes of structured English into your daily routine via WhatsApp, pairing listening, writing, and authentic voice production with direct audio corrections from Teacher Ivan.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <span className="px-3 py-1 rounded-full bg-[#10b981]/15 border border-[#10b981]/30 text-[#10b981] text-xs font-semibold">
+                Daily Audio Recasts
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-xs font-semibold">
+                Neuroplastic Retention
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#A7C7E7]/15 border border-[#A7C7E7]/30 text-[#A7C7E7] text-xs font-semibold">
+                Zero Commute Time
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 5-Day Interactive Grid */}

@@ -19,30 +19,30 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 }) => {
   const isLight = variant === 'light';
 
-  // Mascot dimensions
+  // Mascot dimensions (w-9 h-9 on mobile for compact header)
   const mascotDimensions = {
-    sm: 'w-10 h-10 md:w-11 md:h-11',
-    md: 'w-12 h-12 md:w-14 md:h-14',
+    sm: 'w-9 h-9 md:w-10 md:h-10',
+    md: 'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
     lg: 'w-16 h-16 md:w-20 md:h-20',
   }[size];
 
-  // Primary text size: font-semibold md:font-bold tracking-tight text-xl md:text-2xl
+  // Primary text size with whitespace-nowrap
   const primaryTextSize = {
-    sm: 'text-lg md:text-xl',
-    md: 'text-xl md:text-2xl',
+    sm: 'text-base sm:text-lg md:text-xl',
+    md: 'text-lg sm:text-xl md:text-2xl',
     lg: 'text-2xl md:text-3xl',
   }[size];
 
-  // Secondary subline size: text-[10px] md:text-xs tracking-[0.25em]
+  // Secondary subline size
   const sublineTextSize = {
-    sm: 'text-[9px] md:text-[10px]',
-    md: 'text-[10px] md:text-xs',
+    sm: 'text-[8px] sm:text-[9px] md:text-[10px]',
+    md: 'text-[9px] sm:text-[10px] md:text-xs',
     lg: 'text-xs md:text-sm',
   }[size];
 
   return (
     <div
-      className={`inline-flex items-center gap-3 select-none min-w-[160px] ${className}`}
+      className={`inline-flex items-center gap-2 sm:gap-3 select-none ${className}`}
       data-testid="official-brand-lockup"
     >
       {/* Brand Mascot (Teacher Ivan Chibi character) with preserved aspect ratio */}
@@ -57,9 +57,9 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 
       {/* Official Two-Line Typographic Block */}
       <div className="flex flex-col justify-center leading-none text-left">
-        {/* Line 1: Teacher in #FAFAFA (or #1A3153) + 'I' in Warm Amber (#E09B30) + van in #FAFAFA */}
+        {/* Line 1: Teacher Ivan on a single line (never wraps) */}
         <div
-          className={`font-montserrat font-semibold md:font-bold tracking-tight ${primaryTextSize} ${
+          className={`font-montserrat font-bold tracking-tight whitespace-nowrap ${primaryTextSize} ${
             isLight ? 'text-[#1A3153]' : 'text-[#FAFAFA]'
           }`}
         >
@@ -68,7 +68,7 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 
         {/* Line 2: ENGLISH CLASSES in uppercase, geometric sans-serif (Montserrat), tracking-[0.25em] */}
         <div
-          className={`font-montserrat uppercase font-semibold tracking-[0.25em] ${sublineTextSize} mt-0.5 md:mt-1 ${
+          className={`font-montserrat uppercase font-semibold tracking-[0.22em] sm:tracking-[0.25em] whitespace-nowrap ${sublineTextSize} mt-0.5 md:mt-1 ${
             isLight ? 'text-[#4A5568]' : 'text-[#A7C7E7]'
           }`}
         >

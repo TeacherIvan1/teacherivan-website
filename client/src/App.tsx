@@ -1,31 +1,34 @@
 import React, { useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
-import { TutorControls } from './components/TutorControls';
+import { OverviewCorePillars } from './components/OverviewCorePillars';
+import { CompactVoiceSimulator } from './components/CompactVoiceSimulator';
+import { HowItWorksSection } from './components/HowItWorksSection';
+import { SessionArchitectureSection } from './components/SessionArchitectureSection';
+import { MarketComparisonSection } from './components/MarketComparisonSection';
+import { AsyncSprintSection } from './components/AsyncSprintSection';
+import { PricingPlansSection } from './components/PricingPlansSection';
+import { LearningPathsSection } from './components/LearningPathsSection';
+import { TrustSection } from './components/TrustSection';
 import { SessionReportPanel } from './components/SessionReportPanel';
 import { TeachingCard } from './components/TeachingCard';
 import { TokenInspector } from './components/TokenInspector';
 import { SessionFeed } from './components/SessionFeed';
 import { LiveDebugPanel } from './components/LiveDebugPanel';
 import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
-import { HowItWorksSection } from './components/HowItWorksSection';
-import { PricingPlansSection } from './components/PricingPlansSection';
-import { LearningPathsSection } from './components/LearningPathsSection';
-import { TrustSection } from './components/TrustSection';
-import { MobileBottomBar } from './components/MobileBottomBar';
 import { StudentReportModal } from './components/StudentReportModal';
 import { SpokenAssessmentModal } from './components/SpokenAssessmentModal';
 import { BrandLockup } from './components/BrandLockup';
-import { Headphones, Terminal, Sparkles } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { useTranslation } from './modules/i18n/languageStore';
 import { useDevModeStore } from './modules/dev/devModeStore';
-import { useAssessmentStore } from './modules/assessment/assessmentStore';
+import { useNavigationStore } from './modules/navigation/navigationStore';
 
 export const App: React.FC = () => {
   const { t } = useTranslation();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
-  const isAssessmentModalOpen = useAssessmentStore((s) => s.isAssessmentModalOpen);
+  const { activeView, setActiveView } = useNavigationStore();
 
   useEffect(() => {
     // Silently wake up the free Render backend instance immediately as page loads
@@ -43,137 +46,95 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter pb-20 md:pb-0">
-      {/* Auto-Pop-Up Spoken Assessment Modal on Website Entry */}
+    <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter">
+      {/* Auto-Pop-Up Spoken Assessment Welcome Sheet on Website Entry */}
       <SpokenAssessmentModal />
 
-      {/* Official Platform Header */}
+      {/* Official Platform Header with View Navigation Tabs */}
       <Header />
 
       <main className="flex-1 flex flex-col">
-        {/* Section 1: Outcome-Focused Brand Hero */}
-        <HeroSection />
+        {/* VIEW 1: INICIO / OVERVIEW (Clean, Scannable Landing Page) */}
+        {activeView === 'overview' && (
+          <div id="view-overview" className="flex flex-col animate-in fade-in duration-200">
+            {/* Section 1: Outcome-Focused Brand Hero */}
+            <HeroSection />
 
-        {/* Section 2: Gemini Voice Tutor Showcase (Directly following Hero) */}
-        <section
-          id="voice-tutor-showcase"
-          className="py-12 md:py-16 px-4 sm:px-6 max-w-7xl mx-auto w-full border-b border-[#A7C7E7]/25"
-          aria-label="Real-Time AI Voice Tutor Demo"
-        >
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#A7C7E7]/25">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 mb-2">
-                <Headphones size={13} className="text-[#E09B30]" />
-                <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-                  {t.voiceDemo.badge}
-                </span>
-              </div>
-              <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl text-[#FAFAFA] tracking-tight">
-                {t.voiceDemo.title}
-              </h2>
-            </div>
+            {/* Section 2: Visual Feature Cards (3 Core Pillars with Custom Chibi Showcase) */}
+            <OverviewCorePillars />
 
-            <div className="flex items-center gap-2 text-xs text-[#A7C7E7]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse" />
-              <span>{t.voiceDemo.activeBadge}</span>
-            </div>
+            {/* Section 3: Plans & Pricing (3 cards, BOB/USD toggle) */}
+            <PricingPlansSection />
+
+            {/* Section 4: Trust, Credentials, Testimonials & WhatsApp CTA */}
+            <TrustSection />
           </div>
+        )}
 
-          {/* Developer Mode Banner Notification (if active) */}
-          {isDeveloperMode && (
-            <div
-              id="dev-mode-active-banner"
-              className="mb-6 p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 flex items-center justify-between gap-3 text-xs text-[#FAFAFA]"
-            >
-              <div className="flex items-center gap-2">
-                <Terminal size={15} className="text-[#E09B30]" />
-                <span className="font-semibold text-[#E09B30]">{t.devMode.activeBanner}:</span>
-                <span>{t.devMode.notice}</span>
-              </div>
-              <button
-                onClick={toggleDeveloperMode}
-                className="text-[#E09B30] hover:underline font-semibold cursor-pointer"
+        {/* VIEW 2: SIMULADOR IA / AI VOICE SIMULATOR (Dedicated Interactive Section) */}
+        {activeView === 'simulator' && (
+          <div id="view-simulator" className="py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col animate-in fade-in duration-200">
+            {/* Developer Mode Banner Notification (if active) */}
+            {isDeveloperMode && (
+              <div
+                id="dev-mode-active-banner"
+                className="mb-6 p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 flex items-center justify-between gap-3 text-xs text-[#FAFAFA]"
               >
-                {t.devMode.toggleStudent}
-              </button>
-            </div>
-          )}
+                <div className="flex items-center gap-2">
+                  <Terminal size={15} className="text-[#E09B30]" />
+                  <span className="font-semibold text-[#E09B30]">{t.devMode.activeBanner}:</span>
+                  <span>{t.devMode.notice}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleDeveloperMode}
+                  className="text-[#E09B30] hover:underline font-semibold cursor-pointer"
+                >
+                  {t.devMode.toggleStudent}
+                </button>
+              </div>
+            )}
 
-          {/* Tutor Console Layout Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {isDeveloperMode ? (
-              /* Developer View: Full diagnostics, latency metrics, token inspector, logs, and raw report */
-              <>
+            {/* Ultra-Compact Voice Simulator Console */}
+            <CompactVoiceSimulator />
+
+            {/* In Developer Mode: Diagnostics Grid */}
+            {isDeveloperMode && (
+              <div className="mt-8 pt-8 border-t border-[#A7C7E7]/25 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 <div className="lg:col-span-7 flex flex-col gap-6">
-                  {!isAssessmentModalOpen ? (
-                    <TutorControls />
-                  ) : (
-                    <div
-                      id="tutor-controls-docked-notice"
-                      className="glass-panel p-6 text-center text-sm text-[#A7C7E7] border border-[#E09B30]/30 rounded-2xl bg-[#1A3153]/40"
-                    >
-                      <div className="flex items-center justify-center gap-2 text-[#E09B30] font-semibold mb-1">
-                        <Sparkles size={16} />
-                        <span>Voice Tutor Active in Diagnostic Assessment</span>
-                      </div>
-                      <p className="text-xs text-[#A7C7E7]">
-                        The Voice Tutor is currently docked inside the Spoken English Assessment modal above.
-                      </p>
-                    </div>
-                  )}
                   <SessionReportPanel />
                   <LatencyMetricsPanel />
                   <SessionFeed />
                 </div>
-
                 <div className="lg:col-span-5 flex flex-col gap-6">
                   <TeachingCard />
                   <TokenInspector />
                   <LiveDebugPanel />
                 </div>
-              </>
-            ) : (
-              /* Student View: Streamlined, distraction-free, 1-click workspace */
-              <>
-                <div className="lg:col-span-7 flex flex-col gap-6">
-                  {!isAssessmentModalOpen ? (
-                    <TutorControls />
-                  ) : (
-                    <div
-                      id="tutor-controls-docked-notice"
-                      className="glass-panel p-6 text-center text-sm text-[#A7C7E7] border border-[#E09B30]/30 rounded-2xl bg-[#1A3153]/40"
-                    >
-                      <div className="flex items-center justify-center gap-2 text-[#E09B30] font-semibold mb-1">
-                        <Sparkles size={16} />
-                        <span>Voice Tutor Active in Diagnostic Assessment</span>
-                      </div>
-                      <p className="text-xs text-[#A7C7E7]">
-                        The Voice Tutor is currently docked inside the Spoken English Assessment modal above.
-                      </p>
-                    </div>
-                  )}
-                  <SessionFeed />
-                </div>
-
-                <div className="lg:col-span-5 flex flex-col gap-6">
-                  <TeachingCard />
-                </div>
-              </>
+              </div>
             )}
           </div>
-        </section>
+        )}
 
-        {/* Section 3: How It Works (Bichronous Method: 3 steps, talk-time bar, week accordion) */}
-        <HowItWorksSection />
+        {/* VIEW 3: MÉTODO / METHODOLOGY (Detailed Bichronous Architecture View) */}
+        {activeView === 'methodology' && (
+          <div id="view-methodology" className="flex flex-col animate-in fade-in duration-200">
+            {/* Step 1: Bichronous Method Overview */}
+            <HowItWorksSection />
 
-        {/* Section 4: Plans & Pricing (Only place prices appear, 3 cards, BOB/USD toggle, 3-row plain comparison) */}
-        <PricingPlansSection />
+            {/* Step 2: 60-Minute Synchronous Session Timeline (>75% STT) with Chibi Online Coach */}
+            <SessionArchitectureSection />
 
-        {/* Section 5: Learning Paths (General Fluency & IELTS Prep, dark navy theme) */}
-        <LearningPathsSection />
+            {/* Step 3: Market Comparison (Traditional vs Private vs Teacher Ivan) */}
+            <MarketComparisonSection />
 
-        {/* Section 6: Trust & Proof + Final CTA (Ivan credentials, philosophy quote, 3 testimonials, final CTA) */}
-        <TrustSection />
+            {/* Step 4: 5-Day Asynchronous Sprint with Chibi Classroom Scene */}
+            <AsyncSprintSection />
+
+            {/* Step 5: Learning Paths (General Fluency vs IELTS Prep) */}
+            <LearningPathsSection />
+          </div>
+        )}
       </main>
 
       {/* Automatic End-of-Session Student Report Pop-Up Modal */}
@@ -189,22 +150,46 @@ export const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 text-xs text-[#A7C7E7]">
-            <a href="#voice-tutor-showcase" className="hover:text-[#E09B30] transition-colors">
-              {t.nav.voiceTutor}
-            </a>
-            <a href="#how-it-works-section" className="hover:text-[#E09B30] transition-colors">
-              {t.nav.howItWorks}
-            </a>
-            <a href="#pricing-plans-section" className="hover:text-[#E09B30] transition-colors">
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 text-xs text-[#A7C7E7]">
+            <button
+              type="button"
+              onClick={() => setActiveView('overview')}
+              className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                activeView === 'overview' ? 'text-[#E09B30] font-bold' : ''
+              }`}
+            >
+              {t.nav.overview}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView('simulator')}
+              className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                activeView === 'simulator' ? 'text-[#E09B30] font-bold' : ''
+              }`}
+            >
+              {t.nav.simulator}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView('methodology')}
+              className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                activeView === 'methodology' ? 'text-[#E09B30] font-bold' : ''
+              }`}
+            >
+              {t.nav.methodology}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView('overview');
+                setTimeout(() => {
+                  document.getElementById('pricing-plans-section')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+              className="hover:text-[#E09B30] transition-colors cursor-pointer"
+            >
               {t.nav.pricing}
-            </a>
-            <a href="#learning-paths-section" className="hover:text-[#E09B30] transition-colors">
-              {t.nav.learningPaths}
-            </a>
-            <a href="#trust-section" className="hover:text-[#E09B30] transition-colors">
-              {t.nav.aboutIvan}
-            </a>
+            </button>
           </div>
         </div>
 
@@ -217,9 +202,6 @@ export const App: React.FC = () => {
           </p>
         </div>
       </footer>
-
-      {/* Sticky Mobile Bottom Bar (Try AI Tutor + WhatsApp) */}
-      <MobileBottomBar />
     </div>
   );
 };
