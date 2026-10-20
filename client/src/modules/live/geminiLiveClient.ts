@@ -148,8 +148,8 @@ export class GeminiLiveClient {
                 disabled: false,
                 startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
                 endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH',
-                prefixPaddingMs: 200,
-                silenceDurationMs: 500,
+                prefixPaddingMs: 150,
+                silenceDurationMs: 350,
               },
             },
           },
@@ -350,6 +350,28 @@ export class GeminiLiveClient {
 
     debugLog('websocket', 'info', `Sending text turn: "${text}"`);
     this.sendMessage(textTurnMessage);
+  }
+
+  /**
+   * Sends an explicit turnComplete trigger to Gemini Live to instruct the model
+   * to immediately finalize the user turn and begin its response.
+   */
+  public sendTurnComplete(): void {
+    if (!this.isConnected || !this.isSetupDone || !this.ws) {
+      return;
+    }
+
+    const turnCompleteMessage = {
+      clientContent: {
+        turnComplete: true,
+      },
+    };
+
+    this.isInterrupted = false;
+    latencyTracker.markEndOfSpeech();
+
+    debugLog('websocket', 'info', 'Sending explicit client turnComplete trigger.');
+    this.sendMessage(turnCompleteMessage);
   }
 
   /**

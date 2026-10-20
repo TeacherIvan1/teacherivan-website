@@ -115,4 +115,32 @@ describe('i18n Language Module', () => {
     assert.ok(translations.en.pricingPlans.executive.name);
     assert.ok(translations.es.pricingPlans.executive.name);
   });
+
+  it('contains parallel translations for new scenarios (daily-routine & scholarship-interview)', () => {
+    // English scenarios
+    assert.ok(translations.en.scenarios['daily-routine']?.title);
+    assert.ok(translations.en.scenarios['daily-routine']?.desc);
+    assert.ok(translations.en.scenarios['scholarship-interview']?.title);
+    assert.ok(translations.en.scenarios['scholarship-interview']?.desc);
+
+    // Spanish scenarios
+    assert.ok(translations.es.scenarios['daily-routine']?.title);
+    assert.ok(translations.es.scenarios['daily-routine']?.desc);
+    assert.ok(translations.es.scenarios['scholarship-interview']?.title);
+    assert.ok(translations.es.scenarios['scholarship-interview']?.desc);
+  });
+
+  it('contains reassurance notice, doneSpeaking button, and dynamic placeholders in en and es', () => {
+    // English transcript strings
+    assert.ok(translations.en.transcript.reassuranceNotice.includes('AI tutor listens to your real voice'));
+    assert.strictEqual(translations.en.transcript.doneSpeaking, 'Done Speaking');
+    assert.ok(translations.en.transcript.placeholderConnectedIvan.includes('Teacher Ivan'));
+    assert.ok(translations.en.transcript.placeholderConnectedEmma.includes('Emma'));
+
+    // Spanish transcript strings
+    assert.ok(translations.es.transcript.reassuranceNotice.includes('El tutor IA escucha tu voz real'));
+    assert.strictEqual(translations.es.transcript.doneSpeaking, 'Listo');
+    assert.ok(translations.es.transcript.placeholderConnectedIvan.includes('Teacher Ivan'));
+    assert.ok(translations.es.transcript.placeholderConnectedEmma.includes('Emma'));
+  });
 });

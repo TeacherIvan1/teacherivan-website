@@ -37,6 +37,22 @@ export const INITIAL_SCENARIOS: LessonScenario[] = [
     targetGrammar: ['Tag questions (isn\'t it?, don\'t you?)', 'Future intentions (going to vs. will)'],
     targetVocabulary: ['Catch up', 'Grab a bite', 'Low-key', 'Up to much', 'Down to earth'],
   },
+  {
+    id: 'daily-routine',
+    title: 'Daily Routine',
+    category: 'Everyday Habits & Schedule',
+    description: 'Practice describing your morning habits, work/study schedule, and weekend hobbies using natural time expressions.',
+    targetVocabulary: ['WAKE UP', 'COMMUTE', 'SCHEDULE', 'USUALLY', 'WIND DOWN'],
+    targetGrammar: ['Present Simple & Adverbs of Frequency (always, usually, sometimes)', 'Prepositions of time (at, in, on)'],
+  },
+  {
+    id: 'scholarship-interview',
+    title: 'University Scholarship Interview',
+    category: 'Academic & Admissions',
+    description: 'Convince an international admissions committee why you deserve an academic scholarship by highlighting your achievements, leadership, and study goals.',
+    targetVocabulary: ['ACADEMIC MERIT', 'FINANCIAL AID', 'EXTRACURRICULAR', 'LONG-TERM GOAL', 'CONTRIBUTION'],
+    targetGrammar: ['Present Perfect for achievements (I have led...)', 'Future intentions & conditionals'],
+  },
 ];
 
 export const useTeachingStore = create<TeachingState>((set, get) => ({

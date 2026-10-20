@@ -19,14 +19,16 @@ import { LearningPathsSection } from './components/LearningPathsSection';
 import { StudentReportModal } from './components/StudentReportModal';
 import { SpokenAssessmentModal } from './components/SpokenAssessmentModal';
 import { BrandLockup } from './components/BrandLockup';
-import { Headphones, Terminal } from 'lucide-react';
+import { Headphones, Terminal, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { useTranslation } from './modules/i18n/languageStore';
 import { useDevModeStore } from './modules/dev/devModeStore';
+import { useAssessmentStore } from './modules/assessment/assessmentStore';
 
 export const App: React.FC = () => {
   const { t } = useTranslation();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
+  const isAssessmentModalOpen = useAssessmentStore((s) => s.isAssessmentModalOpen);
 
   useEffect(() => {
     // Silently wake up the free Render backend instance immediately as page loads
@@ -123,7 +125,22 @@ export const App: React.FC = () => {
             <>
               {/* Primary Column: Voice Controls, Pedagogical Report, Latency & Live Feed */}
               <div className="lg:col-span-7 flex flex-col gap-6">
-                <TutorControls />
+                {!isAssessmentModalOpen ? (
+                  <TutorControls />
+                ) : (
+                  <div
+                    id="tutor-controls-docked-notice"
+                    className="glass-panel p-6 text-center text-sm text-[#A7C7E7] border border-[#E09B30]/30 rounded-2xl bg-[#1A3153]/40"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-[#E09B30] font-semibold mb-1">
+                      <Sparkles size={16} />
+                      <span>Voice Tutor Active in Diagnostic Assessment</span>
+                    </div>
+                    <p className="text-xs text-[#A7C7E7]">
+                      The Voice Tutor is currently docked inside the Spoken English Assessment modal above.
+                    </p>
+                  </div>
+                )}
                 <SessionReportPanel />
                 <LatencyMetricsPanel />
                 <SessionFeed />
@@ -141,7 +158,22 @@ export const App: React.FC = () => {
             <>
               {/* Primary Column: Voice Controls & Live Voice Transcript */}
               <div className="lg:col-span-7 flex flex-col gap-6">
-                <TutorControls />
+                {!isAssessmentModalOpen ? (
+                  <TutorControls />
+                ) : (
+                  <div
+                    id="tutor-controls-docked-notice"
+                    className="glass-panel p-6 text-center text-sm text-[#A7C7E7] border border-[#E09B30]/30 rounded-2xl bg-[#1A3153]/40"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-[#E09B30] font-semibold mb-1">
+                      <Sparkles size={16} />
+                      <span>Voice Tutor Active in Diagnostic Assessment</span>
+                    </div>
+                    <p className="text-xs text-[#A7C7E7]">
+                      The Voice Tutor is currently docked inside the Spoken English Assessment modal above.
+                    </p>
+                  </div>
+                )}
                 <SessionFeed />
               </div>
 

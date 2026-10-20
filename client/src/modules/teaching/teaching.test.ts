@@ -2,7 +2,7 @@ import test, { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { buildSystemInstruction } from './instructionBuilder';
 import { TutorSettings, LessonScenario } from './types';
-import { DIAGNOSTIC_SCENARIO } from './teachingStore';
+import { DIAGNOSTIC_SCENARIO, INITIAL_SCENARIOS } from './teachingStore';
 import { useAssessmentStore } from '../assessment/assessmentStore';
 
 const MOCK_SCENARIO: LessonScenario = {
@@ -174,6 +174,10 @@ describe('buildSystemInstruction - Guardrails & Pure Function Integrity', () => 
     // 6. Acoustic & STT context
     assert(instruction.includes('ACOUSTIC & STT CONTEXT'), 'Must include acoustic & STT context');
     assert(instruction.includes('often from Sucre, Bolivia'), 'Must include phonetic grounding');
+    assert(
+      instruction.includes('CRITICAL: Never penalize or awkwardly question the student over Speech-to-Text transcription glitches'),
+      'Must include anti-penalty instruction for STT glitches'
+    );
   });
 
   it('is a deterministic pure function that does not mutate inputs', () => {
@@ -274,6 +278,42 @@ describe('Diagnostic Placement Test Scenario & Assessment Store', () => {
 
     store.openAssessmentModal();
     assert.strictEqual(useAssessmentStore.getState().isAssessmentModalOpen, true);
+  });
+});
+
+describe('New Curriculum Scenarios (Daily Routine & Scholarship Interview)', () => {
+  it('contains daily-routine scenario with required vocabulary and grammar targets', () => {
+    const dailyRoutine = INITIAL_SCENARIOS.find((s) => s.id === 'daily-routine');
+    assert.ok(dailyRoutine, 'daily-routine scenario must exist in INITIAL_SCENARIOS');
+    assert.strictEqual(dailyRoutine.title, 'Daily Routine');
+    assert.deepStrictEqual(dailyRoutine.targetVocabulary, [
+      'WAKE UP',
+      'COMMUTE',
+      'SCHEDULE',
+      'USUALLY',
+      'WIND DOWN',
+    ]);
+    assert(
+      dailyRoutine.targetGrammar.some((g) => g.includes('Present Simple & Adverbs of Frequency')),
+      'Must contain Present Simple & Adverbs of Frequency'
+    );
+  });
+
+  it('contains scholarship-interview scenario with required vocabulary and grammar targets', () => {
+    const scholarship = INITIAL_SCENARIOS.find((s) => s.id === 'scholarship-interview');
+    assert.ok(scholarship, 'scholarship-interview scenario must exist in INITIAL_SCENARIOS');
+    assert.strictEqual(scholarship.title, 'University Scholarship Interview');
+    assert.deepStrictEqual(scholarship.targetVocabulary, [
+      'ACADEMIC MERIT',
+      'FINANCIAL AID',
+      'EXTRACURRICULAR',
+      'LONG-TERM GOAL',
+      'CONTRIBUTION',
+    ]);
+    assert(
+      scholarship.targetGrammar.some((g) => g.includes('Present Perfect for achievements')),
+      'Must contain Present Perfect for achievements'
+    );
   });
 });
 

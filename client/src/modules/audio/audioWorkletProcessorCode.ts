@@ -8,9 +8,13 @@
  * 2. Downsamples from any browser AudioContext sample rate (e.g. 48kHz, 44.1kHz)
  *    to the official Gemini Live API specification: 16,000 Hz.
  * 3. Converts linear Float32 values [-1.0, 1.0] to signed 16-bit PCM little-endian.
- * 4. Buffers samples into chunks of 2048 samples (128ms at 16kHz).
- * 5. Computes RMS mic volume level (0-100) for UI visualization.
- * 6. Transfers the Int16Array ArrayBuffer to the main thread with zero copy.
+ * 4. Buffers samples into chunks of 1024 samples (64ms at 16kHz).
+ * 5. Calculates frame RMS volume level.
+ * 6. RMS Noise Gate: When RMS is below noise floor threshold (0.006) for >250ms,
+ *    streams pure digital zeros to prevent room hum from locking Gemini server-side VAD.
+ * 7. Tail Padding: Keeps streaming trailing audio for up to 250ms after speech stops
+ *    to prevent clipping the ends of words.
+ * 8. Transfers the Int16Array ArrayBuffer to the main thread with zero copy.
  */
 
 export const AUDIO_WORKLET_PROCESSOR_CODE = `
@@ -18,12 +22,16 @@ class GeminiAudioProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
     this.targetSampleRate = 16000;
-    this.bufferSize = 2048; // 2048 samples = ~128ms at 16kHz
+    this.bufferSize = 1024; // 1024 samples = 64ms at 16kHz
     this.outputBuffer = new Int16Array(this.bufferSize);
     this.outputIndex = 0;
     this.resampleRatio = sampleRate / this.targetSampleRate;
     this.resampleIndex = 0;
     this.inputBuffer = [];
+
+    // RMS Noise Gate & Tail Padding parameters
+    this.noiseThreshold = 0.006; // RMS noise floor threshold
+    this.silenceDurationMs = 9999; // Initialized in silent state
   }
 
   process(inputs) {
@@ -74,6 +82,7 @@ class GeminiAudioProcessor extends AudioWorkletProcessor {
 
   flush() {
     const copy = new Int16Array(this.outputBuffer);
+    const frameDurationMs = (copy.length / this.targetSampleRate) * 1000;
 
     // Calculate RMS volume level
     let sum = 0;
@@ -84,12 +93,32 @@ class GeminiAudioProcessor extends AudioWorkletProcessor {
     const rms = Math.sqrt(sum / copy.length);
     const level = Math.min(100, Math.round(rms * 130));
 
+    if (rms < this.noiseThreshold) {
+      this.silenceDurationMs += frameDurationMs;
+    } else {
+      this.silenceDurationMs = 0;
+    }
+
+    const isSilenceGateActive = this.silenceDurationMs > 250;
+    let outBuffer;
+
+    if (isSilenceGateActive) {
+      // Send pure digital zeros to prevent room hum from locking Gemini VAD
+      const zeroFrame = new Int16Array(copy.length);
+      outBuffer = zeroFrame.buffer;
+    } else {
+      // Stream actual speech or trailing silence tail padding
+      outBuffer = copy.buffer;
+    }
+
     this.port.postMessage(
       {
-        pcm16: copy.buffer,
-        level: level,
+        pcm16: outBuffer,
+        level: isSilenceGateActive ? 0 : level,
+        rms: rms,
+        isSilence: isSilenceGateActive,
       },
-      [copy.buffer]
+      [outBuffer]
     );
 
     this.outputIndex = 0;

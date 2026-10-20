@@ -10,6 +10,7 @@ import {
   Mic,
   Volume2,
   RotateCcw,
+  CheckCircle2,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useDebugStore } from '../modules/debug/debugLogger';
@@ -28,8 +29,10 @@ export const TutorControls: React.FC = () => {
     sessionStartTime,
     micLevel,
     isTutorSpeaking,
+    isUserSpeaking,
     startSession,
     stopSession,
+    forceTurnComplete,
     clearError,
   } = useConversationStore();
 
@@ -164,12 +167,24 @@ export const TutorControls: React.FC = () => {
       {/* Audio Status Banner */}
       {isConnected ? (
         <div className="audio-live-banner" style={{ marginTop: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <div className={`status-indicator-dot ${micLevel > 5 ? 'active-pulse' : ''}`} />
             <Mic size={16} color="#818cf8" />
             <span>
               {t.tutorConsole.micStream} <strong>{micLevel > 5 ? t.tutorConsole.micDetecting : t.tutorConsole.micListening}</strong>
             </span>
+            {isUserSpeaking && (
+              <button
+                id="tutor-controls-done-speaking-btn"
+                type="button"
+                onClick={() => forceTurnComplete()}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#E09B30]/90 transition-all cursor-pointer shadow-sm border-none ml-2"
+                title="Click to force AI tutor to reply immediately"
+              >
+                <CheckCircle2 size={12} />
+                <span>{t.transcript.doneSpeaking}</span>
+              </button>
+            )}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

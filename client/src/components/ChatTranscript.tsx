@@ -10,6 +10,7 @@ import {
   User,
   Bot,
   Terminal,
+  CheckCircle2,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
@@ -25,6 +26,7 @@ export const ChatTranscript: React.FC = () => {
     toggleMute,
     clearMessages,
     sendUserTextMessage,
+    forceTurnComplete,
   } = useConversationStore();
 
   const { t } = useTranslation();
@@ -164,6 +166,15 @@ export const ChatTranscript: React.FC = () => {
         </div>
       </div>
 
+      {/* Student-Friendly Reassurance Banner */}
+      <div
+        id="transcript-reassurance-banner"
+        className="px-3 py-1.5 mb-3 rounded-xl bg-[#1A3153]/60 border border-[#A7C7E7]/30 flex items-center gap-2 text-[11px] text-[#A7C7E7]"
+      >
+        <Sparkles size={13} className="text-[#E09B30] flex-shrink-0" />
+        <span>{t.transcript.reassuranceNotice}</span>
+      </div>
+
       {/* Messages Stream */}
       <div className="chat-messages-scroll" ref={scrollRef} id="chat-messages-container">
         {messages.length === 0 ? (
@@ -212,15 +223,30 @@ export const ChatTranscript: React.FC = () => {
                   <div className="bubble-header">
                     <span className={`bubble-author ${item.isInterrupted ? 'interrupted-author' : ''}`}>
                       {isUser ? (
-                        <>
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span>{t.transcript.you}</span>
                           {isUserSpeakingInterim && (
-                            <span className="live-speaking-pill">
-                              <span className="live-speaking-dot" />
-                              {t.transcript.speaking}
-                            </span>
+                            <>
+                              <span className="live-speaking-pill">
+                                <span className="live-speaking-dot" />
+                                {t.transcript.speaking}
+                              </span>
+                              <button
+                                type="button"
+                                id="done-speaking-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  forceTurnComplete();
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#E09B30]/90 transition-all shadow-sm cursor-pointer border-none"
+                                title="Click to force AI tutor to reply immediately"
+                              >
+                                <CheckCircle2 size={11} />
+                                <span>{t.transcript.doneSpeaking}</span>
+                              </button>
+                            </>
                           )}
-                        </>
+                        </div>
                       ) : item.isInterrupted ? (
                         isIvan ? `${tutorName} (interrupted)` : t.transcript.interruptedTutor
                       ) : (
@@ -253,7 +279,9 @@ export const ChatTranscript: React.FC = () => {
           id="chat-message-input"
           placeholder={
             isConnected
-              ? t.transcript.placeholderConnected
+              ? (isIvan
+                  ? (t.transcript.placeholderConnectedIvan || `Speak into microphone or type a message to ${tutorName}...`)
+                  : (t.transcript.placeholderConnectedEmma || `Speak into microphone or type a message to ${tutorName}...`))
               : t.transcript.placeholderDisconnected
           }
           value={inputMessage}

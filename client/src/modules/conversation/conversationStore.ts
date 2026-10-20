@@ -7,8 +7,25 @@ import { buildSystemInstruction, useTeachingStore } from '../teaching/teachingSt
 import { useReportStore } from '../report/reportStore';
 import { debugLog } from '../debug/debugLogger';
 import { latencyTracker } from '../latency/latencyTracker';
+import { cleanTranscript, mergeTranscriptionChunks } from './transcriptCleaner';
 
 let cleanupAudioStats: (() => void) | null = null;
+let turnEndWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
+
+function cancelTurnEndWatchdog(): void {
+  if (turnEndWatchdogTimer) {
+    clearTimeout(turnEndWatchdogTimer);
+    turnEndWatchdogTimer = null;
+  }
+}
+
+function resetTurnEndWatchdog(onTimeout: () => void): void {
+  cancelTurnEndWatchdog();
+  turnEndWatchdogTimer = setTimeout(() => {
+    turnEndWatchdogTimer = null;
+    onTimeout();
+  }, 1200);
+}
 
 export const useConversationStore = create<ConversationState>((set, get) => {
   // Subscribe to latency metrics updates
@@ -24,6 +41,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
     messages: [],
     micLevel: 0,
     isTutorSpeaking: false,
+    isUserSpeaking: false,
     isMuted: false,
     latencyStats: latencyTracker.getStats(),
 
@@ -126,6 +144,14 @@ export const useConversationStore = create<ConversationState>((set, get) => {
                 isTutorSpeaking: stats.isPlaying,
                 isMuted: stats.isMuted,
               });
+
+              // Turn-End Watchdog: If user is actively speaking and voice energy continues above threshold, keep resetting watchdog
+              if (get().isUserSpeaking && !stats.isMuted && stats.micLevel > 15 && !stats.isPlaying) {
+                resetTurnEndWatchdog(() => {
+                  debugLog('general', 'info', 'Turn-End Watchdog (1.2s silence) triggered automatic turn completion.');
+                  get().forceTurnComplete();
+                });
+              }
             });
           },
 
@@ -134,11 +160,15 @@ export const useConversationStore = create<ConversationState>((set, get) => {
           },
 
           onOutputTranscription: (text: string) => {
+            cancelTurnEndWatchdog();
+            set({ isUserSpeaking: false });
             get().finalizeTurn('user');
             get().appendInterimText('assistant', text);
           },
 
           onAudioChunk: (pcmBase64: string, turnId?: number) => {
+            cancelTurnEndWatchdog();
+            set({ isUserSpeaking: false });
             get().finalizeTurn('user');
             audioManager.playChunk(pcmBase64, turnId).catch((err) => {
               console.warn('[Audio Playback Warning]:', err);
@@ -188,6 +218,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
   },
 
   stopSession: () => {
+    cancelTurnEndWatchdog();
     const { status, sessionStartTime, messages } = get();
 
     if (cleanupAudioStats) {
@@ -216,6 +247,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
       sessionStartTime: null,
       micLevel: 0,
       isTutorSpeaking: false,
+      isUserSpeaking: false,
       messages: [...finalizedMessages, stopMessage],
     });
 
@@ -248,6 +280,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
   },
 
   resetSession: () => {
+    cancelTurnEndWatchdog();
     if (cleanupAudioStats) {
       cleanupAudioStats();
       cleanupAudioStats = null;
@@ -264,6 +297,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
       messages: [],
       micLevel: 0,
       isTutorSpeaking: false,
+      isUserSpeaking: false,
       isMuted: false,
       latencyStats: latencyTracker.getStats(),
     });
@@ -290,17 +324,22 @@ export const useConversationStore = create<ConversationState>((set, get) => {
   appendInterimText: (role: 'user' | 'assistant', textChunk: string) => {
     if (!textChunk) return;
 
+    if (role === 'user') {
+      set({ isUserSpeaking: true });
+      resetTurnEndWatchdog(() => {
+        debugLog('general', 'info', 'Turn-End Watchdog (1.2s silence) triggered automatic turn completion.');
+        get().forceTurnComplete();
+      });
+    }
+
     set((state) => {
       const messages = [...state.messages];
       const lastMsg = messages[messages.length - 1];
 
-      // If the last message matches the role and is marked interim, append/update text
+      // If the last message matches the role and is marked interim, merge text chunks
       if (lastMsg && lastMsg.role === role && lastMsg.isInterim) {
-        if (textChunk.startsWith(lastMsg.content)) {
-          lastMsg.content = textChunk;
-        } else {
-          lastMsg.content = lastMsg.content + textChunk;
-        }
+        const merged = mergeTranscriptionChunks(lastMsg.content, textChunk);
+        lastMsg.content = role === 'user' ? cleanTranscript(merged) : merged;
         return { messages };
       }
 
@@ -310,10 +349,11 @@ export const useConversationStore = create<ConversationState>((set, get) => {
       }
 
       // Create new interim message
+      const initialContent = role === 'user' ? cleanTranscript(textChunk) : textChunk;
       const newMsg: ConversationMessage = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         role,
-        content: textChunk,
+        content: initialContent,
         timestamp: new Date().toLocaleTimeString(),
         isInterim: true,
       };
@@ -323,15 +363,32 @@ export const useConversationStore = create<ConversationState>((set, get) => {
   },
 
   finalizeTurn: (role?: 'user' | 'assistant') => {
+    if (!role || role === 'user') {
+      cancelTurnEndWatchdog();
+      set({ isUserSpeaking: false });
+    }
+
     set((state) => {
       const messages = state.messages.map((m) => {
         if (m.isInterim && (!role || m.role === role)) {
-          return { ...m, isInterim: false };
+          const finalContent = m.role === 'user' ? cleanTranscript(m.content) : m.content;
+          return { ...m, content: finalContent, isInterim: false };
         }
         return m;
       });
       return { messages };
     });
+  },
+
+  forceTurnComplete: () => {
+    cancelTurnEndWatchdog();
+    const { status, isTutorSpeaking } = get();
+    if (status !== 'connected' || isTutorSpeaking) return;
+
+    debugLog('general', 'info', 'forceTurnComplete triggered (watchdog or manual Done Speaking button).');
+    get().finalizeTurn('user');
+    set({ isUserSpeaking: false });
+    geminiLiveClient.sendTurnComplete();
   },
 
   handleInterruption: (_turnId?: number) => {
@@ -375,7 +432,9 @@ export const useConversationStore = create<ConversationState>((set, get) => {
   sendUserTextMessage: (text: string) => {
     if (!text || text.trim() === '') return;
 
-    const trimmed = text.trim();
+    cancelTurnEndWatchdog();
+    set({ isUserSpeaking: false });
+    const trimmed = cleanTranscript(text.trim());
     // Add user message to transcript
     get().addMessage('user', trimmed);
     // Send to Gemini Live via WebSocket clientContent

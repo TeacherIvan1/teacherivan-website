@@ -26,6 +26,7 @@ export interface ConversationState {
   messages: ConversationMessage[];
   micLevel: number; // 0 - 100 RMS volume
   isTutorSpeaking: boolean;
+  isUserSpeaking: boolean;
   isMuted: boolean;
   latencyStats: LatencyStats;
 
@@ -37,6 +38,7 @@ export interface ConversationState {
   addMessage: (role: 'user' | 'assistant' | 'system', content: string) => void;
   appendInterimText: (role: 'user' | 'assistant', textChunk: string) => void;
   finalizeTurn: (role?: 'user' | 'assistant') => void;
+  forceTurnComplete: () => void;
   handleInterruption: (turnId?: number) => void;
   sendUserTextMessage: (text: string) => void;
   clearMessages: () => void;
