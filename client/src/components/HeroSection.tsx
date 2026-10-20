@@ -1,49 +1,35 @@
 import React from 'react';
-import { Mic, Sparkles, ArrowRight, ShieldCheck, Headphones, Zap } from 'lucide-react';
+import { Mic, MessageCircle, ArrowRight, CheckCircle2, Zap, Clock } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
-import { useAssessmentStore } from '../modules/assessment/assessmentStore';
 import { useTranslation } from '../modules/i18n/languageStore';
-import { useDevModeStore } from '../modules/dev/devModeStore';
 
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const persona = useTeachingStore((s) => s.persona);
-  const selectScenario = useTeachingStore((s) => s.selectScenario);
-  const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
   const { t } = useTranslation();
-  const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
   const isConnected = status === 'connected';
 
-  const isIvan = persona === 'teacher-ivan';
-  const heroCoachName = isIvan ? 'Teacher Ivan • AI Mentor' : t.hero.coachName;
-  const heroAvatarSrc = isIvan ? '/assets/logo.svg' : '/assets/emma.svg';
-  const heroAvatarAlt = isIvan ? 'Teacher Ivan Official Mascot' : 'Emma AI Tutor Mascot';
+  const WHATSAPP_PHONE = '59178680795';
+  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+    'Hola Teacher Ivan! Me gustaría consultar disponibilidad para clases 1 a 1 de inglés y probar el tutor de voz IA.'
+  )}`;
 
   const handleStartPractice = () => {
-    const startBtn = document.getElementById('start-session-btn');
-    if (startBtn) {
-      startBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      if (!isConnected) {
-        startSession();
-      }
-    }
-  };
-
-  const handleTakeAssessment = () => {
-    selectScenario('diagnostic-placement');
-    openAssessmentModal();
-  };
-
-  const handleLearnMore = () => {
-    const el = document.getElementById('market-comparison-section');
+    const el = document.getElementById('voice-tutor-showcase');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    if (!isConnected) {
+      startSession();
+    }
   };
 
+  const isEmma = persona === 'emma';
+  const tutorName = isEmma ? 'Emma' : 'Teacher Ivan';
+
   return (
-    <section className="relative bg-[#1A3153] border-b border-[#A7C7E7]/25 text-[#FAFAFA] py-16 md:py-20 px-6 overflow-hidden">
+    <section className="relative bg-[#1A3153] border-b border-[#A7C7E7]/25 text-[#FAFAFA] pt-14 pb-16 md:pt-20 md:pb-24 px-4 sm:px-6 overflow-hidden">
       {/* Decorative ambient background accents */}
       <div
         className="absolute top-0 right-1/4 w-96 h-96 bg-[#A7C7E7]/10 rounded-full blur-3xl pointer-events-none"
@@ -58,118 +44,136 @@ export const HeroSection: React.FC = () => {
         {/* Left Column: Value Proposition & High-Converting CTAs */}
         <div className="flex-1 text-center lg:text-left">
           {/* Institutional Trust Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAFAFA]/10 border border-[#A7C7E7]/40 mb-6 backdrop-blur-sm">
-            <Sparkles size={14} className="text-[#E09B30]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12223a]/80 border border-[#A7C7E7]/40 mb-5 backdrop-blur-sm shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
             <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#FAFAFA]">
-              {t.hero.badge}
+              {t.heroRedesign.badge}
             </span>
           </div>
 
-          {/* Main H1 Headline */}
-          <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-5xl leading-tight mb-6 tracking-tight text-[#FAFAFA]">
-            {t.hero.titlePart1}
-            <span className="text-[#E09B30] relative inline-block">
-              {t.hero.titleTeacher}
-              <span className="absolute bottom-0 left-0 w-full h-1 bg-[#E09B30]/40 rounded-full" />
+          {/* Main Outcome-Focused H1 (<=8 words) */}
+          <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.12] mb-5 tracking-tight text-[#FAFAFA]">
+            {t.heroRedesign.headlinePart1}
+            <span className="text-[#E09B30] relative inline-block underline decoration-[#E09B30]/40 decoration-4 underline-offset-4">
+              {t.heroRedesign.headlineHighlight}
             </span>
-            <br className="hidden sm:inline" /> {t.hero.titlePart2}
           </h1>
 
-          {/* Subtitle / Value Proposition */}
-          <p className="font-inter text-base sm:text-lg text-[#A7C7E7] max-width-xl mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-            {t.hero.subtitle}
+          {/* Subhead (<=20 words: Ivan + AI differentiator) */}
+          <p className="font-inter text-base sm:text-lg text-[#A7C7E7] mb-7 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            {t.heroRedesign.subhead}
           </p>
 
-          {/* High-Converting CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
-            {/* Primary: Take Spoken Assessment */}
+          {/* Primary CTA (Amber) + WhatsApp CTA */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-4 mb-4">
+            {/* Primary: Try AI Voice Tutor Free */}
             <button
-              id="hero-take-assessment-btn"
-              onClick={handleTakeAssessment}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/30 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50"
+              id="hero-primary-cta-btn"
+              onClick={handleStartPractice}
+              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-[#E09B30]/35 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#E09B30]/50 cursor-pointer min-h-[48px]"
             >
-              <Sparkles size={17} />
-              <span>{t.hero.takeAssessment}</span>
+              <Mic size={18} className="text-[#1A3153]" />
+              <span>{isConnected ? t.hero.sessionActive : t.heroRedesign.primaryCta}</span>
               <ArrowRight size={16} />
             </button>
 
-            {/* Secondary: Start AI Voice Practice */}
-            <button
-              id="hero-start-practice-btn"
-              onClick={handleStartPractice}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-montserrat font-semibold text-sm uppercase tracking-[0.15em] bg-[#FAFAFA]/10 border border-[#A7C7E7] text-[#FAFAFA] hover:bg-[#FAFAFA]/20 hover:border-[#FAFAFA] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C7E7]"
+            {/* Secondary: WhatsApp with Ivan */}
+            <a
+              id="hero-whatsapp-cta-link"
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full font-montserrat font-semibold text-sm uppercase tracking-[0.15em] bg-[#12223a] border border-[#A7C7E7]/60 text-[#FAFAFA] hover:bg-[#1A3153] hover:border-[#E09B30] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C7E7] min-h-[48px]"
             >
-              <Mic size={16} className="text-[#E09B30]" />
-              <span>{isConnected ? t.hero.sessionActive : t.hero.startPractice}</span>
-            </button>
-
-            {/* Tertiary: The Method */}
-            <button
-              id="hero-the-method-btn"
-              onClick={handleLearnMore}
-              className="w-full sm:w-auto text-xs text-[#A7C7E7] hover:text-[#FAFAFA] hover:underline font-medium py-2 px-3 transition-colors"
-            >
-              <span>{t.hero.theMethod}</span>
-            </button>
+              <MessageCircle size={18} className="text-[#25D366]" />
+              <span>{t.heroRedesign.whatsappCta}</span>
+            </a>
           </div>
 
+          {/* Reassurance Microcopy */}
+          <p className="text-xs text-[#A7C7E7]/80 mb-8 flex items-center justify-center lg:justify-start gap-1.5 font-medium">
+            <CheckCircle2 size={13} className="text-[#10b981]" />
+            <span>{t.heroRedesign.noSignup}</span>
+          </p>
+
           {/* Trust Metrics / Micro-proof */}
-          <div className="pt-6 border-t border-[#A7C7E7]/20 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-[#A7C7E7]">
+          <div className="pt-6 border-t border-[#A7C7E7]/20 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-[#A7C7E7]">
             <div className="flex items-center gap-2">
-              <Headphones size={16} className="text-[#E09B30]" />
-              <span>{isDeveloperMode ? t.hero.metricAudio : t.hero.metricAudioStudent}</span>
+              <Clock size={15} className="text-[#E09B30]" />
+              <span className="font-medium text-[#FAFAFA]">{t.heroRedesign.metricSpeaking}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Zap size={16} className="text-[#E09B30]" />
-              <span>{t.hero.metricLatency}</span>
+              <Zap size={15} className="text-[#E09B30]" />
+              <span>{t.heroRedesign.metricInstant}</span>
             </div>
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-[#E09B30]" />
-              <span>{t.hero.metricCefr}</span>
+              <CheckCircle2 size={15} className="text-[#10b981]" />
+              <span>{t.heroRedesign.metricPersonalized}</span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Hero Visual Card with Brand Mascot Logo */}
+        {/* Right Column: Interactive Live Mic + Sound Wave Visual */}
         <div className="w-full lg:w-auto flex-shrink-0 flex justify-center">
-          <div className="relative p-6 sm:p-8 rounded-2xl bg-[#12223a]/90 border border-[#A7C7E7] shadow-2xl backdrop-blur-md max-w-sm sm:max-w-md w-full">
-            {/* Top Badge */}
+          <div className="relative p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/40 shadow-2xl backdrop-blur-md max-w-sm sm:max-w-md w-full text-center">
+            {/* Top Indicator */}
             <div className="flex items-center justify-between pb-4 border-b border-[#A7C7E7]/25 mb-6">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse" />
                 <span className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#FAFAFA]">
-                  {t.hero.cardBadge}
+                  {t.heroRedesign.liveReady}
                 </span>
               </div>
-              <span className="text-[11px] font-mono font-medium text-[#A7C7E7] px-2 py-0.5 rounded bg-[#1A3153] border border-[#A7C7E7]/30">
-                {heroCoachName}
+              <span className="text-[11px] font-mono font-medium text-[#E09B30] px-2.5 py-0.5 rounded-full bg-[#1A3153] border border-[#E09B30]/30">
+                {tutorName}
               </span>
             </div>
 
-            {/* Logo Graphic Display with Isolation Zone (Minimum 160px width guaranteed) */}
-            <div className="bg-[#1A3153] rounded-xl p-6 flex flex-col items-center justify-center border border-[#A7C7E7]/30 mb-6 group transition-all">
-              <div className="relative py-2 px-4 flex items-center justify-center min-h-[160px]">
-                <img
-                  src={heroAvatarSrc}
-                  alt={heroAvatarAlt}
-                  className="min-w-[160px] w-52 sm:w-60 h-auto max-h-56 object-contain transition-transform duration-300 group-hover:scale-105"
-                />
+            {/* Interactive Sound Wave & Mic Stage */}
+            <div
+              onClick={handleStartPractice}
+              className="bg-[#1A3153]/80 rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center border border-[#A7C7E7]/30 hover:border-[#E09B30] transition-all cursor-pointer group shadow-inner relative overflow-hidden"
+              role="button"
+              tabIndex={0}
+              aria-label="Click to start speaking English with AI tutor"
+              onKeyDown={(e) => e.key === 'Enter' && handleStartPractice()}
+            >
+              {/* Radial background pulse */}
+              <div className="absolute inset-0 bg-radial from-[#E09B30]/10 via-transparent to-transparent pointer-events-none group-hover:scale-125 transition-transform duration-700" />
+
+              {/* Pulsing Mic Circle */}
+              <div className="relative mb-5">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-[#E09B30] to-[#f59e0b] flex items-center justify-center text-[#1A3153] shadow-lg shadow-[#E09B30]/35 transform group-hover:scale-105 transition-transform duration-300">
+                  <Mic size={36} className="text-[#1A3153]" />
+                </div>
+                {/* Subtle ripple rings */}
+                <div className="absolute -inset-2 rounded-full border border-[#E09B30]/40 animate-ping pointer-events-none opacity-40" />
+                <div className="absolute -inset-4 rounded-full border border-[#A7C7E7]/20 pointer-events-none" />
               </div>
-              <p className="mt-3 font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-                {t.hero.platformTag}
+
+              {/* Dynamic Sound Wave Bars */}
+              <div className="flex items-center justify-center gap-1.5 h-10 w-full mb-3" aria-hidden="true">
+                {[14, 24, 38, 20, 32, 42, 28, 16, 36, 44, 26, 18, 30, 22].map((height, i) => (
+                  <span
+                    key={i}
+                    className="w-1.5 rounded-full bg-gradient-to-t from-[#A7C7E7]/50 via-[#E09B30] to-[#E09B30]/80 group-hover:scale-y-125 transition-transform duration-300"
+                    style={{
+                      height: `${height}px`,
+                      animation: `soundWavePulse 1.2s ease-in-out infinite alternate ${i * 0.08}s`,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <p className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#FAFAFA] group-hover:text-[#E09B30] transition-colors">
+                {t.heroRedesign.liveReadySub}
               </p>
             </div>
 
-            {/* Micro details */}
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between text-[#A7C7E7]">
-                <span>{t.hero.curriculumMode}</span>
-                <span className="text-[#FAFAFA] font-medium">{t.hero.curriculumVal}</span>
-              </div>
-              <div className="flex justify-between text-[#A7C7E7]">
-                <span>{t.hero.cefrRange}</span>
-                <span className="text-[#FAFAFA] font-medium">{t.hero.cefrVal}</span>
-              </div>
+            {/* Bottom Value Tag */}
+            <div className="mt-4 pt-3 border-t border-[#A7C7E7]/15 flex items-center justify-center gap-2 text-xs text-[#A7C7E7]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E09B30]" />
+              <span>{t.heroRedesign.tagline}</span>
             </div>
           </div>
         </div>

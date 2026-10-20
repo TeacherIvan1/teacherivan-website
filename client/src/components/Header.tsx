@@ -83,10 +83,10 @@ export const Header: React.FC = () => {
             {t.nav.voiceTutor}
           </a>
           <a
-            href="#market-comparison-section"
+            href="#how-it-works-section"
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
-            {t.nav.bichronous}
+            {t.nav.howItWorks}
           </a>
           <a
             href="#pricing-plans-section"
@@ -95,10 +95,16 @@ export const Header: React.FC = () => {
             {t.nav.pricing}
           </a>
           <a
-            href="#hybrid-method-section"
+            href="#learning-paths-section"
             className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
           >
-            {t.nav.hybridMethod}
+            {t.nav.learningPaths}
+          </a>
+          <a
+            href="#trust-section"
+            className="text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors"
+          >
+            {t.nav.aboutIvan}
           </a>
         </nav>
       </div>

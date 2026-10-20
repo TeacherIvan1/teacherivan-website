@@ -16,12 +16,16 @@ import { useConversationStore } from '../modules/conversation/conversationStore'
 import { useDebugStore } from '../modules/debug/debugLogger';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useDevModeStore } from '../modules/dev/devModeStore';
+import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { TutorPersonaSelector } from './TutorPersonaSelector';
 import { TutorAvatarStage } from './TutorAvatarStage';
 
 export const TutorControls: React.FC = () => {
   const lastCloseCode = useDebugStore((s) => s.lastCloseCode);
   const lastCloseReason = useDebugStore((s) => s.lastCloseReason);
+  const selectedScenarioId = useTeachingStore((s) => s.selectedScenarioId);
+  const selectScenario = useTeachingStore((s) => s.selectScenario);
+  const isLocked = useTeachingStore((s) => s.isLocked);
   const {
     status,
     tokenInfo,
@@ -82,6 +86,40 @@ export const TutorControls: React.FC = () => {
         <TutorAvatarStage />
       </div>
 
+      {/* 4–6 Clickable Scenario Chips directly above the mic */}
+      <div className="w-full my-4 px-2">
+        <p className="text-xs text-[#A7C7E7] mb-2 font-medium text-center">
+          {t.voiceDemo.scenariosHeading}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {[
+            { id: 'casual-coffee', label: t.voiceDemo.chips.coffee },
+            { id: 'job-interview', label: t.voiceDemo.chips.interview },
+            { id: 'travel-airport', label: t.voiceDemo.chips.travel },
+            { id: 'daily-routine', label: t.voiceDemo.chips.routine },
+            { id: 'scholarship-interview', label: t.voiceDemo.chips.scholarship },
+          ].map((chip) => {
+            const isSelected = selectedScenarioId === chip.id;
+            return (
+              <button
+                key={chip.id}
+                type="button"
+                id={`scenario-chip-${chip.id}`}
+                disabled={isLocked}
+                onClick={() => selectScenario(chip.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-montserrat font-semibold transition-all duration-150 cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/35 font-bold scale-105'
+                    : 'bg-[#12223a] text-[#FAFAFA] border border-[#A7C7E7]/30 hover:border-[#E09B30] hover:text-[#E09B30]'
+                }`}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="button-stage">
         {isConnected && <div className="pulse-ring active" />}
 
@@ -120,6 +158,11 @@ export const TutorControls: React.FC = () => {
           </button>
         )}
       </div>
+
+      {/* 1-Line Reassurance Notice */}
+      <p className="text-xs text-[#A7C7E7]/80 text-center mt-2 mb-4 font-medium max-w-md mx-auto">
+        {t.voiceDemo.reassurance}
+      </p>
 
       {/* Metrics Bar */}
       <div className="session-metrics" id="session-metrics-bar">

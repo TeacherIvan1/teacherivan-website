@@ -54,6 +54,9 @@ export const TeachingCard: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const showFullSettings = isDeveloperMode || isCustomizing;
+
   return (
     <div className="glass-panel" id="teaching-context-panel">
       {/* Panel Header */}
@@ -64,6 +67,20 @@ export const TeachingCard: React.FC = () => {
             {t.pedagogy.cardTitle}
           </h2>
         </div>
+        
+        {/* Customize Toggle for Student Mode */}
+        {!isDeveloperMode && (
+          <button
+            type="button"
+            id="customize-settings-toggle-btn"
+            onClick={() => setIsCustomizing((prev) => !prev)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider bg-[#12223a] border border-[#A7C7E7]/40 text-[#E09B30] hover:border-[#E09B30] transition-all cursor-pointer"
+          >
+            <span>{isCustomizing ? t.voiceDemo.customizeHide : t.voiceDemo.customizeToggle}</span>
+            {isCustomizing ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+        )}
+
         {isLocked ? (
           <span
             style={{
@@ -83,11 +100,11 @@ export const TeachingCard: React.FC = () => {
             <Lock size={12} />
             {t.pedagogy.lockedBadge}
           </span>
-        ) : (
+        ) : isDeveloperMode ? (
           <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
             {t.pedagogy.activeDirectives}
           </span>
-        )}
+        ) : null}
       </div>
 
       {isLocked && (
@@ -110,10 +127,30 @@ export const TeachingCard: React.FC = () => {
         </div>
       )}
 
-      {/* Tutor Persona & Voice Partner Selector */}
-      <div className="mb-4">
-        <TutorPersonaSelector compact />
-      </div>
+      {/* Collapsed Summary Card (Student View Default) */}
+      {!showFullSettings && (
+        <div className="py-3 px-4 rounded-xl bg-[#12223a]/70 border border-[#A7C7E7]/25 text-xs text-[#A7C7E7] space-y-2 mb-2">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-[#FAFAFA]">{t.pedagogy.levelHeading}:</span>
+            <span className="font-bold text-[#E09B30] uppercase tracking-wider">{level}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-[#FAFAFA]">{t.pedagogy.modeHeading}:</span>
+            <span className="font-semibold text-[#FAFAFA] capitalize">{correctionMode}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-[#FAFAFA]">{t.pedagogy.scenarioHeading}:</span>
+            <span className="font-semibold text-[#FAFAFA] truncate max-w-[180px]">{activeScenario.title}</span>
+          </div>
+        </div>
+      )}
+
+      {showFullSettings && (
+        <>
+          {/* Tutor Persona & Voice Partner Selector */}
+          <div className="mb-4">
+            <TutorPersonaSelector compact />
+          </div>
 
       {/* 1. Learner Proficiency Level */}
       <div style={{ marginBottom: 8, fontSize: '0.8rem', color: '#A7C7E7', fontWeight: 600 }}>
@@ -344,6 +381,8 @@ export const TeachingCard: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+        </>
       )}
     </div>
   );
