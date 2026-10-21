@@ -1,0 +1,344 @@
+{
+  "format": "effectcraft.project",
+  "schema_version": 1,
+  "generator": "EffectCraft 0.1.0 (Teacher Ivan Pipeline)",
+  "composition": {
+    "name": "Reel - The Recast Technique: How Native Speakers Fix Your Mistakes",
+    "width": 1080,
+    "height": 1920,
+    "fps": 60,
+    "duration_seconds": 12,
+    "brand_palette": {
+      "NAVY": "#1A3153",
+      "AMBER": "#E09B30",
+      "DENIM": "#A7C7E7",
+      "SLATE": "#4A5568",
+      "WHITE": "#FAFAFA"
+    },
+    "layers": [
+      {
+        "id": "layer_top_half",
+        "name": "Top Half - Motion Graphics",
+        "type": "graphics_group",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 960
+        },
+        "scenes": [
+          {
+            "id": "scene-1-pills",
+            "type": "PillCloudScene",
+            "startTime": 0,
+            "endTime": 3,
+            "characterPose": "listening",
+            "background": "#FAFAFA",
+            "config": {
+              "badge": "PEDAGOGICAL BREAKTHROUGH",
+              "headline": "STOP MEMORIZING DEAD GRAMMAR RULES",
+              "pills": [
+                {
+                  "text": "❌ Rule Memorization",
+                  "accent": false
+                },
+                {
+                  "text": "✅ Native Recast Method",
+                  "accent": true
+                },
+                {
+                  "text": "🧠 Implicit Acquisition",
+                  "accent": true
+                },
+                {
+                  "text": "🔄 Conversational Flow",
+                  "accent": false
+                },
+                {
+                  "text": "⚡ Zero Interruption",
+                  "accent": true
+                }
+              ]
+            }
+          },
+          {
+            "id": "scene-2-comparison",
+            "type": "PhoneComparisonScene",
+            "startTime": 3,
+            "endTime": 6.5,
+            "characterPose": "recast-alert",
+            "background": "#FAFAFA",
+            "config": {
+              "badge": "HOW A RECAST ACTUALLY WORKS",
+              "leftCard": {
+                "title": "COMMON MISTAKE",
+                "badge": "STUDENT SPOKE",
+                "points": [
+                  "\"I have 26 years old.\"",
+                  "\"Yesterday I go to cinema.\"",
+                  "Direct translation from Spanish",
+                  "Interrupting breaks speaking confidence"
+                ]
+              },
+              "rightCard": {
+                "title": "NATIVE RECAST",
+                "badge": "TEACHER IVAN AI",
+                "points": [
+                  "\"Oh, you're 26 years old!\"",
+                  "\"Awesome, what movie did you see?\"",
+                  "Correct grammar modeled in context",
+                  "Keeps conversation flowing naturally"
+                ]
+              }
+            }
+          },
+          {
+            "id": "scene-3-counter",
+            "type": "CounterScene",
+            "startTime": 6.5,
+            "endTime": 9.5,
+            "characterPose": "speaking",
+            "background": "#FAFAFA",
+            "config": {
+              "badge": "MEASURED RETENTION IMPACT",
+              "startValue": 20,
+              "targetValue": 94,
+              "format": "%",
+              "label": "GRAMMAR RETENTION RATE",
+              "sublabel": "Implicit Recasts vs Traditional Textbook Drills",
+              "features": [
+                "Natural Ear Training",
+                "Instant Subconscious Recall",
+                "Permanent Pronunciation Fix"
+              ]
+            }
+          },
+          {
+            "id": "scene-4-cta",
+            "type": "CTACardScene",
+            "startTime": 9.5,
+            "endTime": 12,
+            "characterPose": "celebrate",
+            "background": "#1A3153",
+            "config": {
+              "badge": "MASTER NATIVE GRAMMAR",
+              "headline": "PRACTICE CONVERSATION RECASTS NOW",
+              "subhead": "Train with Teacher Ivan's real-time AI voice tutor for instant feedback.",
+              "buttonText": "START RECAST CHALLENGE",
+              "handle": "teacherivan.com • @morfeoacademy"
+            }
+          }
+        ]
+      },
+      {
+        "id": "layer_center_seam",
+        "name": "Center Seam - Dynamic Subtitle Banner",
+        "type": "text_animator",
+        "bounds": {
+          "x": 48,
+          "y": 880,
+          "width": 984,
+          "height": 160
+        },
+        "style": {
+          "background": "#1A3153",
+          "border": "3.5px solid #A7C7E7",
+          "border_radius": "32px",
+          "active_word_color": "#E09B30"
+        },
+        "cues": [
+          {
+            "startTime": 0,
+            "endTime": 3,
+            "text": "Stop memorizing grammar rules that you instantly forget when speaking.",
+            "words": [
+              {
+                "word": "Stop",
+                "startTime": 0,
+                "endTime": 0.4
+              },
+              {
+                "word": "memorizing",
+                "startTime": 0.4,
+                "endTime": 1,
+                "highlight": true
+              },
+              {
+                "word": "grammar",
+                "startTime": 1,
+                "endTime": 1.4
+              },
+              {
+                "word": "rules",
+                "startTime": 1.4,
+                "endTime": 1.8
+              },
+              {
+                "word": "you",
+                "startTime": 1.8,
+                "endTime": 2.1
+              },
+              {
+                "word": "forget",
+                "startTime": 2.1,
+                "endTime": 2.5,
+                "highlight": true
+              },
+              {
+                "word": "speaking.",
+                "startTime": 2.5,
+                "endTime": 3,
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "startTime": 3,
+            "endTime": 6.5,
+            "text": "When you say 'I have 26 years', native teachers don't correct—they recast.",
+            "words": [
+              {
+                "word": "When",
+                "startTime": 3,
+                "endTime": 3.3
+              },
+              {
+                "word": "you",
+                "startTime": 3.3,
+                "endTime": 3.6
+              },
+              {
+                "word": "make",
+                "startTime": 3.6,
+                "endTime": 3.9
+              },
+              {
+                "word": "mistakes,",
+                "startTime": 3.9,
+                "endTime": 4.5,
+                "highlight": true
+              },
+              {
+                "word": "we",
+                "startTime": 4.5,
+                "endTime": 4.8
+              },
+              {
+                "word": "don't",
+                "startTime": 4.8,
+                "endTime": 5.2
+              },
+              {
+                "word": "interrupt—",
+                "startTime": 5.2,
+                "endTime": 5.7
+              },
+              {
+                "word": "we",
+                "startTime": 5.7,
+                "endTime": 6
+              },
+              {
+                "word": "recast!",
+                "startTime": 6,
+                "endTime": 6.5,
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "startTime": 6.5,
+            "endTime": 9.5,
+            "text": "This triggers a 94 percent grammar retention without stress.",
+            "words": [
+              {
+                "word": "This",
+                "startTime": 6.5,
+                "endTime": 6.8
+              },
+              {
+                "word": "triggers",
+                "startTime": 6.8,
+                "endTime": 7.3
+              },
+              {
+                "word": "94%",
+                "startTime": 7.3,
+                "endTime": 7.9,
+                "highlight": true
+              },
+              {
+                "word": "retention",
+                "startTime": 7.9,
+                "endTime": 8.5,
+                "highlight": true
+              },
+              {
+                "word": "without",
+                "startTime": 8.5,
+                "endTime": 9
+              },
+              {
+                "word": "stress.",
+                "startTime": 9,
+                "endTime": 9.5,
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "startTime": 9.5,
+            "endTime": 12,
+            "text": "Experience the recast technique free at teacherivan.com!",
+            "words": [
+              {
+                "word": "Experience",
+                "startTime": 9.5,
+                "endTime": 10
+              },
+              {
+                "word": "the",
+                "startTime": 10,
+                "endTime": 10.2
+              },
+              {
+                "word": "recast",
+                "startTime": 10.2,
+                "endTime": 10.7,
+                "highlight": true
+              },
+              {
+                "word": "method",
+                "startTime": 10.7,
+                "endTime": 11.2
+              },
+              {
+                "word": "today!",
+                "startTime": 11.2,
+                "endTime": 12,
+                "highlight": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "layer_bottom_half",
+        "name": "Bottom Half - 2D Chibi Character Rig",
+        "type": "svg_puppet",
+        "bounds": {
+          "x": 0,
+          "y": 960,
+          "width": 1080,
+          "height": 960
+        },
+        "character": {
+          "id": "ivan",
+          "name": "Teacher Ivan",
+          "folder": "ivan",
+          "defaultPose": "listening"
+        }
+      }
+    ]
+  }
+}

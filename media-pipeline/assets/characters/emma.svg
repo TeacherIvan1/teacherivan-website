@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="emmaSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FAFAFA" />
+      <stop offset="100%" stop-color="#FAFAFA" />
+    </linearGradient>
+    <linearGradient id="emmaHair" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4A5568" />
+      <stop offset="100%" stop-color="#1A3153" />
+    </linearGradient>
+    <linearGradient id="emmaBlazer" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1A3153" />
+      <stop offset="100%" stop-color="#1A3153" />
+    </linearGradient>
+    <linearGradient id="emmaDenim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A7C7E7" />
+      <stop offset="100%" stop-color="#A7C7E7" />
+    </linearGradient>
+    <linearGradient id="emmaAmber" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E09B30" />
+      <stop offset="100%" stop-color="#E09B30" />
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#1A3153" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- BACK HAIR -->
+  <g id="back-hair">
+    <ellipse cx="250" cy="220" rx="145" ry="140" fill="url(#emmaHair)" />
+    <!-- Ponytail / Side Volume -->
+    <path d="M 120 220 Q 90 280 130 360 Q 170 330 160 270 Z" fill="url(#emmaHair)" />
+    <path d="M 380 220 Q 410 280 370 360 Q 330 330 340 270 Z" fill="url(#emmaHair)" />
+  </g>
+
+  <!-- BODY / TORSO -->
+  <g id="body" filter="url(#softShadow)">
+    <!-- Neck -->
+    <rect x="232" y="300" width="36" height="42" rx="10" fill="#FAFAFA" />
+    <rect x="232" y="300" width="36" height="42" rx="10" fill="#E09B30" fill-opacity="0.25" />
+    <!-- Shadow under chin -->
+    <ellipse cx="250" cy="312" rx="26" ry="8" fill="#4A5568" fill-opacity="0.25" />
+
+    <!-- Soft Denim Shirt -->
+    <path d="M 205 340 L 295 340 L 315 470 L 185 470 Z" fill="url(#emmaDenim)" />
+    <!-- Collar / Neckline -->
+    <path d="M 230 340 Q 250 368 270 340 Z" fill="#FAFAFA" />
+    <path d="M 230 340 Q 250 368 270 340 Z" fill="#E09B30" fill-opacity="0.25" />
+    
+    <!-- Deep Navy Blazer -->
+    <path d="M 185 340 Q 155 370 145 470 L 195 470 L 225 365 L 185 340 Z" fill="url(#emmaBlazer)" />
+    <path d="M 315 340 Q 345 370 355 470 L 305 470 L 275 365 L 315 340 Z" fill="url(#emmaBlazer)" />
+    
+    <!-- Warm Amber Lapel Accents -->
+    <path d="M 225 365 L 205 435 L 230 435 L 245 378 Z" fill="url(#emmaAmber)" />
+    <path d="M 275 365 L 295 435 L 270 435 L 255 378 Z" fill="url(#emmaAmber)" />
+
+    <!-- Tutor Badge on Lapel -->
+    <circle cx="200" cy="385" r="7" fill="url(#emmaAmber)" stroke="#FAFAFA" stroke-width="1.5" />
+    <circle cx="200" cy="385" r="3" fill="#1A3153" />
+  </g>
+
+  <!-- ENGLISH NOTEBOOK & ARMS -->
+  <g id="notebook-and-hands">
+    <!-- Left Arm -->
+    <path d="M 155 360 Q 140 405 180 435 Q 200 425 185 390 Z" fill="url(#emmaBlazer)" />
+    <!-- Right Arm -->
+    <path d="M 345 360 Q 360 405 320 435 Q 300 425 315 390 Z" fill="url(#emmaBlazer)" />
+
+    <!-- Notebook Base (Tilted Soft Denim Binder) -->
+    <rect x="200" y="390" width="100" height="95" rx="8" fill="url(#emmaDenim)" stroke="#1A3153" stroke-width="3" transform="rotate(-6 250 435)" />
+    <!-- Notebook Paper -->
+    <rect x="208" y="396" width="84" height="82" rx="4" fill="#FAFAFA" transform="rotate(-6 250 435)" />
+    
+    <!-- Warm Amber Ribbon Bookmark -->
+    <path d="M 245 385 L 245 425 L 252 418 L 259 425 L 259 385 Z" fill="url(#emmaAmber)" transform="rotate(-6 250 435)" />
+
+    <!-- Notebook Lines & "ABC" Graphic -->
+    <line x1="220" y1="425" x2="278" y2="425" stroke="#A7C7E7" stroke-width="2.5" stroke-linecap="round" transform="rotate(-6 250 435)" />
+    <line x1="220" y1="440" x2="278" y2="440" stroke="#A7C7E7" stroke-width="2.5" stroke-linecap="round" transform="rotate(-6 250 435)" />
+    <line x1="220" y1="455" x2="260" y2="455" stroke="#A7C7E7" stroke-width="2.5" stroke-linecap="round" transform="rotate(-6 250 435)" />
+    
+    <text x="222" y="415" font-family="'Montserrat', sans-serif" font-weight="900" font-size="12" fill="#1A3153" transform="rotate(-6 250 435)" letter-spacing="1">ENGLISH</text>
+
+    <!-- Hands Holding Notebook -->
+    <!-- Left Hand -->
+    <ellipse cx="196" cy="438" rx="14" ry="11" fill="#FAFAFA" stroke="#1A3153" stroke-width="1.5" transform="rotate(15 196 438)" />
+    <ellipse cx="196" cy="438" rx="14" ry="11" fill="#E09B30" fill-opacity="0.25" transform="rotate(15 196 438)" />
+    <!-- Right Hand -->
+    <ellipse cx="304" cy="432" rx="14" ry="11" fill="#FAFAFA" stroke="#1A3153" stroke-width="1.5" transform="rotate(-15 304 432)" />
+    <ellipse cx="304" cy="432" rx="14" ry="11" fill="#E09B30" fill-opacity="0.25" transform="rotate(-15 304 432)" />
+  </g>
+
+  <!-- HEAD & FACE -->
+  <g id="head" filter="url(#softShadow)">
+    <!-- Ears -->
+    <circle cx="135" cy="225" r="18" fill="#FAFAFA" />
+    <circle cx="135" cy="225" r="18" fill="#E09B30" fill-opacity="0.25" />
+    <circle cx="135" cy="225" r="9" fill="#4A5568" fill-opacity="0.2" />
+    <circle cx="365" cy="225" r="18" fill="#FAFAFA" />
+    <circle cx="365" cy="225" r="18" fill="#E09B30" fill-opacity="0.25" />
+    <circle cx="365" cy="225" r="9" fill="#4A5568" fill-opacity="0.2" />
+
+    <!-- Head Contour (Cute Chibi Shape) -->
+    <path d="M 140 210 Q 135 295 250 315 Q 365 295 360 210 Q 360 120 250 115 Q 140 120 140 210 Z" fill="#FAFAFA" stroke="#1A3153" stroke-width="3.5" />
+    <path d="M 140 210 Q 135 295 250 315 Q 365 295 360 210 Q 360 120 250 115 Q 140 120 140 210 Z" fill="#E09B30" fill-opacity="0.25" />
+
+    <!-- Cute Cheeks / Blush -->
+    <ellipse cx="185" cy="245" rx="16" ry="9" fill="#E09B30" fill-opacity="0.28" />
+    <ellipse cx="315" cy="245" rx="16" ry="9" fill="#E09B30" fill-opacity="0.28" />
+
+    <!-- Big Anime / Chibi Eyes -->
+    <!-- Left Eye -->
+    <g id="left-eye">
+      <ellipse cx="195" cy="215" rx="20" ry="24" fill="#1A3153" />
+      <ellipse cx="195" cy="218" rx="16" ry="20" fill="#4A5568" />
+      <ellipse cx="195" cy="222" rx="12" ry="14" fill="#E09B30" fill-opacity="0.85" />
+      <!-- Pupil & Sparkles -->
+      <ellipse cx="195" cy="216" rx="9" ry="11" fill="#1A3153" />
+      <circle cx="189" cy="208" r="6" fill="#FAFAFA" />
+      <circle cx="203" cy="222" r="3" fill="#FAFAFA" />
+      <!-- Eyelashes -->
+      <path d="M 172 204 Q 195 190 220 205" stroke="#1A3153" stroke-width="4.5" fill="none" stroke-linecap="round" />
+      <path d="M 218 198 L 227 193" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Right Eye -->
+    <g id="right-eye">
+      <ellipse cx="305" cy="215" rx="20" ry="24" fill="#1A3153" />
+      <ellipse cx="305" cy="218" rx="16" ry="20" fill="#4A5568" />
+      <ellipse cx="305" cy="222" rx="12" ry="14" fill="#E09B30" fill-opacity="0.85" />
+      <!-- Pupil & Sparkles -->
+      <ellipse cx="305" cy="216" rx="9" ry="11" fill="#1A3153" />
+      <circle cx="299" cy="208" r="6" fill="#FAFAFA" />
+      <circle cx="313" cy="222" r="3" fill="#FAFAFA" />
+      <!-- Eyelashes -->
+      <path d="M 280 205 Q 305 190 328 204" stroke="#1A3153" stroke-width="4.5" fill="none" stroke-linecap="round" />
+      <path d="M 326 198 L 335 193" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Eyebrows (Warm & Friendly) -->
+    <path d="M 175 186 Q 195 174 218 184" stroke="#4A5568" stroke-width="3.5" fill="none" stroke-linecap="round" />
+    <path d="M 282 184 Q 305 174 325 186" stroke="#4A5568" stroke-width="3.5" fill="none" stroke-linecap="round" />
+
+    <!-- Cute Nose -->
+    <path d="M 248 232 Q 252 236 248 240" stroke="#4A5568" stroke-width="2.5" fill="none" stroke-linecap="round" />
+
+    <!-- Cheerful Open Tutor Smile -->
+    <path d="M 230 256 Q 250 282 270 256 Z" fill="#E09B30" stroke="#1A3153" stroke-width="3" stroke-linejoin="round" />
+    <!-- White Teeth Accent -->
+    <path d="M 235 258 Q 250 266 265 258 Z" fill="#FAFAFA" />
+  </g>
+
+  <!-- STYLISH GLASSES (Warm Amber Frames) -->
+  <g id="glasses">
+    <!-- Left Frame -->
+    <circle cx="195" cy="216" r="28" fill="none" stroke="url(#emmaAmber)" stroke-width="4" />
+    <circle cx="195" cy="216" r="26" fill="#FAFAFA" fill-opacity="0.12" />
+    <!-- Right Frame -->
+    <circle cx="305" cy="216" r="28" fill="none" stroke="url(#emmaAmber)" stroke-width="4" />
+    <circle cx="305" cy="216" r="26" fill="#FAFAFA" fill-opacity="0.12" />
+    <!-- Bridge -->
+    <path d="M 223 216 Q 250 208 277 216" fill="none" stroke="url(#emmaAmber)" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Temples -->
+    <line x1="167" y1="216" x2="135" y2="210" stroke="url(#emmaAmber)" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="333" y1="216" x2="365" y2="210" stroke="url(#emmaAmber)" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Lens Sheen Highlights -->
+    <path d="M 180 196 L 210 200" stroke="#FAFAFA" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+    <path d="M 290 196 L 320 200" stroke="#FAFAFA" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+  </g>
+
+  <!-- FRONT HAIR & BANGS -->
+  <g id="front-hair">
+    <!-- Side Framing Hair -->
+    <path d="M 136 185 Q 120 250 148 310 Q 165 280 152 230 Z" fill="url(#emmaHair)" />
+    <path d="M 364 185 Q 380 250 352 310 Q 335 280 348 230 Z" fill="url(#emmaHair)" />
+    
+    <!-- Top Hair Volume & Soft Bangs -->
+    <path d="M 135 180 Q 150 90 250 85 Q 350 90 365 180 Q 330 140 280 155 Q 250 125 210 150 Q 170 135 135 180 Z" fill="url(#emmaHair)" />
+    <!-- Bang Strands -->
+    <path d="M 175 145 Q 210 185 235 160 Q 210 130 175 145 Z" fill="url(#emmaHair)" />
+    <path d="M 225 155 Q 260 190 290 155 Q 255 130 225 155 Z" fill="url(#emmaHair)" />
+    <path d="M 275 155 Q 315 185 335 160 Q 305 135 275 155 Z" fill="url(#emmaHair)" />
+    <!-- Hair Sheen Highlight -->
+    <path d="M 180 115 Q 250 98 320 115" stroke="#4A5568" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" />
+  </g>
+
+  <!-- EDTECH HEADSET WITH MIC (Voice Tutor Theme) -->
+  <g id="headset">
+    <!-- Headband -->
+    <path d="M 130 220 Q 120 70 250 65 Q 380 70 370 220" fill="none" stroke="#1A3153" stroke-width="8" stroke-linecap="round" />
+    <path d="M 140 180 Q 135 80 250 75 Q 365 80 360 180" fill="none" stroke="url(#emmaDenim)" stroke-width="3.5" stroke-linecap="round" />
+    
+    <!-- Left Earpad -->
+    <rect x="115" y="200" width="22" height="42" rx="9" fill="url(#emmaDenim)" stroke="#1A3153" stroke-width="3" />
+    <rect x="123" y="208" width="6" height="26" rx="3" fill="url(#emmaAmber)" />
+
+    <!-- Right Earpad -->
+    <rect x="363" y="200" width="22" height="42" rx="9" fill="url(#emmaDenim)" stroke="#1A3153" stroke-width="3" />
+    <rect x="371" y="208" width="6" height="26" rx="3" fill="url(#emmaAmber)" />
+
+    <!-- Microphone Boom (Extending from right earpad to mouth) -->
+    <path d="M 372 230 Q 375 285 295 280" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
+    <!-- Mic Capsule -->
+    <ellipse cx="286" cy="279" rx="9" ry="6" fill="#1A3153" stroke="url(#emmaDenim)" stroke-width="1.5" />
+    <!-- Active Indicator Light (Warm Amber) -->
+    <circle cx="283" cy="279" r="2.5" fill="url(#emmaAmber)" />
+  </g>
+</svg>

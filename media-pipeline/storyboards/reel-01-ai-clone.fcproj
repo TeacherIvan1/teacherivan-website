@@ -1,0 +1,245 @@
+{
+  "format": "filmcraft.project",
+  "schema_version": 13,
+  "generator": "FilmCraft 0.1.0 (Teacher Ivan Pipeline)",
+  "project": {
+    "name": "Habla Inglés con Fluidez Real: Test de Voz IA + Coaching 1-a-1",
+    "settings": {
+      "renderer": "FilmCraft GPU Acceleration (wgpu)",
+      "video_display": "Timecode",
+      "audio_display_samples": true,
+      "canvas_width": 1080,
+      "canvas_height": 1920,
+      "aspect_ratio": "9:16",
+      "frame_rate": 60,
+      "duration_seconds": 15
+    },
+    "brand_tokens": {
+      "NAVY": "#1A3153",
+      "AMBER": "#E09B30",
+      "DENIM": "#A7C7E7",
+      "SLATE": "#4A5568",
+      "WHITE": "#FAFAFA"
+    },
+    "root": {
+      "id": 0,
+      "name": "Habla Inglés con Fluidez Real: Test de Voz IA + Coaching 1-a-1",
+      "children": [
+        {
+          "Bin": {
+            "id": 1,
+            "name": "Motion Graphics Scenes",
+            "children": []
+          }
+        },
+        {
+          "Bin": {
+            "id": 2,
+            "name": "Character Poses",
+            "children": []
+          }
+        },
+        {
+          "Bin": {
+            "id": 3,
+            "name": "Audio Voiceovers",
+            "children": []
+          }
+        }
+      ]
+    },
+    "sequences": [
+      {
+        "id": 10,
+        "name": "9:16 Split-Screen Reel",
+        "width": 1080,
+        "height": 1920,
+        "fps": 60,
+        "tracks": [
+          {
+            "name": "V1_TopHalf_MotionGraphics",
+            "type": "video",
+            "items": [
+              {
+                "id": 100,
+                "type": "CounterScene",
+                "start_time": 0,
+                "end_time": 3,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "DIAGNÓSTICO EN TIEMPO REAL",
+                  "startValue": 0,
+                  "targetValue": 75,
+                  "format": "% STT",
+                  "label": "RATIO DE HABLA ACTIVA",
+                  "sublabel": "Test de fluidez y pronunciación instantánea",
+                  "features": [
+                    "Sin Miedo a Juicios",
+                    "Audio Nativo Gemini 2.0",
+                    "Recast Subconsciente"
+                  ]
+                }
+              },
+              {
+                "id": 101,
+                "type": "PillCloudScene",
+                "start_time": 3,
+                "end_time": 6,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "OBJETIVOS DE CARRERA REALES",
+                  "headline": "DESBLOQUEA TUS METAS EN INGLÉS",
+                  "pills": [
+                    {
+                      "text": "JOB INTERVIEW",
+                      "icon": "💼",
+                      "accent": false
+                    },
+                    {
+                      "text": "IELTS 7.0+",
+                      "icon": "🎯",
+                      "accent": true
+                    },
+                    {
+                      "text": "SCHOLARSHIP",
+                      "icon": "🎓",
+                      "accent": true
+                    },
+                    {
+                      "text": "QUICK RECAST",
+                      "icon": "💡",
+                      "accent": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": 102,
+                "type": "PhoneComparisonScene",
+                "start_time": 6,
+                "end_time": 9.5,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "TIEMPO REAL DE HABLA DEL ESTUDIANTE",
+                  "leftCard": {
+                    "title": "ACADEMIA TRADICIONAL",
+                    "ratio": "30%",
+                    "points": [
+                      "45 min de monólogo del profesor",
+                      "Menos de 2 min de turno al hablar",
+                      "Miedo y bloqueo frente a compañeros",
+                      "Gramática en hojas de papel"
+                    ]
+                  },
+                  "rightCard": {
+                    "title": "TEACHER IVAN BICHRONOUS",
+                    "ratio": ">75%",
+                    "points": [
+                      "24/7 de práctica con voz en vivo",
+                      "Recast conversacional sin interrupción",
+                      "1-a-1 de mentoría con Teacher Ivan",
+                      "Progreso CEFR 3.5x más rápido"
+                    ]
+                  }
+                }
+              },
+              {
+                "id": 103,
+                "type": "BichronousCycleScene",
+                "start_time": 9.5,
+                "end_time": 12.5,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "EL MÉTODO BICHRONOUS EN 24 HORAS",
+                  "nodes": [
+                    "1. Evalúa (90s IA)",
+                    "2. Practica 24/7",
+                    "3. Recast Instantáneo",
+                    "4. Sprint WhatsApp",
+                    "5. Clase 1-a-1"
+                  ]
+                }
+              },
+              {
+                "id": 104,
+                "type": "CTACardScene",
+                "start_time": 12.5,
+                "end_time": 15,
+                "background": "#1A3153",
+                "config": {
+                  "badge": "EMPIEZA GRATIS HOY",
+                  "headline": "TEST DE VOZ GRATIS (90S)",
+                  "subhead": "Prueba tu nivel oral real y descubre el método Bichronous en minutos.",
+                  "buttonText": "TEACHERIVAN.COM — TEST DE VOZ GRATIS (90S)",
+                  "handle": "TEACHERIVAN.COM • @MORFEOACADEMY"
+                }
+              }
+            ]
+          },
+          {
+            "name": "V2_CenterSeam_Subtitles",
+            "type": "video",
+            "items": [
+              {
+                "id": 200,
+                "start_time": 0,
+                "end_time": 3,
+                "text": "¿SABÍAS QUE EN CLASES TRADICIONALES SÓLO HABLAS UN 30% DEL TIEMPO?",
+                "word_count": 7
+              },
+              {
+                "id": 201,
+                "start_time": 3,
+                "end_time": 6,
+                "text": "DESBLOQUEA TUS METAS EN INGLÉS: ENTREVISTAS, BECAS Y TU CERTIFICACIÓN IELTS.",
+                "word_count": 5
+              },
+              {
+                "id": 202,
+                "start_time": 6,
+                "end_time": 9.5,
+                "text": "CON NUESTRO TUTOR IA HABLÁS MÁS DEL 75% DEL TIEMPO CON RECAST NATIVO.",
+                "word_count": 7
+              },
+              {
+                "id": 203,
+                "start_time": 9.5,
+                "end_time": 12.5,
+                "text": "EL CICLO BICHRONOUS UNE VOZ IA 24/7 CON CLASES 1-A-1 PERSONALIZADAS.",
+                "word_count": 5
+              },
+              {
+                "id": 204,
+                "start_time": 12.5,
+                "end_time": 15,
+                "text": "ENTRA HOY A TEACHERIVAN.COM Y HAZ TU TEST DE VOZ GRATIS EN 90 SEGUNDOS.",
+                "word_count": 5
+              }
+            ]
+          },
+          {
+            "name": "V3_BottomHalf_Protagonist",
+            "type": "video",
+            "items": [
+              {
+                "id": 301,
+                "mode": "chibi-avatar",
+                "character": "Teacher Ivan",
+                "folder": "ivan",
+                "start_time": 0,
+                "end_time": 15
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "next_id": 500
+  },
+  "view": {
+    "open_sequences": [
+      10
+    ],
+    "active_sequence": 10
+  }
+}

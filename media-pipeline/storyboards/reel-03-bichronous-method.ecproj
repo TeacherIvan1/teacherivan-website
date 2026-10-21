@@ -1,0 +1,340 @@
+{
+  "format": "effectcraft.project",
+  "schema_version": 1,
+  "generator": "EffectCraft 0.1.0 (Teacher Ivan Pipeline)",
+  "composition": {
+    "name": "Reel - The Bichronous Method: AI Voice Drilling + 1-on-1 Human Coaching",
+    "width": 1080,
+    "height": 1920,
+    "fps": 60,
+    "duration_seconds": 12,
+    "brand_palette": {
+      "NAVY": "#1A3153",
+      "AMBER": "#E09B30",
+      "DENIM": "#A7C7E7",
+      "SLATE": "#4A5568",
+      "WHITE": "#FAFAFA"
+    },
+    "layers": [
+      {
+        "id": "layer_top_half",
+        "name": "Top Half - Motion Graphics",
+        "type": "graphics_group",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 960
+        },
+        "scenes": [
+          {
+            "id": "scene-1-cycle",
+            "type": "BichronousCycleScene",
+            "startTime": 0,
+            "endTime": 3.5,
+            "characterPose": "speaking",
+            "background": "#FAFAFA",
+            "config": {
+              "badge": "THE HYBRID PEDAGOGY STANDARD",
+              "headline": "THE BICHRONOUS LEARNING CYCLE",
+              "nodes": [
+                {
+                  "title": "24/7 AI VOICE",
+                  "desc": "Low-stakes daily spoken repetition",
+                  "icon": "🎙️"
+                },
+                {
+                  "title": "1-ON-1 COACH",
+                  "desc": "Live strategy & personalized nuances",
+                  "icon": "👨‍🏫"
+                },
+                {
+                  "title": "RECAST DATA",
+                  "desc": "CEFR diagnostic & error trends",
+                  "icon": "📊"
+                }
+              ],
+              "centerBadge": "3.5x FASTER"
+            }
+          },
+          {
+            "id": "scene-2-counter",
+            "type": "CounterScene",
+            "startTime": 3.5,
+            "endTime": 6.5,
+            "characterPose": "celebrate",
+            "background": "#FAFAFA",
+            "config": {
+              "badge": "MEASURED RESULTS",
+              "startValue": 1,
+              "targetValue": 3.5,
+              "format": "x",
+              "label": "ACCELERATION TO CEFR B2",
+              "sublabel": "Compared to apps alone or weekly classroom sessions",
+              "features": [
+                "Eliminates Speaking Inhibitions",
+                "Permanent Pronunciation Muscle Memory",
+                "Customized Real-World Roleplays"
+              ]
+            }
+          },
+          {
+            "id": "scene-3-pills",
+            "type": "PillCloudScene",
+            "startTime": 6.5,
+            "endTime": 9.5,
+            "characterPose": "recast-alert",
+            "background": "#FAFAFA",
+            "config": {
+              "badge": "WHY BICHRONOUS WINS",
+              "headline": "AI BUILDS HABIT • HUMANS BUILD MASTERY",
+              "pills": [
+                {
+                  "text": "🤖 Unlimited AI Repetition",
+                  "accent": true
+                },
+                {
+                  "text": "❤️ Human Empathy & Nuance",
+                  "accent": true
+                },
+                {
+                  "text": "🕒 Zero Scheduling Friction",
+                  "accent": false
+                },
+                {
+                  "text": "🎯 Guaranteed Exam Readiness",
+                  "accent": false
+                },
+                {
+                  "text": "🏆 CEFR Certified Progress",
+                  "accent": true
+                }
+              ]
+            }
+          },
+          {
+            "id": "scene-4-cta",
+            "type": "CTACardScene",
+            "startTime": 9.5,
+            "endTime": 12,
+            "characterPose": "celebrate",
+            "background": "#1A3153",
+            "config": {
+              "badge": "TRANSFORM YOUR ENGLISH",
+              "headline": "EXPERIENCE THE BICHRONOUS DIFFERENCE",
+              "subhead": "Combines cutting-edge Gemini Live AI voice practice with master coaching.",
+              "buttonText": "BOOK FREE DIAGNOSTIC",
+              "handle": "teacherivan.com • @morfeoacademy"
+            }
+          }
+        ]
+      },
+      {
+        "id": "layer_center_seam",
+        "name": "Center Seam - Dynamic Subtitle Banner",
+        "type": "text_animator",
+        "bounds": {
+          "x": 48,
+          "y": 880,
+          "width": 984,
+          "height": 160
+        },
+        "style": {
+          "background": "#1A3153",
+          "border": "3.5px solid #A7C7E7",
+          "border_radius": "32px",
+          "active_word_color": "#E09B30"
+        },
+        "cues": [
+          {
+            "startTime": 0,
+            "endTime": 3.5,
+            "text": "The fastest path to B2 fluency is the Bichronous method: AI plus human coaching.",
+            "words": [
+              {
+                "word": "The",
+                "startTime": 0,
+                "endTime": 0.3
+              },
+              {
+                "word": "fastest",
+                "startTime": 0.3,
+                "endTime": 0.8,
+                "highlight": true
+              },
+              {
+                "word": "path",
+                "startTime": 0.8,
+                "endTime": 1.1
+              },
+              {
+                "word": "is",
+                "startTime": 1.1,
+                "endTime": 1.4
+              },
+              {
+                "word": "the",
+                "startTime": 1.4,
+                "endTime": 1.6
+              },
+              {
+                "word": "Bichronous",
+                "startTime": 1.6,
+                "endTime": 2.3,
+                "highlight": true
+              },
+              {
+                "word": "method:",
+                "startTime": 2.3,
+                "endTime": 2.8,
+                "highlight": true
+              },
+              {
+                "word": "AI",
+                "startTime": 2.8,
+                "endTime": 3.1,
+                "highlight": true
+              },
+              {
+                "word": "+ Human.",
+                "startTime": 3.1,
+                "endTime": 3.5,
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "startTime": 3.5,
+            "endTime": 6.5,
+            "text": "Students achieve confident conversational fluency three point five times faster.",
+            "words": [
+              {
+                "word": "Students",
+                "startTime": 3.5,
+                "endTime": 4
+              },
+              {
+                "word": "achieve",
+                "startTime": 4,
+                "endTime": 4.5
+              },
+              {
+                "word": "fluency",
+                "startTime": 4.5,
+                "endTime": 5,
+                "highlight": true
+              },
+              {
+                "word": "3.5x",
+                "startTime": 5,
+                "endTime": 5.7,
+                "highlight": true
+              },
+              {
+                "word": "faster!",
+                "startTime": 5.7,
+                "endTime": 6.5,
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "startTime": 6.5,
+            "endTime": 9.5,
+            "text": "AI voice builds daily muscle memory, while human mentorship builds real-world confidence.",
+            "words": [
+              {
+                "word": "AI",
+                "startTime": 6.5,
+                "endTime": 6.8
+              },
+              {
+                "word": "builds",
+                "startTime": 6.8,
+                "endTime": 7.2
+              },
+              {
+                "word": "muscle",
+                "startTime": 7.2,
+                "endTime": 7.7,
+                "highlight": true
+              },
+              {
+                "word": "memory,",
+                "startTime": 7.7,
+                "endTime": 8.2
+              },
+              {
+                "word": "humans",
+                "startTime": 8.2,
+                "endTime": 8.7
+              },
+              {
+                "word": "build",
+                "startTime": 8.7,
+                "endTime": 9
+              },
+              {
+                "word": "confidence.",
+                "startTime": 9,
+                "endTime": 9.5,
+                "highlight": true
+              }
+            ]
+          },
+          {
+            "startTime": 9.5,
+            "endTime": 12,
+            "text": "Book your personalized diagnostic English session today at teacherivan.com!",
+            "words": [
+              {
+                "word": "Book",
+                "startTime": 9.5,
+                "endTime": 9.9
+              },
+              {
+                "word": "your",
+                "startTime": 9.9,
+                "endTime": 10.2
+              },
+              {
+                "word": "diagnostic",
+                "startTime": 10.2,
+                "endTime": 10.8,
+                "highlight": true
+              },
+              {
+                "word": "session",
+                "startTime": 10.8,
+                "endTime": 11.2
+              },
+              {
+                "word": "today!",
+                "startTime": 11.2,
+                "endTime": 12,
+                "highlight": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "layer_bottom_half",
+        "name": "Bottom Half - 2D Chibi Character Rig",
+        "type": "svg_puppet",
+        "bounds": {
+          "x": 0,
+          "y": 960,
+          "width": 1080,
+          "height": 960
+        },
+        "character": {
+          "id": "emma",
+          "name": "Coach Emma",
+          "folder": "emma",
+          "defaultPose": "speaking"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Teacher Ivan - 9:16 Vertical Reel</title>
+<!-- Plantilla oficial Teacher Ivan adaptada de reels-con-ia.
+     Preserva la arquitectura seek(t) y sincronización con palabras.json.
+     Colores y tipografía 100% fieles a DESIGN.md y rules.md. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1A3153;
+  --amber: #E09B30;
+  --denim: #A7C7E7;
+  --slate: #4A5568;
+  --white: #FAFAFA;
+  --sans: "Montserrat", sans-serif;
+  --body: "Inter", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0b1422; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+
+#reel {
+  width: 1080px;
+  height: 1920px;
+  position: relative;
+  overflow: hidden;
+  background: var(--white);
+  font-family: var(--sans);
+  color: var(--navy);
+}
+
+/* Patrón educativo sutil al 10% */
+.edu-pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.08;
+  z-index: 1;
+}
+
+#broll {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1152px;
+  overflow: hidden;
+  z-index: 2;
+  transition: height 0.3s ease;
+}
+
+.escena {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 80px 140px 80px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 3;
+}
+
+/* Etiqueta / Pill Header */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: var(--white);
+  border: 2px solid var(--denim);
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--navy);
+  margin-bottom: 24px;
+  box-shadow: 0 4px 14px rgba(26, 49, 83, 0.08);
+}
+.badge-pill.dark { background: rgba(250,250,250,0.1); border-color: var(--amber); color: var(--amber); }
+.badge-pill .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); }
+
+/* Cámara / Protagonist Stage (Mitad inferior en el gancho: bottom 0, height 880px) */
+#cam {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1080px;
+  height: 880px;
+  overflow: hidden;
+  background: var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 4;
+}
+
+/* Soporte para video real (tomas/t1.webm) */
+#cam video, #cierre video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Soporte para Avatar SVG Rig (Teacher Ivan o Emma) */
+#chibi-rig-stage {
+  position: relative;
+  width: 580px;
+  height: 720px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.studio-podium {
+  position: absolute;
+  bottom: 10px;
+  width: 600px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(167, 199, 231, 0.45) 0%, rgba(26, 49, 83, 0.05) 70%, transparent 100%);
+  filter: blur(8px);
+}
+
+#avatar-svg-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+#avatar-svg-container svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 20px 30px rgba(26, 49, 83, 0.15));
+}
+
+/* Título de la unión / Center Seam Banner (y: 880px a 1040px) */
+#titulo {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 920px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+}
+
+#titulo span {
+  font: 900 52px/1.1 var(--sans);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  padding: 16px 32px 14px;
+  background: var(--navy);
+  color: var(--white);
+  border-radius: 20px;
+  border: 3px solid var(--denim);
+  box-shadow: 0 16px 40px rgba(26, 49, 83, 0.35);
+}
+
+#titulo span.b {
+  background: var(--amber);
+  color: var(--navy);
+  border-color: var(--navy);
+}
+
+/* Subtítulos dinámicos de reels-con-ia */
+#sub {
+  position: absolute;
+  left: 50px;
+  right: 50px;
+  bottom: 180px;
+  text-align: center;
+  z-index: 105;
+}
+
+#sub span {
+  display: inline-block;
+  font: 800 48px/1.2 var(--sans);
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--navy);
+  padding: 18px 32px;
+  border-radius: 24px;
+  border: 3px solid var(--denim);
+  box-shadow: 0 16px 45px rgba(26, 49, 83, 0.4);
+}
+
+#sub span em {
+  font-style: normal;
+  color: var(--amber);
+  text-shadow: 0 0 16px rgba(224, 155, 48, 0.6);
+}
+
+/* Cierre / Pantalla final con CTA */
+#cierre {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  z-index: 110;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+  text-align: center;
+}
+
+#cierre .cta {
+  font: 900 48px/1.2 var(--sans);
+  text-transform: uppercase;
+  color: var(--navy);
+  background: var(--amber);
+  padding: 26px 48px;
+  border-radius: 9999px;
+  box-shadow: 0 16px 50px rgba(224, 155, 48, 0.45);
+  margin-top: 30px;
+}
+
+/* Piezas de diseño de escenas */
+.grande { font: 900 110px/1.05 var(--sans); letter-spacing: -0.02em; color: var(--navy); }
+.grande em { font-style: normal; color: var(--amber); }
+.chico { font: 700 24px/1.3 var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); margin-top: 24px; }
+.numero-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 3.5px solid var(--denim);
+  border-radius: 28px;
+  padding: 16px 36px;
+  box-shadow: 0 16px 40px rgba(26, 49, 83, 0.1);
+  margin-top: 20px;
+}
+.numero { font: 900 120px/1 var(--sans); color: var(--navy); font-variant-numeric: tabular-nums; }
+.numero-unit { background: var(--amber); color: var(--navy); font: 900 36px var(--sans); padding: 10px 18px; border-radius: 14px; }
+
+.tarjeta {
+  background: #FFFFFF;
+  border: 2px solid var(--denim);
+  border-radius: 24px;
+  box-shadow: 0 12px 30px rgba(26, 49, 83, 0.08);
+  padding: 26px 36px;
+  font: 800 38px/1.2 var(--sans);
+  margin: 12px 0;
+  width: 100%;
+  max-width: 860px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: var(--navy);
+}
+.tarjeta i {
+  font-style: normal;
+  width: 60px;
+  height: 60px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--amber);
+  display: grid;
+  place-items: center;
+  font: 900 28px/1 var(--sans);
+}
+</style>
+</head>
+<body>
+<div id="reel">
+  <!-- Patrón educativo sutil al 10% -->
+  <svg class="edu-pattern" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <pattern id="edu-grid" width="100" height="100" patternUnits="userSpaceOnUse">
+        <path d="M15 25 h25 a5 5 0 0 1 5 5 v10 a5 5 0 0 1 -5 5 h-10 l-6 6 v-6 h-9 a5 5 0 0 1 -5 -5 v-10 a5 5 0 0 1 5 -5 z" fill="none" stroke="#A7C7E7" stroke-width="2" />
+        <path d="M65 20 v14 M71 16 v22 M77 22 v10" stroke="#E09B30" stroke-width="2" stroke-linecap="round" />
+        <circle cx="75" cy="75" r="10" fill="none" stroke="#1A3153" stroke-width="2" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#edu-grid)" />
+  </svg>
+
+  <div id="broll"></div>
+
+  <!-- Mitad inferior: Video real o Avatar SVG Rig -->
+  <div id="cam">
+    <!-- Si existe tomas/t1.webm o t1.mp4 -->
+    <video id="v-gancho" src="tomas/t1.webm" muted preload="auto" data-desfase="0" style="display:none;"></video>
+    
+    <!-- Avatar Rig SVG Chibi Teacher Ivan / Emma -->
+    <div id="chibi-rig-stage">
+      <div class="studio-podium"></div>
+      <div id="avatar-svg-container"></div>
+    </div>
+  </div>
+
+  <div id="titulo"></div>
+  <div id="sub"></div>
+
+  <!-- Cierre con Avatar o Pantalla Final -->
+  <div id="cierre">
+    <video id="v-cierre" src="tomas/t2.webm" muted preload="auto" data-desfase="0" style="display:none;"></video>
+    <div class="badge-pill dark"><span class="dot"></span>TEST DE VOZ 90S</div>
+    <div class="grande" style="color:var(--white);">HABLA INGLÉS<br><em style="color:var(--amber);">SIN BLOQUEOS</em></div>
+    <div class="cta"></div>
+  </div>
+</div>
+
+<script>
+// ==============================================================================
+// 1. CONFIGURACIÓN DEL REEL (Edición en Código)
+// ==============================================================================
+const CONFIG = {
+  DURACION: 38,                         // duración total en segundos = duración de voz.mp3
+  GANCHO_FIN: 6.8,                      // hasta acá: pantalla dividida (escena arriba, avatar abajo) con el título en la unión
+  CIERRE_DESDE: 32,                     // desde acá: llamado a la acción final
+  TITULO: ["¿SABÍAS QUE EN CLASES", "SÓLO HABLAS UN 30%?"],
+  CTA: "TEACHERIVAN.COM — TEST GRATIS",
+  BPM: 124,
+  AVATAR: "ivan",                       // "ivan" o "emma" (usa el rig SVG si no hay tomas/t1)
+};
+
+// ==============================================================================
+// 2. ESCENAS (Una por idea central)
+// ==============================================================================
+const ESCENAS = [
+  {
+    desde: 0,
+    hasta: 6.8,
+    html: `
+      <div class="badge-pill"><span class="dot"></span>DIAGNÓSTICO REAL</div>
+      <div class="grande">¿SÓLO HABLAS<br><em>UN 30%?</em></div>
+      <div class="chico">En clases tradicionales de inglés</div>
+    `,
+    anim: (el, p, t) => entrar(el.children[1], p * 4)
+  },
+  {
+    desde: 6.8,
+    hasta: 15.0,
+    html: `
+      <div class="badge-pill"><span class="dot"></span>RATIO DE HABLA</div>
+      <div class="numero-box">
+        <div class="numero" data-target="78">0</div>
+        <div class="numero-unit">% STT</div>
+      </div>
+      <div class="chico">CON EL TUTOR DE VOZ IA DE TEACHER IVAN</div>
+    `,
+    anim: (el, p) => {
+      const n = el.querySelector('.numero');
+      if (n) {
+        const target = +n.dataset.target || 78;
+        n.textContent = Math.round(target * suave(p * 2));
+      }
+    }
+  },
+  {
+    desde: 15.0,
+    hasta: 24.0,
+    html: `
+      <div class="badge-pill"><span class="dot"></span>OBJETIVOS DE CARRERA</div>
+      <div class="tarjeta"><i>💼</i>Entrevistas de Trabajo en Inglés</div>
+      <div class="tarjeta"><i>🎯</i>Certificación IELTS 7.0+</div>
+      <div class="tarjeta"><i>💡</i>Recast Instantáneo sin Juicios</div>
+    `,
+    anim: (el, p, t) => [...el.querySelectorAll('.tarjeta')].forEach((c, i) => entrar(c, (t - i * 0.7) * 2.5))
+  },
+  {
+    desde: 24.0,
+    hasta: 32.0,
+    html: `
+      <div class="badge-pill"><span class="dot"></span>EL CICLO 24H</div>
+      <div class="grande">IA 24/7 +<br><em>CLASE 1-A-1</em></div>
+      <div class="chico">MÉTODO BICHRONOUS COMPLETO</div>
+    `,
+    anim: (el, p, t) => entrar(el.children[1], p * 3)
+  }
+];
+
+// ==============================================================================
+// 3. MOTOR DE EDICIÓN & RENDER CUADRO A CUADRO
+// ==============================================================================
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const suave = x => { x = cl(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const rebote = x => { x = cl(x); const c = 1.70158; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+function entrar(el, x) {
+  if (!el) return;
+  el.style.opacity = cl(x * 1.6);
+  el.style.transform = `translateY(${(1 - suave(x)) * 36}px) scale(${.92 + .08 * rebote(x)})`;
+}
+
+const broll = document.getElementById('broll');
+ESCENAS.forEach(e => {
+  e.el = document.createElement('div');
+  e.el.className = 'escena';
+  e.el.innerHTML = e.html;
+  broll.appendChild(e.el);
+});
+
+document.getElementById('titulo').innerHTML = CONFIG.TITULO.map((l, i) => `<span class="${i ? 'b' : ''}">${l}</span>`).join('');
+document.querySelector('#cierre .cta').textContent = CONFIG.CTA;
+
+window.PALABRAS = window.PALABRAS || [];
+
+function frases() {
+  const out = []; let cur = [];
+  for (const w of window.PALABRAS) {
+    cur.push(w);
+    if (/[.,;:?!]$/.test(w.w.trim()) || cur.length >= 6) {
+      out.push(cur);
+      cur = [];
+    }
+  }
+  if (cur.length) out.push(cur);
+  return out.map(g => ({
+    s: g[0].s,
+    e: g[g.length - 1].e + 0.15,
+    t: g.map(w => w.w.trim()).join(' ')
+  }));
+}
+let FRASES = null;
+
+// Cargar Avatar Rig SVG en el contenedor
+let avatarSvgEl = null;
+const rigPath = CONFIG.AVATAR === 'emma' ? '../../assets/characters/emma-rig.svg' : '../../assets/characters/teacher-ivan-rig.svg';
+
+fetch(rigPath)
+  .then(r => r.text())
+  .then(svgText => {
+    document.getElementById('avatar-svg-container').innerHTML = svgText;
+    avatarSvgEl = document.getElementById('avatar-svg-container').querySelector('svg');
+  })
+  .catch(() => {
+    // Fallback a ruta local de assets
+    fetch('./assets/teacher-ivan-rig.svg')
+      .then(r => r.text())
+      .then(svgText => {
+        document.getElementById('avatar-svg-container').innerHTML = svgText;
+        avatarSvgEl = document.getElementById('avatar-svg-container').querySelector('svg');
+      }).catch(() => {});
+  });
+
+/**
+ * Función principal llamada por Playwright cuadro a cuadro: window.seek(t)
+ */
+window.seek = async function (t) {
+  FRASES = FRASES || frases();
+  const gancho = t < CONFIG.GANCHO_FIN;
+  const cierre = CONFIG.CIERRE_DESDE != null && t >= CONFIG.CIERRE_DESDE;
+
+  // Split-screen en el gancho, broll extendido luego
+  broll.style.height = gancho ? '1040px' : '1920px';
+  document.getElementById('cam').style.display = gancho ? 'flex' : 'none';
+  document.getElementById('titulo').style.display = gancho ? 'flex' : 'none';
+  document.getElementById('cierre').style.opacity = cierre ? 1 : 0;
+
+  // Escenas activas
+  for (const e of ESCENAS) {
+    const on = t >= e.desde && t < e.hasta;
+    e.el.style.opacity = on ? 1 : 0;
+    if (on && e.anim) e.anim(e.el, (t - e.desde) / (e.hasta - e.desde), t - e.desde);
+  }
+
+  // Subtítulos
+  const f = !gancho && !cierre && FRASES.find(x => t >= x.s && t < x.e);
+  if (f) {
+    // Resaltar la palabra activa en Warm Amber
+    const activeWord = window.PALABRAS.find(w => t >= w.s && t < w.e);
+    const highlightedText = activeWord
+      ? f.t.replace(new RegExp(`\\b${activeWord.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'), `<em>${activeWord.w}</em>`)
+      : f.t;
+    document.getElementById('sub').innerHTML = `<span>${highlightedText}</span>`;
+  } else {
+    document.getElementById('sub').innerHTML = '';
+  }
+
+  // Animación del Rig SVG según voz y timestamps
+  if (avatarSvgEl) {
+    const isSpeaking = window.PALABRAS.some(w => t >= w.s && t <= w.e);
+    const mouthOpen = avatarSvgEl.getElementById('mouth-talk-open');
+    const mouthIdle = avatarSvgEl.getElementById('mouth-idle');
+    const mouthSmile = avatarSvgEl.getElementById('mouth-smile');
+    const armGesture = avatarSvgEl.getElementById('right-arm-gesture');
+
+    if (mouthOpen && mouthIdle && mouthSmile) {
+      if (cierre) {
+        mouthSmile.setAttribute('opacity', '1');
+        mouthOpen.setAttribute('opacity', '0');
+        mouthIdle.setAttribute('opacity', '0');
+      } else if (isSpeaking) {
+        // Ciclo rápido de fonemas
+        const visemeStep = Math.floor(t * 12) % 2;
+        mouthOpen.setAttribute('opacity', visemeStep === 0 ? '1' : '0');
+        mouthIdle.setAttribute('opacity', visemeStep === 0 ? '0' : '1');
+        mouthSmile.setAttribute('opacity', '0');
+      } else {
+        mouthIdle.setAttribute('opacity', '1');
+        mouthOpen.setAttribute('opacity', '0');
+        mouthSmile.setAttribute('opacity', '0');
+      }
+    }
+
+    if (armGesture) {
+      // Si está en el gancho o hablando con énfasis, levantar brazo apuntando arriba
+      if (isSpeaking && gancho) {
+        armGesture.style.transform = 'rotate(-25deg)';
+      } else {
+        armGesture.style.transform = 'rotate(0deg)';
+      }
+    }
+  }
+
+  // Videos de apoyo (t1/t2) si existen
+  const vs = [...document.querySelectorAll('video')];
+  await Promise.all(vs.map(v => new Promise(res => {
+    if (!v.src || v.style.display === 'none') return res();
+    const desde = (v.id === 'v-cierre' ? (CONFIG.CIERRE_DESDE || 0) : 0) + (+v.dataset.desfase || 0);
+    const d = v.duration || 1, tt = Math.min(Math.max(0, t - desde), d - .04);
+    if (Math.abs(v.currentTime - tt) < 1e-3) return res();
+    const h = () => { v.removeEventListener('seeked', h); res(); };
+    v.addEventListener('seeked', h);
+    v.currentTime = tt;
+  })));
+};
+
+window.listo = async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.querySelectorAll('video')].map(v => {
+    if (!v.src || v.style.display === 'none') return Promise.resolve();
+    return v.readyState >= 2 ? Promise.resolve() : new Promise(r => { v.onloadeddata = r; v.onerror = r; });
+  }));
+};
+</script>
+</body>
+</html>

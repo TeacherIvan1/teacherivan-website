@@ -1,0 +1,232 @@
+{
+  "format": "filmcraft.project",
+  "schema_version": 13,
+  "generator": "FilmCraft 0.1.0 (Teacher Ivan Pipeline)",
+  "project": {
+    "name": "The Recast Technique: How Native Speakers Fix Your Mistakes",
+    "settings": {
+      "renderer": "FilmCraft GPU Acceleration (wgpu)",
+      "video_display": "Timecode",
+      "audio_display_samples": true,
+      "canvas_width": 1080,
+      "canvas_height": 1920,
+      "aspect_ratio": "9:16",
+      "frame_rate": 60,
+      "duration_seconds": 12
+    },
+    "brand_tokens": {
+      "NAVY": "#1A3153",
+      "AMBER": "#E09B30",
+      "DENIM": "#A7C7E7",
+      "SLATE": "#4A5568",
+      "WHITE": "#FAFAFA"
+    },
+    "root": {
+      "id": 0,
+      "name": "The Recast Technique: How Native Speakers Fix Your Mistakes",
+      "children": [
+        {
+          "Bin": {
+            "id": 1,
+            "name": "Motion Graphics Scenes",
+            "children": []
+          }
+        },
+        {
+          "Bin": {
+            "id": 2,
+            "name": "Character Poses",
+            "children": []
+          }
+        },
+        {
+          "Bin": {
+            "id": 3,
+            "name": "Audio Voiceovers",
+            "children": []
+          }
+        }
+      ]
+    },
+    "sequences": [
+      {
+        "id": 10,
+        "name": "9:16 Split-Screen Reel",
+        "width": 1080,
+        "height": 1920,
+        "fps": 60,
+        "tracks": [
+          {
+            "name": "V1_TopHalf_MotionGraphics",
+            "type": "video",
+            "items": [
+              {
+                "id": 100,
+                "type": "PillCloudScene",
+                "start_time": 0,
+                "end_time": 3,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "PEDAGOGICAL BREAKTHROUGH",
+                  "headline": "STOP MEMORIZING DEAD GRAMMAR RULES",
+                  "pills": [
+                    {
+                      "text": "❌ Rule Memorization",
+                      "accent": false
+                    },
+                    {
+                      "text": "✅ Native Recast Method",
+                      "accent": true
+                    },
+                    {
+                      "text": "🧠 Implicit Acquisition",
+                      "accent": true
+                    },
+                    {
+                      "text": "🔄 Conversational Flow",
+                      "accent": false
+                    },
+                    {
+                      "text": "⚡ Zero Interruption",
+                      "accent": true
+                    }
+                  ]
+                }
+              },
+              {
+                "id": 101,
+                "type": "PhoneComparisonScene",
+                "start_time": 3,
+                "end_time": 6.5,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "HOW A RECAST ACTUALLY WORKS",
+                  "leftCard": {
+                    "title": "COMMON MISTAKE",
+                    "badge": "STUDENT SPOKE",
+                    "points": [
+                      "\"I have 26 years old.\"",
+                      "\"Yesterday I go to cinema.\"",
+                      "Direct translation from Spanish",
+                      "Interrupting breaks speaking confidence"
+                    ]
+                  },
+                  "rightCard": {
+                    "title": "NATIVE RECAST",
+                    "badge": "TEACHER IVAN AI",
+                    "points": [
+                      "\"Oh, you're 26 years old!\"",
+                      "\"Awesome, what movie did you see?\"",
+                      "Correct grammar modeled in context",
+                      "Keeps conversation flowing naturally"
+                    ]
+                  }
+                }
+              },
+              {
+                "id": 102,
+                "type": "CounterScene",
+                "start_time": 6.5,
+                "end_time": 9.5,
+                "background": "#FAFAFA",
+                "config": {
+                  "badge": "MEASURED RETENTION IMPACT",
+                  "startValue": 20,
+                  "targetValue": 94,
+                  "format": "%",
+                  "label": "GRAMMAR RETENTION RATE",
+                  "sublabel": "Implicit Recasts vs Traditional Textbook Drills",
+                  "features": [
+                    "Natural Ear Training",
+                    "Instant Subconscious Recall",
+                    "Permanent Pronunciation Fix"
+                  ]
+                }
+              },
+              {
+                "id": 103,
+                "type": "CTACardScene",
+                "start_time": 9.5,
+                "end_time": 12,
+                "background": "#1A3153",
+                "config": {
+                  "badge": "MASTER NATIVE GRAMMAR",
+                  "headline": "PRACTICE CONVERSATION RECASTS NOW",
+                  "subhead": "Train with Teacher Ivan's real-time AI voice tutor for instant feedback.",
+                  "buttonText": "START RECAST CHALLENGE",
+                  "handle": "teacherivan.com • @morfeoacademy"
+                }
+              }
+            ]
+          },
+          {
+            "name": "V2_CenterSeam_Subtitles",
+            "type": "video",
+            "items": [
+              {
+                "id": 200,
+                "start_time": 0,
+                "end_time": 3,
+                "text": "Stop memorizing grammar rules that you instantly forget when speaking.",
+                "word_count": 7
+              },
+              {
+                "id": 201,
+                "start_time": 3,
+                "end_time": 6.5,
+                "text": "When you say 'I have 26 years', native teachers don't correct—they recast.",
+                "word_count": 9
+              },
+              {
+                "id": 202,
+                "start_time": 6.5,
+                "end_time": 9.5,
+                "text": "This triggers a 94 percent grammar retention without stress.",
+                "word_count": 6
+              },
+              {
+                "id": 203,
+                "start_time": 9.5,
+                "end_time": 12,
+                "text": "Experience the recast technique free at teacherivan.com!",
+                "word_count": 5
+              }
+            ]
+          },
+          {
+            "name": "V3_BottomHalf_CharacterRig",
+            "type": "video",
+            "items": [
+              {
+                "id": 301,
+                "character": "Teacher Ivan",
+                "folder": "ivan",
+                "start_time": 0,
+                "end_time": 12
+              }
+            ]
+          },
+          {
+            "name": "A1_Voiceover",
+            "type": "audio",
+            "items": [
+              {
+                "id": 401,
+                "name": "Gemini Live Speech / Voice Track",
+                "start_time": 0,
+                "end_time": 12
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "next_id": 500
+  },
+  "view": {
+    "open_sequences": [
+      10
+    ],
+    "active_sequence": 10
+  }
+}

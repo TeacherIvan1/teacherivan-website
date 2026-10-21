@@ -1,0 +1,260 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%" role="img" aria-labelledby="ivan-title">
+  <title id="ivan-title">Chibi Teacher Ivan - Full-Body Rigged SVG</title>
+  <defs>
+    <style>
+      .rig-layer {
+        transform-box: view-box;
+        transition: transform 0.25s ease-out, opacity 0.15s ease-in-out;
+      }
+      @keyframes auraPulse {
+        0%, 100% { transform: scale(1); opacity: 0.92; }
+        50% { transform: scale(1.03); opacity: 1; }
+      }
+      #bg-aura {
+        animation: auraPulse 3.5s ease-in-out infinite;
+      }
+    </style>
+
+    <!-- Woven Chambray Shirt Texture (Matches Reference Image Shirt) -->
+    <pattern id="chambray-weave" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#A7C7E7" />
+      <path d="M 0 0 L 8 0 M 0 4 L 8 4 M 0 0 L 0 8 M 4 0 L 4 8" stroke="#FAFAFA" stroke-width="1" stroke-opacity="0.45" />
+      <path d="M 2 0 L 2 8 M 6 0 L 6 8 M 0 2 L 8 2 M 0 6 L 8 6" stroke="#4A5568" stroke-width="0.6" stroke-opacity="0.12" />
+    </pattern>
+  </defs>
+
+  <!-- ======================================================== -->
+  <!-- 1. BACKGROUND AURA & GROUND SHADOW (#A7C7E7 / #E09B30)   -->
+  <!-- ======================================================== -->
+  <g id="bg-aura" class="rig-layer" transform-origin="300 320" style="transform-origin: 300px 320px;">
+    <!-- Subtle Ambient Aura Rings -->
+    <circle cx="300" cy="300" r="245" fill="#FAFAFA" stroke="#A7C7E7" stroke-width="3" stroke-opacity="0.45" />
+    <circle cx="300" cy="300" r="220" fill="#A7C7E7" fill-opacity="0.1" stroke="#E09B30" stroke-width="2.5" stroke-dasharray="18 14" stroke-opacity="0.45" />
+    <!-- Ground Cast Shadow (From Reference Image) -->
+    <ellipse cx="300" cy="542" rx="96" ry="14" fill="#4A5568" fill-opacity="0.22" />
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 2. TORSO, CHAMBRAY SHIRT, BELT, JEANS & SHOES            -->
+  <!-- ======================================================== -->
+  <g id="torso" class="rig-layer" transform-origin="300 430" style="transform-origin: 300px 430px;">
+
+    <!-- Shoes (#4A5568 + #1A3153 + Warm Tint) -->
+    <g id="shoes">
+      <!-- Left Shoe (Viewer's Left) -->
+      <path d="M 234 514 C 216 516 206 526 208 535 C 210 541 248 541 260 535 L 264 514 Z" fill="#4A5568" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+      <path d="M 234 514 C 216 516 206 526 208 535 C 210 541 248 541 260 535 L 264 514 Z" fill="#E09B30" fill-opacity="0.18" />
+      <!-- Right Shoe (Viewer's Right) -->
+      <path d="M 332 514 L 334 536 C 344 543 376 542 380 534 C 384 524 374 515 358 514 Z" fill="#4A5568" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+      <path d="M 332 514 L 334 536 C 344 543 376 542 380 534 C 384 524 374 515 358 514 Z" fill="#E09B30" fill-opacity="0.18" />
+    </g>
+
+    <!-- Denim Jeans (#1A3153 Base + #A7C7E7 Mid-Blue Denim Overlay) -->
+    <g id="jeans">
+      <path d="M 238 422 L 362 422 C 366 456 364 490 362 520 L 330 520 L 302 464 L 296 464 L 268 520 L 232 520 C 230 490 234 456 238 422 Z" fill="#1A3153" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+      <path d="M 238 422 L 362 422 C 366 456 364 490 362 520 L 330 520 L 302 464 L 296 464 L 268 520 L 232 520 C 230 490 234 456 238 422 Z" fill="#A7C7E7" fill-opacity="0.38" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+      <!-- Pocket Seams & Fly Details -->
+      <path d="M 236 446 Q 254 448 258 432" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+      <path d="M 364 446 Q 346 448 342 432" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+      <line x1="296" y1="434" x2="296" y2="462" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+      <line x1="288" y1="458" x2="308" y2="458" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="306" y1="468" x2="318" y2="468" stroke="#1A3153" stroke-width="3" stroke-linecap="round" />
+    </g>
+
+    <!-- Neck Base (Warm Peach Skin via #FAFAFA + #E09B30) -->
+    <path d="M 276 310 L 324 310 L 320 348 L 280 348 Z" fill="#FAFAFA" stroke="#1A3153" stroke-width="5" />
+    <path d="M 276 310 L 324 310 L 320 348 L 280 348 Z" fill="#E09B30" fill-opacity="0.28" />
+
+    <!-- Textured Light-Blue Chambray Button-Up Shirt -->
+    <g id="shirt-body">
+      <path d="M 250 318 C 234 326 232 372 236 420 Q 300 432 364 420 C 368 372 366 326 350 318 Z" fill="url(#chambray-weave)" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+
+      <!-- Open V-Neck Skin Triangle -->
+      <polygon points="285,316 296,342 315,316" fill="#FAFAFA" />
+      <polygon points="285,316 296,342 315,316" fill="#E09B30" fill-opacity="0.28" />
+      <polyline points="285,316 296,342 315,316" fill="none" stroke="#1A3153" stroke-width="5" stroke-linejoin="round" />
+
+      <!-- Shirt Collar Flaps -->
+      <polygon points="274,315 268,339 291,330 285,316" fill="#A7C7E7" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
+      <polygon points="326,315 332,339 309,330 315,316" fill="#A7C7E7" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
+
+      <!-- Center Placket & 4 Buttons -->
+      <path d="M 296 342 Q 293 382 294 422" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+      <circle cx="299" cy="355" r="3" fill="#1A3153" />
+      <circle cx="298" cy="374" r="3" fill="#1A3153" />
+      <circle cx="298" cy="393" r="3" fill="#1A3153" />
+      <circle cx="298" cy="411" r="3" fill="#1A3153" />
+    </g>
+
+    <!-- Leather Belt & Buckle -->
+    <g id="belt">
+      <path d="M 235 415 Q 300 429 365 415 L 364 427 Q 300 441 236 427 Z" fill="#4A5568" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
+      <path d="M 235 415 Q 300 429 365 415 L 364 427 Q 300 441 236 427 Z" fill="#E09B30" fill-opacity="0.3" />
+      <!-- Belt Loops -->
+      <rect x="252" y="417" width="6" height="13" rx="2" fill="#1A3153" />
+      <rect x="342" y="417" width="6" height="13" rx="2" fill="#1A3153" />
+      <!-- Belt Buckle -->
+      <rect x="282" y="420" width="24" height="12" rx="3" fill="#FAFAFA" stroke="#1A3153" stroke-width="4" />
+      <rect x="288" y="423" width="12" height="6" rx="1.5" fill="#4A5568" />
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 3. LEFT ARM & ROLLED CUFF + COMPACT CEFR PROP            -->
+  <!-- ======================================================== -->
+  <g id="left-arm-prop" class="rig-layer" transform-origin="242 332" style="transform-origin: 242px 332px;">
+    <!-- Left Forearm & Hand (Warm Peach Skin) -->
+    <path d="M 206 386 C 202 406 202 426 208 438 C 214 447 232 446 234 432 C 236 418 234 402 234 388 Z" fill="#FAFAFA" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M 206 386 C 202 406 202 426 208 438 C 214 447 232 446 234 432 C 236 418 234 402 234 388 Z" fill="#E09B30" fill-opacity="0.28" />
+    <!-- Hand Finger Curl Detail (Matches Reference) -->
+    <path d="M 216 423 C 216 434 225 435 225 422" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Left Short Sleeve & Rolled Cuff -->
+    <path d="M 248 320 C 224 328 210 352 206 380 L 238 384 L 242 348 Z" fill="url(#chambray-weave)" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M 201 374 Q 220 371 239 379 L 237 392 Q 219 385 201 388 Z" fill="#A7C7E7" stroke="#1A3153" stroke-width="5" stroke-linejoin="round" />
+
+    <!-- Floating / Clip-On Mini CEFR Badge Prop (Cleanly Paired with Left Arm) -->
+    <g transform="translate(116, 388) rotate(-6)">
+      <rect x="0" y="0" width="76" height="54" rx="10" fill="#FAFAFA" stroke="#1A3153" stroke-width="4" />
+      <rect x="6" y="6" width="64" height="18" rx="6" fill="#1A3153" />
+      <text x="38" y="19" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="800" font-size="9.5" fill="#E09B30">CEFR A1-C1</text>
+      <text x="12" y="38" font-family="Montserrat, sans-serif" font-weight="700" font-size="10" fill="#1A3153">English</text>
+      <path d="M 54 31 L 59 36 L 67 27" fill="none" stroke="#E09B30" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 4. RIGHT ARM GESTURE (PIVOTS AT SHOULDER: 358, 332)      -->
+  <!-- ======================================================== -->
+  <g id="right-arm-gesture" class="rig-layer" transform-origin="358 332" style="transform-origin: 358px 332px;">
+    <!-- Right Forearm & Hand (Matches Reference Silhouette) -->
+    <path d="M 394 386 C 398 406 398 426 392 438 C 386 447 368 446 366 432 C 364 418 366 402 366 388 Z" fill="#FAFAFA" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M 394 386 C 398 406 398 426 392 438 C 386 447 368 446 366 432 C 364 418 366 402 366 388 Z" fill="#E09B30" fill-opacity="0.28" />
+    <!-- Thumb Tucked Detail -->
+    <path d="M 366 420 C 372 424 374 432 368 436" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Right Short Sleeve & Rolled Cuff -->
+    <path d="M 352 320 C 376 328 390 352 394 380 L 362 384 L 358 348 Z" fill="url(#chambray-weave)" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M 361 379 Q 380 371 399 374 L 399 388 Q 381 385 363 392 Z" fill="#A7C7E7" stroke="#1A3153" stroke-width="5" stroke-linejoin="round" />
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 5. HEAD GROUP (EXACT CHIBI HEAD, HAIR, BROWS, HEADSET)   -->
+  <!-- ======================================================== -->
+  <g id="head-group" class="rig-layer" transform-origin="300 310" style="transform-origin: 300px 310px;">
+
+    <!-- Rounded Side Ears (Warm Peach Skin) -->
+    <g id="ears">
+      <!-- Left Ear -->
+      <circle cx="188" cy="252" r="24" fill="#FAFAFA" stroke="#1A3153" stroke-width="6" />
+      <circle cx="188" cy="252" r="24" fill="#E09B30" fill-opacity="0.28" />
+      <!-- Right Ear -->
+      <circle cx="412" cy="252" r="24" fill="#FAFAFA" stroke="#1A3153" stroke-width="6" />
+      <circle cx="412" cy="252" r="24" fill="#E09B30" fill-opacity="0.28" />
+    </g>
+
+    <!-- Wide Rounded-Square Chibi Head (Matches Reference Proportions) -->
+    <path d="M 192 170 C 188 232 190 278 214 300 C 238 318 268 322 300 322 C 332 322 362 318 386 300 C 410 278 412 232 408 170 C 404 130 360 116 300 116 C 240 116 196 130 192 170 Z" fill="#FAFAFA" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
+    <path d="M 192 170 C 188 232 190 278 214 300 C 238 318 268 322 300 322 C 332 322 362 318 386 300 C 410 278 412 232 408 170 C 404 130 360 116 300 116 C 240 116 196 130 192 170 Z" fill="#E09B30" fill-opacity="0.28" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
+
+    <!-- Swept-Back Hair with Left Cowlick Spike & Sideburns (Matches Reference Image) -->
+    <g id="hair">
+      <path d="M 192 252
+               C 182 234 176 206 174 178
+               C 170 144 182 126 198 120
+               C 194 106 198 92 204 88
+               C 214 96 226 96 238 88
+               C 258 72 288 70 318 76
+               C 356 72 396 84 410 118
+               C 424 136 428 166 420 196
+               C 420 218 416 238 408 252
+               L 404 206
+               C 394 196 390 176 388 152
+               C 348 160 256 160 206 150
+               C 192 164 190 190 192 208
+               Z" fill="#4A5568" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
+      <!-- Warm Espresso-Brown Hair Overlay (#1A3153 + #E09B30 Tint) -->
+      <path d="M 192 252
+               C 182 234 176 206 174 178
+               C 170 144 182 126 198 120
+               C 194 106 198 92 204 88
+               C 214 96 226 96 238 88
+               C 258 72 288 70 318 76
+               C 356 72 396 84 410 118
+               C 424 136 428 166 420 196
+               C 420 218 416 238 408 252
+               L 404 206
+               C 394 196 390 176 388 152
+               C 348 160 256 160 206 150
+               C 192 164 190 190 192 208
+               Z" fill="#E09B30" fill-opacity="0.18" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
+
+      <!-- Interior Hair Parting Creases & Sideburn Lines (Exact Reference Detail) -->
+      <path d="M 262 118 Q 270 142 280 156" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
+      <path d="M 348 124 Q 338 144 322 156" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
+      <path d="M 176 192 Q 184 198 191 200" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+      <path d="M 404 198 Q 412 202 418 198" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+    </g>
+
+    <!-- Bold Confident Angled Eyebrows (Exact Reference Shape) -->
+    <g id="eyebrows">
+      <path d="M 212 197 C 232 197 252 204 265 215 C 248 211 228 205 212 202 Z" fill="#1A3153" stroke="#1A3153" stroke-width="2" stroke-linejoin="round" />
+      <path d="M 388 197 C 368 197 348 204 335 215 C 352 211 372 205 388 202 Z" fill="#1A3153" stroke="#1A3153" stroke-width="2" stroke-linejoin="round" />
+    </g>
+
+    <!-- ======================================================== -->
+    <!-- 6A. EYES OPEN LAYER (Solid Dark Oval Eyes + Crease)      -->
+    <!-- ======================================================== -->
+    <g id="eyes-open" class="rig-layer" transform-origin="300 240" style="transform-origin: 300px 240px;" opacity="1">
+      <!-- Left Upper Eyelid Crease & Solid Oval Eye -->
+      <path d="M 218 227 Q 242 214 264 229" fill="none" stroke="#1A3153" stroke-width="5" stroke-linecap="round" />
+      <ellipse cx="244" cy="242" rx="14" ry="18" fill="#1A3153" />
+
+      <!-- Right Upper Eyelid Crease & Solid Oval Eye -->
+      <path d="M 336 229 Q 358 214 382 227" fill="none" stroke="#1A3153" stroke-width="5" stroke-linecap="round" />
+      <ellipse cx="356" cy="242" rx="14" ry="18" fill="#1A3153" />
+    </g>
+
+    <!-- ======================================================== -->
+    <!-- 6B. EYES BLINK LAYER (Toggle opacity: 1)                 -->
+    <!-- ======================================================== -->
+    <g id="eyes-blink" class="rig-layer" transform-origin="300 240" style="transform-origin: 300px 240px;" opacity="0">
+      <path d="M 222 244 Q 244 256 264 244" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
+      <path d="M 336 244 Q 356 256 378 244" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Minimalist Curved Chibi Nose Tick -->
+    <path d="M 297 256 C 293 263 294 268 300 270" fill="none" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
+
+    <!-- ======================================================== -->
+    <!-- 7A. MOUTH VISEME: SMILE (Exact Asymmetric Smirk)         -->
+    <!-- ======================================================== -->
+    <g id="mouth-smile" class="rig-layer" transform-origin="300 280" style="transform-origin: 300px 280px;" opacity="1">
+      <path d="M 275 283 Q 304 288 326 273" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
+      <path d="M 323 268 Q 329 272 328 278" fill="none" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
+    </g>
+
+    <!-- ======================================================== -->
+    <!-- 7B. MOUTH VISEME: IDLE (Gentle Neutral Line)             -->
+    <!-- ======================================================== -->
+    <g id="mouth-idle" class="rig-layer" transform-origin="300 280" style="transform-origin: 300px 280px;" opacity="0">
+      <path d="M 284 283 Q 300 287 316 281" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
+    </g>
+
+    <!-- ======================================================== -->
+    <!-- 7C. MOUTH VISEME: TALK OPEN (Active Speaking Sync)       -->
+    <!-- ======================================================== -->
+    <g id="mouth-talk-open" class="rig-layer" transform-origin="300 280" style="transform-origin: 300px 280px;" opacity="0">
+      <path d="M 280 278 Q 300 275 320 278 C 322 294 312 302 300 302 C 288 302 278 294 280 278 Z" fill="#1A3153" stroke="#1A3153" stroke-width="3.5" stroke-linejoin="round" />
+      <ellipse cx="300" cy="295" rx="10" ry="5" fill="#E09B30" />
+    </g>
+
+    <!-- Sleek Low-Profile Coach Headset Microphone -->
+    <g id="headset-mic">
+      <rect x="166" y="236" width="14" height="32" rx="7" fill="#1A3153" stroke="#FAFAFA" stroke-width="2" />
+      <circle cx="173" cy="252" r="4" fill="#E09B30" />
+      <path d="M 173 266 C 180 290 212 298 252 292" fill="none" stroke="#4A5568" stroke-width="4.5" stroke-linecap="round" />
+      <rect x="248" y="286" width="14" height="10" rx="5" fill="#E09B30" stroke="#1A3153" stroke-width="3" />
+    </g>
+  </g>
+</svg>

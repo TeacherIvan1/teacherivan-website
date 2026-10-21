@@ -1,0 +1,167 @@
+{
+  "id": "reel-02-recast-challenge",
+  "title": "The Recast Technique: How Native Speakers Fix Your Mistakes",
+  "aspectRatio": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "durationSeconds": 12.0,
+  "brand": {
+    "primary": "#1A3153",
+    "accent": "#E09B30",
+    "secondary": "#A7C7E7",
+    "slate": "#4A5568",
+    "background": "#FAFAFA"
+  },
+  "character": {
+    "id": "ivan",
+    "name": "Teacher Ivan",
+    "folder": "ivan",
+    "defaultPose": "listening"
+  },
+  "scenes": [
+    {
+      "id": "scene-1-pills",
+      "type": "PillCloudScene",
+      "startTime": 0.0,
+      "endTime": 3.0,
+      "characterPose": "listening",
+      "background": "#FAFAFA",
+      "config": {
+        "badge": "PEDAGOGICAL BREAKTHROUGH",
+        "headline": "STOP MEMORIZING DEAD GRAMMAR RULES",
+        "pills": [
+          { "text": "❌ Rule Memorization", "accent": false },
+          { "text": "✅ Native Recast Method", "accent": true },
+          { "text": "🧠 Implicit Acquisition", "accent": true },
+          { "text": "🔄 Conversational Flow", "accent": false },
+          { "text": "⚡ Zero Interruption", "accent": true }
+        ]
+      }
+    },
+    {
+      "id": "scene-2-comparison",
+      "type": "PhoneComparisonScene",
+      "startTime": 3.0,
+      "endTime": 6.5,
+      "characterPose": "recast-alert",
+      "background": "#FAFAFA",
+      "config": {
+        "badge": "HOW A RECAST ACTUALLY WORKS",
+        "leftCard": {
+          "title": "COMMON MISTAKE",
+          "badge": "STUDENT SPOKE",
+          "points": [
+            "\"I have 26 years old.\"",
+            "\"Yesterday I go to cinema.\"",
+            "Direct translation from Spanish",
+            "Interrupting breaks speaking confidence"
+          ]
+        },
+        "rightCard": {
+          "title": "NATIVE RECAST",
+          "badge": "TEACHER IVAN AI",
+          "points": [
+            "\"Oh, you're 26 years old!\"",
+            "\"Awesome, what movie did you see?\"",
+            "Correct grammar modeled in context",
+            "Keeps conversation flowing naturally"
+          ]
+        }
+      }
+    },
+    {
+      "id": "scene-3-counter",
+      "type": "CounterScene",
+      "startTime": 6.5,
+      "endTime": 9.5,
+      "characterPose": "speaking",
+      "background": "#FAFAFA",
+      "config": {
+        "badge": "MEASURED RETENTION IMPACT",
+        "startValue": 20,
+        "targetValue": 94,
+        "format": "%",
+        "label": "GRAMMAR RETENTION RATE",
+        "sublabel": "Implicit Recasts vs Traditional Textbook Drills",
+        "features": [
+          "Natural Ear Training",
+          "Instant Subconscious Recall",
+          "Permanent Pronunciation Fix"
+        ]
+      }
+    },
+    {
+      "id": "scene-4-cta",
+      "type": "CTACardScene",
+      "startTime": 9.5,
+      "endTime": 12.0,
+      "characterPose": "celebrate",
+      "background": "#1A3153",
+      "config": {
+        "badge": "MASTER NATIVE GRAMMAR",
+        "headline": "PRACTICE CONVERSATION RECASTS NOW",
+        "subhead": "Train with Teacher Ivan's real-time AI voice tutor for instant feedback.",
+        "buttonText": "START RECAST CHALLENGE",
+        "handle": "teacherivan.com • @morfeoacademy"
+      }
+    }
+  ],
+  "subtitles": [
+    {
+      "startTime": 0.0,
+      "endTime": 3.0,
+      "text": "Stop memorizing grammar rules that you instantly forget when speaking.",
+      "words": [
+        { "word": "Stop", "startTime": 0.0, "endTime": 0.4 },
+        { "word": "memorizing", "startTime": 0.4, "endTime": 1.0, "highlight": true },
+        { "word": "grammar", "startTime": 1.0, "endTime": 1.4 },
+        { "word": "rules", "startTime": 1.4, "endTime": 1.8 },
+        { "word": "you", "startTime": 1.8, "endTime": 2.1 },
+        { "word": "forget", "startTime": 2.1, "endTime": 2.5, "highlight": true },
+        { "word": "speaking.", "startTime": 2.5, "endTime": 3.0, "highlight": true }
+      ]
+    },
+    {
+      "startTime": 3.0,
+      "endTime": 6.5,
+      "text": "When you say 'I have 26 years', native teachers don't correct—they recast.",
+      "words": [
+        { "word": "When", "startTime": 3.0, "endTime": 3.3 },
+        { "word": "you", "startTime": 3.3, "endTime": 3.6 },
+        { "word": "make", "startTime": 3.6, "endTime": 3.9 },
+        { "word": "mistakes,", "startTime": 3.9, "endTime": 4.5, "highlight": true },
+        { "word": "we", "startTime": 4.5, "endTime": 4.8 },
+        { "word": "don't", "startTime": 4.8, "endTime": 5.2 },
+        { "word": "interrupt—", "startTime": 5.2, "endTime": 5.7 },
+        { "word": "we", "startTime": 5.7, "endTime": 6.0 },
+        { "word": "recast!", "startTime": 6.0, "endTime": 6.5, "highlight": true }
+      ]
+    },
+    {
+      "startTime": 6.5,
+      "endTime": 9.5,
+      "text": "This triggers a 94 percent grammar retention without stress.",
+      "words": [
+        { "word": "This", "startTime": 6.5, "endTime": 6.8 },
+        { "word": "triggers", "startTime": 6.8, "endTime": 7.3 },
+        { "word": "94%", "startTime": 7.3, "endTime": 7.9, "highlight": true },
+        { "word": "retention", "startTime": 7.9, "endTime": 8.5, "highlight": true },
+        { "word": "without", "startTime": 8.5, "endTime": 9.0 },
+        { "word": "stress.", "startTime": 9.0, "endTime": 9.5, "highlight": true }
+      ]
+    },
+    {
+      "startTime": 9.5,
+      "endTime": 12.0,
+      "text": "Experience the recast technique free at teacherivan.com!",
+      "words": [
+        { "word": "Experience", "startTime": 9.5, "endTime": 10.0 },
+        { "word": "the", "startTime": 10.0, "endTime": 10.2 },
+        { "word": "recast", "startTime": 10.2, "endTime": 10.7, "highlight": true },
+        { "word": "method", "startTime": 10.7, "endTime": 11.2 },
+        { "word": "today!", "startTime": 11.2, "endTime": 12.0, "highlight": true }
+      ]
+    }
+  ]
+}

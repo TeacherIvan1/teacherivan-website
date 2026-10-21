@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reel</title>
+<!-- Plantilla de edición de reels-con-ia. Claude la copia a la carpeta del reel como reel.html y completa CONFIG y ESCENAS.
+     render.py la recorre cuadro a cuadro llamando a seek(t), así que todo lo que se ve tiene que depender sólo de t. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Instrument+Serif:ital@1&family=Geist:wght@500;700;800&family=Geist+Mono:wght@500&display=swap">
+<style>
+:root { --papel:#F0EEE6; --hoja:#FAF9F5; --tinta:#141413; --gris:#6B6A65; --acento:#D97757; --acento2:#C6613F;
+        --serif:"Newsreader", Georgia, serif; --ital:"Instrument Serif", Georgia, serif; --sans:"Geist", Arial, sans-serif; --mono:"Geist Mono", Menlo, monospace; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#222; }
+#reel { width:1080px; height:1920px; position:relative; overflow:hidden; background:var(--papel); font-family:var(--sans); color:var(--tinta);
+        background-image:radial-gradient(rgba(20,20,19,.07) 1.6px, transparent 2px); background-size:26px 26px; }
+#broll { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+.escena { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 90px; text-align:center; opacity:0; }
+#cam { position:absolute; left:0; bottom:0; width:1080px; height:768px; overflow:hidden; background:#000; }
+#cam video, #cierre video { width:100%; height:100%; object-fit:cover; }
+#titulo { position:absolute; left:0; right:0; top:1100px; display:flex; flex-direction:column; align-items:center; gap:10px; z-index:5; }
+#titulo span { font:800 70px/1 var(--sans); letter-spacing:-.01em; text-transform:uppercase; padding:14px 26px 12px; background:var(--tinta); color:var(--hoja); border-radius:14px; }
+#titulo span.b { background:var(--acento); color:var(--hoja); }
+#sub { position:absolute; left:60px; right:60px; top:1560px; text-align:center; z-index:6; }
+#sub span { display:inline-block; font:700 52px/1.15 var(--sans); color:var(--tinta); background:var(--hoja); padding:12px 22px; border-radius:16px; box-shadow:0 10px 30px rgba(20,20,19,.12); }
+#cierre { position:absolute; inset:0; opacity:0; z-index:7; background:#000; }
+#cierre .cta { position:absolute; left:80px; right:80px; bottom:260px; text-align:center; font:700 54px/1.15 var(--sans); color:var(--tinta); background:var(--hoja); padding:26px 30px; border-radius:24px; }
+/* piezas para escenas */
+.grande { font:400 150px/0.98 var(--serif); letter-spacing:-.02em; }
+.grande em { font-family:var(--ital); font-style:italic; color:var(--acento); }
+.chico { font:500 34px/1.3 var(--mono); letter-spacing:.12em; text-transform:uppercase; color:var(--gris); margin-top:36px; }
+.tarjeta { background:var(--hoja); border-radius:36px; box-shadow:0 24px 50px rgba(20,20,19,.14); padding:44px 54px; font:700 58px/1.15 var(--sans); margin:14px 0; width:100%; text-align:left; display:flex; align-items:center; gap:28px; }
+.tarjeta i { font-style:normal; width:84px; height:84px; flex:none; border-radius:50%; background:#F2D2C2; color:var(--acento2); display:grid; place-items:center; font:500 40px/1 var(--mono); }
+.numero { font:400 300px/1 var(--serif); color:var(--acento2); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div id="reel">
+  <div id="broll"></div>
+  <div id="cam"><video id="v-gancho" src="tomas/t1.webm" muted preload="auto" data-desfase="0"></video></div>
+  <div id="titulo"></div>
+  <div id="sub"></div>
+  <div id="cierre"><video id="v-cierre" src="tomas/t2.webm" muted preload="auto" data-desfase="0"></video><div class="cta"></div></div>
+</div>
+<script>
+// ===================== Lo que Claude completa para cada reel =====================
+const CONFIG = {
+  DURACION: 40,            // duración total en segundos = duración de voz.mp3
+  GANCHO_FIN: 6.8,         // hasta acá: pantalla dividida (escena arriba, avatar abajo) con el título en la unión
+  CIERRE_DESDE: 34,        // desde acá: avatar a pantalla completa con el llamado a la acción (o null si no hay cierre con avatar)
+  TITULO: ["Línea uno", "línea dos"],   // máximo dos líneas cortas
+  CTA: "Escribí tu llamado a la acción",
+  BPM: 128,                // el de la música elegida: las escenas cambian sobre el pulso
+};
+// Una escena por idea. desde/hasta en segundos del reel. html = lo que se ve; anim(el, p, t) la mueve (p = 0..1 dentro de la escena).
+const ESCENAS = [
+  { desde: 0, hasta: 6.8, html: `<div class="grande">Una idea,<br><em>dicha simple.</em></div>`,
+    anim: (el, p, t) => entrar(el.firstChild, p * 4) },
+  { desde: 6.8, hasta: 14, html: `<div class="numero" data-n="2.43">0</div><div class="chico">un número que cuenta</div>`,
+    anim: (el, p) => { const n = el.querySelector('.numero'); n.textContent = (n.dataset.n * suave(p * 2)).toFixed(2).replace('.', ','); } },
+  { desde: 14, hasta: 34, html: `<div class="tarjeta"><i>1</i>Un paso</div><div class="tarjeta"><i>2</i>Otro paso</div><div class="tarjeta"><i>3</i>El último</div>`,
+    anim: (el, p, t) => [...el.children].forEach((c, i) => entrar(c, (t - i * 0.6) * 2.5)) },
+];
+// ===================== Motor (no hace falta tocarlo) =====================
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const suave = x => { x = cl(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const rebote = x => { x = cl(x); const c = 1.70158; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+function entrar(el, x) { if (!el) return; el.style.opacity = cl(x * 1.6); el.style.transform = `translateY(${(1 - suave(x)) * 40}px) scale(${.9 + .1 * rebote(x)})`; }
+const broll = document.getElementById('broll');
+ESCENAS.forEach(e => { e.el = document.createElement('div'); e.el.className = 'escena'; e.el.innerHTML = e.html; broll.appendChild(e.el); });
+document.getElementById('titulo').innerHTML = CONFIG.TITULO.map((l, i) => `<span class="${i ? 'b' : ''}">${l}</span>`).join('');
+document.querySelector('#cierre .cta').textContent = CONFIG.CTA;
+window.PALABRAS = window.PALABRAS || [];
+function frases() {   // agrupa palabras en frases cortas de una línea para los subtítulos
+  const out = []; let cur = [];
+  for (const w of window.PALABRAS) { cur.push(w); if (/[.,;:?!]$/.test(w.w.trim()) || cur.length >= 5) { out.push(cur); cur = []; } }
+  if (cur.length) out.push(cur);
+  return out.map(g => ({ s: g[0].s, e: g[g.length - 1].e + 0.15, t: g.map(w => w.w.trim()).join(' ') }));
+}
+let FRASES = null;
+window.seek = async function (t) {
+  FRASES = FRASES || frases();
+  const gancho = t < CONFIG.GANCHO_FIN, cierre = CONFIG.CIERRE_DESDE != null && t >= CONFIG.CIERRE_DESDE;
+  // en el gancho la escena ocupa la parte de arriba (1152 px) y el avatar la de abajo
+  broll.style.height = gancho ? '1152px' : '1920px';
+  document.getElementById('cam').style.display = gancho ? 'block' : 'none';
+  document.getElementById('titulo').style.display = gancho ? 'flex' : 'none';
+  document.getElementById('cierre').style.opacity = cierre ? 1 : 0;
+  for (const e of ESCENAS) {
+    const on = t >= e.desde && t < e.hasta; e.el.style.opacity = on ? 1 : 0;
+    if (on && e.anim) e.anim(e.el, (t - e.desde) / (e.hasta - e.desde), t - e.desde);
+  }
+  const f = !gancho && !cierre && FRASES.find(x => t >= x.s && t < x.e);
+  document.getElementById('sub').innerHTML = f ? `<span>${f.t}</span>` : '';
+  // videos: el del gancho arranca en 0 y el del cierre en CIERRE_DESDE. data-desfase negativo adelanta la imagen (boca atrasada).
+  const vs = [...document.querySelectorAll('video')];
+  await Promise.all(vs.map(v => new Promise(res => {
+    const desde = (v.id === 'v-cierre' ? (CONFIG.CIERRE_DESDE || 0) : 0) + (+v.dataset.desfase || 0);
+    const d = v.duration || 1, tt = Math.min(Math.max(0, t - desde), d - .04);
+    if (Math.abs(v.currentTime - tt) < 1e-3) return res();
+    const h = () => { v.removeEventListener('seeked', h); res(); }; v.addEventListener('seeked', h); v.currentTime = tt;
+  })));
+};
+window.listo = async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.querySelectorAll('video')].map(v => v.readyState >= 2 ? 1 : new Promise(r => { v.onloadeddata = r; v.onerror = r; })));
+};
+</script>
+</body>
+</html>
