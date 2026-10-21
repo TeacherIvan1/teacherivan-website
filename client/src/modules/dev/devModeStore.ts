@@ -5,20 +5,14 @@ const STORAGE_KEY = 'teacherivan_dev_mode';
 function getInitialDevMode(): boolean {
   if (typeof window !== 'undefined') {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const devParam = params.get('dev');
-      if (devParam === 'true' || devParam === '1') {
-        return true;
-      }
-      if (devParam === 'false' || devParam === '0') {
-        return false;
-      }
+      // NOTE: Public ?dev=true URL activation is strictly DISABLED for guests and regular students.
+      // Dev Mode is exclusively reserved for Teacher Ivan's admin session.
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored !== null) {
         return stored === 'true';
       }
     } catch {
-      // Ignore URL/localStorage access errors
+      // Ignore storage errors
     }
   }
   return false;

@@ -9,6 +9,7 @@ import {
   BookOpen,
   Lock,
   LogOut,
+  Calendar,
   User as UserIcon,
 } from 'lucide-react';
 import { checkServerHealth } from '../modules/auth/tokenService';
@@ -31,7 +32,7 @@ export const Header: React.FC = () => {
   const selectScenario = useTeachingStore((s) => s.selectScenario);
   const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, openAuthModal, signOut } = useAuthStore();
-  const isDeveloperMode = useDevModeStore((s) => s.isDeveloperMode);
+  const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
 
   useEffect(() => {
     let mounted = true;
@@ -147,6 +148,22 @@ export const Header: React.FC = () => {
               </span>
             </button>
           )}
+
+          {/* Tab 3: Dedicated 1-on-1 Class Scheduling (Registered students) */}
+          {isAuthenticated && (
+            <button
+              id="nav-tab-schedule"
+              onClick={() => setActiveView('schedule')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                activeView === 'schedule'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
+              }`}
+            >
+              <Calendar size={14} />
+              <span>{t.scheduling.navTab}</span>
+            </button>
+          )}
         </nav>
 
         {/* Right: Controls, Authentication & Language Switcher */}
@@ -195,6 +212,24 @@ export const Header: React.FC = () => {
                 </span>
               </div>
             </>
+          )}
+
+          {/* Strict Admin Gate: Dev Mode toggle button ONLY rendered when user?.role === 'admin' */}
+          {user?.role === 'admin' && (
+            <button
+              id="admin-dev-toggle-btn"
+              type="button"
+              onClick={toggleDeveloperMode}
+              className={`px-3 py-1.5 rounded-full text-xs font-montserrat font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                isDeveloperMode
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30'
+                  : 'bg-[#1A3153] text-[#A7C7E7] border border-[#A7C7E7]/30 hover:text-[#FAFAFA]'
+              }`}
+              title="Teacher Ivan Admin Dev Mode"
+            >
+              <span>🛠️ Dev Mode</span>
+              <span className={`w-2 h-2 rounded-full ${isDeveloperMode ? 'bg-[#1A3153]' : 'bg-[#10b981]'}`} />
+            </button>
           )}
 
           {/* Authentication Badge or Free Sign-Up CTA */}
@@ -255,19 +290,34 @@ export const Header: React.FC = () => {
         </button>
 
         {isAuthenticated ? (
-          <button
-            id="mobile-nav-tab-resources"
-            type="button"
-            onClick={() => setActiveView('resources')}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              activeView === 'resources'
-                ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
-                : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-            }`}
-          >
-            <BookOpen size={13} />
-            <span>{isEs ? 'Recursos' : 'Resources'}</span>
-          </button>
+          <>
+            <button
+              id="mobile-nav-tab-resources"
+              type="button"
+              onClick={() => setActiveView('resources')}
+              className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                activeView === 'resources'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              }`}
+            >
+              <BookOpen size={13} />
+              <span>{isEs ? 'Recursos' : 'Resources'}</span>
+            </button>
+            <button
+              id="mobile-nav-tab-schedule"
+              type="button"
+              onClick={() => setActiveView('schedule')}
+              className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                activeView === 'schedule'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              }`}
+            >
+              <Calendar size={13} />
+              <span>{isEs ? 'Agendar' : 'Book'}</span>
+            </button>
+          </>
         ) : (
           <button
             id="mobile-nav-tab-resources-locked"

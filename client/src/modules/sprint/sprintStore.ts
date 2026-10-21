@@ -32,11 +32,33 @@ interface SprintState {
   day4Writing: string;
   day4Feedback: string | null;
 
+  // AI Tailored 5-Day Sprint
+  personalizedSprint?: {
+    targetLevel: string;
+    primaryGoal: string;
+    focusSkill: string;
+    personalObjective: string;
+    days: Array<{
+      day: 'D1' | 'D2' | 'D3' | 'D4' | 'D5';
+      type: 'Receptive Input' | 'Structural Processing' | 'Async Oral Production' | 'Functional Writing Prompt' | 'Weekly Closure';
+      title: string;
+      time: string;
+      description: string;
+      targetCollocations: string[];
+      simulatorScenarioPreset: string;
+      functionalWritingPrompt?: string;
+      highlight: string;
+    }>;
+    generatedBy?: 'gemini' | 'deterministic-fallback';
+    modelUsed?: string;
+  };
+
   // Report Modal State
   isReportModalOpen: boolean;
 
   // Actions
   updateProfile: (profile: Partial<StudentProfile>) => void;
+  setPersonalizedSprint: (sprint: any) => void;
   completeStage: (stageIndex: number) => void;
   markReadingComplete: (readingId: string) => void;
   markVideoComplete: (videoId: string) => void;
@@ -65,6 +87,7 @@ function persistState(state: Partial<SprintState>) {
   try {
     const toSave = {
       profile: state.profile,
+      personalizedSprint: state.personalizedSprint,
       completedStages: state.completedStages,
       completedReadings: state.completedReadings,
       completedVideos: state.completedVideos,
@@ -88,6 +111,7 @@ export const useSprintStore = create<SprintState>((set, get) => ({
     focusScenario: 'tech-interview',
     weakCompetency: 'Syntactic Control',
   },
+  personalizedSprint: initialSaved.personalizedSprint,
   completedStages: initialSaved.completedStages || [],
   completedReadings: initialSaved.completedReadings || [],
   completedVideos: initialSaved.completedVideos || [],
@@ -100,6 +124,14 @@ export const useSprintStore = create<SprintState>((set, get) => ({
   updateProfile: (newProfile) => {
     set((s) => {
       const updated = { profile: { ...s.profile, ...newProfile } };
+      persistState({ ...s, ...updated });
+      return updated;
+    });
+  },
+
+  setPersonalizedSprint: (sprint: any) => {
+    set((s) => {
+      const updated = { personalizedSprint: sprint };
       persistState({ ...s, ...updated });
       return updated;
     });

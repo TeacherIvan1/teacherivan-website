@@ -34,6 +34,7 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
     saveDay4Writing,
     openReportModal,
     totalXp,
+    personalizedSprint,
   } = useSprintStore();
 
   const setActiveView = useNavigationStore((s) => s.setActiveView);
@@ -83,12 +84,14 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
     setActiveView('games');
   };
 
+  const pDays = personalizedSprint?.days || [];
+
   const stages = [
     {
       id: 0,
       label: 'D1',
-      title: t.sprintDashboard.stage1,
-      desc: t.sprintDashboard.stage1Desc,
+      title: pDays[0]?.title || t.sprintDashboard.stage1,
+      desc: pDays[0]?.description || t.sprintDashboard.stage1Desc,
       icon: BookOpen,
       actionText: t.sprintDashboard.goToResources,
       action: handleGoToResources,
@@ -96,8 +99,8 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
     {
       id: 1,
       label: 'D2',
-      title: t.sprintDashboard.stage2,
-      desc: t.sprintDashboard.stage2Desc,
+      title: pDays[1]?.title || t.sprintDashboard.stage2,
+      desc: pDays[1]?.description || t.sprintDashboard.stage2Desc,
       icon: Gamepad2,
       actionText: t.sprintDashboard.goToGames,
       action: handleGoToGames,
@@ -105,8 +108,8 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
     {
       id: 2,
       label: 'D3',
-      title: t.sprintDashboard.stage3,
-      desc: t.sprintDashboard.stage3Desc,
+      title: pDays[2]?.title || t.sprintDashboard.stage3,
+      desc: pDays[2]?.description || t.sprintDashboard.stage3Desc,
       icon: Mic,
       actionText: t.sprintDashboard.goToSimulator,
       action: handleGoToSimulator,
@@ -114,8 +117,8 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
     {
       id: 3,
       label: 'D4',
-      title: t.sprintDashboard.stage4,
-      desc: t.sprintDashboard.stage4Desc,
+      title: pDays[3]?.title || t.sprintDashboard.stage4,
+      desc: pDays[3]?.description || t.sprintDashboard.stage4Desc,
       icon: PenTool,
       actionText: isEs ? 'Escribir aquí ↓' : 'Write below ↓',
       action: () => setIsExpanded(true),
@@ -123,8 +126,8 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
     {
       id: 4,
       label: 'D5',
-      title: t.sprintDashboard.stage5,
-      desc: t.sprintDashboard.stage5Desc,
+      title: pDays[4]?.title || t.sprintDashboard.stage5,
+      desc: pDays[4]?.description || t.sprintDashboard.stage5Desc,
       icon: Award,
       actionText: t.sprintDashboard.viewWeeklyReport,
       action: () => {
@@ -350,6 +353,18 @@ export const WeeklySprintDashboard: React.FC<{ compact?: boolean }> = ({ compact
                   </span>
                 </div>
               </div>
+
+              {pDays[3]?.functionalWritingPrompt && (
+                <div className="p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/30 text-xs text-[#FAFAFA] space-y-1">
+                  <div className="font-montserrat font-bold text-[#E09B30] flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+                    <Sparkles size={12} />
+                    <span>{isEs ? 'Consigna Personalizada de Teacher Ivan:' : 'Teacher Ivan’s Tailored Prompt:'}</span>
+                  </div>
+                  <p className="font-inter text-xs leading-relaxed text-[#FAFAFA]">
+                    {pDays[3].functionalWritingPrompt}
+                  </p>
+                </div>
+              )}
 
               <textarea
                 id="sprint-day4-writing-input"

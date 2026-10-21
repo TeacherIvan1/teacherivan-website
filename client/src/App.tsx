@@ -10,13 +10,16 @@ import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { StudentReportModal } from './components/StudentReportModal';
 import { SpokenAssessmentModal } from './components/SpokenAssessmentModal';
 import { StudentAuthModal } from './components/StudentAuthModal';
+import { MandatoryGoalsModal } from './components/MandatoryGoalsModal';
 import { WeeklyReportModal } from './components/WeeklyReportModal';
 import { WeeklySprintDashboard } from './components/WeeklySprintDashboard';
 import { EducationalResourcesView } from './components/EducationalResourcesView';
 import { InteractiveGamesView } from './components/InteractiveGamesView';
+import { ClassSchedulerView } from './components/ClassSchedulerView';
 import { RegisteredStudentsTable } from './components/RegisteredStudentsTable';
+import { AdminBookingsTable } from './components/AdminBookingsTable';
 import { BrandLockup } from './components/BrandLockup';
-import { Terminal, Sparkles, BookOpen, Headphones, Lock } from 'lucide-react';
+import { Terminal, Sparkles, BookOpen, Headphones, Calendar } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { TEACHER_PHONE, getWhatsAppUrl } from './config/contact';
 import { useTranslation } from './modules/i18n/languageStore';
@@ -28,7 +31,10 @@ export const App: React.FC = () => {
   const { t, isEs } = useTranslation();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
   const { activeView, setActiveView } = useNavigationStore();
-  const { isAuthenticated, openAuthModal, syncWithServer } = useAuthStore();
+  const { user, isAuthenticated, openAuthModal, syncWithServer } = useAuthStore();
+
+  const isAdmin = user?.role === 'admin';
+  const showDevMode = isAdmin && isDeveloperMode;
 
   useEffect(() => {
     // 1. Silently wake up the Render backend instance on page load
@@ -47,6 +53,9 @@ export const App: React.FC = () => {
     <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter">
       {/* Student Sign-Up & Authentication Modal */}
       <StudentAuthModal />
+
+      {/* Mandatory Onboarding Gate: Non-dismissible goals modal for new students */}
+      <MandatoryGoalsModal />
 
       {/* Spoken Assessment Diagnostic Modal */}
       <SpokenAssessmentModal />
@@ -93,43 +102,29 @@ export const App: React.FC = () => {
                 <span>{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
               </button>
             </div>
-
-            {/* Developer Mode Diagnostics Grid (If ?dev=true is active) */}
-            {isDeveloperMode && (
-              <div className="mt-8 pt-8 border-t border-[#A7C7E7]/25 flex flex-col gap-6">
-                <RegisteredStudentsTable />
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                  <div className="lg:col-span-7 flex flex-col gap-6">
-                    <SessionReportPanel />
-                    <LatencyMetricsPanel />
-                    <SessionFeed />
-                  </div>
-                  <div className="lg:col-span-5 flex flex-col gap-6">
-                    <TeachingCard />
-                    <TokenInspector />
-                    <LiveDebugPanel />
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           /* ========================================================================= */
-          /* REGISTERED USERS VIEW: UNLOCKED SIMULATOR + EDUCATIONAL RESOURCES PORTAL  */
+          /* REGISTERED USERS VIEW: SIMULATOR + RESOURCES + CLASS SCHEDULING VIEW      */
           /* ========================================================================= */
           <div className="flex-1 flex flex-col animate-in fade-in duration-200">
-            {/* VIEW A: RECURSOS EDUCATIVOS (Interactive Readings, Video Lessons, Games & Progress Generator) */}
+            {/* VIEW A: RECURSOS EDUCATIVOS */}
             {activeView === 'resources' ? (
               <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
                 <WeeklySprintDashboard />
                 <EducationalResourcesView />
                 <InteractiveGamesView />
               </div>
+            ) : activeView === 'schedule' ? (
+              /* VIEW B: CLASS SCHEDULING (14:00 - 20:00 Bolivia Time) */
+              <div id="view-schedule" className="flex flex-col animate-in fade-in duration-200">
+                <ClassSchedulerView />
+              </div>
             ) : (
-              /* VIEW B: SIMULADOR IA & DIAGNÓSTICO (Dedicated Voice Simulator) */
+              /* VIEW C: SIMULADOR IA & DIAGNÓSTICO (Dedicated Voice Simulator) */
               <div id="view-simulator" className="py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200">
                 {/* Developer Mode Banner Notification (if active) */}
-                {isDeveloperMode && (
+                {showDevMode && (
                   <div
                     id="dev-mode-active-banner"
                     className="p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 flex items-center justify-between gap-3 text-xs text-[#FAFAFA]"
@@ -157,10 +152,16 @@ export const App: React.FC = () => {
                 {/* Ultra-Compact Voice Simulator Console */}
                 <CompactVoiceSimulator />
 
-                {/* In Developer Mode: Registered Students Database Table + Diagnostics Grid */}
-                {isDeveloperMode && (
+                {/* In Developer Mode: Registered Students Table, All Booked Classes, Telemetry & Logs */}
+                {showDevMode && (
                   <div className="mt-8 pt-8 border-t border-[#A7C7E7]/25 flex flex-col gap-6">
+                    {/* (2) Registered Students Database Table */}
                     <RegisteredStudentsTable />
+
+                    {/* (3) All Booked 1-on-1 Classes */}
+                    <AdminBookingsTable />
+
+                    {/* (1) Live Audio/Latency Telemetry & Logs */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                       <div className="lg:col-span-7 flex flex-col gap-6">
                         <SessionReportPanel />
@@ -212,18 +213,33 @@ export const App: React.FC = () => {
             </button>
 
             {isAuthenticated ? (
-              <button
-                type="button"
-                onClick={() => setActiveView('resources')}
-                className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
-                  activeView === 'resources' ? 'text-[#E09B30] font-bold' : ''
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <BookOpen size={13} />
-                  <span>{isEs ? 'Recursos Educativos' : 'Educational Resources'}</span>
-                </span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveView('resources')}
+                  className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                    activeView === 'resources' ? 'text-[#E09B30] font-bold' : ''
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen size={13} />
+                    <span>{isEs ? 'Recursos Educativos' : 'Educational Resources'}</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveView('schedule')}
+                  className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                    activeView === 'schedule' ? 'text-[#E09B30] font-bold' : ''
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Calendar size={13} />
+                    <span>{t.scheduling.navTab}</span>
+                  </span>
+                </button>
+              </>
             ) : (
               <button
                 type="button"
@@ -248,20 +264,11 @@ export const App: React.FC = () => {
 
         <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-[#A7C7E7]/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#A7C7E7]/70">
           <p>{t.footer.copyright}</p>
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={toggleDeveloperMode}
-              className="text-[10px] text-[#A7C7E7]/60 hover:text-[#E09B30] underline cursor-pointer"
-            >
-              {isDeveloperMode ? 'Disable Dev Mode' : 'Dev Mode'}
-            </button>
-            <p className="font-mono">
-              {isDeveloperMode
-                ? t.footer.poweredBy
-                : 'Teacher Ivan • English Classes • Sucre, Bolivia • Online Worldwide'}
-            </p>
-          </div>
+          <p className="font-mono">
+            {showDevMode
+              ? t.footer.poweredBy
+              : 'Teacher Ivan • English Classes • Sucre, Bolivia • Online Worldwide'}
+          </p>
         </div>
       </footer>
     </div>

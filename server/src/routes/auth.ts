@@ -47,6 +47,108 @@ router.post('/register', (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/auth/login
+ * Body: { email: string, password?: string }
+ * Handles admin credential login (returning role: 'admin') and returning student login.
+ */
+router.post('/login', (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body || {};
+
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email address is required' });
+    }
+
+    const normEmail = userStore.normalizeEmail(email);
+    const isAdminEmail = normEmail === userStore.normalizeEmail(process.env.ADMIN_EMAIL || 'ivan@teacherivan.com');
+
+    if (isAdminEmail) {
+      if (!password || !userStore.verifyAdminCredentials(email, password)) {
+        return res.status(401).json({ error: 'Invalid admin credentials' });
+      }
+
+      let admin = userStore.findByEmail(normEmail);
+      if (!admin) {
+        admin = userStore.upsertUser({
+          fullName: 'Teacher Ivan (Admin)',
+          email: normEmail,
+          role: 'admin',
+          profileCompleted: true,
+        });
+      }
+
+      const token = userStore.createSessionToken(admin.id, 'admin');
+      return res.status(200).json({
+        status: 'ok',
+        user: admin,
+        token,
+      });
+    }
+
+    // Returning student login
+    const existing = userStore.findByEmail(normEmail);
+    if (!existing) {
+      return res.status(404).json({ error: 'Account not found. Please register first.' });
+    }
+
+    const token = userStore.createSessionToken(existing.id, existing.role || 'student');
+    return res.status(200).json({
+      status: 'ok',
+      user: existing,
+      token,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[POST /api/auth/login Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error during login' });
+  }
+});
+
+/**
+ * PUT /api/auth/profile
+ * Body: { id?: string, email?: string, learningGoals: LearningGoals, cefrLevel?: string, fullName?: string, country?: string, dateOfBirth?: string }
+ * Completes mandatory onboarding profile and goals.
+ */
+router.put('/profile', (req: Request, res: Response) => {
+  try {
+    const { id, email, learningGoals, cefrLevel, fullName, country, dateOfBirth } = req.body || {};
+
+    if (!id && !email) {
+      return res.status(400).json({ error: 'Student ID or email is required to update profile' });
+    }
+
+    if (!learningGoals || typeof learningGoals !== 'object') {
+      return res.status(400).json({ error: 'Learning goals are required' });
+    }
+
+    const updated = userStore.updateUserProfile(
+      { id, email },
+      {
+        learningGoals,
+        cefrLevel: cefrLevel || learningGoals.targetLevel,
+        fullName,
+        country,
+        dateOfBirth,
+        profileCompleted: true,
+      }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Student profile not found' });
+    }
+
+    return res.status(200).json({
+      status: 'ok',
+      user: updated,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[PUT /api/auth/profile Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error updating profile' });
+  }
+});
+
+/**
  * POST /api/auth/google
  * Body: { email: string, fullName: string, googleId?: string, dateOfBirth?: string, country?: string }
  */

@@ -64,9 +64,63 @@ test('authStore - user stats update and signOut', () => {
   assert.equal(useAuthStore.getState().user?.cefrLevel, 'B2');
   assert.equal(useAuthStore.getState().user?.lastScore, 88);
 
-  // Sign out
+  // Sign out resets dev mode
   useAuthStore.getState().signOut();
   assert.equal(useAuthStore.getState().isAuthenticated, false);
   assert.equal(useAuthStore.getState().user, null);
   assert.equal(useAuthStore.getState().token, null);
+});
+
+test('authStore - student vs admin roles and learning goals schema', () => {
+  // 1. Regular Student with incomplete profile
+  useAuthStore.setState({
+    user: {
+      id: 'usr_student_1',
+      fullName: 'Carlos Gomez',
+      email: 'carlos@example.com',
+      dateOfBirth: '1997-03-22',
+      country: 'Mexico',
+      authProvider: 'email',
+      role: 'student',
+      profileCompleted: false,
+      createdAt: new Date().toISOString(),
+    },
+    token: 'tok_student',
+    isAuthenticated: true,
+  });
+
+  const student = useAuthStore.getState().user;
+  assert.equal(student?.role, 'student');
+  assert.equal(student?.profileCompleted, false);
+
+  // 2. Admin User
+  useAuthStore.setState({
+    user: {
+      id: 'usr_admin_ivan',
+      fullName: 'Teacher Ivan (Admin)',
+      email: 'ivan@teacherivan.com',
+      dateOfBirth: '1990-01-01',
+      country: 'Bolivia',
+      authProvider: 'email',
+      role: 'admin',
+      profileCompleted: true,
+      learningGoals: {
+        targetLevel: 'C1 / IELTS',
+        primaryGoal: 'Business & Executive English',
+        focusSkill: 'Speaking Fluency & Pronunciation',
+        personalObjective: 'Master executive presentation',
+      },
+      createdAt: new Date().toISOString(),
+    },
+    token: 'tok_admin',
+    isAuthenticated: true,
+  });
+
+  const admin = useAuthStore.getState().user;
+  assert.equal(admin?.role, 'admin');
+  assert.equal(admin?.profileCompleted, true);
+  assert.equal(admin?.learningGoals?.targetLevel, 'C1 / IELTS');
+  assert.equal(admin?.learningGoals?.primaryGoal, 'Business & Executive English');
+
+  useAuthStore.getState().signOut();
 });

@@ -221,5 +221,43 @@ describe('i18n Language Module', () => {
     assert.ok(translations.es.authModal.saveScoreAndUnlock);
     assert.ok(translations.en.authModal.reconnecting);
     assert.ok(translations.es.authModal.reconnecting);
+    assert.ok(translations.en.authModal.tabSignIn);
+    assert.ok(translations.es.authModal.tabSignIn);
+    assert.ok(translations.en.authModal.passwordLabel);
+    assert.ok(translations.es.authModal.passwordLabel);
+  });
+
+  it('contains parallel translations for mandatoryGoalsModal in en and es', () => {
+    assert.ok(translations.en.mandatoryGoalsModal.badge);
+    assert.ok(translations.es.mandatoryGoalsModal.badge);
+    assert.ok(translations.en.mandatoryGoalsModal.title);
+    assert.ok(translations.es.mandatoryGoalsModal.title);
+    assert.ok(translations.en.mandatoryGoalsModal.levelLabel);
+    assert.ok(translations.es.mandatoryGoalsModal.levelLabel);
+    assert.ok(translations.en.mandatoryGoalsModal.primaryGoalLabel);
+    assert.ok(translations.es.mandatoryGoalsModal.primaryGoalLabel);
+    assert.ok(translations.en.mandatoryGoalsModal.focusSkillLabel);
+    assert.ok(translations.es.mandatoryGoalsModal.focusSkillLabel);
+    assert.ok(translations.en.mandatoryGoalsModal.personalObjectiveLabel);
+    assert.ok(translations.es.mandatoryGoalsModal.personalObjectiveLabel);
+    assert.ok(translations.en.mandatoryGoalsModal.submitBtn);
+    assert.ok(translations.es.mandatoryGoalsModal.submitBtn);
+  });
+
+  it('contains parallel translations for scheduling in en and es', () => {
+    assert.ok(translations.en.scheduling.navTab);
+    assert.ok(translations.es.scheduling.navTab);
+    assert.ok(translations.en.scheduling.title);
+    assert.ok(translations.es.scheduling.title);
+    assert.ok(translations.en.scheduling.currentWeek);
+    assert.ok(translations.es.scheduling.currentWeek);
+    assert.ok(translations.en.scheduling.nextWeek);
+    assert.ok(translations.es.scheduling.nextWeek);
+    assert.ok(translations.en.scheduling.confirmWhatsApp.includes('+591 72878330'));
+    assert.ok(translations.es.scheduling.confirmWhatsApp.includes('+591 72878330'));
+    assert.ok(translations.en.scheduling.quickBookBtn);
+    assert.ok(translations.es.scheduling.quickBookBtn);
+    assert.ok(translations.en.scheduling.adminBookingsTitle);
+    assert.ok(translations.es.scheduling.adminBookingsTitle);
   });
 });

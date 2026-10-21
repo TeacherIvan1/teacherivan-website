@@ -14,8 +14,16 @@ test('UserStore - registration, upsert and retrieval', (t) => {
     }
   });
 
-  // 1. Initial state
-  assert.equal(store.getAllUsers().length, 0);
+  // 1. Initial state (Admin auto-seeded)
+  assert.equal(store.getAllUsers().length, 1);
+  const admin = store.getAllUsers()[0];
+  assert.equal(admin.role, 'admin');
+  assert.equal(admin.profileCompleted, true);
+
+  // Verify Admin credentials
+  assert.equal(store.verifyAdminCredentials('ivan@teacherivan.com', 'IvanAdmin2026!'), true);
+  assert.equal(store.verifyAdminCredentials('ivan@teacherivan.com', 'wrongpassword'), false);
+  assert.equal(store.verifyAdminCredentials('student@example.com', 'IvanAdmin2026!'), false);
 
   // 2. Upsert new email user
   const user1 = store.upsertUser({
@@ -31,27 +39,46 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(user1.email, 'maria@example.com');
   assert.equal(user1.country, 'Bolivia');
   assert.equal(user1.dateOfBirth, '1998-05-14');
+  assert.equal(user1.role, 'student');
+  assert.equal(user1.profileCompleted, false);
 
   // 3. Find by email
   const found = store.findByEmail('MARIA@example.com');
   assert.ok(found);
   assert.equal(found?.id, user1.id);
 
-  // 4. Upsert existing user (update CEFR level and score)
+  // 4. Update Profile & Learning Goals
+  const updatedProfile = store.updateUserProfile(
+    { email: 'maria@example.com' },
+    {
+      learningGoals: {
+        targetLevel: 'B2',
+        primaryGoal: 'Tech & Job Interviews',
+        focusSkill: 'Speaking Fluency & Pronunciation',
+        personalObjective: 'Ace senior software engineer interview in English',
+      },
+      cefrLevel: 'B2',
+    }
+  );
+  assert.ok(updatedProfile);
+  assert.equal(updatedProfile?.profileCompleted, true);
+  assert.equal(updatedProfile?.learningGoals?.primaryGoal, 'Tech & Job Interviews');
+
+  // 5. Upsert existing user (update CEFR level and score)
   const updated = store.upsertUser({
     fullName: 'Maria Rodriguez Updated',
     email: 'maria@example.com',
-    cefrLevel: 'B1',
+    cefrLevel: 'B2',
     lastScore: 82,
   });
 
   assert.equal(updated.id, user1.id);
   assert.equal(updated.fullName, 'Maria Rodriguez Updated');
-  assert.equal(updated.cefrLevel, 'B1');
+  assert.equal(updated.cefrLevel, 'B2');
   assert.equal(updated.lastScore, 82);
   assert.equal(updated.country, 'Bolivia'); // Preserved
 
-  // 5. Google user with incomplete profile
+  // 6. Google user with incomplete profile
   const googleUser = store.upsertUser({
     fullName: 'Carlos Google',
     email: 'carlos@gmail.com',
@@ -61,7 +88,7 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(googleUser.dateOfBirth, '');
   assert.equal(googleUser.country, '');
 
-  // 6. Complete Google user profile
+  // 7. Complete Google user profile
   const completedGoogleUser = store.upsertUser({
     fullName: 'Carlos Gomez',
     email: 'carlos@gmail.com',
@@ -72,10 +99,10 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(completedGoogleUser.country, 'Mexico');
   assert.equal(completedGoogleUser.dateOfBirth, '1995-10-20');
 
-  // 7. Verify session token creation
+  // 8. Verify session token creation
   const token = store.createSessionToken(user1.id);
   assert.ok(typeof token === 'string' && token.length > 20);
 
-  // 8. Verify total users
-  assert.equal(store.getAllUsers().length, 2);
+  // 9. Verify total users (Admin + Maria + Carlos = 3)
+  assert.equal(store.getAllUsers().length, 3);
 });

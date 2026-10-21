@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "usr_admin_ivan",
+    "fullName": "Teacher Ivan (Admin)",
+    "email": "ivan@teacherivan.com",
+    "dateOfBirth": "1990-01-01",
+    "country": "Bolivia",
+    "authProvider": "email",
+    "role": "admin",
+    "profileCompleted": true,
+    "learningGoals": {
+      "targetLevel": "C1 / IELTS",
+      "primaryGoal": "Business & Executive English",
+      "focusSkill": "Speaking Fluency & Pronunciation",
+      "personalObjective": "Lead international English tutoring & AI immersion"
+    },
+    "cefrLevel": "C2",
+    "lastScore": 100,
+    "createdAt": "2026-10-21T20:40:40.667Z"
+  }
+]

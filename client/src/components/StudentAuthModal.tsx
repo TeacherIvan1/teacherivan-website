@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, User, Mail, Calendar, Globe, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, Sparkles, User, Mail, Calendar, Globe, AlertCircle, Loader2, CheckCircle2, Lock, KeyRound } from 'lucide-react';
 import { useAuthStore } from '../modules/auth/authStore';
 import { SUPPORTED_COUNTRIES, SupportedCountry } from '../modules/auth/types';
 import { useTranslation } from '../modules/i18n/languageStore';
@@ -13,8 +13,10 @@ export const StudentAuthModal: React.FC = () => {
     isLoading,
     error,
     closeAuthModal,
+    openAuthModal,
     registerWithEmail,
     authenticateWithGoogle,
+    loginWithCredentials,
   } = useAuthStore();
 
   const { t, isEs } = useTranslation();
@@ -22,6 +24,7 @@ export const StudentAuthModal: React.FC = () => {
   // Form fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [country, setCountry] = useState<SupportedCountry | ''>('Bolivia');
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -48,8 +51,9 @@ export const StudentAuthModal: React.FC = () => {
   if (!isAuthModalOpen) return null;
 
   const isCompletingProfile = authModalMode === 'complete_google_profile';
+  const isSignInMode = authModalMode === 'signin';
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
 
@@ -94,9 +98,28 @@ export const StudentAuthModal: React.FC = () => {
     }
   };
 
+  const handleSignInSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      setValidationError(isEs ? 'Por favor ingresa un correo válido.' : 'Please enter a valid email.');
+      return;
+    }
+
+    try {
+      await loginWithCredentials({
+        email: trimmedEmail,
+        password: password ? password.trim() : undefined,
+      });
+    } catch {
+      // Error handled in store
+    }
+  };
+
   const handleGoogleClick = async () => {
     setValidationError(null);
-    // If standard Google Client ID is configured in environment
     const googleClientId = getEnvVar('VITE_GOOGLE_CLIENT_ID');
 
     if (googleClientId && typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
@@ -105,7 +128,6 @@ export const StudentAuthModal: React.FC = () => {
           client_id: googleClientId,
           callback: async (response: any) => {
             if (response.credential) {
-              // Decode base64 payload
               try {
                 const base64Url = response.credential.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -133,7 +155,7 @@ export const StudentAuthModal: React.FC = () => {
       }
     }
 
-    // Direct Google Account Selector / Email prompt fallback (works seamlessly in local dev, test & prod)
+    // Direct Google Account Selector / Email prompt fallback
     const promptEmail = window.prompt(
       isEs
         ? 'Ingresa tu correo de Google (Gmail):'
@@ -181,7 +203,11 @@ export const StudentAuthModal: React.FC = () => {
                 id="auth-modal-title"
                 className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug"
               >
-                {isCompletingProfile ? t.authModal.titleCompleteProfile : t.authModal.titleSignUp}
+                {isCompletingProfile
+                  ? t.authModal.titleCompleteProfile
+                  : isSignInMode
+                  ? t.authModal.titleSignIn
+                  : t.authModal.titleSignUp}
               </h2>
               <p className="text-[11px] text-[#A7C7E7]">Teacher Ivan • English Classes</p>
             </div>
@@ -200,14 +226,52 @@ export const StudentAuthModal: React.FC = () => {
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-4">
+          {/* Mode Switcher Tabs (Sign Up vs Sign In) */}
+          {!isCompletingProfile && (
+            <div className="flex rounded-2xl bg-[#1A3153]/10 p-1 border border-[#A7C7E7]/30">
+              <button
+                type="button"
+                id="auth-tab-signup"
+                onClick={() => {
+                  setValidationError(null);
+                  openAuthModal('signup');
+                }}
+                className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  !isSignInMode
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                    : 'text-[#4A5568] hover:text-[#1A3153]'
+                }`}
+              >
+                {t.authModal.tabSignUp}
+              </button>
+              <button
+                type="button"
+                id="auth-tab-signin"
+                onClick={() => {
+                  setValidationError(null);
+                  openAuthModal('signin');
+                }}
+                className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  isSignInMode
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                    : 'text-[#4A5568] hover:text-[#1A3153]'
+                }`}
+              >
+                {t.authModal.tabSignIn}
+              </button>
+            </div>
+          )}
+
           <p className="font-inter text-xs text-[#4A5568] leading-relaxed">
             {isCompletingProfile
               ? t.authModal.subtitleCompleteProfile
+              : isSignInMode
+              ? t.authModal.subtitleSignIn
               : t.authModal.subtitleSignUp}
           </p>
 
           {/* Google One-Tap Action (Only in main signup mode) */}
-          {!isCompletingProfile && (
+          {!isCompletingProfile && !isSignInMode && (
             <div className="space-y-3">
               <button
                 type="button"
@@ -216,7 +280,6 @@ export const StudentAuthModal: React.FC = () => {
                 onClick={handleGoogleClick}
                 className="w-full py-3 px-4 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] hover:bg-slate-50 text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all duration-150 cursor-pointer"
               >
-                {/* Official Google G Logo SVG */}
                 <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -244,124 +307,211 @@ export const StudentAuthModal: React.FC = () => {
             </div>
           )}
 
-          {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Full Name */}
-            <div>
-              <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                {t.authModal.fullNameLabel} <span className="text-[#E09B30]">*</span>
-              </label>
-              <div className="relative">
-                <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                <input
-                  type="text"
-                  id="auth-full-name-input"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder={t.authModal.fullNamePlaceholder}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
-                />
+          {/* ========================================================================= */}
+          {/* SIGN IN FORM (Returning Students & Teacher Ivan Admin Login)              */}
+          {/* ========================================================================= */}
+          {isSignInMode ? (
+            <form onSubmit={handleSignInSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.emailLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="email"
+                    id="auth-signin-email-input"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ivan@teacherivan.com or your student email"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                {t.authModal.emailLabel} <span className="text-[#E09B30]">*</span>
-              </label>
-              <div className="relative">
-                <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                <input
-                  type="email"
-                  id="auth-email-input"
-                  required
-                  value={email}
-                  disabled={Boolean(pendingGoogleProfile?.email)}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.authModal.emailPlaceholder}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] disabled:bg-slate-100 disabled:text-slate-500"
-                />
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.passwordLabel}
+                </label>
+                <div className="relative">
+                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="password"
+                    id="auth-signin-password-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t.authModal.passwordPlaceholder}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                  />
+                </div>
+                <p className="text-[10px] text-[#4A5568]/80 mt-1 flex items-center gap-1">
+                  <KeyRound size={11} className="text-[#E09B30]" />
+                  <span>{t.authModal.passwordAdminNote}</span>
+                </p>
               </div>
-            </div>
 
-            {/* Date of Birth (<input type="date" />) */}
-            <div>
-              <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                {t.authModal.dobLabel} <span className="text-[#E09B30]">*</span>
-              </label>
-              <div className="relative">
-                <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                <input
-                  type="date"
-                  id="auth-dob-input"
-                  required
-                  max={new Date().toISOString().split('T')[0]}
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
-                />
-              </div>
-            </div>
+              <button
+                type="submit"
+                id="submit-signin-form-btn"
+                disabled={isLoading}
+                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>{isEs ? 'Verificando...' : 'Verifying...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 size={16} />
+                    <span>{t.authModal.submitSignIn}</span>
+                  </>
+                )}
+              </button>
 
-            {/* Country Selector Dropdown */}
-            <div>
-              <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                {t.authModal.countryLabel} <span className="text-[#E09B30]">*</span>
-              </label>
-              <div className="relative">
-                <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                <select
-                  id="auth-country-select"
-                  required
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value as SupportedCountry)}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] cursor-pointer"
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('signup')}
+                  className="text-xs text-[#E09B30] hover:underline font-semibold cursor-pointer"
                 >
-                  <option value="" disabled>
-                    {t.authModal.selectCountry}
-                  </option>
-                  {SUPPORTED_COUNTRIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c === 'Bolivia' ? '🇧🇴 Bolivia' :
-                       c === 'Mexico' ? '🇲🇽 Mexico' :
-                       c === 'Colombia' ? '🇨🇴 Colombia' :
-                       c === 'Peru' ? '🇵🇪 Peru' :
-                       c === 'Argentina' ? '🇦🇷 Argentina' :
-                       c === 'Chile' ? '🇨🇱 Chile' :
-                       c === 'Spain' ? '🇪🇸 Spain' :
-                       c === 'USA' ? '🇺🇸 United States' :
-                       '🌐 Other'}
-                    </option>
-                  ))}
-                </select>
+                  {t.authModal.needAccount}
+                </button>
               </div>
-            </div>
+            </form>
+          ) : (
+            /* ========================================================================= */
+            /* REGISTRATION / PROFILE COMPLETION FORM                                    */
+            /* ========================================================================= */
+            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+              {/* Full Name */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.fullNameLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="text"
+                    id="auth-full-name-input"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder={t.authModal.fullNamePlaceholder}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                  />
+                </div>
+              </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              id="submit-auth-form-btn"
-              disabled={isLoading}
-              className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>{isEs ? 'Procesando...' : 'Processing...'}</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={16} />
-                  <span>
-                    {isCompletingProfile
-                      ? t.authModal.submitCompleteProfile
-                      : t.authModal.submitSignUp}
-                  </span>
-                </>
-              )}
-            </button>
-          </form>
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.emailLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="email"
+                    id="auth-email-input"
+                    required
+                    value={email}
+                    disabled={Boolean(pendingGoogleProfile?.email)}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t.authModal.emailPlaceholder}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] disabled:bg-slate-100 disabled:text-slate-500"
+                  />
+                </div>
+              </div>
+
+              {/* Date of Birth (<input type="date" />) */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.dobLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="date"
+                    id="auth-dob-input"
+                    required
+                    max={new Date().toISOString().split('T')[0]}
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                  />
+                </div>
+              </div>
+
+              {/* Country Selector Dropdown */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.countryLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <select
+                    id="auth-country-select"
+                    required
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value as SupportedCountry)}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      {t.authModal.selectCountry}
+                    </option>
+                    {SUPPORTED_COUNTRIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c === 'Bolivia' ? '🇧🇴 Bolivia' :
+                         c === 'Mexico' ? '🇲🇽 Mexico' :
+                         c === 'Colombia' ? '🇨🇴 Colombia' :
+                         c === 'Peru' ? '🇵🇪 Peru' :
+                         c === 'Argentina' ? '🇦🇷 Argentina' :
+                         c === 'Chile' ? '🇨🇱 Chile' :
+                         c === 'Spain' ? '🇪🇸 Spain' :
+                         c === 'USA' ? '🇺🇸 United States' :
+                         '🌐 Other'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                id="submit-auth-form-btn"
+                disabled={isLoading}
+                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>{isEs ? 'Procesando...' : 'Processing...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 size={16} />
+                    <span>
+                      {isCompletingProfile
+                        ? t.authModal.submitCompleteProfile
+                        : t.authModal.submitSignUp}
+                    </span>
+                  </>
+                )}
+              </button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('signin')}
+                  className="text-xs text-[#E09B30] hover:underline font-semibold cursor-pointer"
+                >
+                  {t.authModal.alreadyRegistered}
+                </button>
+              </div>
+            </form>
+          )}
 
           <p className="text-[11px] text-center text-[#4A5568]/80 pt-1">
             {t.authModal.termsNote}

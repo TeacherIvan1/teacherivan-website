@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AppView = 'overview' | 'simulator' | 'resources' | 'games' | 'methodology';
+export type AppView = 'overview' | 'simulator' | 'resources' | 'games' | 'methodology' | 'schedule';
 
 interface NavigationState {
   activeView: AppView;

@@ -6,6 +6,13 @@ import crypto from 'crypto';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+export interface LearningGoals {
+  targetLevel: string; // 'A1' | 'A2' | 'B1' | 'B2' | 'C1 / IELTS'
+  primaryGoal: string; // 'Tech & Job Interviews' | 'University Scholarship' | 'IELTS Exam Prep' | 'Business & Executive English' | 'Daily Conversational Fluency'
+  focusSkill: string;  // 'Speaking Fluency & Pronunciation' | 'Grammar & Syntax Accuracy' | 'Professional Vocabulary & Collocations' | 'Listening Comprehension'
+  personalObjective: string;
+}
+
 export interface User {
   id: string;
   fullName: string;
@@ -13,10 +20,16 @@ export interface User {
   dateOfBirth: string;
   country: string;
   authProvider: 'email' | 'google';
+  role?: 'student' | 'admin';
+  profileCompleted?: boolean;
+  learningGoals?: LearningGoals;
   cefrLevel?: string;
   lastScore?: number;
   createdAt: string;
 }
+
+export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'ivan@teacherivan.com').trim().toLowerCase();
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'IvanAdmin2026!';
 
 export class UserStore {
   private dataFilePath: string;
@@ -34,10 +47,38 @@ export class UserStore {
       this.dataFilePath = path.join(dataDir, 'users.json');
     }
     this.loadFromDisk();
+    this.seedAdminUser();
   }
 
-  private normalizeEmail(email: string): string {
+  public normalizeEmail(email: string): string {
     return email ? email.trim().toLowerCase() : '';
+  }
+
+  private seedAdminUser(): void {
+    const normAdminEmail = this.normalizeEmail(ADMIN_EMAIL);
+    if (!this.users.has(normAdminEmail)) {
+      const adminUser: User = {
+        id: 'usr_admin_ivan',
+        fullName: 'Teacher Ivan (Admin)',
+        email: normAdminEmail,
+        dateOfBirth: '1990-01-01',
+        country: 'Bolivia',
+        authProvider: 'email',
+        role: 'admin',
+        profileCompleted: true,
+        learningGoals: {
+          targetLevel: 'C1 / IELTS',
+          primaryGoal: 'Business & Executive English',
+          focusSkill: 'Speaking Fluency & Pronunciation',
+          personalObjective: 'Lead international English tutoring & AI immersion',
+        },
+        cefrLevel: 'C2',
+        lastScore: 100,
+        createdAt: new Date().toISOString(),
+      };
+      this.users.set(normAdminEmail, adminUser);
+      this.saveToDisk();
+    }
   }
 
   public loadFromDisk(): void {
@@ -54,7 +95,6 @@ export class UserStore {
           }
         }
       } else {
-        // Initialize empty file
         this.saveToDisk();
       }
       this.isLoaded = true;
@@ -101,11 +141,15 @@ export class UserStore {
     dateOfBirth?: string;
     country?: string;
     authProvider?: 'email' | 'google';
+    role?: 'student' | 'admin';
+    profileCompleted?: boolean;
+    learningGoals?: LearningGoals;
     cefrLevel?: string;
     lastScore?: number;
   }): User {
     const normEmail = this.normalizeEmail(data.email);
     const existing = this.users.get(normEmail);
+    const isAdmin = normEmail === this.normalizeEmail(ADMIN_EMAIL) || data.role === 'admin';
 
     if (existing) {
       const updated: User = {
@@ -114,6 +158,9 @@ export class UserStore {
         dateOfBirth: data.dateOfBirth ? data.dateOfBirth.trim() : existing.dateOfBirth,
         country: data.country ? data.country.trim() : existing.country,
         authProvider: data.authProvider || existing.authProvider,
+        role: isAdmin ? 'admin' : (existing.role || 'student'),
+        profileCompleted: data.profileCompleted !== undefined ? data.profileCompleted : existing.profileCompleted,
+        learningGoals: data.learningGoals || existing.learningGoals,
         cefrLevel: data.cefrLevel !== undefined ? data.cefrLevel : existing.cefrLevel,
         lastScore: data.lastScore !== undefined ? data.lastScore : existing.lastScore,
       };
@@ -123,12 +170,15 @@ export class UserStore {
     }
 
     const newUser: User = {
-      id: `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-      fullName: data.fullName ? data.fullName.trim() : 'Student',
+      id: isAdmin ? 'usr_admin_ivan' : `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      fullName: data.fullName ? data.fullName.trim() : (isAdmin ? 'Teacher Ivan (Admin)' : 'Student'),
       email: normEmail,
       dateOfBirth: data.dateOfBirth ? data.dateOfBirth.trim() : '',
       country: data.country ? data.country.trim() : '',
       authProvider: data.authProvider || 'email',
+      role: isAdmin ? 'admin' : 'student',
+      profileCompleted: isAdmin ? true : (data.profileCompleted || false),
+      learningGoals: data.learningGoals,
       cefrLevel: data.cefrLevel,
       lastScore: data.lastScore,
       createdAt: new Date().toISOString(),
@@ -139,10 +189,53 @@ export class UserStore {
     return newUser;
   }
 
-  public createSessionToken(userId: string): string {
+  public updateUserProfile(
+    identifier: { id?: string; email?: string },
+    updates: {
+      learningGoals?: LearningGoals;
+      cefrLevel?: string;
+      fullName?: string;
+      country?: string;
+      dateOfBirth?: string;
+      profileCompleted?: boolean;
+    }
+  ): User | null {
+    let user: User | undefined;
+    if (identifier.email) {
+      user = this.findByEmail(identifier.email);
+    } else if (identifier.id) {
+      user = this.findById(identifier.id);
+    }
+
+    if (!user) return null;
+
+    const normEmail = this.normalizeEmail(user.email);
+    const updated: User = {
+      ...user,
+      fullName: updates.fullName ? updates.fullName.trim() : user.fullName,
+      country: updates.country ? updates.country.trim() : user.country,
+      dateOfBirth: updates.dateOfBirth ? updates.dateOfBirth.trim() : user.dateOfBirth,
+      learningGoals: updates.learningGoals || user.learningGoals,
+      cefrLevel: updates.cefrLevel !== undefined ? updates.cefrLevel : user.cefrLevel,
+      profileCompleted: updates.profileCompleted !== undefined ? updates.profileCompleted : true,
+    };
+
+    this.users.set(normEmail, updated);
+    this.saveToDisk();
+    return updated;
+  }
+
+  public createSessionToken(userId: string, role: 'student' | 'admin' = 'student'): string {
     const timestamp = Date.now();
     const nonce = crypto.randomBytes(16).toString('hex');
-    return Buffer.from(`${userId}:${timestamp}:${nonce}`).toString('base64');
+    return Buffer.from(`${userId}:${role}:${timestamp}:${nonce}`).toString('base64');
+  }
+
+  public verifyAdminCredentials(email: string, password?: string): boolean {
+    if (!password) return false;
+    const normEmail = this.normalizeEmail(email);
+    const normAdmin = this.normalizeEmail(ADMIN_EMAIL);
+    return normEmail === normAdmin && password === ADMIN_PASSWORD;
   }
 }
 

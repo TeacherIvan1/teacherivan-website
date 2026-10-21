@@ -32,15 +32,17 @@ export const RegisteredStudentsTable: React.FC = () => {
 
   const handleExportCsv = () => {
     if (users.length === 0) return;
-    const headers = ['ID', 'Full Name', 'Email', 'Date of Birth', 'Country', 'Provider', 'CEFR Level', 'Last Score', 'Created At'];
+    const headers = ['ID', 'Full Name', 'Email', 'Date of Birth', 'Country', 'Role', 'CEFR Level', 'Learning Goal', 'Personal Objective', 'Last Score', 'Created At'];
     const rows = users.map((u) => [
       u.id,
       `"${u.fullName.replace(/"/g, '""')}"`,
       u.email,
       u.dateOfBirth,
       `"${u.country}"`,
-      u.authProvider,
+      u.role || 'student',
       u.cefrLevel || 'N/A',
+      `"${(u.learningGoals?.primaryGoal || 'N/A').replace(/"/g, '""')}"`,
+      `"${(u.learningGoals?.personalObjective || '').replace(/"/g, '""')}"`,
       u.lastScore !== undefined ? u.lastScore : 'N/A',
       u.createdAt,
     ]);
@@ -111,11 +113,11 @@ export const RegisteredStudentsTable: React.FC = () => {
           <thead>
             <tr className="border-b border-[#A7C7E7]/20 text-[#A7C7E7] font-montserrat font-bold uppercase text-[10px] tracking-wider">
               <th className="py-2.5 px-3">Student</th>
-              <th className="py-2.5 px-3">Country</th>
               <th className="py-2.5 px-3">Date of Birth</th>
-              <th className="py-2.5 px-3">Auth</th>
+              <th className="py-2.5 px-3">Country</th>
               <th className="py-2.5 px-3">Level / Score</th>
-              <th className="py-2.5 px-3">Joined</th>
+              <th className="py-2.5 px-3">Learning Goal</th>
+              <th className="py-2.5 px-3">Role</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#A7C7E7]/10 font-inter">
@@ -129,23 +131,21 @@ export const RegisteredStudentsTable: React.FC = () => {
               users.map((student) => (
                 <tr key={student.id} className="hover:bg-[#1A3153]/40 transition-colors">
                   <td className="py-3 px-3">
-                    <div className="font-semibold text-[#FAFAFA]">{student.fullName}</div>
+                    <div className="font-semibold text-[#FAFAFA] flex items-center gap-1.5">
+                      <span>{student.fullName}</span>
+                      {student.role === 'admin' && (
+                        <span className="px-1.5 py-0.2 rounded bg-[#E09B30] text-[#1A3153] text-[9px] font-black uppercase">
+                          Admin
+                        </span>
+                      )}
+                    </div>
                     <div className="text-[11px] text-[#A7C7E7] font-mono">{student.email}</div>
-                  </td>
-                  <td className="py-3 px-3 text-[#FAFAFA]">
-                    {student.country || <span className="text-[#A7C7E7]/50 italic">None</span>}
                   </td>
                   <td className="py-3 px-3 text-[#A7C7E7]">
                     {student.dateOfBirth || <span className="text-[#A7C7E7]/50 italic">None</span>}
                   </td>
-                  <td className="py-3 px-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      student.authProvider === 'google'
-                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
-                        : 'bg-[#A7C7E7]/20 text-[#A7C7E7] border border-[#A7C7E7]/30'
-                    }`}>
-                      {student.authProvider}
-                    </span>
+                  <td className="py-3 px-3 text-[#FAFAFA]">
+                    {student.country || <span className="text-[#A7C7E7]/50 italic">None</span>}
                   </td>
                   <td className="py-3 px-3">
                     {student.cefrLevel ? (
@@ -160,8 +160,32 @@ export const RegisteredStudentsTable: React.FC = () => {
                       <span className="text-[#A7C7E7]/50 italic">Pending</span>
                     )}
                   </td>
-                  <td className="py-3 px-3 text-[#A7C7E7] text-[11px]">
-                    {student.createdAt ? new Date(student.createdAt).toLocaleDateString() : 'N/A'}
+                  <td className="py-3 px-3 text-[#FAFAFA]">
+                    {student.learningGoals ? (
+                      <div>
+                        <div className="font-semibold text-xs text-[#E09B30]">
+                          {student.learningGoals.primaryGoal}
+                        </div>
+                        {student.learningGoals.personalObjective && (
+                          <div className="text-[10px] text-[#A7C7E7] truncate max-w-[200px]" title={student.learningGoals.personalObjective}>
+                            "{student.learningGoals.personalObjective}"
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-[#A7C7E7]/50 italic">No goals set</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      student.role === 'admin'
+                        ? 'bg-[#E09B30] text-[#1A3153]'
+                        : student.authProvider === 'google'
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                        : 'bg-[#A7C7E7]/20 text-[#A7C7E7] border border-[#A7C7E7]/30'
+                    }`}>
+                      {student.role || student.authProvider}
+                    </span>
                   </td>
                 </tr>
               ))

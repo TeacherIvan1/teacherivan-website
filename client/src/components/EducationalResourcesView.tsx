@@ -13,9 +13,11 @@ import {
   Check,
   AlertCircle,
   HelpCircle,
+  Calendar,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
+import { useNavigationStore } from '../modules/navigation/navigationStore';
 
 export interface Collocation {
   term: string;
@@ -53,6 +55,7 @@ export interface ListeningItem {
 
 export const EducationalResourcesView: React.FC = () => {
   const { t, isEs } = useTranslation();
+  const setActiveView = useNavigationStore((s) => s.setActiveView);
   const { completedReadings, completedVideos, markReadingComplete, markVideoComplete } =
     useSprintStore();
 
@@ -436,6 +439,30 @@ export const EducationalResourcesView: React.FC = () => {
         <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
           {t.resourcesView.subtitle}
         </p>
+      </div>
+
+      {/* Quick-Access Card: 1-on-1 Class Scheduling with Teacher Ivan */}
+      <div
+        id="quick-book-class-card"
+        className="p-6 rounded-3xl bg-gradient-to-r from-[#12223a] via-[#1A3153] to-[#12223a] border-2 border-[#E09B30]/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
+      >
+        <div className="space-y-1.5 text-center md:text-left">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
+            <Calendar size={14} />
+            <span>{t.scheduling.quickBookCardTitle}</span>
+          </div>
+          <p className="font-inter text-xs text-[#FAFAFA] max-w-2xl leading-relaxed">
+            {t.scheduling.quickBookCardDesc}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setActiveView('schedule')}
+          className="shrink-0 px-6 py-3.5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all shadow-lg shadow-[#E09B30]/30 cursor-pointer flex items-center gap-2"
+        >
+          <Calendar size={14} />
+          <span>{t.scheduling.quickBookBtn}</span>
+        </button>
       </div>
 
       {/* Filter Strip */}
