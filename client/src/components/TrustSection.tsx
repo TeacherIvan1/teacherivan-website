@@ -2,15 +2,15 @@ import React from 'react';
 import { Award, CheckCircle2, MessageCircle, Mic, ArrowRight, Quote, Shield } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { getWhatsAppUrl } from '../config/contact';
 
 export const TrustSection: React.FC = () => {
   const { t } = useTranslation();
   const { startSession, status } = useConversationStore();
 
-  const WHATSAPP_PHONE = '59178680795';
-  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+  const whatsappUrl = getWhatsAppUrl(
     'Hola Teacher Ivan! Me gustaría hacer una consulta para empezar mis clases 1 a 1 de inglés.'
-  )}`;
+  );
 
   const handleStartTutor = () => {
     const el = document.getElementById('voice-tutor-showcase');

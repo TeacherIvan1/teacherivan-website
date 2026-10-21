@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
   <defs>
     <linearGradient id="emmaSkin" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFF2E2" />
-      <stop offset="100%" stop-color="#FCDDC3" />
+      <stop offset="0%" stop-color="#FAFAFA" />
+      <stop offset="100%" stop-color="#FAFAFA" />
     </linearGradient>
     <linearGradient id="emmaHair" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#4A332D" />
-      <stop offset="100%" stop-color="#2C1D18" />
+      <stop offset="0%" stop-color="#4A5568" />
+      <stop offset="100%" stop-color="#1A3153" />
     </linearGradient>
     <linearGradient id="emmaBlazer" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#24416b" />
+      <stop offset="0%" stop-color="#1A3153" />
       <stop offset="100%" stop-color="#1A3153" />
     </linearGradient>
     <linearGradient id="emmaDenim" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#C5DCF2" />
+      <stop offset="0%" stop-color="#A7C7E7" />
       <stop offset="100%" stop-color="#A7C7E7" />
     </linearGradient>
     <linearGradient id="emmaAmber" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#F2AF42" />
+      <stop offset="0%" stop-color="#E09B30" />
       <stop offset="100%" stop-color="#E09B30" />
     </linearGradient>
     <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
@@ -36,14 +36,16 @@
   <!-- BODY / TORSO -->
   <g id="body" filter="url(#softShadow)">
     <!-- Neck -->
-    <rect x="232" y="300" width="36" height="42" rx="10" fill="url(#emmaSkin)" />
+    <rect x="232" y="300" width="36" height="42" rx="10" fill="#FAFAFA" />
+    <rect x="232" y="300" width="36" height="42" rx="10" fill="#E09B30" fill-opacity="0.25" />
     <!-- Shadow under chin -->
-    <ellipse cx="250" cy="312" rx="26" ry="8" fill="#E8BFA4" opacity="0.6" />
+    <ellipse cx="250" cy="312" rx="26" ry="8" fill="#4A5568" fill-opacity="0.25" />
 
     <!-- Soft Denim Shirt -->
     <path d="M 205 340 L 295 340 L 315 470 L 185 470 Z" fill="url(#emmaDenim)" />
     <!-- Collar / Neckline -->
-    <path d="M 230 340 Q 250 368 270 340 Z" fill="url(#emmaSkin)" />
+    <path d="M 230 340 Q 250 368 270 340 Z" fill="#FAFAFA" />
+    <path d="M 230 340 Q 250 368 270 340 Z" fill="#E09B30" fill-opacity="0.25" />
     
     <!-- Deep Navy Blazer -->
     <path d="M 185 340 Q 155 370 145 470 L 195 470 L 225 365 L 185 340 Z" fill="url(#emmaBlazer)" />
@@ -82,32 +84,37 @@
 
     <!-- Hands Holding Notebook -->
     <!-- Left Hand -->
-    <ellipse cx="196" cy="438" rx="14" ry="11" fill="url(#emmaSkin)" stroke="#E8BFA4" stroke-width="1.5" transform="rotate(15 196 438)" />
+    <ellipse cx="196" cy="438" rx="14" ry="11" fill="#FAFAFA" stroke="#1A3153" stroke-width="1.5" transform="rotate(15 196 438)" />
+    <ellipse cx="196" cy="438" rx="14" ry="11" fill="#E09B30" fill-opacity="0.25" transform="rotate(15 196 438)" />
     <!-- Right Hand -->
-    <ellipse cx="304" cy="432" rx="14" ry="11" fill="url(#emmaSkin)" stroke="#E8BFA4" stroke-width="1.5" transform="rotate(-15 304 432)" />
+    <ellipse cx="304" cy="432" rx="14" ry="11" fill="#FAFAFA" stroke="#1A3153" stroke-width="1.5" transform="rotate(-15 304 432)" />
+    <ellipse cx="304" cy="432" rx="14" ry="11" fill="#E09B30" fill-opacity="0.25" transform="rotate(-15 304 432)" />
   </g>
 
   <!-- HEAD & FACE -->
   <g id="head" filter="url(#softShadow)">
     <!-- Ears -->
-    <circle cx="135" cy="225" r="18" fill="url(#emmaSkin)" />
-    <circle cx="135" cy="225" r="9" fill="#E8BFA4" opacity="0.7" />
-    <circle cx="365" cy="225" r="18" fill="url(#emmaSkin)" />
-    <circle cx="365" cy="225" r="9" fill="#E8BFA4" opacity="0.7" />
+    <circle cx="135" cy="225" r="18" fill="#FAFAFA" />
+    <circle cx="135" cy="225" r="18" fill="#E09B30" fill-opacity="0.25" />
+    <circle cx="135" cy="225" r="9" fill="#4A5568" fill-opacity="0.2" />
+    <circle cx="365" cy="225" r="18" fill="#FAFAFA" />
+    <circle cx="365" cy="225" r="18" fill="#E09B30" fill-opacity="0.25" />
+    <circle cx="365" cy="225" r="9" fill="#4A5568" fill-opacity="0.2" />
 
     <!-- Head Contour (Cute Chibi Shape) -->
-    <path d="M 140 210 Q 135 295 250 315 Q 365 295 360 210 Q 360 120 250 115 Q 140 120 140 210 Z" fill="url(#emmaSkin)" />
+    <path d="M 140 210 Q 135 295 250 315 Q 365 295 360 210 Q 360 120 250 115 Q 140 120 140 210 Z" fill="#FAFAFA" stroke="#1A3153" stroke-width="3.5" />
+    <path d="M 140 210 Q 135 295 250 315 Q 365 295 360 210 Q 360 120 250 115 Q 140 120 140 210 Z" fill="#E09B30" fill-opacity="0.25" />
 
     <!-- Cute Cheeks / Blush -->
-    <ellipse cx="185" cy="245" rx="16" ry="9" fill="#F87171" opacity="0.32" />
-    <ellipse cx="315" cy="245" rx="16" ry="9" fill="#F87171" opacity="0.32" />
+    <ellipse cx="185" cy="245" rx="16" ry="9" fill="#E09B30" fill-opacity="0.28" />
+    <ellipse cx="315" cy="245" rx="16" ry="9" fill="#E09B30" fill-opacity="0.28" />
 
     <!-- Big Anime / Chibi Eyes -->
     <!-- Left Eye -->
     <g id="left-eye">
       <ellipse cx="195" cy="215" rx="20" ry="24" fill="#1A3153" />
-      <ellipse cx="195" cy="218" rx="16" ry="20" fill="#2C1D18" />
-      <ellipse cx="195" cy="222" rx="12" ry="14" fill="#E09B30" opacity="0.85" />
+      <ellipse cx="195" cy="218" rx="16" ry="20" fill="#4A5568" />
+      <ellipse cx="195" cy="222" rx="12" ry="14" fill="#E09B30" fill-opacity="0.85" />
       <!-- Pupil & Sparkles -->
       <ellipse cx="195" cy="216" rx="9" ry="11" fill="#1A3153" />
       <circle cx="189" cy="208" r="6" fill="#FAFAFA" />
@@ -120,8 +127,8 @@
     <!-- Right Eye -->
     <g id="right-eye">
       <ellipse cx="305" cy="215" rx="20" ry="24" fill="#1A3153" />
-      <ellipse cx="305" cy="218" rx="16" ry="20" fill="#2C1D18" />
-      <ellipse cx="305" cy="222" rx="12" ry="14" fill="#E09B30" opacity="0.85" />
+      <ellipse cx="305" cy="218" rx="16" ry="20" fill="#4A5568" />
+      <ellipse cx="305" cy="222" rx="12" ry="14" fill="#E09B30" fill-opacity="0.85" />
       <!-- Pupil & Sparkles -->
       <ellipse cx="305" cy="216" rx="9" ry="11" fill="#1A3153" />
       <circle cx="299" cy="208" r="6" fill="#FAFAFA" />
@@ -132,14 +139,14 @@
     </g>
 
     <!-- Eyebrows (Warm & Friendly) -->
-    <path d="M 175 186 Q 195 174 218 184" stroke="#4A332D" stroke-width="3.5" fill="none" stroke-linecap="round" />
-    <path d="M 282 184 Q 305 174 325 186" stroke="#4A332D" stroke-width="3.5" fill="none" stroke-linecap="round" />
+    <path d="M 175 186 Q 195 174 218 184" stroke="#4A5568" stroke-width="3.5" fill="none" stroke-linecap="round" />
+    <path d="M 282 184 Q 305 174 325 186" stroke="#4A5568" stroke-width="3.5" fill="none" stroke-linecap="round" />
 
     <!-- Cute Nose -->
-    <path d="M 248 232 Q 252 236 248 240" stroke="#D9A683" stroke-width="2.5" fill="none" stroke-linecap="round" />
+    <path d="M 248 232 Q 252 236 248 240" stroke="#4A5568" stroke-width="2.5" fill="none" stroke-linecap="round" />
 
     <!-- Cheerful Open Tutor Smile -->
-    <path d="M 230 256 Q 250 282 270 256 Z" fill="#F43F5E" stroke="#1A3153" stroke-width="3" stroke-linejoin="round" />
+    <path d="M 230 256 Q 250 282 270 256 Z" fill="#E09B30" stroke="#1A3153" stroke-width="3" stroke-linejoin="round" />
     <!-- White Teeth Accent -->
     <path d="M 235 258 Q 250 266 265 258 Z" fill="#FAFAFA" />
   </g>
@@ -175,7 +182,7 @@
     <path d="M 225 155 Q 260 190 290 155 Q 255 130 225 155 Z" fill="url(#emmaHair)" />
     <path d="M 275 155 Q 315 185 335 160 Q 305 135 275 155 Z" fill="url(#emmaHair)" />
     <!-- Hair Sheen Highlight -->
-    <path d="M 180 115 Q 250 98 320 115" stroke="#785348" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" />
+    <path d="M 180 115 Q 250 98 320 115" stroke="#4A5568" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6" />
   </g>
 
   <!-- EDTECH HEADSET WITH MIC (Voice Tutor Theme) -->

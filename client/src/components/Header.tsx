@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Server, CheckCircle2, AlertTriangle, Sparkles, Home, Headphones, BookOpen } from 'lucide-react';
+import { Shield, Server, CheckCircle2, AlertTriangle, Sparkles, Home, Headphones, BookOpen, Gamepad2 } from 'lucide-react';
 import { checkServerHealth } from '../modules/auth/tokenService';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
@@ -14,7 +14,7 @@ export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
   const status = useConversationStore((s) => s.status);
-  const { t } = useTranslation();
+  const { t, isEs } = useTranslation();
   const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
   const selectScenario = useTeachingStore((s) => s.selectScenario);
   const { activeView, setActiveView } = useNavigationStore();
@@ -65,9 +65,11 @@ export const Header: React.FC = () => {
   };
 
   const navTabs: { id: AppView; label: string; icon: React.ReactNode }[] = [
-    { id: 'overview', label: t.nav.overview, icon: <Home size={15} /> },
-    { id: 'simulator', label: t.nav.simulator, icon: <Headphones size={15} /> },
-    { id: 'methodology', label: t.nav.methodology, icon: <BookOpen size={15} /> },
+    { id: 'overview', label: t.nav.overview, icon: <Home size={14} /> },
+    { id: 'simulator', label: t.nav.simulator, icon: <Headphones size={14} /> },
+    { id: 'resources', label: t.nav.resources, icon: <BookOpen size={14} /> },
+    { id: 'games', label: t.nav.games, icon: <Gamepad2 size={14} /> },
+    { id: 'methodology', label: t.nav.methodology, icon: <Sparkles size={14} /> },
   ];
 
   return (
@@ -167,8 +169,8 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Mobile Sub-Header Tab Bar (<768px): Guaranteed zero overflow */}
-      <div className="md:hidden border-t border-[#A7C7E7]/20 bg-[#1A3153]/95 px-3 py-1.5">
-        <nav className="flex items-center justify-around gap-1">
+      <div className="md:hidden border-t border-[#A7C7E7]/20 bg-[#1A3153]/95 px-1.5 py-1.5 overflow-x-auto scrollbar-none">
+        <nav className="flex items-center justify-between gap-1 w-full min-w-0">
           {navTabs.map((tab) => {
             const isActive = activeView === tab.id;
             return (
@@ -176,14 +178,16 @@ export const Header: React.FC = () => {
                 key={tab.id}
                 id={`mobile-nav-tab-${tab.id}`}
                 onClick={() => setActiveView(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-full text-[11px] font-montserrat font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
+                className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 py-1 px-1 rounded-xl text-[10px] font-montserrat font-bold uppercase tracking-tight transition-all duration-150 cursor-pointer min-w-0 ${
                   isActive
-                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
                     : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
                 }`}
               >
                 {tab.icon}
-                <span className="truncate">{tab.label}</span>
+                <span className="truncate max-w-[68px]">
+                  {tab.id === 'simulator' ? (isEs ? 'Simulador' : 'Simulator') : tab.label}
+                </span>
               </button>
             );
           })}

@@ -15,7 +15,7 @@ export const AsyncSprintSection: React.FC = () => {
       time: t.asyncSprint.day1Time,
       desc: t.asyncSprint.day1Desc,
       icon: Headphones,
-      highlight: '3–5m Audio + 3 Collocations',
+      highlight: t.asyncSprint.day1Highlight,
     },
     {
       id: 1,
@@ -24,7 +24,7 @@ export const AsyncSprintSection: React.FC = () => {
       time: t.asyncSprint.day2Time,
       desc: t.asyncSprint.day2Desc,
       icon: PenTool,
-      highlight: 'Contextualized Structural Writing',
+      highlight: t.asyncSprint.day2Highlight,
     },
     {
       id: 2,
@@ -33,7 +33,7 @@ export const AsyncSprintSection: React.FC = () => {
       time: t.asyncSprint.day3Time,
       desc: t.asyncSprint.day3Desc,
       icon: Mic,
-      highlight: '60–90s WhatsApp Voice Note',
+      highlight: t.asyncSprint.day3Highlight,
     },
     {
       id: 3,
@@ -42,7 +42,7 @@ export const AsyncSprintSection: React.FC = () => {
       time: t.asyncSprint.day4Time,
       desc: t.asyncSprint.day4Desc,
       icon: Mail,
-      highlight: '<120 Words Professional Email',
+      highlight: t.asyncSprint.day4Highlight,
     },
     {
       id: 4,
@@ -51,7 +51,7 @@ export const AsyncSprintSection: React.FC = () => {
       time: t.asyncSprint.day5Time,
       desc: t.asyncSprint.day5Desc,
       icon: Volume2,
-      highlight: '45–60s Coach Audio-Feedback',
+      highlight: t.asyncSprint.day5Highlight,
     },
   ];
 
@@ -80,31 +80,31 @@ export const AsyncSprintSection: React.FC = () => {
           <ChibiSceneShowcase
             imageSrc="/assets/chibi-classroom.png"
             altText="Teacher Ivan Interactive Classroom and Async Habit Sprint"
-            badge1Text="5-Day Voice Sprint 🚀"
+            badge1Text={t.asyncSprint.showcaseBadge1}
             badge1Icon="audio"
-            badge2Text="Daily 10–15m Micro-Habit ⏱️"
+            badge2Text={t.asyncSprint.showcaseBadge2}
             badge2Icon="star"
-            caption="Collaborative Asynchronous Sprints: Daily voice notes build lasting confidence"
+            caption={t.asyncSprint.showcaseCaption}
           />
         </div>
         <div className="lg:col-span-7 flex flex-col justify-center space-y-4">
           <div className="p-6 rounded-3xl bg-[#1A3153]/80 border border-[#A7C7E7]/30 shadow-xl space-y-3">
             <h3 className="font-montserrat font-bold text-lg text-[#FAFAFA] flex items-center gap-2">
               <Sparkles size={18} className="text-[#E09B30]" />
-              <span>Micro-Learning That Fits Your Schedule</span>
+              <span>{t.asyncSprint.microLearningTitle}</span>
             </h3>
             <p className="font-inter text-sm text-[#A7C7E7] leading-relaxed">
-              Fluency is not built in exhausting once-a-week marathons. Our 5-day asynchronous sprint embeds 10–15 minutes of structured English into your daily routine via WhatsApp, pairing listening, writing, and authentic voice production with direct audio corrections from Teacher Ivan.
+              {t.asyncSprint.microLearningDesc}
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
               <span className="px-3 py-1 rounded-full bg-[#10b981]/15 border border-[#10b981]/30 text-[#10b981] text-xs font-semibold">
-                Daily Audio Recasts
+                {t.asyncSprint.badgeDailyRecasts}
               </span>
               <span className="px-3 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-xs font-semibold">
-                Neuroplastic Retention
+                {t.asyncSprint.badgeNeuroplastic}
               </span>
               <span className="px-3 py-1 rounded-full bg-[#A7C7E7]/15 border border-[#A7C7E7]/30 text-[#A7C7E7] text-xs font-semibold">
-                Zero Commute Time
+                {t.asyncSprint.badgeZeroCommute}
               </span>
             </div>
           </div>

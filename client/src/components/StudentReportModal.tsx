@@ -18,6 +18,7 @@ import { useReportStore } from '../modules/report/reportStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { getWhatsAppUrl } from '../config/contact';
 
 export const StudentReportModal: React.FC = () => {
   const {
@@ -72,9 +73,7 @@ export const StudentReportModal: React.FC = () => {
 
     // 2. Open WhatsApp if pre-filled message is provided
     if (whatsappMessage) {
-      const cleanPhone = '59178680795';
-      const encodedMsg = encodeURIComponent(whatsappMessage);
-      const url = `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
+      const url = getWhatsAppUrl(whatsappMessage);
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   };

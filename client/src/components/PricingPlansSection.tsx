@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { Check, Sparkles, MessageCircle, ShieldCheck, Zap } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { getWhatsAppUrl } from '../config/contact';
 
 export const PricingPlansSection: React.FC = () => {
   const { t } = useTranslation();
   const [currency, setCurrency] = useState<'BOB' | 'USD'>('BOB');
 
-  const WHATSAPP_PHONE = '59178680795';
-
   const getWhatsAppLink = (planName: string, price: string) => {
     const text = `Hola Teacher Ivan! Me gustaría consultar disponibilidad e inscribirme al "${planName}" (${price}).`;
-    return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
+    return getWhatsAppUrl(text);
   };
 
   const plans = [

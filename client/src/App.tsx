@@ -18,9 +18,14 @@ import { LiveDebugPanel } from './components/LiveDebugPanel';
 import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { StudentReportModal } from './components/StudentReportModal';
 import { SpokenAssessmentModal } from './components/SpokenAssessmentModal';
+import { WeeklyReportModal } from './components/WeeklyReportModal';
+import { WeeklySprintDashboard } from './components/WeeklySprintDashboard';
+import { EducationalResourcesView } from './components/EducationalResourcesView';
+import { InteractiveGamesView } from './components/InteractiveGamesView';
 import { BrandLockup } from './components/BrandLockup';
 import { Terminal } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
+import { TEACHER_PHONE, getWhatsAppUrl } from './config/contact';
 import { useTranslation } from './modules/i18n/languageStore';
 import { useDevModeStore } from './modules/dev/devModeStore';
 import { useNavigationStore } from './modules/navigation/navigationStore';
@@ -73,12 +78,12 @@ export const App: React.FC = () => {
 
         {/* VIEW 2: SIMULADOR IA / AI VOICE SIMULATOR (Dedicated Interactive Section) */}
         {activeView === 'simulator' && (
-          <div id="view-simulator" className="py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col animate-in fade-in duration-200">
+          <div id="view-simulator" className="py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200">
             {/* Developer Mode Banner Notification (if active) */}
             {isDeveloperMode && (
               <div
                 id="dev-mode-active-banner"
-                className="mb-6 p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 flex items-center justify-between gap-3 text-xs text-[#FAFAFA]"
+                className="p-3 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 flex items-center justify-between gap-3 text-xs text-[#FAFAFA]"
               >
                 <div className="flex items-center gap-2">
                   <Terminal size={15} className="text-[#E09B30]" />
@@ -94,6 +99,11 @@ export const App: React.FC = () => {
                 </button>
               </div>
             )}
+
+            {/* Persistent 5-Day Sprint Tracker (Compact Mode) */}
+            <div className="rounded-3xl overflow-hidden border border-[#A7C7E7]/25 shadow-xl">
+              <WeeklySprintDashboard compact />
+            </div>
 
             {/* Ultra-Compact Voice Simulator Console */}
             <CompactVoiceSimulator />
@@ -116,7 +126,23 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* VIEW 3: MÉTODO / METHODOLOGY (Detailed Bichronous Architecture View) */}
+        {/* VIEW 3: RECURSOS / EDUCATIONAL RESOURCES */}
+        {activeView === 'resources' && (
+          <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
+            <WeeklySprintDashboard />
+            <EducationalResourcesView />
+          </div>
+        )}
+
+        {/* VIEW 4: JUEGOS / INTERACTIVE PEDAGOGICAL GAMES */}
+        {activeView === 'games' && (
+          <div id="view-games" className="flex flex-col animate-in fade-in duration-200">
+            <WeeklySprintDashboard />
+            <InteractiveGamesView />
+          </div>
+        )}
+
+        {/* VIEW 5: MÉTODO / METHODOLOGY (Detailed Bichronous Architecture View) */}
         {activeView === 'methodology' && (
           <div id="view-methodology" className="flex flex-col animate-in fade-in duration-200">
             {/* Step 1: Bichronous Method Overview */}
@@ -140,6 +166,9 @@ export const App: React.FC = () => {
       {/* Automatic End-of-Session Student Report Pop-Up Modal */}
       <StudentReportModal />
 
+      {/* End-of-Week Teacher Pedagogical Report Modal */}
+      <WeeklyReportModal />
+
       {/* Clean Institutional Footer */}
       <footer className="bg-[#12223a] border-t border-[#A7C7E7]/25 text-[#FAFAFA] py-12 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
@@ -150,7 +179,7 @@ export const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 text-xs text-[#A7C7E7]">
+          <div className="flex flex-wrap justify-center gap-5 sm:gap-6 text-xs text-[#A7C7E7]">
             <button
               type="button"
               onClick={() => setActiveView('overview')}
@@ -171,6 +200,24 @@ export const App: React.FC = () => {
             </button>
             <button
               type="button"
+              onClick={() => setActiveView('resources')}
+              className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                activeView === 'resources' ? 'text-[#E09B30] font-bold' : ''
+              }`}
+            >
+              {t.nav.resources}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView('games')}
+              className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                activeView === 'games' ? 'text-[#E09B30] font-bold' : ''
+              }`}
+            >
+              {t.nav.games}
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveView('methodology')}
               className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
                 activeView === 'methodology' ? 'text-[#E09B30] font-bold' : ''
@@ -178,18 +225,14 @@ export const App: React.FC = () => {
             >
               {t.nav.methodology}
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView('overview');
-                setTimeout(() => {
-                  document.getElementById('pricing-plans-section')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-              className="hover:text-[#E09B30] transition-colors cursor-pointer"
+            <a
+              href={getWhatsAppUrl('Hola Teacher Ivan! Me gustaría consultar por clases 1 a 1 de inglés.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#10b981] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
             >
-              {t.nav.pricing}
-            </button>
+              💬 WhatsApp ({TEACHER_PHONE})
+            </a>
           </div>
         </div>
 

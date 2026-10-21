@@ -2,15 +2,15 @@ import React from 'react';
 import { Mic, MessageCircle } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
+import { getWhatsAppUrl } from '../config/contact';
 
 export const MobileBottomBar: React.FC = () => {
   const { t } = useTranslation();
   const { startSession, status } = useConversationStore();
 
-  const WHATSAPP_PHONE = '59178680795';
-  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+  const whatsappUrl = getWhatsAppUrl(
     'Hola Teacher Ivan! Me gustaría consultar disponibilidad e información sobre las clases de inglés.'
-  )}`;
+  );
 
   const handleStartTutor = () => {
     const el = document.getElementById('voice-tutor-showcase');

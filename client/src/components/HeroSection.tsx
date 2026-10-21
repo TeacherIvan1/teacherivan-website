@@ -5,6 +5,8 @@ import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 
+import { getWhatsAppUrl } from '../config/contact';
+
 export const HeroSection: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const persona = useTeachingStore((s) => s.persona);
@@ -12,10 +14,9 @@ export const HeroSection: React.FC = () => {
   const { t } = useTranslation();
   const isConnected = status === 'connected';
 
-  const WHATSAPP_PHONE = '59178680795';
-  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+  const whatsappUrl = getWhatsAppUrl(
     'Hola Teacher Ivan! Me gustaría consultar disponibilidad para clases 1 a 1 de inglés y probar el tutor de voz IA.'
-  )}`;
+  );
 
   const handleStartPractice = () => {
     setActiveView('simulator');

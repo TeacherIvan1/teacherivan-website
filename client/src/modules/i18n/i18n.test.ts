@@ -143,4 +143,66 @@ describe('i18n Language Module', () => {
     assert.ok(translations.es.transcript.placeholderConnectedIvan.includes('Teacher Ivan'));
     assert.ok(translations.es.transcript.placeholderConnectedEmma.includes('Emma'));
   });
+
+  it('contains 5 navigation tabs and complete asyncSprint bilingual keys in en and es', () => {
+    // 5 Navigation Tabs
+    assert.strictEqual(translations.en.nav.overview, 'Overview');
+    assert.strictEqual(translations.es.nav.overview, 'Inicio');
+    assert.strictEqual(translations.en.nav.simulator, 'AI Simulator');
+    assert.strictEqual(translations.es.nav.simulator, 'Simulador IA');
+    assert.strictEqual(translations.en.nav.resources, 'Resources');
+    assert.strictEqual(translations.es.nav.resources, 'Recursos');
+    assert.strictEqual(translations.en.nav.games, 'Games');
+    assert.strictEqual(translations.es.nav.games, 'Juegos');
+    assert.strictEqual(translations.en.nav.methodology, 'Method');
+    assert.strictEqual(translations.es.nav.methodology, 'Método');
+
+    // Async Sprint Bilingual Keys
+    assert.strictEqual(translations.en.asyncSprint.microLearningTitle, 'Micro-Learning That Fits Your Schedule');
+    assert.strictEqual(translations.es.asyncSprint.microLearningTitle, 'Micro-Aprendizaje Adaptado a Tu Horario');
+    assert.ok(translations.en.asyncSprint.microLearningDesc.includes('Fluency is not built'));
+    assert.ok(translations.es.asyncSprint.microLearningDesc.includes('La fluidez no se construye'));
+    assert.strictEqual(translations.en.asyncSprint.badgeDailyRecasts, 'Daily Audio Recasts');
+    assert.strictEqual(translations.es.asyncSprint.badgeDailyRecasts, 'Recasting en Audio Diario');
+    assert.strictEqual(translations.en.asyncSprint.badgeNeuroplastic, 'Neuroplastic Retention');
+    assert.strictEqual(translations.es.asyncSprint.badgeNeuroplastic, 'Retención Neuroplástica');
+    assert.strictEqual(translations.en.asyncSprint.badgeZeroCommute, 'Zero Commute Time');
+    assert.strictEqual(translations.es.asyncSprint.badgeZeroCommute, 'Sin Pérdida de Tiempo en Traslados');
+    assert.strictEqual(translations.en.asyncSprint.showcaseBadge1, '5-Day Voice Sprint 🚀');
+    assert.strictEqual(translations.es.asyncSprint.showcaseBadge1, 'Sprint de Voz de 5 Días 🚀');
+    assert.strictEqual(translations.en.asyncSprint.showcaseBadge2, 'Daily 10–15m Micro-Habit ⏱️');
+    assert.strictEqual(translations.es.asyncSprint.showcaseBadge2, 'Micro-Hábito Diario 10–15m ⏱️');
+    assert.ok(translations.en.asyncSprint.showcaseCaption.includes('Collaborative Asynchronous Sprints'));
+    assert.ok(translations.es.asyncSprint.showcaseCaption.includes('Sprints Asíncronos Colaborativos'));
+    assert.ok(translations.en.asyncSprint.day1Highlight);
+    assert.ok(translations.es.asyncSprint.day1Highlight);
+  });
+
+  it('contains parallel translations for resourcesView, gamesView, and sprintDashboard', () => {
+    // Resources View
+    assert.ok(translations.en.resourcesView.title);
+    assert.ok(translations.es.resourcesView.title);
+    assert.ok(translations.en.resourcesView.readingsTitle);
+    assert.ok(translations.es.resourcesView.readingsTitle);
+    assert.ok(translations.en.resourcesView.listeningsTitle);
+    assert.ok(translations.es.resourcesView.listeningsTitle);
+
+    // Games View
+    assert.ok(translations.en.gamesView.title);
+    assert.ok(translations.es.gamesView.title);
+    assert.ok(translations.en.gamesView.tabRecast);
+    assert.ok(translations.es.gamesView.tabRecast);
+    assert.ok(translations.en.gamesView.tabMatcher);
+    assert.ok(translations.es.gamesView.tabMatcher);
+    assert.ok(translations.en.gamesView.tabBuilder);
+    assert.ok(translations.es.gamesView.tabBuilder);
+
+    // Sprint Dashboard
+    assert.ok(translations.en.sprintDashboard.title);
+    assert.ok(translations.es.sprintDashboard.title);
+    assert.ok(translations.en.sprintDashboard.reportTitle);
+    assert.ok(translations.es.sprintDashboard.reportTitle);
+    assert.ok(translations.en.sprintDashboard.sendToIvan.includes('+591 72878330'));
+    assert.ok(translations.es.sprintDashboard.sendToIvan.includes('+591 72878330'));
+  });
 });
