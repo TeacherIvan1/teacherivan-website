@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Target, Sparkles, Award, Compass, BookOpen, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Target, Sparkles, Award, Compass, BookOpen, CheckCircle2, Loader2, AlertCircle, X } from 'lucide-react';
 import { useAuthStore } from '../modules/auth/authStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
 import { LearningGoals } from '../modules/auth/types';
@@ -23,22 +23,52 @@ const FOCUS_SKILLS = [
   'Listening Comprehension',
 ] as const;
 
-export const MandatoryGoalsModal: React.FC = () => {
+export interface GoalsModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export const MandatoryGoalsModal: React.FC<GoalsModalProps> = ({
+  isOpen = false,
+  onClose,
+}) => {
   const { user, isAuthenticated, saveProfileGoals } = useAuthStore();
   const setPersonalizedSprint = useSprintStore((s) => s.setPersonalizedSprint);
   const { t, isEs } = useTranslation();
 
-  const [targetLevel, setTargetLevel] = useState<string>('B1');
-  const [primaryGoal, setPrimaryGoal] = useState<string>('Tech & Job Interviews');
-  const [focusSkill, setFocusSkill] = useState<string>('Speaking Fluency & Pronunciation');
-  const [personalObjective, setPersonalObjective] = useState<string>('');
+  const [targetLevel, setTargetLevel] = useState<string>(
+    user?.learningGoals?.targetLevel || 'B1'
+  );
+  const [primaryGoal, setPrimaryGoal] = useState<string>(
+    user?.learningGoals?.primaryGoal || 'Tech & Job Interviews'
+  );
+  const [focusSkill, setFocusSkill] = useState<string>(
+    user?.learningGoals?.focusSkill || 'Speaking Fluency & Pronunciation'
+  );
+  const [personalObjective, setPersonalObjective] = useState<string>(
+    user?.learningGoals?.personalObjective || ''
+  );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Strictly non-dismissible: opens ONLY if authenticated, NOT admin, and profileCompleted is false
-  if (!isAuthenticated || !user || user.role === 'admin' || user.profileCompleted === true) {
+  // Sync with user's existing goals when opened
+  useEffect(() => {
+    if (user?.learningGoals) {
+      if (user.learningGoals.targetLevel) setTargetLevel(user.learningGoals.targetLevel);
+      if (user.learningGoals.primaryGoal) setPrimaryGoal(user.learningGoals.primaryGoal);
+      if (user.learningGoals.focusSkill) setFocusSkill(user.learningGoals.focusSkill);
+      if (user.learningGoals.personalObjective) setPersonalObjective(user.learningGoals.personalObjective);
+    }
+  }, [user, isOpen]);
+
+  // NEVER auto-pop-up on initial page load. Opens ONLY when explicitly triggered (e.g. from Edit Goals)
+  if (!isOpen || !isAuthenticated) {
     return null;
   }
+
+  const handleClose = () => {
+    if (onClose) onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +94,7 @@ export const MandatoryGoalsModal: React.FC = () => {
     };
 
     try {
-      // 1. Save mandatory profile to database
+      // 1. Save profile to database
       await saveProfileGoals(goals);
 
       // 2. Request AI Personalized 5-Day Micro-Learning Sprint
@@ -82,8 +112,10 @@ export const MandatoryGoalsModal: React.FC = () => {
           }
         }
       } catch (genErr) {
-        console.warn('[MandatoryGoalsModal] Sprint generator warning (falling back to local):', genErr);
+        console.warn('[MandatoryGoalsModal] Sprint generator warning:', genErr);
       }
+
+      if (onClose) onClose();
     } catch (saveErr: unknown) {
       const msg = saveErr instanceof Error ? saveErr.message : String(saveErr);
       setError(msg || 'Error saving learning goals. Please try again.');
@@ -94,18 +126,23 @@ export const MandatoryGoalsModal: React.FC = () => {
 
   return (
     <div
-      id="mandatory-goals-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1A3153]/95 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      id="goals-modal-backdrop"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1A3153]/90 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="mandatory-goals-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !isSubmitting) {
+          handleClose();
+        }
+      }}
     >
       <div
         id="mandatory-goals-modal-card"
-        className="relative w-full max-w-2xl bg-[#FAFAFA] text-[#1A3153] border-3 border-[#E09B30] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]"
+        className="relative w-full max-w-2xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#E09B30] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]"
       >
         {/* Header Bar */}
-        <div className="px-6 py-5 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30 flex items-center justify-between gap-3">
+        <div className="px-6 py-4 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#E09B30]/20 border border-[#E09B30] flex items-center justify-center text-[#E09B30]">
               <Target size={20} />
@@ -116,12 +153,22 @@ export const MandatoryGoalsModal: React.FC = () => {
               </span>
               <h2
                 id="mandatory-goals-title"
-                className="font-montserrat font-extrabold text-lg sm:text-xl tracking-tight leading-snug"
+                className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug"
               >
                 {t.mandatoryGoalsModal.title}
               </h2>
             </div>
           </div>
+
+          <button
+            type="button"
+            id="close-goals-modal-btn"
+            onClick={handleClose}
+            className="w-8 h-8 rounded-full bg-[#FAFAFA]/10 hover:bg-[#FAFAFA]/20 text-[#FAFAFA] flex items-center justify-center transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
         </div>
 
         {/* Form Body */}
@@ -137,21 +184,20 @@ export const MandatoryGoalsModal: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* 1. CEFR Level Selector */}
             <div>
               <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-2 flex items-center gap-1.5">
                 <Award size={14} className="text-[#E09B30]" />
                 <span>{t.mandatoryGoalsModal.levelLabel}</span>
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {CEFR_LEVELS.map((lvl) => {
                   const isSelected = targetLevel === lvl;
                   return (
                     <button
                       key={lvl}
                       type="button"
-                      id={`goals-level-opt-${lvl.toLowerCase().replace(/[^a-z0-9]/g, '')}`}
                       onClick={() => setTargetLevel(lvl)}
                       className={`py-2.5 px-3 rounded-xl border text-xs font-montserrat font-bold transition-all text-center cursor-pointer ${
                         isSelected
@@ -179,7 +225,6 @@ export const MandatoryGoalsModal: React.FC = () => {
                     <button
                       key={goal}
                       type="button"
-                      id={`goals-primary-opt-${goal.toLowerCase().replace(/[^a-z0-9]/g, '')}`}
                       onClick={() => setPrimaryGoal(goal)}
                       className={`p-3 rounded-2xl border text-left text-xs font-montserrat font-bold transition-all flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
@@ -208,7 +253,6 @@ export const MandatoryGoalsModal: React.FC = () => {
                     <button
                       key={skill}
                       type="button"
-                      id={`goals-skill-opt-${skill.toLowerCase().replace(/[^a-z0-9]/g, '')}`}
                       onClick={() => setFocusSkill(skill)}
                       className={`p-3 rounded-2xl border text-left text-xs font-montserrat font-bold transition-all flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
@@ -234,15 +278,12 @@ export const MandatoryGoalsModal: React.FC = () => {
               <textarea
                 id="goals-personal-objective-input"
                 required
-                rows={3}
+                rows={2}
                 value={personalObjective}
                 onChange={(e) => setPersonalObjective(e.target.value)}
                 placeholder={t.mandatoryGoalsModal.personalObjectivePlaceholder}
-                className="w-full p-3.5 rounded-2xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] leading-relaxed"
+                className="w-full p-3 rounded-2xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] leading-relaxed"
               />
-              <p className="text-[11px] text-[#4A5568]/80 mt-1">
-                {t.mandatoryGoalsModal.personalObjectiveHelper}
-              </p>
             </div>
 
             {/* Submit Button */}
@@ -250,7 +291,7 @@ export const MandatoryGoalsModal: React.FC = () => {
               type="submit"
               id="submit-mandatory-goals-btn"
               disabled={isSubmitting || !personalObjective.trim()}
-              className="w-full py-4 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-xl shadow-[#E09B30]/30 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/30 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

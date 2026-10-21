@@ -124,3 +124,15 @@ test('authStore - student vs admin roles and learning goals schema', () => {
 
   useAuthStore.getState().signOut();
 });
+
+test('authStore - banner support on openAuthModal', () => {
+  const store = useAuthStore.getState();
+  const bannerMessage = 'Sign up free in 30 seconds to unlock all custom scenarios!';
+
+  store.openAuthModal('signup', undefined, bannerMessage);
+  assert.equal(useAuthStore.getState().isAuthModalOpen, true);
+  assert.equal(useAuthStore.getState().authModalBanner, bannerMessage);
+
+  store.closeAuthModal();
+  assert.equal(useAuthStore.getState().isAuthModalOpen, false);
+});

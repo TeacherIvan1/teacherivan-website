@@ -9,8 +9,8 @@ interface AssessmentState {
 }
 
 export const useAssessmentStore = create<AssessmentState>((set) => ({
-  // Auto-pop-up on website entry as required
-  isAssessmentModalOpen: true,
+  // Default to false: no automatic pop-ups on initial entry
+  isAssessmentModalOpen: false,
   hasUserDismissedModal: false,
   openAssessmentModal: () => {
     const conv = useConversationStore.getState();

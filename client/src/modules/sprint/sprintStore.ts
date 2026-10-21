@@ -42,12 +42,16 @@ interface SprintState {
       day: 'D1' | 'D2' | 'D3' | 'D4' | 'D5';
       type: 'Receptive Input' | 'Structural Processing' | 'Async Oral Production' | 'Functional Writing Prompt' | 'Weekly Closure';
       title: string;
+      titleEs?: string;
       time: string;
       description: string;
+      descriptionEs?: string;
       targetCollocations: string[];
       simulatorScenarioPreset: string;
       functionalWritingPrompt?: string;
+      functionalWritingPromptEs?: string;
       highlight: string;
+      highlightEs?: string;
     }>;
     generatedBy?: 'gemini' | 'deterministic-fallback';
     modelUsed?: string;

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AppView = 'overview' | 'simulator' | 'resources' | 'games' | 'methodology' | 'schedule';
+export type AppView = 'path' | 'simulator' | 'resources' | 'games' | 'schedule' | 'overview' | 'methodology';
 
 interface NavigationState {
   activeView: AppView;
@@ -8,7 +8,7 @@ interface NavigationState {
 }
 
 export const useNavigationStore = create<NavigationState>((set) => ({
-  activeView: 'overview',
+  activeView: 'path',
   setActiveView: (activeView: AppView) => {
     set({ activeView });
     // Scroll to top smoothly when switching views

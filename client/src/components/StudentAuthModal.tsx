@@ -1,14 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, User, Mail, Calendar, Globe, AlertCircle, Loader2, CheckCircle2, Lock, KeyRound } from 'lucide-react';
+import {
+  X,
+  Sparkles,
+  User,
+  Mail,
+  Calendar,
+  Globe,
+  AlertCircle,
+  Loader2,
+  CheckCircle2,
+  Lock,
+  KeyRound,
+  ArrowRight,
+  ArrowLeft,
+  Award,
+  Compass,
+  BookOpen,
+  Target,
+} from 'lucide-react';
 import { useAuthStore } from '../modules/auth/authStore';
-import { SUPPORTED_COUNTRIES, SupportedCountry } from '../modules/auth/types';
+import { SUPPORTED_COUNTRIES, SupportedCountry, LearningGoals } from '../modules/auth/types';
 import { useTranslation } from '../modules/i18n/languageStore';
-import { getEnvVar } from '../config/api';
+import { useSprintStore } from '../modules/sprint/sprintStore';
+import { useNavigationStore } from '../modules/navigation/navigationStore';
+import { getEnvVar, getApiUrl } from '../config/api';
+
+const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1 / IELTS'] as const;
+
+const PRIMARY_GOALS = [
+  'Tech & Job Interviews',
+  'University Scholarship',
+  'IELTS Exam Prep',
+  'Business & Executive English',
+  'Daily Conversational Fluency',
+] as const;
+
+const FOCUS_SKILLS = [
+  'Speaking Fluency & Pronunciation',
+  'Grammar & Syntax Accuracy',
+  'Professional Vocabulary & Collocations',
+  'Listening Comprehension',
+] as const;
 
 export const StudentAuthModal: React.FC = () => {
   const {
     isAuthModalOpen,
     authModalMode,
+    authModalBanner,
     pendingGoogleProfile,
     isLoading,
     error,
@@ -20,14 +58,34 @@ export const StudentAuthModal: React.FC = () => {
   } = useAuthStore();
 
   const { t, isEs } = useTranslation();
+  const setPersonalizedSprint = useSprintStore((s) => s.setPersonalizedSprint);
+  const setActiveView = useNavigationStore((s) => s.setActiveView);
 
-  // Form fields
+  // Wizard Step (1: Account Credentials, 2: Learning Goals)
+  const [step, setStep] = useState<1 | 2>(1);
+
+  // Step 1 Form fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [country, setCountry] = useState<SupportedCountry | ''>('Bolivia');
+
+  // Step 2 Form fields (Learning Goals)
+  const [targetLevel, setTargetLevel] = useState<string>('B1');
+  const [primaryGoal, setPrimaryGoal] = useState<string>('Tech & Job Interviews');
+  const [focusSkill, setFocusSkill] = useState<string>('Speaking Fluency & Pronunciation');
+  const [personalObjective, setPersonalObjective] = useState<string>('');
+
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Reset step to 1 when modal opens or mode changes
+  useEffect(() => {
+    if (isAuthModalOpen) {
+      setStep(1);
+      setValidationError(null);
+    }
+  }, [isAuthModalOpen, authModalMode]);
 
   // Sync state when pending Google profile changes
   useEffect(() => {
@@ -40,20 +98,21 @@ export const StudentAuthModal: React.FC = () => {
   // Handle escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isAuthModalOpen) {
+      if (e.key === 'Escape' && isAuthModalOpen && !isLoading) {
         closeAuthModal();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAuthModalOpen, closeAuthModal]);
+  }, [isAuthModalOpen, closeAuthModal, isLoading]);
 
   if (!isAuthModalOpen) return null;
 
   const isCompletingProfile = authModalMode === 'complete_google_profile';
   const isSignInMode = authModalMode === 'signin';
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
+  // Advance from Step 1 to Step 2
+  const handleProceedToStep2 = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
 
@@ -77,6 +136,34 @@ export const StudentAuthModal: React.FC = () => {
       return;
     }
 
+    setStep(2);
+  };
+
+  // Submit complete 2-step registration
+  const handleFinalRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+
+    const trimmedName = fullName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedObjective = personalObjective.trim();
+
+    if (!trimmedObjective) {
+      setValidationError(
+        isEs
+          ? 'Por favor escribe tu objetivo personal específico (ej: Preparar entrevista de beca o trabajo).'
+          : 'Please enter your specific personal goal (e.g. Prepare for job or scholarship interview).'
+      );
+      return;
+    }
+
+    const learningGoals: LearningGoals = {
+      targetLevel,
+      primaryGoal,
+      focusSkill,
+      personalObjective: trimmedObjective,
+    };
+
     try {
       if (isCompletingProfile || pendingGoogleProfile) {
         await authenticateWithGoogle({
@@ -84,6 +171,8 @@ export const StudentAuthModal: React.FC = () => {
           fullName: trimmedName,
           dateOfBirth,
           country,
+          learningGoals,
+          profileCompleted: true,
         });
       } else {
         await registerWithEmail({
@@ -91,8 +180,31 @@ export const StudentAuthModal: React.FC = () => {
           email: trimmedEmail,
           dateOfBirth,
           country,
+          learningGoals,
+          profileCompleted: true,
         });
       }
+
+      // Immediately generate tailored 5-day sprint
+      try {
+        const res = await fetch(getApiUrl('/api/curriculum/generate-sprint'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ learningGoals }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.sprint) {
+            setPersonalizedSprint(data.sprint);
+          }
+        }
+      } catch (genErr) {
+        console.warn('[StudentAuthModal] Sprint generator warning:', genErr);
+      }
+
+      // Automatically navigate to My Path tab
+      setActiveView('path' as any);
     } catch {
       // Error handled in store
     }
@@ -109,10 +221,14 @@ export const StudentAuthModal: React.FC = () => {
     }
 
     try {
-      await loginWithCredentials({
+      const signedInUser = await loginWithCredentials({
         email: trimmedEmail,
         password: password ? password.trim() : undefined,
       });
+
+      if (signedInUser?.role !== 'admin') {
+        setActiveView('path' as any);
+      }
     } catch {
       // Error handled in store
     }
@@ -138,10 +254,12 @@ export const StudentAuthModal: React.FC = () => {
                     .join('')
                 );
                 const gData = JSON.parse(jsonPayload);
-                await authenticateWithGoogle({
-                  email: gData.email,
-                  fullName: gData.name || gData.given_name || 'Student',
-                });
+                const gEmail = gData.email;
+                const gName = gData.name || gData.given_name || 'Student';
+
+                setFullName(gName);
+                setEmail(gEmail);
+                setStep(2);
               } catch (decErr) {
                 console.error('[Google JWT decode error]:', decErr);
               }
@@ -151,15 +269,13 @@ export const StudentAuthModal: React.FC = () => {
         (window as any).google.accounts.id.prompt();
         return;
       } catch (gErr) {
-        console.warn('[Google Identity Services warning, falling back to direct prompt]:', gErr);
+        console.warn('[Google Identity Services warning]:', gErr);
       }
     }
 
-    // Direct Google Account Selector / Email prompt fallback
+    // Direct Google prompt fallback
     const promptEmail = window.prompt(
-      isEs
-        ? 'Ingresa tu correo de Google (Gmail):'
-        : 'Enter your Google (Gmail) email address:',
+      isEs ? 'Ingresa tu correo de Google (Gmail):' : 'Enter your Google (Gmail) email address:',
       email || 'student@gmail.com'
     );
 
@@ -168,10 +284,9 @@ export const StudentAuthModal: React.FC = () => {
         isEs ? 'Confirma tu nombre completo:' : 'Confirm your full name:',
         fullName || 'Student'
       );
-      await authenticateWithGoogle({
-        email: promptEmail.trim(),
-        fullName: (promptName || 'Student').trim(),
-      });
+      setFullName((promptName || 'Student').trim());
+      setEmail(promptEmail.trim());
+      setStep(2);
     }
   };
 
@@ -190,24 +305,24 @@ export const StudentAuthModal: React.FC = () => {
     >
       <div
         id="student-auth-modal-card"
-        className="relative w-full max-w-md bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]"
+        className="relative w-full max-w-lg bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#E09B30]/20 border border-[#E09B30] flex items-center justify-center text-[#E09B30]">
-              <Sparkles size={16} />
+            <div className="w-9 h-9 rounded-2xl bg-[#E09B30]/20 border border-[#E09B30] flex items-center justify-center text-[#E09B30]">
+              <Sparkles size={18} />
             </div>
             <div>
               <h2
                 id="auth-modal-title"
                 className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug"
               >
-                {isCompletingProfile
-                  ? t.authModal.titleCompleteProfile
-                  : isSignInMode
+                {isSignInMode
                   ? t.authModal.titleSignIn
-                  : t.authModal.titleSignUp}
+                  : step === 1
+                  ? t.authModal.step1Title
+                  : t.authModal.step2Title}
               </h2>
               <p className="text-[11px] text-[#A7C7E7]">Teacher Ivan • English Classes</p>
             </div>
@@ -226,6 +341,17 @@ export const StudentAuthModal: React.FC = () => {
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-4">
+          {/* Custom Banner if opened from locked feature */}
+          {authModalBanner && (
+            <div
+              id="auth-modal-tier-banner"
+              className="p-3.5 rounded-2xl bg-[#E09B30]/15 border border-[#E09B30] text-xs font-montserrat font-bold text-[#1A3153] flex items-center gap-2.5 shadow-sm"
+            >
+              <Sparkles size={16} className="text-[#E09B30] shrink-0" />
+              <span>{authModalBanner}</span>
+            </div>
+          )}
+
           {/* Mode Switcher Tabs (Sign Up vs Sign In) */}
           {!isCompletingProfile && (
             <div className="flex rounded-2xl bg-[#1A3153]/10 p-1 border border-[#A7C7E7]/30">
@@ -234,6 +360,7 @@ export const StudentAuthModal: React.FC = () => {
                 id="auth-tab-signup"
                 onClick={() => {
                   setValidationError(null);
+                  setStep(1);
                   openAuthModal('signup');
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
@@ -262,40 +389,22 @@ export const StudentAuthModal: React.FC = () => {
             </div>
           )}
 
-          <p className="font-inter text-xs text-[#4A5568] leading-relaxed">
-            {isCompletingProfile
-              ? t.authModal.subtitleCompleteProfile
-              : isSignInMode
-              ? t.authModal.subtitleSignIn
-              : t.authModal.subtitleSignUp}
-          </p>
-
-          {/* Google One-Tap Action (Only in main signup mode) */}
-          {!isCompletingProfile && !isSignInMode && (
-            <div className="space-y-3">
-              <button
-                type="button"
-                id="continue-with-google-btn"
-                disabled={isLoading}
-                onClick={handleGoogleClick}
-                className="w-full py-3 px-4 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] hover:bg-slate-50 text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all duration-150 cursor-pointer"
-              >
-                <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                <span>{t.authModal.googleBtn}</span>
-              </button>
-
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-[#A7C7E7]/40" />
-                <span className="text-[11px] font-medium text-[#4A5568] uppercase tracking-wider">
-                  {t.authModal.orDivider}
-                </span>
-                <div className="flex-1 h-px bg-[#A7C7E7]/40" />
-              </div>
+          {/* Stepper Indicator for Sign Up */}
+          {!isSignInMode && (
+            <div className="flex items-center justify-between gap-2 px-1">
+              <div
+                className={`flex-1 h-1.5 rounded-full transition-all ${
+                  step >= 1 ? 'bg-[#E09B30]' : 'bg-[#A7C7E7]/40'
+                }`}
+              />
+              <span className="text-[11px] font-montserrat font-bold text-[#4A5568]">
+                {step === 1 ? '1 / 2' : '2 / 2'}
+              </span>
+              <div
+                className={`flex-1 h-1.5 rounded-full transition-all ${
+                  step === 2 ? 'bg-[#E09B30]' : 'bg-[#A7C7E7]/40'
+                }`}
+              />
             </div>
           )}
 
@@ -324,7 +433,7 @@ export const StudentAuthModal: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ivan@teacherivan.com or your student email"
+                    placeholder="ivan@teacherivan.com or student email"
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
@@ -380,11 +489,38 @@ export const StudentAuthModal: React.FC = () => {
                 </button>
               </div>
             </form>
-          ) : (
+          ) : step === 1 ? (
             /* ========================================================================= */
-            /* REGISTRATION / PROFILE COMPLETION FORM                                    */
+            /* STEP 1: ACCOUNT CREDENTIALS (Email or Google)                             */
             /* ========================================================================= */
-            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+            <form onSubmit={handleProceedToStep2} className="space-y-3.5">
+              {/* Google One-Tap Action */}
+              <div className="space-y-3 mb-2">
+                <button
+                  type="button"
+                  id="continue-with-google-btn"
+                  disabled={isLoading}
+                  onClick={handleGoogleClick}
+                  className="w-full py-3 px-4 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] hover:bg-slate-50 text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all duration-150 cursor-pointer"
+                >
+                  <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                  </svg>
+                  <span>{t.authModal.googleBtn}</span>
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-[#A7C7E7]/40" />
+                  <span className="text-[11px] font-medium text-[#4A5568] uppercase tracking-wider">
+                    {t.authModal.orDivider}
+                  </span>
+                  <div className="flex-1 h-px bg-[#A7C7E7]/40" />
+                </div>
+              </div>
+
               {/* Full Name */}
               <div>
                 <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
@@ -416,92 +552,75 @@ export const StudentAuthModal: React.FC = () => {
                     id="auth-email-input"
                     required
                     value={email}
-                    disabled={Boolean(pendingGoogleProfile?.email)}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t.authModal.emailPlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] disabled:bg-slate-100 disabled:text-slate-500"
-                  />
-                </div>
-              </div>
-
-              {/* Date of Birth (<input type="date" />) */}
-              <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                  {t.authModal.dobLabel} <span className="text-[#E09B30]">*</span>
-                </label>
-                <div className="relative">
-                  <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                  <input
-                    type="date"
-                    id="auth-dob-input"
-                    required
-                    max={new Date().toISOString().split('T')[0]}
-                    value={dateOfBirth}
-                    onChange={(e) => setDateOfBirth(e.target.value)}
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
               </div>
 
-              {/* Country Selector Dropdown */}
-              <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                  {t.authModal.countryLabel} <span className="text-[#E09B30]">*</span>
-                </label>
-                <div className="relative">
-                  <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                  <select
-                    id="auth-country-select"
-                    required
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value as SupportedCountry)}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] cursor-pointer"
-                  >
-                    <option value="" disabled>
-                      {t.authModal.selectCountry}
-                    </option>
-                    {SUPPORTED_COUNTRIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c === 'Bolivia' ? '🇧🇴 Bolivia' :
-                         c === 'Mexico' ? '🇲🇽 Mexico' :
-                         c === 'Colombia' ? '🇨🇴 Colombia' :
-                         c === 'Peru' ? '🇵🇪 Peru' :
-                         c === 'Argentina' ? '🇦🇷 Argentina' :
-                         c === 'Chile' ? '🇨🇱 Chile' :
-                         c === 'Spain' ? '🇪🇸 Spain' :
-                         c === 'USA' ? '🇺🇸 United States' :
-                         '🌐 Other'}
-                      </option>
-                    ))}
-                  </select>
+              {/* Date of Birth & Country (2-column on sm) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    {t.authModal.dobLabel} <span className="text-[#E09B30]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <input
+                      type="date"
+                      id="auth-dob-input"
+                      required
+                      max={new Date().toISOString().split('T')[0]}
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      className="w-full pl-10 pr-2.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    {t.authModal.countryLabel} <span className="text-[#E09B30]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <select
+                      id="auth-country-select"
+                      required
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value as SupportedCountry)}
+                      className="w-full pl-10 pr-2.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] cursor-pointer"
+                    >
+                      {SUPPORTED_COUNTRIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c === 'Bolivia' ? '🇧🇴 Bolivia' :
+                           c === 'Mexico' ? '🇲🇽 Mexico' :
+                           c === 'Colombia' ? '🇨🇴 Colombia' :
+                           c === 'Peru' ? '🇵🇪 Peru' :
+                           c === 'Argentina' ? '🇦🇷 Argentina' :
+                           c === 'Chile' ? '🇨🇱 Chile' :
+                           c === 'Spain' ? '🇪🇸 Spain' :
+                           c === 'USA' ? '🇺🇸 United States' :
+                           '🌐 Other'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Button: Next: Set Your English Goal → */}
               <button
                 type="submit"
-                id="submit-auth-form-btn"
-                disabled={isLoading}
-                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+                id="auth-next-step-btn"
+                className="w-full mt-3 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    <span>{isEs ? 'Procesando...' : 'Processing...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 size={16} />
-                    <span>
-                      {isCompletingProfile
-                        ? t.authModal.submitCompleteProfile
-                        : t.authModal.submitSignUp}
-                    </span>
-                  </>
-                )}
+                <span>{t.authModal.nextGoalsBtn}</span>
+                <ArrowRight size={15} />
               </button>
 
-              <div className="text-center pt-2">
+              <div className="text-center pt-1">
                 <button
                   type="button"
                   onClick={() => openAuthModal('signin')}
@@ -510,6 +629,147 @@ export const StudentAuthModal: React.FC = () => {
                   {t.authModal.alreadyRegistered}
                 </button>
               </div>
+            </form>
+          ) : (
+            /* ========================================================================= */
+            /* STEP 2: LEARNING GOALS & CEFR TARGET WIZARD                               */
+            /* ========================================================================= */
+            <form onSubmit={handleFinalRegisterSubmit} className="space-y-4">
+              {/* Back to Step 1 Button */}
+              <button
+                type="button"
+                id="auth-back-step1-btn"
+                onClick={() => setStep(1)}
+                className="text-xs text-[#4A5568] hover:text-[#1A3153] font-montserrat font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <ArrowLeft size={14} />
+                <span>{t.authModal.backBtn}</span>
+              </button>
+
+              {/* 1. Current / Target CEFR Level */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1.5 flex items-center gap-1.5">
+                  <Award size={14} className="text-[#E09B30]" />
+                  <span>{t.mandatoryGoalsModal.levelLabel}</span>
+                </label>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                  {CEFR_LEVELS.map((lvl) => {
+                    const isSelected = targetLevel === lvl;
+                    return (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setTargetLevel(lvl)}
+                        className={`py-2 px-2 rounded-xl border text-xs font-montserrat font-bold transition-all text-center cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#1A3153] text-[#E09B30] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
+                            : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7]/60 hover:bg-slate-100'
+                        }`}
+                      >
+                        {lvl}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Primary Learning Goal */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1.5 flex items-center gap-1.5">
+                  <Compass size={14} className="text-[#E09B30]" />
+                  <span>{t.mandatoryGoalsModal.primaryGoalLabel}</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {PRIMARY_GOALS.map((goal) => {
+                    const isSelected = primaryGoal === goal;
+                    return (
+                      <button
+                        key={goal}
+                        type="button"
+                        onClick={() => setPrimaryGoal(goal)}
+                        className={`p-2.5 rounded-xl border text-left text-xs font-montserrat font-bold transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#1A3153] text-[#FAFAFA] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
+                            : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7]/60 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className="truncate">{goal}</span>
+                        {isSelected && <CheckCircle2 size={14} className="text-[#E09B30] shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Priority Skill Focus */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1.5 flex items-center gap-1.5">
+                  <BookOpen size={14} className="text-[#E09B30]" />
+                  <span>{t.mandatoryGoalsModal.focusSkillLabel}</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {FOCUS_SKILLS.map((skill) => {
+                    const isSelected = focusSkill === skill;
+                    return (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() => setFocusSkill(skill)}
+                        className={`p-2.5 rounded-xl border text-left text-xs font-montserrat font-bold transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#1A3153] text-[#FAFAFA] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
+                            : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7]/60 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className="truncate">{skill}</span>
+                        {isSelected && <CheckCircle2 size={14} className="text-[#E09B30] shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 4. Specific Personal Goal (Required Input) */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1 flex items-center gap-1.5">
+                  <Target size={14} className="text-[#E09B30]" />
+                  <span>{t.mandatoryGoalsModal.personalObjectiveLabel}</span>
+                  <span className="text-[#E09B30]">*</span>
+                </label>
+                <textarea
+                  id="auth-personal-objective-input"
+                  required
+                  rows={2}
+                  value={personalObjective}
+                  onChange={(e) => setPersonalObjective(e.target.value)}
+                  placeholder={
+                    isEs
+                      ? 'ej., Preparar mi entrevista de beca internacional / Pasar entrevistas técnicas'
+                      : 'e.g., Prepare for my international scholarship interview / Pass tech interviews'
+                  }
+                  className="w-full p-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] leading-relaxed"
+                />
+              </div>
+
+              {/* Complete Registration Button */}
+              <button
+                type="submit"
+                id="submit-auth-form-btn"
+                disabled={isLoading || !personalObjective.trim()}
+                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>{isEs ? 'Creando cuenta y plan...' : 'Creating account & plan...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={16} />
+                    <span>{t.authModal.completeRegistrationBtn}</span>
+                  </>
+                )}
+              </button>
             </form>
           )}
 

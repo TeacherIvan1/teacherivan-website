@@ -9,7 +9,7 @@ const router = Router();
  */
 router.post('/register', (req: Request, res: Response) => {
   try {
-    const { fullName, email, dateOfBirth, country } = req.body || {};
+    const { fullName, email, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
 
     if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
       return res.status(400).json({ error: 'Full name is required' });
@@ -30,6 +30,9 @@ router.post('/register', (req: Request, res: Response) => {
       dateOfBirth,
       country,
       authProvider: 'email',
+      profileCompleted: profileCompleted !== undefined ? profileCompleted : (learningGoals ? true : false),
+      learningGoals,
+      cefrLevel: learningGoals?.targetLevel,
     });
 
     const token = userStore.createSessionToken(user.id);
@@ -154,7 +157,7 @@ router.put('/profile', (req: Request, res: Response) => {
  */
 router.post('/google', (req: Request, res: Response) => {
   try {
-    const { email, fullName, dateOfBirth, country } = req.body || {};
+    const { email, fullName, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return res.status(400).json({ error: 'Valid Google email is required' });
@@ -163,7 +166,7 @@ router.post('/google', (req: Request, res: Response) => {
     const existing = userStore.findByEmail(email);
 
     // If student already has completed profile
-    if (existing && existing.dateOfBirth && existing.country) {
+    if (existing && existing.profileCompleted && !learningGoals) {
       const token = userStore.createSessionToken(existing.id);
       return res.status(200).json({
         status: 'ok',
@@ -181,6 +184,9 @@ router.post('/google', (req: Request, res: Response) => {
         dateOfBirth,
         country,
         authProvider: 'google',
+        profileCompleted: profileCompleted !== undefined ? profileCompleted : Boolean(learningGoals),
+        learningGoals: learningGoals || existing?.learningGoals,
+        cefrLevel: learningGoals?.targetLevel || existing?.cefrLevel,
       });
       const token = userStore.createSessionToken(user.id);
       return res.status(200).json({

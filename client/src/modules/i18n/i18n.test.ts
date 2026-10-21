@@ -260,4 +260,81 @@ describe('i18n Language Module', () => {
     assert.ok(translations.en.scheduling.adminBookingsTitle);
     assert.ok(translations.es.scheduling.adminBookingsTitle);
   });
+
+  it('contains 100% parallel translations for high-converting landing page in en and es', () => {
+    const enLp = translations.en.landingPage;
+    const esLp = translations.es.landingPage;
+
+    // 1. Hero 5 elements
+    assert.strictEqual(enLp.heroHeadline, 'Speak English confidently without freezing in real conversations');
+    assert.strictEqual(esLp.heroHeadline, 'Habla inglés con fluidez y sin bloqueos al conversar');
+    assert.ok(enLp.heroSubhead.includes('Teacher Ivan'));
+    assert.ok(esLp.heroSubhead.includes('Teacher Ivan'));
+    assert.ok(enLp.heroPrimaryCta);
+    assert.ok(esLp.heroPrimaryCta);
+    assert.ok(enLp.heroFrictionReducer);
+    assert.ok(esLp.heroFrictionReducer);
+    assert.ok(enLp.heroTrustSignal.includes('4.9/5'));
+    assert.ok(esLp.heroTrustSignal.includes('4.9/5'));
+
+    // 2. Problem -> Solution
+    assert.ok(enLp.problemLine);
+    assert.ok(esLp.problemLine);
+    assert.ok(enLp.solutionLine);
+    assert.ok(esLp.solutionLine);
+
+    // 3. Outcomes
+    assert.ok(enLp.benefit1Title);
+    assert.ok(esLp.benefit1Title);
+    assert.ok(enLp.benefit2Title);
+    assert.ok(esLp.benefit2Title);
+    assert.ok(enLp.benefit3Title);
+    assert.ok(esLp.benefit3Title);
+
+    // 4. How it works
+    assert.ok(enLp.step1Title);
+    assert.ok(esLp.step1Title);
+    assert.ok(enLp.step2Title);
+    assert.ok(esLp.step2Title);
+    assert.ok(enLp.step3Title);
+    assert.ok(esLp.step3Title);
+
+    // 5. FAQ
+    assert.ok(enLp.faqTitle);
+    assert.ok(esLp.faqTitle);
+    assert.ok(enLp.faq1Q);
+    assert.ok(esLp.faq1Q);
+    assert.ok(enLp.faq2Q);
+    assert.ok(esLp.faq2Q);
+    assert.ok(enLp.faq3Q);
+    assert.ok(esLp.faq3Q);
+    assert.ok(enLp.faq4Q);
+    assert.ok(esLp.faq4Q);
+
+    // 6. Final CTA
+    assert.ok(enLp.finalCtaHeadline);
+    assert.ok(esLp.finalCtaHeadline);
+    assert.strictEqual(enLp.finalPrimaryCta, enLp.heroPrimaryCta);
+    assert.strictEqual(esLp.finalPrimaryCta, esLp.heroPrimaryCta);
+  });
+
+  it('contains parallel translations for microLearning D1-D5 interactive dashboard', () => {
+    const enMl = translations.en.microLearning;
+    const esMl = translations.es.microLearning;
+
+    assert.ok(enMl.badge);
+    assert.ok(esMl.badge);
+    assert.ok(enMl.editGoals);
+    assert.ok(esMl.editGoals);
+    assert.ok(enMl.d1ReadingTitle);
+    assert.ok(esMl.d1ReadingTitle);
+    assert.ok(enMl.d2GrammarTitle);
+    assert.ok(esMl.d2GrammarTitle);
+    assert.ok(enMl.d3OralTitle);
+    assert.ok(esMl.d3OralTitle);
+    assert.ok(enMl.d4WritingTitle);
+    assert.ok(esMl.d4WritingTitle);
+    assert.ok(enMl.d5WhatsAppBtn.includes('+591 72878330'));
+    assert.ok(esMl.d5WhatsAppBtn.includes('+591 72878330'));
+  });
 });

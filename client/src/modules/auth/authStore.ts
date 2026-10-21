@@ -56,14 +56,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
     isAuthenticated: Boolean(initialUser && initialToken),
     isAuthModalOpen: false,
     authModalMode: 'signup',
+    authModalBanner: null,
     pendingGoogleProfile: null,
     isLoading: false,
     error: null,
 
-    openAuthModal: (mode = 'signup', pending = undefined) => {
+    openAuthModal: (mode = 'signup', pending = undefined, banner = null) => {
       set({
         isAuthModalOpen: true,
         authModalMode: mode,
+        authModalBanner: banner || null,
         pendingGoogleProfile: pending || null,
         error: null,
       });
@@ -72,6 +74,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     closeAuthModal: () => {
       set({
         isAuthModalOpen: false,
+        authModalBanner: null,
         pendingGoogleProfile: null,
         error: null,
       });

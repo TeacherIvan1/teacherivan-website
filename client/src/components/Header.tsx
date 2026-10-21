@@ -11,6 +11,7 @@ import {
   LogOut,
   Calendar,
   User as UserIcon,
+  Target,
 } from 'lucide-react';
 import { checkServerHealth } from '../modules/auth/tokenService';
 import { useConversationStore } from '../modules/conversation/conversationStore';
@@ -96,7 +97,13 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
         {/* Left: Brand Lockup with Chibi Mascot */}
         <button
-          onClick={() => setActiveView('simulator')}
+          onClick={() => {
+            if (isAuthenticated) {
+              setActiveView('path');
+            } else {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
           className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30] rounded-lg transition-transform hover:scale-[1.01] cursor-pointer"
           title="Teacher Ivan - English Classes"
         >
@@ -105,66 +112,103 @@ export const Header: React.FC = () => {
         </button>
 
         {/* Center: Desktop Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1.5 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
-          {/* Tab 1: Simulator & Diagnostic */}
-          <button
-            id="nav-tab-simulator"
-            onClick={() => setActiveView('simulator')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
-              activeView === 'simulator'
-                ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30'
-                : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
-            }`}
-          >
-            <Headphones size={14} />
-            <span>{isEs ? 'Simulador IA & Diagnóstico' : 'AI Simulator & Diagnostic'}</span>
-          </button>
+        {isAuthenticated ? (
+          <nav className="hidden md:flex items-center gap-1.5 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
+            {/* Tab 1: 🎯 Mi Ruta (Micro-Learning) */}
+            <button
+              id="nav-tab-path"
+              onClick={() => setActiveView('path')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                activeView === 'path'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
+              }`}
+            >
+              <Target size={14} />
+              <span>{isEs ? '🎯 Mi Ruta (Micro-Learning)' : '🎯 My Path (Micro-Learning)'}</span>
+            </button>
 
-          {/* Tab 2: Educational Resources (Unlocked if authenticated, locked badge if guest) */}
-          {isAuthenticated ? (
+            {/* Tab 2: 🎙️ Simulador IA */}
+            <button
+              id="nav-tab-simulator"
+              onClick={() => setActiveView('simulator')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                activeView === 'simulator'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
+              }`}
+            >
+              <Headphones size={14} />
+              <span>{isEs ? '🎙️ Simulador IA' : '🎙️ AI Simulator'}</span>
+            </button>
+
+            {/* Tab 3: 📚 Recursos & Juegos */}
             <button
               id="nav-tab-resources"
               onClick={() => setActiveView('resources')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                 activeView === 'resources'
-                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
               }`}
             >
               <BookOpen size={14} />
-              <span>{isEs ? 'Recursos Educativos' : 'Educational Resources'}</span>
+              <span>{isEs ? '📚 Recursos & Juegos' : '📚 Resources & Games'}</span>
             </button>
-          ) : (
-            <button
-              id="nav-tab-resources-locked"
-              onClick={() => openAuthModal('signup')}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7]/70 hover:text-[#E09B30] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
-              title={isEs ? 'Regístrate gratis para desbloquear' : 'Sign up free to unlock'}
-            >
-              <Lock size={13} className="text-[#E09B30]" />
-              <span>{isEs ? 'Recursos Educativos' : 'Educational Resources'}</span>
-              <span className="px-1.5 py-0.2 rounded bg-[#E09B30]/20 text-[#E09B30] text-[9px] font-extrabold">
-                LOCKED
-              </span>
-            </button>
-          )}
 
-          {/* Tab 3: Dedicated 1-on-1 Class Scheduling (Registered students) */}
-          {isAuthenticated && (
+            {/* Tab 4: 📅 Agendar Clase (14:00–20:00) */}
             <button
               id="nav-tab-schedule"
               onClick={() => setActiveView('schedule')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                 activeView === 'schedule'
-                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
               }`}
             >
               <Calendar size={14} />
-              <span>{t.scheduling.navTab}</span>
+              <span>{isEs ? '📅 Agendar Clase (14:00–20:00)' : '📅 Book Class (14:00–20:00)'}</span>
             </button>
-          )}
-        </nav>
+          </nav>
+        ) : (
+          <nav className="hidden md:flex items-center gap-1.5 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
+            <button
+              id="guest-nav-simulator"
+              onClick={() => {
+                const el = document.getElementById('flagship-simulator-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+            >
+              <Headphones size={14} />
+              <span>{isEs ? '🎙️ Simulador IA' : '🎙️ AI Simulator'}</span>
+            </button>
+
+            <button
+              id="guest-nav-pricing"
+              onClick={() => {
+                const el = document.getElementById('faq-pricing-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+            >
+              <BookOpen size={14} />
+              <span>{isEs ? '📚 Planes & Precios' : '📚 Plans & Pricing'}</span>
+            </button>
+
+            <button
+              id="guest-nav-schedule"
+              onClick={() => {
+                const el = document.getElementById('faq-pricing-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+            >
+              <Calendar size={14} />
+              <span>{isEs ? '📅 Clases 1 a 1' : '📅 1-on-1 Classes'}</span>
+            </button>
+          </nav>
+        )}
 
         {/* Right: Controls, Authentication & Language Switcher */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -274,30 +318,42 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Mobile Sub-Header Tab Bar (<768px): Guaranteed zero overflow */}
-      <div className="md:hidden border-t border-[#A7C7E7]/20 bg-[#1A3153]/95 px-2 py-1.5 flex items-center justify-around gap-2">
-        <button
-          id="mobile-nav-tab-simulator"
-          type="button"
-          onClick={() => setActiveView('simulator')}
-          className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-            activeView === 'simulator'
-              ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
-              : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-          }`}
-        >
-          <Headphones size={13} />
-          <span>{isEs ? 'Simulador' : 'Simulator'}</span>
-        </button>
-
+      <div className="md:hidden border-t border-[#A7C7E7]/20 bg-[#1A3153]/95 px-2 py-1.5 flex items-center justify-around gap-1">
         {isAuthenticated ? (
           <>
+            <button
+              id="mobile-nav-tab-path"
+              type="button"
+              onClick={() => setActiveView('path')}
+              className={`flex-1 py-1.5 px-1.5 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                activeView === 'path'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              }`}
+            >
+              <Target size={13} />
+              <span>{isEs ? 'Ruta' : 'Path'}</span>
+            </button>
+            <button
+              id="mobile-nav-tab-simulator"
+              type="button"
+              onClick={() => setActiveView('simulator')}
+              className={`flex-1 py-1.5 px-1.5 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                activeView === 'simulator'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              }`}
+            >
+              <Headphones size={13} />
+              <span>{isEs ? 'Simulador' : 'Simulator'}</span>
+            </button>
             <button
               id="mobile-nav-tab-resources"
               type="button"
               onClick={() => setActiveView('resources')}
-              className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 px-1.5 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 transition-all cursor-pointer ${
                 activeView === 'resources'
-                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
               }`}
             >
@@ -308,9 +364,9 @@ export const Header: React.FC = () => {
               id="mobile-nav-tab-schedule"
               type="button"
               onClick={() => setActiveView('schedule')}
-              className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 px-1.5 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 transition-all cursor-pointer ${
                 activeView === 'schedule'
-                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-extrabold'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
               }`}
             >
@@ -319,16 +375,41 @@ export const Header: React.FC = () => {
             </button>
           </>
         ) : (
-          <button
-            id="mobile-nav-tab-resources-locked"
-            type="button"
-            onClick={() => openAuthModal('signup')}
-            className="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 text-[#A7C7E7]/70 hover:text-[#E09B30] cursor-pointer"
-          >
-            <Lock size={12} className="text-[#E09B30]" />
-            <span>{isEs ? 'Recursos' : 'Resources'}</span>
-            <span className="text-[9px] text-[#E09B30]">🔒</span>
-          </button>
+          <>
+            <button
+              id="mobile-nav-guest-simulator"
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('flagship-simulator-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 text-[#A7C7E7] hover:text-[#FAFAFA] cursor-pointer"
+            >
+              <Headphones size={13} />
+              <span>{isEs ? 'Simulador' : 'Simulator'}</span>
+            </button>
+            <button
+              id="mobile-nav-guest-pricing"
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('faq-pricing-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-bold uppercase tracking-tight flex items-center justify-center gap-1 text-[#A7C7E7] hover:text-[#FAFAFA] cursor-pointer"
+            >
+              <BookOpen size={13} />
+              <span>{isEs ? 'Precios' : 'Plans'}</span>
+            </button>
+            <button
+              id="mobile-nav-guest-signup"
+              type="button"
+              onClick={() => openAuthModal('signup')}
+              className="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-montserrat font-extrabold uppercase tracking-tight flex items-center justify-center gap-1 bg-[#E09B30] text-[#1A3153] shadow-sm cursor-pointer"
+            >
+              <Sparkles size={13} />
+              <span>{isEs ? 'Registro' : 'Sign Up'}</span>
+            </button>
+          </>
         )}
       </div>
     </header>

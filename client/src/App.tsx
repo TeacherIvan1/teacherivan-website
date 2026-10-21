@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Header } from './components/Header';
+import { LandingPageView } from './components/LandingPageView';
 import { CompactVoiceSimulator } from './components/CompactVoiceSimulator';
 import { SessionReportPanel } from './components/SessionReportPanel';
 import { TeachingCard } from './components/TeachingCard';
@@ -10,7 +11,6 @@ import { LatencyMetricsPanel } from './components/LatencyMetricsPanel';
 import { StudentReportModal } from './components/StudentReportModal';
 import { SpokenAssessmentModal } from './components/SpokenAssessmentModal';
 import { StudentAuthModal } from './components/StudentAuthModal';
-import { MandatoryGoalsModal } from './components/MandatoryGoalsModal';
 import { WeeklyReportModal } from './components/WeeklyReportModal';
 import { WeeklySprintDashboard } from './components/WeeklySprintDashboard';
 import { EducationalResourcesView } from './components/EducationalResourcesView';
@@ -19,7 +19,7 @@ import { ClassSchedulerView } from './components/ClassSchedulerView';
 import { RegisteredStudentsTable } from './components/RegisteredStudentsTable';
 import { AdminBookingsTable } from './components/AdminBookingsTable';
 import { BrandLockup } from './components/BrandLockup';
-import { Terminal, Sparkles, BookOpen, Headphones, Calendar } from 'lucide-react';
+import { Terminal, Sparkles, BookOpen, Headphones, Calendar, Target } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { TEACHER_PHONE, getWhatsAppUrl } from './config/contact';
 import { useTranslation } from './modules/i18n/languageStore';
@@ -51,13 +51,10 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter">
-      {/* Student Sign-Up & Authentication Modal */}
+      {/* Student Sign-Up & Authentication Modal (Unified 2-Step Registration Flow) */}
       <StudentAuthModal />
 
-      {/* Mandatory Onboarding Gate: Non-dismissible goals modal for new students */}
-      <MandatoryGoalsModal />
-
-      {/* Spoken Assessment Diagnostic Modal */}
+      {/* Spoken Assessment Diagnostic Modal (Non-blocking, triggerable) */}
       <SpokenAssessmentModal />
 
       {/* Official Platform Header with Auth & View Navigation */}
@@ -65,63 +62,33 @@ export const App: React.FC = () => {
 
       <main className="flex-1 flex flex-col">
         {/* ========================================================================= */}
-        {/* NON-REGISTERED (GUEST) VIEW: MINIMALIST SIMULATOR & DIAGNOSTIC WORKSPACE  */}
+        {/* NON-REGISTERED (GUEST) VIEW: HIGH-CONVERTING LANDING PAGE                */}
         {/* ========================================================================= */}
         {!isAuthenticated ? (
-          <div
-            id="guest-simulator-landing"
-            className="py-6 px-4 sm:px-6 max-w-4xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200"
-          >
-            {/* Dedicated Voice Simulator & Spoken Diagnostic */}
-            <CompactVoiceSimulator />
-
-            {/* Reassurance & Educational Resources Teaser Card */}
-            <div
-              id="unlock-resources-teaser-card"
-              className="p-6 rounded-3xl bg-gradient-to-r from-[#12223a] to-[#1A3153] border-2 border-[#E09B30]/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5"
-            >
-              <div className="space-y-1.5 text-center sm:text-left">
-                <span className="inline-flex items-center gap-1.5 text-xs font-montserrat font-bold text-[#E09B30] uppercase tracking-wider">
-                  <Sparkles size={14} />
-                  <span>{isEs ? 'Recursos Educativos y Práctica Asincrónica' : 'Educational Resources & Async Practice'}</span>
-                </span>
-                <p className="text-xs text-[#FAFAFA] font-inter max-w-xl leading-relaxed">
-                  {isEs
-                    ? 'Prueba el simulador de voz de Gemini Live libremente. Al registrarte gratis, guardas tu puntaje CEFR y desbloqueas lecturas interactivas, video lecciones, juegos y el reporte semanal para Teacher Ivan.'
-                    : 'Test the Gemini Live AI voice tutor freely. Sign up free to save your CEFR score and unlock interactive readings, video lessons, games, and weekly progress reporting for Teacher Ivan.'}
-                </p>
-              </div>
-
-              <button
-                id="unlock-resources-guest-cta"
-                type="button"
-                onClick={() => openAuthModal('signup')}
-                className="shrink-0 px-7 py-3.5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-lg shadow-[#E09B30]/30 cursor-pointer flex items-center gap-2"
-              >
-                <Sparkles size={14} />
-                <span>{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
-              </button>
-            </div>
-          </div>
+          <LandingPageView />
         ) : (
           /* ========================================================================= */
-          /* REGISTERED USERS VIEW: SIMULATOR + RESOURCES + CLASS SCHEDULING VIEW      */
+          /* REGISTERED USERS VIEW: ROUTED STUDENT WORKSPACE                          */
           /* ========================================================================= */
           <div className="flex-1 flex flex-col animate-in fade-in duration-200">
-            {/* VIEW A: RECURSOS EDUCATIVOS */}
-            {activeView === 'resources' ? (
-              <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
+            {/* VIEW 1: 🎯 MI RUTA (MICRO-LEARNING 5-DAY SPRINT DASHBOARD) */}
+            {activeView === 'path' ? (
+              <div id="view-path" className="flex flex-col animate-in fade-in duration-200">
                 <WeeklySprintDashboard />
+              </div>
+            ) : activeView === 'resources' ? (
+              /* VIEW 2: 📚 RECURSOS & JUEGOS */
+              <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
                 <EducationalResourcesView />
                 <InteractiveGamesView />
               </div>
             ) : activeView === 'schedule' ? (
-              /* VIEW B: CLASS SCHEDULING (14:00 - 20:00 Bolivia Time) */
+              /* VIEW 3: 📅 AGENDAR CLASE (14:00 - 20:00 Bolivia Time) */
               <div id="view-schedule" className="flex flex-col animate-in fade-in duration-200">
                 <ClassSchedulerView />
               </div>
             ) : (
-              /* VIEW C: SIMULADOR IA & DIAGNÓSTICO (Dedicated Voice Simulator) */
+              /* VIEW 4: 🎙️ SIMULADOR IA (Full Unlocked Simulator Model) */
               <div id="view-simulator" className="py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200">
                 {/* Developer Mode Banner Notification (if active) */}
                 {showDevMode && (
@@ -149,7 +116,7 @@ export const App: React.FC = () => {
                   <WeeklySprintDashboard compact />
                 </div>
 
-                {/* Ultra-Compact Voice Simulator Console */}
+                {/* Flagship Voice Simulator Console (Fully Unlocked for Registered Student) */}
                 <CompactVoiceSimulator />
 
                 {/* In Developer Mode: Registered Students Table, All Booked Classes, Telemetry & Logs */}
@@ -199,21 +166,34 @@ export const App: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-5 sm:gap-6 text-xs text-[#A7C7E7]">
-            <button
-              type="button"
-              onClick={() => setActiveView('simulator')}
-              className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
-                activeView === 'simulator' ? 'text-[#E09B30] font-bold' : ''
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <Headphones size={13} />
-                <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
-              </span>
-            </button>
-
             {isAuthenticated ? (
               <>
+                <button
+                  type="button"
+                  onClick={() => setActiveView('path')}
+                  className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                    activeView === 'path' ? 'text-[#E09B30] font-bold' : ''
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Target size={13} />
+                    <span>{isEs ? 'Mi Ruta' : 'My Path'}</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveView('simulator')}
+                  className={`hover:text-[#E09B30] transition-colors cursor-pointer ${
+                    activeView === 'simulator' ? 'text-[#E09B30] font-bold' : ''
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Headphones size={13} />
+                    <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
+                  </span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setActiveView('resources')}
@@ -223,7 +203,7 @@ export const App: React.FC = () => {
                 >
                   <span className="flex items-center gap-1.5">
                     <BookOpen size={13} />
-                    <span>{isEs ? 'Recursos Educativos' : 'Educational Resources'}</span>
+                    <span>{isEs ? 'Recursos & Juegos' : 'Resources & Games'}</span>
                   </span>
                 </button>
 
@@ -241,14 +221,44 @@ export const App: React.FC = () => {
                 </button>
               </>
             ) : (
-              <button
-                type="button"
-                onClick={() => openAuthModal('signup')}
-                className="hover:text-[#E09B30] transition-colors cursor-pointer text-[#E09B30] font-bold flex items-center gap-1.5"
-              >
-                <Sparkles size={13} />
-                <span>{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('flagship-simulator-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-[#E09B30] transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Headphones size={13} />
+                    <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('faq-pricing-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-[#E09B30] transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen size={13} />
+                    <span>{isEs ? 'Planes & Precios' : 'Plans & Pricing'}</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('signup')}
+                  className="hover:text-[#E09B30] transition-colors cursor-pointer text-[#E09B30] font-bold flex items-center gap-1.5"
+                >
+                  <Sparkles size={13} />
+                  <span>{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
+                </button>
+              </>
             )}
 
             <a

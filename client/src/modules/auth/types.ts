@@ -40,14 +40,33 @@ export interface AuthState {
   isAuthenticated: boolean;
   isAuthModalOpen: boolean;
   authModalMode: 'signup' | 'signin' | 'complete_google_profile';
+  authModalBanner: string | null;
   pendingGoogleProfile: { email: string; fullName: string } | null;
   isLoading: boolean;
   error: string | null;
 
-  openAuthModal: (mode?: 'signup' | 'signin' | 'complete_google_profile', pending?: { email: string; fullName: string }) => void;
+  openAuthModal: (
+    mode?: 'signup' | 'signin' | 'complete_google_profile',
+    pending?: { email: string; fullName: string },
+    banner?: string | null
+  ) => void;
   closeAuthModal: () => void;
-  registerWithEmail: (data: { fullName: string; email: string; dateOfBirth: string; country: string }) => Promise<void>;
-  authenticateWithGoogle: (data: { email: string; fullName: string; dateOfBirth?: string; country?: string }) => Promise<{ needsProfileCompletion: boolean }>;
+  registerWithEmail: (data: {
+    fullName: string;
+    email: string;
+    dateOfBirth: string;
+    country: string;
+    learningGoals?: LearningGoals;
+    profileCompleted?: boolean;
+  }) => Promise<void>;
+  authenticateWithGoogle: (data: {
+    email: string;
+    fullName: string;
+    dateOfBirth?: string;
+    country?: string;
+    learningGoals?: LearningGoals;
+    profileCompleted?: boolean;
+  }) => Promise<{ needsProfileCompletion: boolean }>;
   loginWithCredentials: (data: { email: string; password?: string }) => Promise<UserProfile>;
   saveProfileGoals: (goals: LearningGoals) => Promise<UserProfile>;
   syncWithServer: () => Promise<void>;
