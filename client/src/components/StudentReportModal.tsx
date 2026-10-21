@@ -18,6 +18,8 @@ import { useReportStore } from '../modules/report/reportStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { useAuthStore } from '../modules/auth/authStore';
+import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { getWhatsAppUrl } from '../config/contact';
 
 export const StudentReportModal: React.FC = () => {
@@ -35,6 +37,15 @@ export const StudentReportModal: React.FC = () => {
   const startSession = useConversationStore((s) => s.startSession);
   const setCustomExerciseScenario = useTeachingStore((s) => s.setCustomExerciseScenario);
   const { t } = useTranslation();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const openAuthModal = useAuthStore((s) => s.openAuthModal);
+  const updateUserStats = useAuthStore((s) => s.updateUserStats);
+
+  const handleSaveScoreAndUnlock = () => {
+    updateUserStats(cefrBand, overallScore);
+    dismissReport();
+    openAuthModal('signup');
+  };
 
   // Handle escape key to dismiss modal
   useEffect(() => {
@@ -501,16 +512,34 @@ export const StudentReportModal: React.FC = () => {
             {t.studentModal.closeBtn}
           </button>
 
-          {!isGenerating && (
-            <button
-              id="practice-again-student-report-btn"
-              onClick={handlePracticeAgain}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-2 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30]"
-            >
-              <Play size={13} fill="currentColor" />
-              <span>{t.studentModal.practiceAgainBtn}</span>
-            </button>
-          )}
+          <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-2.5">
+            {!isGenerating && !isAuthenticated && (
+              <button
+                id="save-score-unlock-resources-btn"
+                type="button"
+                onClick={handleSaveScoreAndUnlock}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30] cursor-pointer"
+              >
+                <Sparkles size={14} />
+                <span>{t.authModal.saveScoreAndUnlock}</span>
+              </button>
+            )}
+
+            {!isGenerating && (
+              <button
+                id="practice-again-student-report-btn"
+                onClick={handlePracticeAgain}
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-2 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-md focus:outline-none focus-visible:ring-2 cursor-pointer ${
+                  !isAuthenticated
+                    ? 'border border-[#A7C7E7] text-[#1A3153] hover:bg-slate-200 focus-visible:ring-[#1A3153]'
+                    : 'bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] shadow-[#E09B30]/25 focus-visible:ring-[#E09B30]'
+                }`}
+              >
+                <Play size={13} fill="currentColor" />
+                <span>{t.studentModal.practiceAgainBtn}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

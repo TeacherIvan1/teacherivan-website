@@ -31,6 +31,7 @@ export const CompactVoiceSimulator: React.FC = () => {
     isTutorSpeaking,
     isUserSpeaking,
     sessionStartTime,
+    isReconnecting,
     errorMessage,
     startSession,
     stopSession,
@@ -151,18 +152,30 @@ export const CompactVoiceSimulator: React.FC = () => {
           </h1>
         </div>
 
-        {/* Timer or Status */}
-        {isConnected ? (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12223a] border border-[#10b981]/50 text-xs text-[#10b981] font-mono font-bold shadow-sm">
-            <Clock size={13} className="text-[#10b981]" />
-            <span>{formatTimer(elapsedSeconds)}</span>
-          </div>
-        ) : (
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#A7C7E7]">
-            <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-            <span>24/7 Available</span>
-          </div>
-        )}
+        {/* Timer, Reconnecting Pill or Status */}
+        <div className="flex items-center gap-2">
+          {isReconnecting && (
+            <div
+              id="reconnecting-audio-pill"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E09B30] text-[#1A3153] text-xs font-montserrat font-bold uppercase tracking-wider animate-pulse shadow-md"
+            >
+              <Loader2 size={13} className="animate-spin text-[#1A3153]" />
+              <span>{t.authModal.reconnecting}</span>
+            </div>
+          )}
+
+          {isConnected ? (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12223a] border border-[#10b981]/50 text-xs text-[#10b981] font-mono font-bold shadow-sm">
+              <Clock size={13} className="text-[#10b981]" />
+              <span>{formatTimer(elapsedSeconds)}</span>
+            </div>
+          ) : (
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#A7C7E7]">
+              <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
+              <span>24/7 Available</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 2. Compact Control Bar (Tutor Persona + Level Selector + Scenario Strip) */}

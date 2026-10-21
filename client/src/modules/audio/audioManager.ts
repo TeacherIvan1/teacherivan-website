@@ -57,6 +57,21 @@ export class AudioManager {
   }
 
   /**
+   * Keep-alive method called periodically during active voice sessions.
+   * Checks if either input or playback AudioContext is suspended, and resumes them immediately.
+   */
+  public async ensureAudioContextsActive(): Promise<void> {
+    if (this.inputContext && this.inputContext.state === 'suspended') {
+      try {
+        await this.inputContext.resume();
+      } catch (err) {
+        console.warn('[AudioManager] inputContext resume warning:', err);
+      }
+    }
+    await this.queuedPlayer.resume();
+  }
+
+  /**
    * Initializes playback audio pipeline and prepares AudioWorklet module.
    */
   public async initialize(): Promise<void> {

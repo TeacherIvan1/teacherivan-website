@@ -14,7 +14,7 @@
 /**
  * Universal environment variable accessor safe in Vite browser, SSR, and Node.js test runners.
  */
-function getEnvVar(key: string): string | undefined {
+export function getEnvVar(key: string): string | undefined {
   try {
     // Vite / modern browser environment
     if (typeof import.meta !== 'undefined' && (import.meta as unknown as { env?: Record<string, string> }).env) {

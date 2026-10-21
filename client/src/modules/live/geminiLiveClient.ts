@@ -353,25 +353,39 @@ export class GeminiLiveClient {
   }
 
   /**
-   * Sends an explicit turnComplete trigger to Gemini Live to instruct the model
-   * to immediately finalize the user turn and begin its response.
+   * Sends pure digital silence (16kHz 16-bit linear PCM all zeros) via realtimeInput
+   * to trigger server-side VAD turn completion cleanly without sending clientContent frames.
    */
-  public sendTurnComplete(): void {
+  public sendDigitalSilence(durationMs: number = 400): void {
     if (!this.isConnected || !this.isSetupDone || !this.ws) {
       return;
     }
 
-    const turnCompleteMessage = {
-      clientContent: {
-        turnComplete: true,
-      },
-    };
+    const sampleRate = 16000;
+    const sampleCount = Math.floor((sampleRate * durationMs) / 1000);
+    const buffer = new Uint8Array(sampleCount * 2); // 16-bit = 2 bytes per sample (all zeros)
+
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < buffer.length; i += chunkSize) {
+      binary += String.fromCharCode(...buffer.subarray(i, i + chunkSize));
+    }
+    const pcmBase64 = btoa(binary);
 
     this.isInterrupted = false;
     latencyTracker.markEndOfSpeech();
 
-    debugLog('websocket', 'info', 'Sending explicit client turnComplete trigger.');
-    this.sendMessage(turnCompleteMessage);
+    debugLog('websocket', 'info', `Sending ${durationMs}ms digital silence via realtimeInput for VAD turn completion.`);
+    this.sendRealtimeAudio(pcmBase64);
+  }
+
+  /**
+   * Completes a turn cleanly.
+   * To prevent abrupt WebSocket closure (codes 1007/1011), we NEVER send a clientContent
+   * frame while realtimeInput PCM audio is streaming. Instead, we send 400ms of pure digital silence.
+   */
+  public sendTurnComplete(): void {
+    this.sendDigitalSilence(400);
   }
 
   /**

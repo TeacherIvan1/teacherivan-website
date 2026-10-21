@@ -205,4 +205,21 @@ describe('i18n Language Module', () => {
     assert.ok(translations.en.sprintDashboard.sendToIvan.includes('+591 72878330'));
     assert.ok(translations.es.sprintDashboard.sendToIvan.includes('+591 72878330'));
   });
+
+  it('contains parallel translations for authModal (registration & profile completion)', () => {
+    assert.ok(translations.en.authModal.titleSignUp);
+    assert.ok(translations.es.authModal.titleSignUp);
+    assert.ok(translations.en.authModal.googleBtn);
+    assert.ok(translations.es.authModal.googleBtn);
+    assert.ok(translations.en.authModal.fullNameLabel);
+    assert.ok(translations.es.authModal.fullNameLabel);
+    assert.ok(translations.en.authModal.dobLabel);
+    assert.ok(translations.es.authModal.dobLabel);
+    assert.ok(translations.en.authModal.countryLabel);
+    assert.ok(translations.es.authModal.countryLabel);
+    assert.ok(translations.en.authModal.saveScoreAndUnlock);
+    assert.ok(translations.es.authModal.saveScoreAndUnlock);
+    assert.ok(translations.en.authModal.reconnecting);
+    assert.ok(translations.es.authModal.reconnecting);
+  });
 });

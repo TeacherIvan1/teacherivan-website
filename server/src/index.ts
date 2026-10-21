@@ -5,6 +5,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import tokenRouter from './routes/token.js';
 import reportRouter from './routes/report.js';
+import authRouter from './routes/auth.js';
+import { userStore } from './services/userStore.js';
 
 // Resolve directory paths for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -70,6 +72,17 @@ app.use(express.json());
 // Routes
 app.use('/api/token', tokenRouter);
 app.use('/api/report', reportRouter);
+app.use('/api/auth', authRouter);
+
+// GET /api/users/export
+app.get('/api/users/export', (_req, res) => {
+  const users = userStore.getAllUsers();
+  res.status(200).json({
+    status: 'ok',
+    total: users.length,
+    users,
+  });
+});
 
 // Health check endpoint
 app.get('/api/health', (_req, res) => {

@@ -28,6 +28,7 @@ export interface ConversationState {
   isTutorSpeaking: boolean;
   isUserSpeaking: boolean;
   isMuted: boolean;
+  isReconnecting: boolean;
   latencyStats: LatencyStats;
 
   // Actions
