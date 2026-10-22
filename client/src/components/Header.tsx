@@ -94,7 +94,7 @@ export const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-[#12223a]/95 backdrop-blur-md border-b border-[#A7C7E7]/25 w-full select-none" id="app-header">
       {/* Primary Top Bar */}
-      <div className="w-full max-w-full px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 overflow-hidden">
+      <div className="w-full max-w-full px-2 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-1 sm:gap-2 overflow-hidden">
         {/* Left: Brand Lockup with Chibi Mascot */}
         <button
           onClick={() => {
@@ -114,7 +114,7 @@ export const Header: React.FC = () => {
         {/* Center: Desktop Navigation Tabs */}
         {isAuthenticated ? (
           <nav className="hidden md:flex items-center gap-1.5 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
-            {/* Tab 1: 🎯 Mi Ruta (Micro-Learning) */}
+            {/* Tab 1: Mi Ruta (Micro-Learning) */}
             <button
               id="nav-tab-path"
               onClick={() => setActiveView('path')}
@@ -125,10 +125,10 @@ export const Header: React.FC = () => {
               }`}
             >
               <Target size={14} />
-              <span>{isEs ? '🎯 Mi Ruta (Micro-Learning)' : '🎯 My Path (Micro-Learning)'}</span>
+              <span>{isEs ? 'Mi Ruta (Micro-Learning)' : 'My Path (Micro-Learning)'}</span>
             </button>
 
-            {/* Tab 2: 🎙️ Simulador IA */}
+            {/* Tab 2: Simulador IA */}
             <button
               id="nav-tab-simulator"
               onClick={() => setActiveView('simulator')}
@@ -139,10 +139,10 @@ export const Header: React.FC = () => {
               }`}
             >
               <Headphones size={14} />
-              <span>{isEs ? '🎙️ Simulador IA' : '🎙️ AI Simulator'}</span>
+              <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
             </button>
 
-            {/* Tab 3: 📚 Recursos & Juegos */}
+            {/* Tab 3: Recursos & Juegos */}
             <button
               id="nav-tab-resources"
               onClick={() => setActiveView('resources')}
@@ -153,10 +153,10 @@ export const Header: React.FC = () => {
               }`}
             >
               <BookOpen size={14} />
-              <span>{isEs ? '📚 Recursos & Juegos' : '📚 Resources & Games'}</span>
+              <span>{isEs ? 'Recursos & Juegos' : 'Resources & Games'}</span>
             </button>
 
-            {/* Tab 4: 📅 Agendar Clase (14:00–20:00) */}
+            {/* Tab 4: Agendar Clase (14:00–20:00) */}
             <button
               id="nav-tab-schedule"
               onClick={() => setActiveView('schedule')}
@@ -167,7 +167,7 @@ export const Header: React.FC = () => {
               }`}
             >
               <Calendar size={14} />
-              <span>{isEs ? '📅 Agendar Clase (14:00–20:00)' : '📅 Book Class (14:00–20:00)'}</span>
+              <span>{isEs ? 'Agendar Clase (14:00–20:00)' : 'Book Class (14:00–20:00)'}</span>
             </button>
           </nav>
         ) : (
@@ -181,7 +181,7 @@ export const Header: React.FC = () => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
               <Headphones size={14} />
-              <span>{isEs ? '🎙️ Simulador IA' : '🎙️ AI Simulator'}</span>
+              <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
             </button>
 
             <button
@@ -193,7 +193,7 @@ export const Header: React.FC = () => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
               <BookOpen size={14} />
-              <span>{isEs ? '📚 Planes & Precios' : '📚 Plans & Pricing'}</span>
+              <span>{isEs ? 'Planes & Precios' : 'Plans & Pricing'}</span>
             </button>
 
             <button
@@ -205,13 +205,13 @@ export const Header: React.FC = () => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
               <Calendar size={14} />
-              <span>{isEs ? '📅 Clases 1 a 1' : '📅 1-on-1 Classes'}</span>
+              <span>{isEs ? 'Clases 1 a 1' : '1-on-1 Classes'}</span>
             </button>
           </nav>
         )}
 
-        {/* Right: Controls, Authentication & Language Switcher */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        {/* Right: Controls, Authentication & Language Switcher (<768px guaranteed fit) */}
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           {/* Language Switcher (EN | ES) */}
           <LanguageToggle id="header-lang-toggle" showIcon={false} />
 
@@ -264,55 +264,57 @@ export const Header: React.FC = () => {
               id="admin-dev-toggle-btn"
               type="button"
               onClick={toggleDeveloperMode}
-              className={`px-3 py-1.5 rounded-full text-xs font-montserrat font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded-lg font-montserrat font-bold flex items-center gap-0.5 sm:gap-1 transition-all cursor-pointer shrink-0 ${
                 isDeveloperMode
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30'
                   : 'bg-[#1A3153] text-[#A7C7E7] border border-[#A7C7E7]/30 hover:text-[#FAFAFA]'
               }`}
               title="Teacher Ivan Admin Dev Mode"
             >
-              <span>🛠️ Dev Mode</span>
-              <span className={`w-2 h-2 rounded-full ${isDeveloperMode ? 'bg-[#1A3153]' : 'bg-[#10b981]'}`} />
+              <span>Dev</span>
+              <span className={`w-1.5 h-1.5 rounded-full ${isDeveloperMode ? 'bg-[#1A3153]' : 'bg-[#10b981]'}`} />
             </button>
           )}
 
-          {/* Authentication Badge or Free Sign-Up CTA */}
+          {/* Authentication Badge or Always-Visible Sign-In Button */}
           {isAuthenticated && user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 shrink-0">
+              {/* @username badge */}
               <div
                 id="student-profile-badge"
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1A3153] border border-[#A7C7E7]/40 text-xs font-montserrat font-bold text-[#FAFAFA] shadow-sm"
+                className="flex items-center gap-0.5 text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 bg-[#1A3153] border border-[#A7C7E7]/40 rounded-lg text-[#FAFAFA] font-montserrat font-bold truncate max-w-[46px] sm:max-w-[120px] shrink-0 shadow-sm"
+                title={`@${user.username || user.fullName.split(' ')[0]}`}
               >
-                <span>{getCountryFlag(user.country)}</span>
-                <span className="truncate max-w-[110px]">{user.fullName.split(' ')[0]}</span>
+                <span className="text-[#E09B30]">@</span>
+                <span className="truncate">{user.username || user.fullName.split(' ')[0].toLowerCase()}</span>
                 {user.cefrLevel && (
-                  <span className="px-1.5 py-0.5 rounded-md bg-[#E09B30] text-[#1A3153] text-[10px] font-black">
+                  <span className="hidden sm:inline-block px-1 py-0.2 rounded bg-[#E09B30] text-[#1A3153] text-[9px] font-black ml-0.5">
                     {user.cefrLevel}
                   </span>
                 )}
               </div>
 
+              {/* Sign Out / Salir Button */}
               <button
                 id="sign-out-btn"
                 type="button"
                 onClick={signOut}
                 title={t.authModal.signOut}
-                className="p-1.5 sm:px-2.5 sm:py-1 rounded-full text-xs font-montserrat text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/10 transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-[#1A3153] border border-[#A7C7E7]/40 rounded-lg shrink-0 text-[#A7C7E7] hover:text-[#FAFAFA] font-montserrat font-bold flex items-center gap-0.5 sm:gap-1 cursor-pointer transition-colors"
               >
-                <LogOut size={13} />
-                <span className="hidden md:inline">{t.authModal.signOut}</span>
+                <LogOut size={11} className="shrink-0" />
+                <span>{isEs ? 'Salir' : 'Sign Out'}</span>
               </button>
             </div>
           ) : (
             <button
-              id="signup-free-nav-btn"
+              id="signin-nav-btn"
               type="button"
-              onClick={() => openAuthModal('signup')}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-montserrat font-bold text-[11px] sm:text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 cursor-pointer shrink-0"
+              onClick={() => openAuthModal('signin')}
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] font-montserrat font-bold transition-all duration-200 shadow-sm cursor-pointer shrink-0 flex items-center gap-1"
             >
-              <Sparkles size={12} />
-              <span className="hidden sm:inline">{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
-              <span className="sm:hidden">{isEs ? 'Registro' : 'Sign Up'}</span>
+              <UserIcon size={12} />
+              <span>{isEs ? 'Entrar' : 'Sign In'}</span>
             </button>
           )}
         </div>

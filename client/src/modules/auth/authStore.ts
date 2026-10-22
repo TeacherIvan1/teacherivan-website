@@ -161,13 +161,24 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
     },
 
-    loginWithCredentials: async (data: { email: string; password?: string }) => {
+    loginWithCredentials: async (data: {
+      username?: string;
+      email?: string;
+      phoneNumber?: string;
+      password?: string;
+    }) => {
       set({ isLoading: true, error: null });
       try {
+        const payload = {
+          username: data.username || data.email,
+          email: data.email,
+          password: data.password,
+          phoneNumber: data.phoneNumber,
+        };
         const res = await fetch(getApiUrl('/api/auth/login'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload),
         });
 
         const json = await res.json();
@@ -189,6 +200,32 @@ export const useAuthStore = create<AuthState>((set, get) => {
         });
 
         return user;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        set({ isLoading: false, error: msg });
+        throw err;
+      }
+    },
+
+    recoverPassword: async (data: {
+      username: string;
+      verificationContact: string;
+      newPassword: string;
+    }) => {
+      set({ isLoading: true, error: null });
+      try {
+        const res = await fetch(getApiUrl('/api/auth/recover-password'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const json = await res.json();
+        if (!res.ok || json.error) {
+          throw new Error(json.error || 'Password recovery failed');
+        }
+
+        set({ isLoading: false, error: null });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         set({ isLoading: false, error: msg });

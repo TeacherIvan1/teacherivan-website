@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
+import { useTeachingStore } from '../modules/teaching/teachingStore';
 
 type GameTab = 'recast' | 'matcher' | 'builder';
 
@@ -43,6 +44,10 @@ interface BuilderChallenge {
 export const InteractiveGamesView: React.FC = () => {
   const { t, isEs } = useTranslation();
   const { recordGameResult, totalXp } = useSprintStore();
+  const { persona } = useTeachingStore();
+
+  const tutorAvatarSrc = persona === 'emma' ? '/assets/emma-rig.svg' : '/assets/teacher-ivan-rig.svg';
+  const tutorAvatarAlt = persona === 'emma' ? 'Emma' : 'Teacher Ivan';
 
   const [activeTab, setActiveTab] = useState<GameTab>('recast');
 
@@ -410,9 +415,9 @@ export const InteractiveGamesView: React.FC = () => {
               {/* Bad Sentence Banner with Chibi Teacher Ivan Recast Mascot */}
               <div className="p-5 rounded-2xl bg-[#1A3153] border-2 border-[#f59e0b]/40 flex items-start gap-4">
                 <img
-                  src="/assets/chibi-mascot.png"
-                  alt="Teacher Ivan Pedagogical Mascot"
-                  className="w-12 h-12 object-contain flex-shrink-0 animate-bounce"
+                  src={tutorAvatarSrc}
+                  alt={tutorAvatarAlt}
+                  className="w-12 h-12 rounded-full bg-[#FAFAFA] p-1 shrink-0 object-contain shadow-md"
                 />
                 <div>
                   <span className="text-[11px] font-mono text-[#f59e0b] uppercase font-bold tracking-wider block mb-1">
@@ -523,13 +528,20 @@ export const InteractiveGamesView: React.FC = () => {
       {activeTab === 'matcher' && (
         <div className="max-w-4xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
           <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
-            <div>
-              <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
-                {t.gamesView.tabMatcher}
-              </span>
-              <p className="font-inter text-xs text-[#A7C7E7]">
-                {t.gamesView.matcherDesc}
-              </p>
+            <div className="flex items-center gap-3">
+              <img
+                src={tutorAvatarSrc}
+                alt={tutorAvatarAlt}
+                className="w-12 h-12 rounded-full bg-[#FAFAFA] p-1 shrink-0 object-contain shadow-md"
+              />
+              <div>
+                <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
+                  {t.gamesView.tabMatcher}
+                </span>
+                <p className="font-inter text-xs text-[#A7C7E7]">
+                  {t.gamesView.matcherDesc}
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -637,13 +649,20 @@ export const InteractiveGamesView: React.FC = () => {
       {activeTab === 'builder' && (
         <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
           <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
-            <div>
-              <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
-                {t.gamesView.tabBuilder} • {currentBuilderIndex + 1} / {builderChallenges.length}
-              </span>
-              <p className="font-inter text-xs text-[#A7C7E7]">
-                {currentChallenge.hint}
-              </p>
+            <div className="flex items-center gap-3">
+              <img
+                src={tutorAvatarSrc}
+                alt={tutorAvatarAlt}
+                className="w-12 h-12 rounded-full bg-[#FAFAFA] p-1 shrink-0 object-contain shadow-md"
+              />
+              <div>
+                <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
+                  {t.gamesView.tabBuilder} • {currentBuilderIndex + 1} / {builderChallenges.length}
+                </span>
+                <p className="font-inter text-xs text-[#A7C7E7]">
+                  {currentChallenge.hint}
+                </p>
+              </div>
             </div>
 
             <button

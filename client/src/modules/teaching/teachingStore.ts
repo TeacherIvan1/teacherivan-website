@@ -58,7 +58,7 @@ export const INITIAL_SCENARIOS: LessonScenario[] = [
 export const useTeachingStore = create<TeachingState>((set, get) => ({
   level: 'intermediate',
   correctionMode: 'conversation',
-  persona: 'emma',
+  persona: 'teacher-ivan',
   selectedScenarioId: 'casual-coffee',
   availableScenarios: INITIAL_SCENARIOS,
   activeInstruction: null,

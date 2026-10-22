@@ -1,12 +1,16 @@
 [
   {
     "id": "usr_admin_ivan",
+    "username": "ivan",
+    "password": "IvanAdmin2026!",
     "fullName": "Teacher Ivan (Admin)",
     "email": "ivan@teacherivan.com",
+    "phoneNumber": "+591 72878330",
     "dateOfBirth": "1990-01-01",
     "country": "Bolivia",
     "authProvider": "email",
     "role": "admin",
+    "plan": "executive",
     "profileCompleted": true,
     "learningGoals": {
       "targetLevel": "C1 / IELTS",
@@ -20,6 +24,8 @@
   },
   {
     "id": "usr_1792637508386_4a39b1e0",
+    "username": "sofia",
+    "password": "Sofia2026!",
     "fullName": "Sofia Rodriguez",
     "email": "sofia@example.com",
     "phoneNumber": "+591 72878330",
@@ -36,5 +42,27 @@
     "profileCompleted": false,
     "cefrLevel": "B1",
     "createdAt": "2026-10-22T02:51:48.386Z"
+  },
+  {
+    "id": "usr_1792682382837_49d49b62",
+    "username": "ana",
+    "password": "Student2026!",
+    "fullName": "Ana Morales",
+    "email": "ana@example.com",
+    "phoneNumber": "",
+    "dateOfBirth": "2000-01-01",
+    "country": "Bolivia",
+    "authProvider": "email",
+    "role": "student",
+    "plan": "free",
+    "planUpdatedAt": "2026-10-22T15:19:42.837Z",
+    "maxWeeklyClasses": 0,
+    "maxDailySessions": 5,
+    "dailySessionsUsed": 0,
+    "lastSessionDate": "2026-10-22",
+    "profileCompleted": false,
+    "cefrLevel": "B2",
+    "lastScore": 88,
+    "createdAt": "2026-10-22T15:19:42.837Z"
   }
 ]

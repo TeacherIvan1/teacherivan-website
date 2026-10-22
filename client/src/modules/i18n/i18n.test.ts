@@ -337,4 +337,37 @@ describe('i18n Language Module', () => {
     assert.ok(enMl.d5WhatsAppBtn.includes('+591 72878330'));
     assert.ok(esMl.d5WhatsAppBtn.includes('+591 72878330'));
   });
+
+  it('contains parallel translations for mobileApp download and installation in en and es', () => {
+    const enApp = translations.en.mobileApp;
+    const esApp = translations.es.mobileApp;
+
+    assert.ok(enApp.sectionBadge);
+    assert.ok(esApp.sectionBadge);
+    assert.ok(enApp.downloadAndroid);
+    assert.ok(esApp.downloadAndroid);
+    assert.ok(enApp.downloadIos);
+    assert.ok(esApp.downloadIos);
+    assert.ok(enApp.iosModalTitle);
+    assert.ok(esApp.iosModalTitle);
+    assert.ok(enApp.iosDownloadBtn);
+    assert.ok(esApp.iosDownloadBtn);
+    assert.ok(enApp.androidModalTitle);
+    assert.ok(esApp.androidModalTitle);
+  });
+
+  it('contains username and password recovery translations in authModal', () => {
+    const enAuth = translations.en.authModal;
+    const esAuth = translations.es.authModal;
+
+    assert.ok(enAuth.usernameLabel);
+    assert.ok(esAuth.usernameLabel);
+    assert.ok(enAuth.forgotPassword);
+    assert.ok(esAuth.forgotPassword);
+    assert.ok(enAuth.titleRecover);
+    assert.ok(esAuth.titleRecover);
+    assert.ok(enAuth.whatsappHelp.includes('+591 72878330'));
+    assert.ok(esAuth.whatsappHelp.includes('+591 72878330'));
+  });
 });
+

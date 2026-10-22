@@ -56,6 +56,7 @@ export const StudentAuthModal: React.FC = () => {
     registerWithEmail,
     authenticateWithGoogle,
     loginWithCredentials,
+    recoverPassword,
   } = useAuthStore();
 
   const { t, isEs } = useTranslation();
@@ -66,12 +67,19 @@ export const StudentAuthModal: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
 
   // Step 1 Form fields
+  const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [country, setCountry] = useState<SupportedCountry | ''>('Bolivia');
+
+  // Recover Password fields
+  const [recoverUsername, setRecoverUsername] = useState('');
+  const [recoverContact, setRecoverContact] = useState('');
+  const [recoverNewPassword, setRecoverNewPassword] = useState('');
+  const [recoverSuccess, setRecoverSuccess] = useState<string | null>(null);
 
   // Step 2 Form fields (Learning Goals)
   const [targetLevel, setTargetLevel] = useState<string>('B1');
@@ -86,6 +94,7 @@ export const StudentAuthModal: React.FC = () => {
     if (isAuthModalOpen) {
       setStep(1);
       setValidationError(null);
+      setRecoverSuccess(null);
     }
   }, [isAuthModalOpen, authModalMode]);
 
@@ -112,16 +121,35 @@ export const StudentAuthModal: React.FC = () => {
 
   const isCompletingProfile = authModalMode === 'complete_google_profile';
   const isSignInMode = authModalMode === 'signin';
+  const isRecoverMode = authModalMode === 'recover_password';
 
   // Advance from Step 1 to Step 2
   const handleProceedToStep2 = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
 
+    const trimmedUsername = username.trim().toLowerCase().replace(/^@/, '');
+    const trimmedPassword = password.trim();
     const trimmedName = fullName.trim();
     const trimmedEmail = email.trim();
     const trimmedPhone = phoneNumber.trim();
 
+    if (!trimmedUsername || trimmedUsername.length < 3) {
+      setValidationError(
+        isEs
+          ? 'Por favor ingresa un nombre de usuario (mínimo 3 caracteres).'
+          : 'Please enter a username (min 3 characters).'
+      );
+      return;
+    }
+    if (!trimmedPassword || trimmedPassword.length < 6) {
+      setValidationError(
+        isEs
+          ? 'Por favor ingresa una contraseña (mínimo 6 caracteres).'
+          : 'Please enter a password (min 6 characters).'
+      );
+      return;
+    }
     if (!trimmedName) {
       setValidationError(isEs ? 'Por favor ingresa tu nombre completo.' : 'Please enter your full name.');
       return;
@@ -151,6 +179,8 @@ export const StudentAuthModal: React.FC = () => {
     e.preventDefault();
     setValidationError(null);
 
+    const trimmedUsername = username.trim().toLowerCase().replace(/^@/, '');
+    const trimmedPassword = password.trim();
     const trimmedName = fullName.trim();
     const trimmedEmail = email.trim();
     const trimmedPhone = phoneNumber.trim();
@@ -191,6 +221,8 @@ export const StudentAuthModal: React.FC = () => {
         });
       } else {
         await registerWithEmail({
+          username: trimmedUsername,
+          password: trimmedPassword,
           fullName: trimmedName,
           email: trimmedEmail,
           phoneNumber: trimmedPhone,
@@ -230,28 +262,69 @@ export const StudentAuthModal: React.FC = () => {
     e.preventDefault();
     setValidationError(null);
 
-    const trimmedEmail = email.trim();
-    const trimmedPhone = phoneNumber.trim();
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
 
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      setValidationError(isEs ? 'Por favor ingresa un correo válido.' : 'Please enter a valid email.');
+    if (!trimmedUsername) {
+      setValidationError(isEs ? 'Por favor ingresa tu nombre de usuario.' : 'Please enter your username.');
       return;
     }
-    if (!trimmedPhone) {
-      setValidationError(isEs ? 'Por favor ingresa tu número de celular.' : 'Please enter your phone number.');
+    if (!trimmedPassword) {
+      setValidationError(isEs ? 'Por favor ingresa tu contraseña.' : 'Please enter your password.');
       return;
     }
 
     try {
       const signedInUser = await loginWithCredentials({
-        email: trimmedEmail,
-        phoneNumber: trimmedPhone,
-        password: password ? password.trim() : undefined,
+        username: trimmedUsername,
+        password: trimmedPassword,
       });
 
       if (signedInUser?.role !== 'admin') {
         setActiveView('path' as any);
       }
+    } catch {
+      // Error handled in store
+    }
+  };
+
+  const handleRecoverPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+    setRecoverSuccess(null);
+
+    const trimmedUser = recoverUsername.trim();
+    const trimmedContact = recoverContact.trim();
+    const trimmedPass = recoverNewPassword.trim();
+
+    if (!trimmedUser) {
+      setValidationError(isEs ? 'Por favor ingresa tu nombre de usuario.' : 'Please enter your username.');
+      return;
+    }
+    if (!trimmedContact) {
+      setValidationError(
+        isEs
+          ? 'Por favor ingresa tu correo o celular registrado.'
+          : 'Please enter your registered email or phone.'
+      );
+      return;
+    }
+    if (!trimmedPass || trimmedPass.length < 6) {
+      setValidationError(
+        isEs
+          ? 'La nueva contraseña debe tener al menos 6 caracteres.'
+          : 'The new password must be at least 6 characters.'
+      );
+      return;
+    }
+
+    try {
+      await recoverPassword({
+        username: trimmedUser,
+        verificationContact: trimmedContact,
+        newPassword: trimmedPass,
+      });
+      setRecoverSuccess(t.authModal.recoverySuccess);
     } catch {
       // Error handled in store
     }
@@ -341,7 +414,9 @@ export const StudentAuthModal: React.FC = () => {
                 id="auth-modal-title"
                 className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug text-[#1A3153]"
               >
-                {isSignInMode
+                {isRecoverMode
+                  ? t.authModal.titleRecover
+                  : isSignInMode
                   ? t.authModal.titleSignIn
                   : step === 1
                   ? t.authModal.step1Title
@@ -375,8 +450,8 @@ export const StudentAuthModal: React.FC = () => {
             </div>
           )}
 
-          {/* Mode Switcher Tabs (Sign Up vs Sign In) */}
-          {!isCompletingProfile && (
+          {/* Mode Switcher Tabs (Sign Up vs Sign In) - Hidden in Recover & Google Complete Profile */}
+          {!isCompletingProfile && !isRecoverMode && (
             <div className="flex rounded-2xl bg-[#1A3153]/10 p-1 border border-[#A7C7E7]/30">
               <button
                 type="button"
@@ -413,7 +488,7 @@ export const StudentAuthModal: React.FC = () => {
           )}
 
           {/* Stepper Indicator for Sign Up */}
-          {!isSignInMode && (
+          {!isSignInMode && !isRecoverMode && (
             <div className="flex items-center justify-between gap-2 px-1">
               <div
                 className={`flex-1 h-1.5 rounded-full transition-all ${
@@ -440,23 +515,157 @@ export const StudentAuthModal: React.FC = () => {
           )}
 
           {/* ========================================================================= */}
-          {/* SIGN IN FORM (Standard Login for Returning Students & Admin)               */}
+          {/* RECOVER PASSWORD VIEW                                                     */}
           {/* ========================================================================= */}
-          {isSignInMode ? (
+          {isRecoverMode ? (
+            <form onSubmit={handleRecoverPasswordSubmit} className="space-y-4">
+              {recoverSuccess ? (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs space-y-3">
+                  <div className="flex items-center gap-2 font-montserrat font-bold">
+                    <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                    <span>{recoverSuccess}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecoverSuccess(null);
+                      openAuthModal('signin');
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#1A3153] text-[#FAFAFA] font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-[#12223a] cursor-pointer"
+                  >
+                    {t.authModal.backToSignIn}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-[#4A5568] leading-relaxed">
+                    {t.authModal.subtitleRecover}
+                  </p>
+
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                      {t.authModal.usernameLabel} <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <div className="relative">
+                      <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                      <input
+                        type="text"
+                        id="auth-recover-username-input"
+                        required
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        value={recoverUsername}
+                        onChange={(e) => setRecoverUsername(e.target.value)}
+                        placeholder={t.authModal.usernamePlaceholder}
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                      {t.authModal.verificationContactLabel} <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                      <input
+                        type="text"
+                        id="auth-recover-contact-input"
+                        required
+                        value={recoverContact}
+                        onChange={(e) => setRecoverContact(e.target.value)}
+                        placeholder={t.authModal.verificationContactPlaceholder}
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                      {t.authModal.newPasswordLabel} <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                      <input
+                        type="password"
+                        id="auth-recover-newpassword-input"
+                        required
+                        minLength={6}
+                        value={recoverNewPassword}
+                        onChange={(e) => setRecoverNewPassword(e.target.value)}
+                        placeholder={t.authModal.newPasswordPlaceholder}
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    id="auth-recover-submit-btn"
+                    disabled={isLoading}
+                    className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>{isEs ? 'Restableciendo...' : 'Resetting...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={16} />
+                        <span>{t.authModal.submitRecover}</span>
+                      </>
+                    )}
+                  </button>
+
+                  <div className="text-center pt-2">
+                    <a
+                      id="auth-recover-whatsapp-link"
+                      href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan,%20necesito%20ayuda%20para%20recuperar%20mi%20cuenta"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[#10b981] hover:underline font-semibold block"
+                    >
+                      {t.authModal.whatsappHelp}
+                    </a>
+                  </div>
+
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      id="auth-recover-back-btn"
+                      onClick={() => {
+                        setValidationError(null);
+                        openAuthModal('signin');
+                      }}
+                      className="text-xs text-[#4A5568] hover:text-[#1A3153] hover:underline font-semibold cursor-pointer"
+                    >
+                      {t.authModal.backToSignIn}
+                    </button>
+                  </div>
+                </>
+              )}
+            </form>
+          ) : isSignInMode ? (
+            /* ========================================================================= */
+            /* SIGN IN FORM (ONLY Username and Password)                                 */
+            /* ========================================================================= */
             <form onSubmit={handleSignInSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                  {t.authModal.emailLabel} <span className="text-[#E09B30]">*</span>
+                  {t.authModal.usernameLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
-                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
                   <input
-                    type="email"
-                    id="auth-signin-email-input"
+                    type="text"
+                    id="auth-signin-username-input"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t.authModal.emailPlaceholder}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder={t.authModal.usernamePlaceholder}
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
@@ -464,31 +673,14 @@ export const StudentAuthModal: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                  {t.authModal.phoneLabel} <span className="text-[#E09B30]">*</span>
-                </label>
-                <div className="relative">
-                  <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
-                  <input
-                    type="tel"
-                    id="auth-signin-phone-input"
-                    required
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder={t.authModal.phonePlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
-                  {t.authModal.passwordLabel}
+                  {t.authModal.passwordLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
                   <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
                   <input
                     type="password"
                     id="auth-signin-password-input"
+                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t.authModal.passwordPlaceholder}
@@ -499,7 +691,7 @@ export const StudentAuthModal: React.FC = () => {
 
               <button
                 type="submit"
-                id="submit-signin-form-btn"
+                id="auth-signin-submit-btn"
                 disabled={isLoading}
                 className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
               >
@@ -516,7 +708,24 @@ export const StudentAuthModal: React.FC = () => {
                 )}
               </button>
 
-              <div className="text-center pt-2">
+              {/* Forgot password link directly underneath */}
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  id="auth-forgot-password-link"
+                  onClick={() => {
+                    setValidationError(null);
+                    setRecoverSuccess(null);
+                    setRecoverUsername(username || '');
+                    openAuthModal('recover_password');
+                  }}
+                  className="text-xs text-[#4A5568] hover:text-[#E09B30] hover:underline font-semibold cursor-pointer"
+                >
+                  {t.authModal.forgotPassword}
+                </button>
+              </div>
+
+              <div className="text-center pt-1">
                 <button
                   type="button"
                   onClick={() => openAuthModal('signup')}
@@ -528,7 +737,7 @@ export const StudentAuthModal: React.FC = () => {
             </form>
           ) : step === 1 ? (
             /* ========================================================================= */
-            /* STEP 1: ACCOUNT CREDENTIALS (Email or Google)                             */
+            /* STEP 1: ACCOUNT CREDENTIALS (Username, Password, Name, Email, Phone, etc) */
             /* ========================================================================= */
             <form onSubmit={handleProceedToStep2} className="space-y-3.5">
               {/* Google One-Tap Action */}
@@ -555,6 +764,48 @@ export const StudentAuthModal: React.FC = () => {
                     {t.authModal.orDivider}
                   </span>
                   <div className="flex-1 h-px bg-[#A7C7E7]/40" />
+                </div>
+              </div>
+
+              {/* Username & Password (2-column on sm) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    {t.authModal.usernameLabel} <span className="text-[#E09B30]">*</span>
+                  </label>
+                  <div className="relative">
+                    <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <input
+                      type="text"
+                      id="auth-username-input"
+                      required
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder={t.authModal.usernamePlaceholder}
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    {t.authModal.passwordLabel} <span className="text-[#E09B30]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <input
+                      type="password"
+                      id="auth-password-input"
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={t.authModal.passwordPlaceholder}
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    />
+                  </div>
                 </div>
               </div>
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>FullScreen</key>
+			<true/>
+			<key>IsRemovable</key>
+			<true/>
+			<key>Label</key>
+			<string>Teacher Ivan</string>
+			<key>PayloadDescription</key>
+			<string>Configures Teacher Ivan AI English Coach as a Standalone Web Clip</string>
+			<key>PayloadDisplayName</key>
+			<string>Teacher Ivan Web Clip</string>
+			<key>PayloadIdentifier</key>
+			<string>com.teacherivan.webclip</string>
+			<key>PayloadType</key>
+			<string>com.apple.webClip.managed</string>
+			<key>PayloadUUID</key>
+			<string>D8A279B0-64C3-4857-BE76-96A93F167DE7</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>Precomposed</key>
+			<true/>
+			<key>URL</key>
+			<string>https://teacherivan.com</string>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Installs Teacher Ivan English Learning App directly on your Apple iOS Home Screen.</string>
+	<key>PayloadDisplayName</key>
+	<string>Teacher Ivan - AI English Coach</string>
+	<key>PayloadIdentifier</key>
+	<string>com.teacherivan.profile</string>
+	<key>PayloadOrganization</key>
+	<string>Teacher Ivan English Classes</string>
+	<key>PayloadRemovalDisallowed</key>
+	<false/>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>4FA67C30-7608-4E45-8120-E143004C8821</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

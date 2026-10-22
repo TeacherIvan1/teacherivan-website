@@ -14,6 +14,7 @@ import {
   Clock,
   AlertCircle,
   X,
+  Lock,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
@@ -254,29 +255,20 @@ export const CompactVoiceSimulator: React.FC = () => {
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
               }`}
             >
-              <span>👨‍🏫</span>
               <span>{t.persona.teacherIvan.name}</span>
             </button>
             <button
               type="button"
               id="tutor-persona-emma-btn"
               disabled={isLocked}
-              onClick={() => {
-                if (!isAuthenticated) {
-                  promptTierLock();
-                  return;
-                }
-                setPersona('emma');
-              }}
+              onClick={() => setPersona('emma')}
               className={`px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 persona === 'emma'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
               }`}
             >
-              <span>👩‍🏫</span>
               <span>{t.persona.emma.name}</span>
-              {!isAuthenticated && <span className="text-[10px] text-[#E09B30]">🔒</span>}
             </button>
           </div>
 
@@ -300,7 +292,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                   }`}
                 >
                   <span>{pill.label}</span>
-                  {isPillLocked && <span className="text-[10px] text-[#E09B30]">🔒</span>}
+                  {isPillLocked && <Lock size={10} className="text-[#E09B30]" />}
                 </button>
               );
             })}
@@ -331,7 +323,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                 const isScenarioLocked = !isAuthenticated && scenario.id !== 'diagnostic-placement';
                 return (
                   <option key={scenario.id} value={scenario.id} className="bg-[#12223a] text-[#FAFAFA]">
-                    {isScenarioLocked ? `🔒 ${scenario.title} (${t.authModal.lockedPillNotice})` : `${scenario.title} (${scenario.category})`}
+                    {isScenarioLocked ? `[Pro] ${scenario.title}` : `${scenario.title} (${scenario.category})`}
                   </option>
                 );
               })}

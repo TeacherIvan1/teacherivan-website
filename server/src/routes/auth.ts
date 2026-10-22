@@ -5,34 +5,96 @@ const router = Router();
 
 /**
  * POST /api/auth/register
- * Body: { fullName: string, email: string, phoneNumber: string, dateOfBirth: string, country: string }
+ * Body: { username: string, password: string, fullName: string, email: string, phoneNumber: string, dateOfBirth: string, country: string, learningGoals: object }
  */
 router.post('/register', (req: Request, res: Response) => {
   try {
-    const { fullName, email, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
+    const { username, password, fullName, email, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
+
+    if (!username || typeof username !== 'string' || username.trim().length < 3) {
+      return res.status(400).json({
+        error: 'Username is required (min 3 characters)',
+        errorEs: 'El nombre de usuario es obligatorio (mínimo 3 caracteres)',
+        errorEn: 'Username is required (min 3 characters)',
+      });
+    }
+
+    if (!password || typeof password !== 'string' || password.trim().length < 6) {
+      return res.status(400).json({
+        error: 'Password is required (min 6 characters)',
+        errorEs: 'La contraseña es obligatoria (mínimo 6 caracteres)',
+        errorEn: 'Password is required (min 6 characters)',
+      });
+    }
 
     if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
-      return res.status(400).json({ error: 'Full name is required' });
+      return res.status(400).json({
+        error: 'Full name is required',
+        errorEs: 'El nombre completo es obligatorio',
+        errorEn: 'Full name is required',
+      });
     }
+
     if (!email || typeof email !== 'string' || !email.includes('@') || !email.includes('.')) {
-      return res.status(400).json({ error: 'Valid email address is required' });
+      return res.status(400).json({
+        error: 'Valid email address is required',
+        errorEs: 'Se requiere una dirección de correo válida',
+        errorEn: 'Valid email address is required',
+      });
     }
+
     if (!phoneNumber || typeof phoneNumber !== 'string' || !phoneNumber.trim()) {
-      return res.status(400).json({ error: 'Phone number is required' });
+      return res.status(400).json({
+        error: 'Phone number is required',
+        errorEs: 'El número de celular es obligatorio',
+        errorEn: 'Phone number is required',
+      });
     }
+
     if (!dateOfBirth || typeof dateOfBirth !== 'string' || !dateOfBirth.trim()) {
-      return res.status(400).json({ error: 'Date of birth is required' });
+      return res.status(400).json({
+        error: 'Date of birth is required',
+        errorEs: 'La fecha de nacimiento es obligatoria',
+        errorEn: 'Date of birth is required',
+      });
     }
+
     if (!country || typeof country !== 'string' || !country.trim()) {
-      return res.status(400).json({ error: 'Country is required' });
+      return res.status(400).json({
+        error: 'Country is required',
+        errorEs: 'El país es obligatorio',
+        errorEn: 'Country is required',
+      });
+    }
+
+    // Check duplicate username
+    const existingByUsername = userStore.findByUsername(username);
+    if (existingByUsername) {
+      return res.status(409).json({
+        error: 'Username is already taken / El nombre de usuario ya está en uso',
+        errorEs: 'El nombre de usuario ya está en uso. Por favor elige otro.',
+        errorEn: 'Username is already taken. Please choose another one.',
+      });
+    }
+
+    // Check duplicate email
+    const existingByEmail = userStore.findByEmail(email);
+    if (existingByEmail) {
+      return res.status(409).json({
+        error: 'Email is already registered / El correo ya está registrado',
+        errorEs: 'El correo electrónico ya está registrado. Por favor inicia sesión.',
+        errorEn: 'Email is already registered. Please sign in instead.',
+      });
     }
 
     const user = userStore.upsertUser({
-      fullName,
-      email,
-      phoneNumber,
-      dateOfBirth,
-      country,
+      username: username.trim(),
+      password: password.trim(),
+      fullName: fullName.trim(),
+      email: email.trim(),
+      phoneNumber: phoneNumber.trim(),
+      dateOfBirth: dateOfBirth.trim(),
+      country: country.trim(),
       authProvider: 'email',
       profileCompleted: profileCompleted !== undefined ? profileCompleted : (learningGoals ? true : false),
       learningGoals,
@@ -55,70 +117,107 @@ router.post('/register', (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/login
- * Body: { email: string, phoneNumber?: string, password?: string }
- * Handles admin credential login (returning role: 'admin') and returning student login.
+ * Body: { username: string, password: string }
+ * Authenticates users using strictly username and password (also accepts admin email or 'ivan' for admin).
  */
 router.post('/login', (req: Request, res: Response) => {
   try {
-    const { email, phoneNumber, password } = req.body || {};
+    const { username, email, password } = req.body || {};
+    const identifier = username || email;
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return res.status(400).json({ error: 'Valid email address is required' });
-    }
-    if (!phoneNumber || typeof phoneNumber !== 'string' || !phoneNumber.trim()) {
-      return res.status(400).json({ error: 'Phone number is required' });
-    }
-
-    const normEmail = userStore.normalizeEmail(email);
-    const isAdminEmail = normEmail === userStore.normalizeEmail(process.env.ADMIN_EMAIL || 'ivan@teacherivan.com');
-
-    if (isAdminEmail) {
-      if (!password || !userStore.verifyAdminCredentials(email, password)) {
-        return res.status(401).json({ error: 'Invalid admin credentials' });
-      }
-
-      let admin = userStore.findByEmail(normEmail);
-      if (!admin) {
-        admin = userStore.upsertUser({
-          fullName: 'Teacher Ivan (Admin)',
-          email: normEmail,
-          phoneNumber: phoneNumber.trim(),
-          role: 'admin',
-          plan: 'executive',
-          profileCompleted: true,
-        });
-      }
-
-      const token = userStore.createSessionToken(admin.id, 'admin');
-      return res.status(200).json({
-        status: 'ok',
-        user: admin,
-        token,
+    if (!identifier || typeof identifier !== 'string' || !identifier.trim()) {
+      return res.status(400).json({
+        error: 'Username is required',
+        errorEs: 'El nombre de usuario es obligatorio',
+        errorEn: 'Username is required',
       });
     }
 
-    // Returning student login
-    const existing = userStore.findByEmail(normEmail);
-    if (!existing) {
-      return res.status(404).json({ error: 'Account not found. Please register first.' });
+    if (!password || typeof password !== 'string' || !password.trim()) {
+      return res.status(400).json({
+        error: 'Password is required',
+        errorEs: 'La contraseña es obligatoria',
+        errorEn: 'Password is required',
+      });
     }
 
-    // Update phone number if provided
-    if (phoneNumber && phoneNumber.trim()) {
-      userStore.updateUserProfile({ email: normEmail }, { phoneNumber: phoneNumber.trim() });
+    const authResult = userStore.verifyUserCredentials(identifier.trim(), password.trim());
+    if (!authResult.success || !authResult.user) {
+      return res.status(401).json({
+        error: 'Invalid username or password / Nombre de usuario o contraseña incorrectos',
+        errorEs: 'Nombre de usuario o contraseña incorrectos',
+        errorEn: 'Invalid username or password',
+      });
     }
 
-    const freshUser = userStore.findByEmail(normEmail) || existing;
-    const token = userStore.createSessionToken(freshUser.id, freshUser.role || 'student');
+    const user = authResult.user;
+    const token = userStore.createSessionToken(user.id, user.role || 'student');
     return res.status(200).json({
       status: 'ok',
-      user: freshUser,
+      user,
       token,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[POST /api/auth/login Error]:', msg);
     return res.status(500).json({ error: 'Internal server error during login' });
+  }
+});
+
+/**
+ * POST /api/auth/recover-password
+ * Body: { username: string, verificationContact: string, newPassword: string }
+ * Verifies that username matches email or phoneNumber, updates password, and returns success.
+ */
+router.post('/recover-password', (req: Request, res: Response) => {
+  try {
+    const { username, verificationContact, newPassword } = req.body || {};
+
+    if (!username || typeof username !== 'string' || !username.trim()) {
+      return res.status(400).json({
+        error: 'Username is required',
+        errorEs: 'El nombre de usuario es obligatorio',
+        errorEn: 'Username is required',
+      });
+    }
+
+    if (!verificationContact || typeof verificationContact !== 'string' || !verificationContact.trim()) {
+      return res.status(400).json({
+        error: 'Registered email or phone number is required',
+        errorEs: 'El correo electrónico o celular registrado es obligatorio',
+        errorEn: 'Registered email or phone number is required',
+      });
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length < 6) {
+      return res.status(400).json({
+        error: 'New password must be at least 6 characters',
+        errorEs: 'La nueva contraseña debe tener al menos 6 caracteres',
+        errorEn: 'New password must be at least 6 characters',
+      });
+    }
+
+    const result = userStore.recoverPassword(username, verificationContact, newPassword);
+    if (!result.success || !result.user) {
+      return res.status(400).json({
+        error: result.error || 'Password recovery failed',
+        errorEs: result.error?.includes('No account found')
+          ? 'No se encontró ninguna cuenta con ese nombre de usuario'
+          : 'El correo electrónico o celular no coincide con el registrado para este usuario',
+        errorEn: result.error || 'Password recovery failed',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'ok',
+      message: 'Password reset successfully / Contraseña restablecida con éxito',
+      messageEs: 'Contraseña restablecida con éxito. Ya puedes iniciar sesión con tu nueva contraseña.',
+      messageEn: 'Password reset successfully. You can now sign in with your new password.',
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[POST /api/auth/recover-password Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error during password recovery' });
   }
 });
 

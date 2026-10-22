@@ -153,6 +153,7 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
           className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 flex items-center justify-center transition-transform duration-300"
         >
           <RiggedCharacter
+            key={persona}
             persona={persona === 'emma' ? 'emma' : 'teacher-ivan'}
             state={isSpeaking ? 'speaking' : isListening ? 'listening' : 'idle'}
             className="w-full h-full"

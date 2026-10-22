@@ -9,6 +9,7 @@ export type StudentPlan = 'free' | 'essential' | 'pro' | 'executive';
 
 export interface UserProfile {
   id: string;
+  username?: string;
   fullName: string;
   email: string;
   phoneNumber?: string;
@@ -48,19 +49,21 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isAuthModalOpen: boolean;
-  authModalMode: 'signup' | 'signin' | 'complete_google_profile';
+  authModalMode: 'signup' | 'signin' | 'recover_password' | 'complete_google_profile';
   authModalBanner: string | null;
   pendingGoogleProfile: { email: string; fullName: string } | null;
   isLoading: boolean;
   error: string | null;
 
   openAuthModal: (
-    mode?: 'signup' | 'signin' | 'complete_google_profile',
+    mode?: 'signup' | 'signin' | 'recover_password' | 'complete_google_profile',
     pending?: { email: string; fullName: string },
     banner?: string | null
   ) => void;
   closeAuthModal: () => void;
   registerWithEmail: (data: {
+    username: string;
+    password?: string;
     fullName: string;
     email: string;
     phoneNumber: string;
@@ -78,7 +81,17 @@ export interface AuthState {
     learningGoals?: LearningGoals;
     profileCompleted?: boolean;
   }) => Promise<{ needsProfileCompletion: boolean }>;
-  loginWithCredentials: (data: { email: string; phoneNumber?: string; password?: string }) => Promise<UserProfile>;
+  loginWithCredentials: (data: {
+    username?: string;
+    email?: string;
+    phoneNumber?: string;
+    password?: string;
+  }) => Promise<UserProfile>;
+  recoverPassword: (data: {
+    username: string;
+    verificationContact: string;
+    newPassword: string;
+  }) => Promise<void>;
   saveProfileGoals: (goals: LearningGoals) => Promise<UserProfile>;
   updateUserPlan: (userId: string, plan: StudentPlan) => Promise<UserProfile>;
   checkAndIncrementSessionQuota: () => { allowed: boolean; remaining: number | 'unlimited'; used: number; max: number };

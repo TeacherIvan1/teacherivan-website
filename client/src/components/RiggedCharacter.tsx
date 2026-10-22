@@ -14,6 +14,18 @@ export interface RiggedCharacterProps {
 // In-memory cache for loaded SVG markup
 const svgMarkupCache: Record<string, string> = {};
 
+// Eagerly preload both rigs in browser environments
+if (typeof window !== 'undefined') {
+  ['/assets/teacher-ivan-rig.svg', '/assets/emma-rig.svg'].forEach((path) => {
+    fetch(path)
+      .then((res) => (res.ok ? res.text() : ''))
+      .then((markup) => {
+        if (markup) svgMarkupCache[path] = markup;
+      })
+      .catch(() => {});
+  });
+}
+
 export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
   persona,
   state = 'idle',
@@ -21,21 +33,20 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
   animateBlink = true,
   alt,
 }) => {
-  const [svgMarkup, setSvgMarkup] = useState<string>(() => {
-    const assetPath = persona === 'teacher-ivan' ? '/assets/teacher-ivan-rig.svg' : '/assets/emma-rig.svg';
-    return svgMarkupCache[assetPath] || '';
-  });
+  const assetPath = persona === 'teacher-ivan' ? '/assets/teacher-ivan-rig.svg' : '/assets/emma-rig.svg';
+  const [svgMarkup, setSvgMarkup] = useState<string>(() => svgMarkupCache[assetPath] || '');
   const [isBlinking, setIsBlinking] = useState(false);
 
-  const assetPath = persona === 'teacher-ivan' ? '/assets/teacher-ivan-rig.svg' : '/assets/emma-rig.svg';
-
-  // 1. Fetch & cache SVG markup
+  // 1. Fetch & cache SVG markup with immediate persona synchronisation
   useEffect(() => {
     let isMounted = true;
     if (svgMarkupCache[assetPath]) {
       setSvgMarkup(svgMarkupCache[assetPath]);
       return;
     }
+
+    // Immediately clear stale previous persona markup while loading
+    setSvgMarkup('');
 
     fetch(assetPath)
       .then((res) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Mic,
   ArrowRight,
@@ -12,6 +12,9 @@ import {
   Calendar,
   MessageCircle,
   ShieldCheck,
+  Smartphone,
+  Download,
+  X,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
@@ -20,12 +23,63 @@ import { CompactVoiceSimulator } from './CompactVoiceSimulator';
 import { RiggedCharacter } from './RiggedCharacter';
 import { getWhatsAppUrl } from '../config/contact';
 
+const AndroidIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8C2.67 8 2 8.67 2 9.5v6c0 .83.67 1.5 1.5 1.5S5 16.33 5 15.5v-6C5 8.67 4.33 8 3.5 8zm17 0c-.83 0-1.5.67-1.5 1.5v6c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-6c0-.83-.67-1.5-1.5-1.5zm-4.97-4.84l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48C13.85 2.23 12.95 2 12 2c-.96 0-1.86.23-2.66.63L7.85 1.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31C6.97 4.26 6 5.96 6 7.88h12c0-1.92-.97-3.62-2.47-4.72zM9 5.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75zm6 0c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z" />
+  </svg>
+);
+
+const AppleIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.79 1.06-1.88.94-2.98-.94.04-2.03.63-2.68 1.41-.58.68-.99 1.77-.87 2.84 1.05.08 2.02-.53 2.61-1.27z" />
+  </svg>
+);
+
 export const LandingPageView: React.FC = () => {
   const { t, isEs } = useTranslation();
   const { status, startSession } = useConversationStore();
   const { openAuthModal } = useAuthStore();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [currency, setCurrency] = useState<'BOB' | 'USD'>('BOB');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showIosModal, setShowIosModal] = useState<boolean>(false);
+  const [showAndroidModal, setShowAndroidModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleDownloadAndroid = async () => {
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          setDeferredPrompt(null);
+          return;
+        }
+      } catch (err) {
+        console.warn('Install prompt error:', err);
+      }
+    }
+    setShowAndroidModal(true);
+  };
+
+  const handleDownloadIos = () => {
+    // Direct download of iOS configuration profile
+    const link = document.createElement('a');
+    link.href = '/downloads/teacher-ivan-ios.mobileconfig';
+    link.download = 'teacher-ivan-ios.mobileconfig';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowIosModal(true);
+  };
 
   const isConnected = status === 'connected';
 
@@ -124,7 +178,7 @@ export const LandingPageView: React.FC = () => {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-4 rounded-full font-montserrat font-bold text-xs sm:text-sm uppercase tracking-wider bg-[#10b981] text-[#FAFAFA] hover:bg-[#059669] transition-all duration-200 shadow-xl shadow-[#10b981]/25 cursor-pointer min-h-[50px]"
                 >
                   <MessageCircle size={17} />
-                  <span>{isEs ? '💬 Contactar a Teacher Ivan por WhatsApp' : '💬 Contact Teacher Ivan on WhatsApp'}</span>
+                  <span>{isEs ? 'Contactar a Teacher Ivan por WhatsApp' : 'Contact Teacher Ivan on WhatsApp'}</span>
                 </a>
               </div>
 
@@ -133,6 +187,33 @@ export const LandingPageView: React.FC = () => {
                 <CheckCircle2 size={13} className="text-[#10b981]" />
                 <span>{lp.heroFrictionReducer}</span>
               </p>
+
+              {/* Mobile App Quick Access Buttons in Hero */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[11px] font-montserrat font-bold text-[#A7C7E7] uppercase tracking-wider">
+                  {isEs ? 'App Móvil:' : 'Mobile App:'}
+                </span>
+                <button
+                  id="hero-download-android-btn"
+                  type="button"
+                  onClick={handleDownloadAndroid}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#12223a] hover:bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] transition-all cursor-pointer shadow-sm hover:border-[#E09B30]"
+                  title="Download for Android"
+                >
+                  <AndroidIcon className="w-3.5 h-3.5 text-[#3ddc84]" />
+                  <span>Android</span>
+                </button>
+                <button
+                  id="hero-download-ios-btn"
+                  type="button"
+                  onClick={handleDownloadIos}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#12223a] hover:bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] transition-all cursor-pointer shadow-sm hover:border-[#E09B30]"
+                  title="Download for iOS"
+                >
+                  <AppleIcon className="w-3.5 h-3.5 text-[#FAFAFA]" />
+                  <span>iOS</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -505,6 +586,122 @@ export const LandingPageView: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
+      {/* 6. DOWNLOAD MOBILE APP SECTION (ANDROID & IOS)                            */}
+      {/* ========================================================================= */}
+      <section
+        id="download-mobile-app-section"
+        className="py-16 md:py-20 px-4 sm:px-6 bg-gradient-to-b from-[#12223a] to-[#1A3153] border-t border-b border-[#A7C7E7]/25 text-[#FAFAFA]"
+      >
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+          {/* Left Column: Headline, Features, and Two Prominent Download Buttons */}
+          <div className="flex-1 space-y-6 max-w-2xl text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1A3153] border border-[#E09B30]/40 text-xs font-montserrat font-bold text-[#E09B30] uppercase tracking-wider">
+              <Smartphone size={14} />
+              <span>{t.mobileApp.sectionBadge}</span>
+            </div>
+
+            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
+              {t.mobileApp.title}
+            </h2>
+
+            <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
+              {t.mobileApp.subtitle}
+            </p>
+
+            {/* Feature Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+              <div className="p-3.5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/20 space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+                  {t.mobileApp.feature1Title}
+                </span>
+                <p className="text-[11px] font-inter text-[#A7C7E7] leading-snug">
+                  {t.mobileApp.feature1Desc}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/20 space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+                  {t.mobileApp.feature2Title}
+                </span>
+                <p className="text-[11px] font-inter text-[#A7C7E7] leading-snug">
+                  {t.mobileApp.feature2Desc}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/20 space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+                  {t.mobileApp.feature3Title}
+                </span>
+                <p className="text-[11px] font-inter text-[#A7C7E7] leading-snug">
+                  {t.mobileApp.feature3Desc}
+                </p>
+              </div>
+            </div>
+
+            {/* Two Dedicated Download Buttons (Clean SVG icons, no emojis) */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+              <button
+                id="app-download-android-btn"
+                type="button"
+                onClick={handleDownloadAndroid}
+                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#1A3153] hover:bg-[#12223a] border-2 border-[#3ddc84]/50 hover:border-[#3ddc84] text-[#FAFAFA] font-montserrat font-bold transition-all transform hover:-translate-y-0.5 shadow-xl cursor-pointer"
+              >
+                <AndroidIcon className="w-6 h-6 text-[#3ddc84] shrink-0" />
+                <div className="text-left">
+                  <span className="block text-[11px] uppercase tracking-wider text-[#A7C7E7]">
+                    {t.mobileApp.androidSubtitle}
+                  </span>
+                  <span className="block text-sm sm:text-base font-extrabold text-[#FAFAFA]">
+                    {t.mobileApp.downloadAndroid}
+                  </span>
+                </div>
+              </button>
+
+              <button
+                id="app-download-ios-btn"
+                type="button"
+                onClick={handleDownloadIos}
+                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#1A3153] hover:bg-[#12223a] border-2 border-[#A7C7E7]/50 hover:border-[#E09B30] text-[#FAFAFA] font-montserrat font-bold transition-all transform hover:-translate-y-0.5 shadow-xl cursor-pointer"
+              >
+                <AppleIcon className="w-6 h-6 text-[#FAFAFA] shrink-0" />
+                <div className="text-left">
+                  <span className="block text-[11px] uppercase tracking-wider text-[#A7C7E7]">
+                    {t.mobileApp.iosSubtitle}
+                  </span>
+                  <span className="block text-sm sm:text-base font-extrabold text-[#FAFAFA]">
+                    {t.mobileApp.downloadIos}
+                  </span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: Visual Device Mockup with Chibi Mascot */}
+          <div className="w-full lg:w-auto flex justify-center flex-shrink-0">
+            <div className="relative w-64 sm:w-72 p-4 rounded-[2.5rem] bg-[#12223a] border-4 border-[#1A3153] shadow-2xl shadow-[#1A3153]/80">
+              <div className="w-20 h-4 bg-[#1A3153] rounded-full mx-auto mb-3" />
+              <div className="rounded-3xl bg-[#1A3153] p-4 text-center border border-[#A7C7E7]/20 flex flex-col items-center">
+                <span className="text-[10px] font-montserrat font-extrabold text-[#E09B30] uppercase tracking-wider mb-2">
+                  Live Voice Assistant
+                </span>
+                <div className="w-36 h-36 mx-auto mb-2">
+                  <RiggedCharacter persona="teacher-ivan" state="listening" className="w-full h-full" />
+                </div>
+                <div className="w-full py-2 px-3 rounded-xl bg-[#12223a] border border-[#A7C7E7]/25 text-left mb-2">
+                  <span className="text-[9px] font-mono font-bold text-[#10b981] block">● Connected (Gemini Live)</span>
+                  <span className="text-[11px] font-inter text-[#FAFAFA]">"Tell me about your project..."</span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-[#A7C7E7] font-montserrat font-bold">
+                  <Mic size={12} className="text-[#E09B30]" />
+                  <span>Tap to Speak</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
       {/* 7. FINAL CALL TO ACTION (REPEATS EXACT PRIMARY BUTTON)                   */}
       {/* ========================================================================= */}
       <section
@@ -540,16 +737,165 @@ export const LandingPageView: React.FC = () => {
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-wider bg-[#10b981] text-[#FAFAFA] hover:bg-[#059669] transition-all duration-200 shadow-xl shadow-[#10b981]/25 cursor-pointer min-h-[52px]"
               >
                 <MessageCircle size={18} />
-                <span>{isEs ? '💬 Contactar a Teacher Ivan por WhatsApp' : '💬 Contact Teacher Ivan on WhatsApp'}</span>
+                <span>{isEs ? 'Contactar a Teacher Ivan por WhatsApp' : 'Contact Teacher Ivan on WhatsApp'}</span>
               </a>
             </div>
             <p className="text-xs text-[#A7C7E7] font-medium flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-[#10b981]" />
               <span>{lp.heroFrictionReducer}</span>
             </p>
+
+            {/* Mobile App Download in Final CTA */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
+              <button
+                type="button"
+                onClick={handleDownloadAndroid}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1A3153] hover:bg-[#12223a] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] transition-all cursor-pointer shadow-sm hover:border-[#E09B30]"
+              >
+                <AndroidIcon className="w-4 h-4 text-[#3ddc84]" />
+                <span>{t.mobileApp.downloadAndroid}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadIos}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1A3153] hover:bg-[#12223a] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] transition-all cursor-pointer shadow-sm hover:border-[#E09B30]"
+              >
+                <AppleIcon className="w-4 h-4 text-[#FAFAFA]" />
+                <span>{t.mobileApp.downloadIos}</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* iOS Installation Instructions Modal */}
+      {showIosModal && (
+        <div
+          id="ios-install-modal-overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#12223a]/80 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div className="bg-[#1A3153] border-2 border-[#E09B30]/50 rounded-3xl max-w-md w-full p-6 text-left shadow-2xl relative space-y-4 text-[#FAFAFA]">
+            <button
+              type="button"
+              onClick={() => setShowIosModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-full text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#12223a] cursor-pointer"
+              aria-label={t.mobileApp.closeModal}
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#FAFAFA]/10 border border-[#A7C7E7]/30 flex items-center justify-center text-[#FAFAFA]">
+                <AppleIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA]">
+                  {t.mobileApp.iosModalTitle}
+                </h3>
+                <p className="text-xs text-[#A7C7E7] font-inter">
+                  {t.mobileApp.iosModalSubtitle}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <div className="p-3.5 rounded-2xl bg-[#12223a] border border-[#A7C7E7]/20 space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+                  {t.mobileApp.iosStep1Title}
+                </span>
+                <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  {t.mobileApp.iosStep1Desc}
+                </p>
+                <a
+                  href="/downloads/teacher-ivan-ios.mobileconfig"
+                  download="teacher-ivan-ios.mobileconfig"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#E09B30] hover:underline font-bold pt-1"
+                >
+                  <Download size={13} />
+                  <span>{t.mobileApp.iosDownloadBtn}</span>
+                </a>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[#12223a] border border-[#A7C7E7]/20 space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+                  {t.mobileApp.iosStep2Title}
+                </span>
+                <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  {t.mobileApp.iosStep2Desc}
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#FAFAFA]/5 border border-[#A7C7E7]/15 text-[11px] text-[#A7C7E7] leading-normal italic">
+                {t.mobileApp.iosAlternative}
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowIosModal(false)}
+                className="px-5 py-2 rounded-full bg-[#E09B30] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-[#c88624] cursor-pointer"
+              >
+                {t.mobileApp.closeModal}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Android Installation Modal */}
+      {showAndroidModal && (
+        <div
+          id="android-install-modal-overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#12223a]/80 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <div className="bg-[#1A3153] border-2 border-[#3ddc84]/50 rounded-3xl max-w-md w-full p-6 text-left shadow-2xl relative space-y-4 text-[#FAFAFA]">
+            <button
+              type="button"
+              onClick={() => setShowAndroidModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-full text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#12223a] cursor-pointer"
+              aria-label={t.mobileApp.closeModal}
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#3ddc84]/15 border border-[#3ddc84]/30 flex items-center justify-center text-[#3ddc84]">
+                <AndroidIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA]">
+                  {t.mobileApp.androidModalTitle}
+                </h3>
+                <p className="text-xs text-[#A7C7E7] font-inter">
+                  {t.mobileApp.androidModalSubtitle}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <div className="p-4 rounded-2xl bg-[#12223a] border border-[#A7C7E7]/20 space-y-2">
+                <span className="text-xs font-montserrat font-bold text-[#3ddc84] block">
+                  {t.mobileApp.androidStep1Title}
+                </span>
+                <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  {t.mobileApp.androidStep1Desc}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowAndroidModal(false)}
+                className="px-5 py-2 rounded-full bg-[#E09B30] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-[#c88624] cursor-pointer"
+              >
+                {t.mobileApp.androidClose}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

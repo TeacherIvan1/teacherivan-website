@@ -129,4 +129,64 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(updatedToPro?.plan, 'pro');
   assert.equal(updatedToPro?.maxDailySessions, -1);
   assert.equal(updatedToPro?.maxWeeklyClasses, 2);
+
+  // 14. Username and Password Authentication Tests
+  assert.equal(admin.username, 'ivan');
+  const foundAdminByUsername = store.findByUsername('ivan');
+  assert.equal(foundAdminByUsername?.email, 'ivan@teacherivan.com');
+  const foundAdminByAlias = store.findByUsername('teacherivan');
+  assert.equal(foundAdminByAlias?.email, 'ivan@teacherivan.com');
+
+  // Admin login via username
+  const adminAuth = store.verifyUserCredentials('ivan', 'IvanAdmin2026!');
+  assert.equal(adminAuth.success, true);
+  assert.equal(adminAuth.user?.role, 'admin');
+
+  // Student username assignment and login
+  const studentUser = store.upsertUser({
+    fullName: 'David Smith',
+    username: 'davidsmith',
+    password: 'DavidPassword123!',
+    email: 'david@example.com',
+    phoneNumber: '+591 70001122',
+    dateOfBirth: '1996-03-22',
+    country: 'Bolivia',
+  });
+  assert.equal(studentUser.username, 'davidsmith');
+
+  const davidAuth = store.verifyUserCredentials('davidsmith', 'DavidPassword123!');
+  assert.equal(davidAuth.success, true);
+  assert.equal(davidAuth.user?.id, studentUser.id);
+
+  const davidWrongAuth = store.verifyUserCredentials('davidsmith', 'WrongPass!');
+  assert.equal(davidWrongAuth.success, false);
+
+  // Reject duplicate username
+  assert.throws(() => {
+    store.upsertUser({
+      fullName: 'David Impostor',
+      username: 'davidsmith',
+      email: 'impostor@example.com',
+    });
+  }, /already taken/);
+
+  // Password Recovery Flow
+  // 1. Fail if verification contact does not match
+  const badRecovery = store.recoverPassword('davidsmith', 'wrongcontact@example.com', 'NewPassword999!');
+  assert.equal(badRecovery.success, false);
+
+  // 2. Succeed when email matches
+  const goodEmailRecovery = store.recoverPassword('davidsmith', 'david@example.com', 'NewPassword999!');
+  assert.equal(goodEmailRecovery.success, true);
+
+  // Verify new password works
+  const davidNewAuth = store.verifyUserCredentials('davidsmith', 'NewPassword999!');
+  assert.equal(davidNewAuth.success, true);
+
+  // 3. Succeed when phone number matches
+  const goodPhoneRecovery = store.recoverPassword('davidsmith', '+591 70001122', 'FinalSecretPass888!');
+  assert.equal(goodPhoneRecovery.success, true);
+
+  const davidFinalAuth = store.verifyUserCredentials('davidsmith', 'FinalSecretPass888!');
+  assert.equal(davidFinalAuth.success, true);
 });

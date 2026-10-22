@@ -36,6 +36,8 @@ export function getPlanDefaults(plan: StudentPlan = 'free'): PlanDefaults {
 
 export interface User {
   id: string;
+  username: string; // unique, lowercased
+  password?: string;
   fullName: string;
   email: string;
   phoneNumber?: string;
@@ -82,12 +84,21 @@ export class UserStore {
     return email ? email.trim().toLowerCase() : '';
   }
 
+  public normalizeUsername(username: string): string {
+    if (!username) return '';
+    return username.trim().toLowerCase().replace(/^@/, '');
+  }
+
   private seedAdminUser(): void {
     const normAdminEmail = this.normalizeEmail(ADMIN_EMAIL);
-    if (!this.users.has(normAdminEmail)) {
-      const todayIso = new Date().toISOString().split('T')[0];
+    const existing = this.users.get(normAdminEmail);
+    const todayIso = new Date().toISOString().split('T')[0];
+
+    if (!existing) {
       const adminUser: User = {
         id: 'usr_admin_ivan',
+        username: 'ivan',
+        password: ADMIN_PASSWORD,
         fullName: 'Teacher Ivan (Admin)',
         email: normAdminEmail,
         phoneNumber: '+591 72878330',
@@ -114,6 +125,19 @@ export class UserStore {
       };
       this.users.set(normAdminEmail, adminUser);
       this.saveToDisk();
+    } else {
+      let changed = false;
+      if (existing.username !== 'ivan') {
+        existing.username = 'ivan';
+        changed = true;
+      }
+      if (existing.password !== ADMIN_PASSWORD) {
+        existing.password = ADMIN_PASSWORD;
+        changed = true;
+      }
+      if (changed) {
+        this.saveToDisk();
+      }
     }
   }
 
@@ -124,9 +148,33 @@ export class UserStore {
         if (raw.trim()) {
           const list: User[] = JSON.parse(raw);
           this.users.clear();
+          const usedUsernames = new Set<string>();
+
           for (const u of list) {
             if (u && u.email) {
-              this.users.set(this.normalizeEmail(u.email), u);
+              const normEmail = this.normalizeEmail(u.email);
+              const isAdmin = normEmail === this.normalizeEmail(ADMIN_EMAIL) || u.role === 'admin';
+
+              let assignedUsername = this.normalizeUsername(u.username);
+              if (isAdmin) {
+                assignedUsername = 'ivan';
+              } else if (!assignedUsername) {
+                const base = this.normalizeUsername(normEmail.split('@')[0]) || 'student';
+                assignedUsername = base;
+                let counter = 1;
+                while (usedUsernames.has(assignedUsername) || assignedUsername === 'ivan' || assignedUsername === 'teacherivan') {
+                  assignedUsername = `${base}${counter}`;
+                  counter++;
+                }
+              }
+              usedUsernames.add(assignedUsername);
+
+              const migratedUser: User = {
+                ...u,
+                username: assignedUsername,
+                password: u.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
+              };
+              this.users.set(normEmail, migratedUser);
             }
           }
         }
@@ -165,15 +213,115 @@ export class UserStore {
     return undefined;
   }
 
+  public findByUsername(username: string): User | undefined {
+    const norm = this.normalizeUsername(username);
+    if (!norm) return undefined;
+
+    // Aliases for admin
+    if (norm === 'ivan' || norm === 'teacherivan' || norm === this.normalizeEmail(ADMIN_EMAIL)) {
+      const admin = this.findByEmail(ADMIN_EMAIL);
+      if (admin) return admin;
+    }
+
+    for (const user of this.users.values()) {
+      if (this.normalizeUsername(user.username) === norm) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
   public getAllUsers(): User[] {
     return Array.from(this.users.values()).sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }
 
+  public verifyUserCredentials(usernameOrEmail: string, password?: string): { success: boolean; user?: User; error?: string } {
+    if (!usernameOrEmail || !password) {
+      return { success: false, error: 'Username and password are required' };
+    }
+    const normUser = this.normalizeUsername(usernameOrEmail);
+    const normEmail = this.normalizeEmail(usernameOrEmail);
+
+    // 1. Check admin account
+    if (normUser === 'ivan' || normUser === 'teacherivan' || normEmail === this.normalizeEmail(ADMIN_EMAIL)) {
+      if (password === ADMIN_PASSWORD) {
+        const admin = this.findByEmail(ADMIN_EMAIL) || this.findByUsername('ivan');
+        return { success: true, user: admin };
+      }
+      return { success: false, error: 'Invalid admin credentials' };
+    }
+
+    // 2. Look up student by username or email
+    let user = this.findByUsername(normUser);
+    if (!user && usernameOrEmail.includes('@')) {
+      user = this.findByEmail(normEmail);
+    }
+
+    if (!user) {
+      return { success: false, error: 'User not found' };
+    }
+
+    if (user.password && user.password !== password) {
+      return { success: false, error: 'Incorrect password' };
+    }
+
+    return { success: true, user };
+  }
+
+  public recoverPassword(
+    username: string,
+    verificationContact: string,
+    newPassword: string
+  ): { success: boolean; user?: User; error?: string } {
+    if (!username || !username.trim()) {
+      return { success: false, error: 'Username is required' };
+    }
+    if (!verificationContact || !verificationContact.trim()) {
+      return { success: false, error: 'Registered email or phone number is required' };
+    }
+    if (!newPassword || newPassword.trim().length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters' };
+    }
+
+    const normUser = this.normalizeUsername(username);
+    let user = this.findByUsername(normUser);
+    if (!user && username.includes('@')) {
+      user = this.findByEmail(this.normalizeEmail(username));
+    }
+
+    if (!user) {
+      return { success: false, error: 'No account found with that username' };
+    }
+
+    // Verify contact matches email or phone
+    const cleanContact = verificationContact.trim().toLowerCase().replace(/[\s\-\(\)\+]/g, '');
+    const userEmail = (user.email || '').trim().toLowerCase();
+    const userPhone = (user.phoneNumber || '').trim().toLowerCase().replace(/[\s\-\(\)\+]/g, '');
+
+    const matchesEmail = userEmail === verificationContact.trim().toLowerCase();
+    const matchesPhone = Boolean(
+      userPhone &&
+      cleanContact &&
+      (userPhone === cleanContact || userPhone.endsWith(cleanContact) || cleanContact.endsWith(userPhone))
+    );
+
+    if (!matchesEmail && !matchesPhone) {
+      return { success: false, error: 'The email or phone number does not match our records for this user' };
+    }
+
+    user.password = newPassword.trim();
+    this.saveToDisk();
+
+    return { success: true, user };
+  }
+
   public upsertUser(data: {
     fullName: string;
     email: string;
+    username?: string;
+    password?: string;
     phoneNumber?: string;
     dateOfBirth?: string;
     country?: string;
@@ -190,11 +338,27 @@ export class UserStore {
     const isAdmin = normEmail === this.normalizeEmail(ADMIN_EMAIL) || data.role === 'admin';
     const todayIso = new Date().toISOString().split('T')[0];
 
+    // Compute username
+    let chosenUsername = data.username ? this.normalizeUsername(data.username) : '';
+    if (isAdmin) {
+      chosenUsername = 'ivan';
+    } else if (!chosenUsername) {
+      chosenUsername = existing?.username || this.normalizeUsername(normEmail.split('@')[0]) || 'student';
+    }
+
+    // Verify username conflict
+    const conflicting = this.findByUsername(chosenUsername);
+    if (conflicting && conflicting.id !== (existing ? existing.id : undefined) && !isAdmin) {
+      throw new Error(`Username "${chosenUsername}" is already taken.`);
+    }
+
     if (existing) {
       const plan = data.plan || existing.plan || (isAdmin ? 'executive' : 'free');
       const planDefaults = getPlanDefaults(plan);
       const updated: User = {
         ...existing,
+        username: chosenUsername || existing.username,
+        password: data.password || existing.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
         fullName: data.fullName ? data.fullName.trim() : existing.fullName,
         phoneNumber: data.phoneNumber ? data.phoneNumber.trim() : (existing.phoneNumber || ''),
         dateOfBirth: data.dateOfBirth ? data.dateOfBirth.trim() : existing.dateOfBirth,
@@ -221,6 +385,8 @@ export class UserStore {
 
     const newUser: User = {
       id: isAdmin ? 'usr_admin_ivan' : `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      username: chosenUsername,
+      password: data.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
       fullName: data.fullName ? data.fullName.trim() : (isAdmin ? 'Teacher Ivan (Admin)' : 'Student'),
       email: normEmail,
       phoneNumber: data.phoneNumber ? data.phoneNumber.trim() : '',
@@ -387,11 +553,12 @@ export class UserStore {
     return Buffer.from(`${userId}:${role}:${timestamp}:${nonce}`).toString('base64');
   }
 
-  public verifyAdminCredentials(email: string, password?: string): boolean {
+  public verifyAdminCredentials(emailOrUsername: string, password?: string): boolean {
     if (!password) return false;
-    const normEmail = this.normalizeEmail(email);
-    const normAdmin = this.normalizeEmail(ADMIN_EMAIL);
-    return normEmail === normAdmin && password === ADMIN_PASSWORD;
+    const norm = this.normalizeUsername(emailOrUsername);
+    const normEmail = this.normalizeEmail(emailOrUsername);
+    const isAdminId = norm === 'ivan' || norm === 'teacherivan' || normEmail === this.normalizeEmail(ADMIN_EMAIL);
+    return isAdminId && password === ADMIN_PASSWORD;
   }
 }
 

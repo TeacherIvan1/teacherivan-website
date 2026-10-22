@@ -19,16 +19,16 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 }) => {
   const isLight = variant === 'light';
 
-  // Mascot dimensions (w-9 h-9 on mobile for compact header)
+  // Mascot dimensions (w-7 h-7 on mobile for compact header)
   const mascotDimensions = {
-    sm: 'w-9 h-9 md:w-10 md:h-10',
+    sm: 'w-7 h-7 shrink-0',
     md: 'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
     lg: 'w-16 h-16 md:w-20 md:h-20',
   }[size];
 
   // Primary text size with whitespace-nowrap
   const primaryTextSize = {
-    sm: 'text-base sm:text-lg md:text-xl',
+    sm: 'text-sm sm:text-lg',
     md: 'text-lg sm:text-xl md:text-2xl',
     lg: 'text-2xl md:text-3xl',
   }[size];
@@ -42,7 +42,7 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 
   return (
     <div
-      className={`inline-flex items-center gap-2 sm:gap-3 select-none ${className}`}
+      className={`inline-flex items-center gap-1.5 sm:gap-3 select-none ${className}`}
       data-testid="official-brand-lockup"
     >
       {/* Brand Mascot (Teacher Ivan Chibi character) with preserved aspect ratio */}
@@ -66,11 +66,11 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
           Teacher <span className="text-[#E09B30]">I</span>van
         </div>
 
-        {/* Line 2: ENGLISH CLASSES in uppercase, geometric sans-serif (Montserrat), tracking-[0.25em] */}
+        {/* Line 2: ENGLISH CLASSES in uppercase, geometric sans-serif (Montserrat), tracking-[0.25em] (hidden on <640px for sm) */}
         <div
           className={`font-montserrat uppercase font-semibold tracking-[0.22em] sm:tracking-[0.25em] whitespace-nowrap ${sublineTextSize} mt-0.5 md:mt-1 ${
-            isLight ? 'text-[#4A5568]' : 'text-[#A7C7E7]'
-          }`}
+            size === 'sm' ? 'hidden sm:block' : ''
+          } ${isLight ? 'text-[#4A5568]' : 'text-[#A7C7E7]'}`}
         >
           ENGLISH CLASSES
         </div>
