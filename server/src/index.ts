@@ -88,6 +88,33 @@ app.get('/api/users/export', (_req, res) => {
   });
 });
 
+// PUT /api/users/:id/plan (Admin manual plan update)
+app.put('/api/users/:id/plan', (req, res) => {
+  try {
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+    const { plan } = req.body || {};
+
+    if (!['free', 'essential', 'pro', 'executive'].includes(plan)) {
+      return res.status(400).json({ error: 'Invalid plan. Allowed values: free, essential, pro, executive' });
+    }
+
+    const updated = userStore.updateUserPlan(id, plan);
+    if (!updated) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.status(200).json({
+      status: 'ok',
+      user: updated,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[PUT /api/users/:id/plan Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error updating user plan' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (_req, res) => {
   const hasKey = Boolean(

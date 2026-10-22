@@ -26,7 +26,8 @@ import { useAuthStore } from '../modules/auth/authStore';
 
 export const CompactVoiceSimulator: React.FC = () => {
   const { t, isEs } = useTranslation();
-  const { isAuthenticated, openAuthModal } = useAuthStore();
+  const { isAuthenticated, openAuthModal, user, checkAndIncrementSessionQuota } = useAuthStore();
+  const [quotaError, setQuotaError] = useState<string | null>(null);
   const {
     status,
     messages,
@@ -58,6 +59,33 @@ export const CompactVoiceSimulator: React.FC = () => {
   const [showVocabTips, setShowVocabTips] = useState(false);
   const [showTranscriptDrawer, setShowTranscriptDrawer] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  const getDailySessionBadge = (): string => {
+    const plan = user?.plan || (user?.role === 'admin' ? 'executive' : 'free');
+    if (user?.role === 'admin' || plan === 'pro' || plan === 'executive') {
+      return isEs ? 'Sesiones Diarias: Ilimitadas' : 'Daily Sessions: Unlimited';
+    }
+    const todayIso = new Date().toISOString().split('T')[0];
+    const used = user?.lastSessionDate === todayIso ? (user?.dailySessionsUsed || 0) : 0;
+    if (plan === 'essential') {
+      return isEs ? `Sesiones Diarias: ${used} / 10` : `Daily Sessions: ${used} / 10`;
+    }
+    return isEs ? `Sesiones Diarias: ${used} / 5` : `Daily Sessions: ${used} / 5`;
+  };
+
+  const handleStartSession = () => {
+    setQuotaError(null);
+    clearError();
+    const quota = checkAndIncrementSessionQuota();
+    if (!quota.allowed) {
+      const errorText = isEs
+        ? `Has alcanzado tu límite diario de ${quota.max} sesiones de práctica (${quota.used}/${quota.max}). ¡Escríbele a Teacher Ivan por WhatsApp para activar un plan con sesiones ilimitadas!`
+        : `You have reached your daily limit of ${quota.max} practice sessions (${quota.used}/${quota.max}). Message Teacher Ivan on WhatsApp to upgrade for unlimited sessions!`;
+      setQuotaError(errorText);
+      return;
+    }
+    startSession();
+  };
 
   // Guests are strictly locked to diagnostic placement test mode
   useEffect(() => {
@@ -174,8 +202,17 @@ export const CompactVoiceSimulator: React.FC = () => {
           </h1>
         </div>
 
-        {/* Timer, Reconnecting Pill or Status */}
-        <div className="flex items-center gap-2">
+        {/* Timer, Reconnecting Pill, Quota Badge or Status */}
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          {/* Daily Sessions Quota Badge */}
+          <div
+            id="simulator-daily-quota-badge"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] shadow-sm"
+          >
+            <Sparkles size={12} className="text-[#E09B30]" />
+            <span>{getDailySessionBadge()}</span>
+          </div>
+
           {isReconnecting && (
             <div
               id="reconnecting-audio-pill"
@@ -203,9 +240,9 @@ export const CompactVoiceSimulator: React.FC = () => {
       {/* 2. Compact Control Bar (Tutor Persona + Level Selector + Scenario Strip) */}
       <div className="bg-[#12223a]/90 backdrop-blur-md rounded-2xl border border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-3 shadow-md">
         {/* Row A: Tutor Persona Pill & Level Pill Selector */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 w-full max-w-full overflow-hidden">
           {/* Tutor Persona Toggle: [👨‍🏫 Ivan | 👩‍🏫 Emma] */}
-          <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30">
+          <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
             <button
               type="button"
               id="tutor-persona-ivan-btn"
@@ -244,7 +281,7 @@ export const CompactVoiceSimulator: React.FC = () => {
           </div>
 
           {/* Level Pill Selector: [Diagnostic | A1 | A2 | B1 | B2 | IELTS] */}
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5">
+          <div className="flex items-center gap-1 w-full sm:w-auto max-w-full overflow-x-auto no-scrollbar py-0.5">
             {levelPills.map((pill) => {
               const active = isPillActive(pill.id);
               const isPillLocked = !isAuthenticated && pill.id !== 'diag';
@@ -496,7 +533,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               id="start-session-btn"
               type="button"
               disabled={isPending}
-              onClick={() => startSession()}
+              onClick={handleStartSession}
               className="w-full max-w-md py-4 px-6 rounded-full font-montserrat font-bold text-sm sm:text-base uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-lg shadow-[#E09B30]/30 flex items-center justify-center gap-3 cursor-pointer min-h-[54px]"
             >
               {isRequesting ? (
@@ -544,6 +581,37 @@ export const CompactVoiceSimulator: React.FC = () => {
               <Square size={16} fill="currentColor" />
               <span>{t.compactSimulator.endAndScore}</span>
             </button>
+          </div>
+        )}
+
+        {/* Quota Exceeded Alert with WhatsApp CTA */}
+        {quotaError && (
+          <div
+            id="simulator-quota-reached-alert"
+            className="w-full p-4 rounded-2xl bg-[#E09B30]/20 border-2 border-[#E09B30] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#FAFAFA] animate-in fade-in"
+          >
+            <div className="flex items-center gap-2.5">
+              <AlertCircle size={18} className="text-[#E09B30] shrink-0" />
+              <span className="font-medium">{quotaError}</span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <a
+                id="quota-upgrade-whatsapp-btn"
+                href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20He%20alcanzado%20mi%20l%C3%ADmite%20diario%20del%20simulador%20y%20deseo%20sesiones%20ilimitadas."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-md transition-all"
+              >
+                <span>{isEs ? 'Desbloquear en WhatsApp' : 'Upgrade on WhatsApp'}</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setQuotaError(null)}
+                className="text-xs underline hover:text-white cursor-pointer px-1"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         )}
 

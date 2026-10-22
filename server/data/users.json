@@ -17,5 +17,24 @@
     "cefrLevel": "C2",
     "lastScore": 100,
     "createdAt": "2026-10-21T20:40:40.667Z"
+  },
+  {
+    "id": "usr_1792637508386_4a39b1e0",
+    "fullName": "Sofia Rodriguez",
+    "email": "sofia@example.com",
+    "phoneNumber": "+591 72878330",
+    "dateOfBirth": "1998-05-12",
+    "country": "Bolivia",
+    "authProvider": "email",
+    "role": "student",
+    "plan": "free",
+    "planUpdatedAt": "2026-10-22T02:51:48.386Z",
+    "maxWeeklyClasses": 0,
+    "maxDailySessions": 5,
+    "dailySessionsUsed": 0,
+    "lastSessionDate": "2026-10-22",
+    "profileCompleted": false,
+    "cefrLevel": "B1",
+    "createdAt": "2026-10-22T02:51:48.386Z"
   }
 ]

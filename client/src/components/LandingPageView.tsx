@@ -17,6 +17,7 @@ import { useTranslation } from '../modules/i18n/languageStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useAuthStore } from '../modules/auth/authStore';
 import { CompactVoiceSimulator } from './CompactVoiceSimulator';
+import { RiggedCharacter } from './RiggedCharacter';
 import { getWhatsAppUrl } from '../config/contact';
 
 export const LandingPageView: React.FC = () => {
@@ -101,18 +102,31 @@ export const LandingPageView: React.FC = () => {
               {lp.heroSubhead}
             </p>
 
-            {/* ELEMENT 3 (One Primary Button + Friction Reducer) */}
-            <div className="flex flex-col items-center lg:items-start gap-2.5">
-              <button
-                id="hero-primary-cta-btn"
-                type="button"
-                onClick={handleStartVoiceTest}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-montserrat font-bold text-sm sm:text-base uppercase tracking-[0.12em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-xl shadow-[#E09B30]/35 cursor-pointer min-h-[52px]"
-              >
-                <Mic size={20} className="text-[#1A3153]" />
-                <span>{lp.heroPrimaryCta}</span>
-                <ArrowRight size={18} />
-              </button>
+            {/* ELEMENT 3 (Primary Button + Direct WhatsApp Button + Friction Reducer) */}
+            <div className="flex flex-col items-center lg:items-start gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <button
+                  id="hero-primary-cta-btn"
+                  type="button"
+                  onClick={handleStartVoiceTest}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-3.5 sm:py-4 rounded-full font-montserrat font-bold text-xs sm:text-sm uppercase tracking-[0.12em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-xl shadow-[#E09B30]/35 cursor-pointer min-h-[50px]"
+                >
+                  <Mic size={18} className="text-[#1A3153]" />
+                  <span>{lp.heroPrimaryCta}</span>
+                  <ArrowRight size={16} />
+                </button>
+
+                <a
+                  id="hero-direct-whatsapp-btn"
+                  href="https://wa.me/59172878330"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-4 rounded-full font-montserrat font-bold text-xs sm:text-sm uppercase tracking-wider bg-[#10b981] text-[#FAFAFA] hover:bg-[#059669] transition-all duration-200 shadow-xl shadow-[#10b981]/25 cursor-pointer min-h-[50px]"
+                >
+                  <MessageCircle size={17} />
+                  <span>{isEs ? '💬 Contactar a Teacher Ivan por WhatsApp' : '💬 Contact Teacher Ivan on WhatsApp'}</span>
+                </a>
+              </div>
 
               {/* Friction Reducer */}
               <p className="text-xs text-[#A7C7E7] font-medium flex items-center gap-1.5">
@@ -127,14 +141,14 @@ export const LandingPageView: React.FC = () => {
             <div
               id="hero-chibi-visual-card"
               onClick={handleStartVoiceTest}
-              className="relative p-6 sm:p-7 rounded-3xl bg-[#12223a]/90 border-2 border-[#E09B30]/50 shadow-2xl max-w-sm sm:max-w-md w-full text-center cursor-pointer group hover:border-[#E09B30] transition-all"
+              className="relative p-5 sm:p-7 rounded-3xl bg-[#12223a]/90 border-2 border-[#E09B30]/50 shadow-2xl max-w-sm sm:max-w-md w-full text-center cursor-pointer group hover:border-[#E09B30] transition-all"
               role="button"
               tabIndex={0}
               aria-label="Click to start 90s voice diagnostic test"
               onKeyDown={(e) => e.key === 'Enter' && handleStartVoiceTest()}
             >
               {/* Top Status */}
-              <div className="flex items-center justify-between pb-3 border-b border-[#A7C7E7]/20 mb-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#A7C7E7]/20 mb-3 sm:mb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse" />
                   <span className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#FAFAFA]">
@@ -147,13 +161,14 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Rigged Chibi Characters Pair (Ivan & Emma) */}
-              <div className="flex items-center justify-center gap-4 py-2">
+              <div className="flex items-center justify-center gap-3 sm:gap-4 py-2">
                 <div className="flex flex-col items-center">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#1A3153] border border-[#E09B30] p-1.5 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <img
-                      src="/assets/characters/ivan-pose-speaking.svg"
-                      alt="Chibi Teacher Ivan Speaking"
-                      className="w-full h-full object-contain"
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#1A3153] border border-[#E09B30] p-1 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
+                    <RiggedCharacter
+                      persona="teacher-ivan"
+                      state="speaking"
+                      className="w-full h-full"
+                      alt="Chibi Teacher Ivan"
                     />
                   </div>
                   <span className="text-[11px] font-montserrat font-bold text-[#E09B30] mt-1.5">
@@ -176,11 +191,12 @@ export const LandingPageView: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#1A3153] border border-[#A7C7E7] p-1.5 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <img
-                      src="/assets/characters/emma-pose-listening.svg"
-                      alt="Chibi Emma Listening Coach"
-                      className="w-full h-full object-contain"
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#1A3153] border border-[#A7C7E7] p-1 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
+                    <RiggedCharacter
+                      persona="emma"
+                      state="listening"
+                      className="w-full h-full"
+                      alt="Chibi Emma Coach"
                     />
                   </div>
                   <span className="text-[11px] font-montserrat font-bold text-[#A7C7E7] mt-1.5">
@@ -503,17 +519,30 @@ export const LandingPageView: React.FC = () => {
             {lp.finalCtaSubhead}
           </p>
 
-          <div className="pt-3 flex flex-col items-center gap-2">
-            <button
-              type="button"
-              id="final-primary-cta-btn"
-              onClick={handleStartVoiceTest}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-montserrat font-bold text-sm sm:text-base uppercase tracking-[0.12em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-xl shadow-[#E09B30]/35 cursor-pointer min-h-[52px]"
-            >
-              <Mic size={20} className="text-[#1A3153]" />
-              <span>{lp.finalPrimaryCta}</span>
-              <ArrowRight size={18} />
-            </button>
+          <div className="pt-3 flex flex-col items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+              <button
+                type="button"
+                id="final-primary-cta-btn"
+                onClick={handleStartVoiceTest}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-montserrat font-bold text-sm sm:text-base uppercase tracking-[0.12em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-xl shadow-[#E09B30]/35 cursor-pointer min-h-[52px]"
+              >
+                <Mic size={20} className="text-[#1A3153]" />
+                <span>{lp.finalPrimaryCta}</span>
+                <ArrowRight size={18} />
+              </button>
+
+              <a
+                id="final-cta-whatsapp-btn"
+                href="https://wa.me/59172878330"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-montserrat font-bold text-sm uppercase tracking-wider bg-[#10b981] text-[#FAFAFA] hover:bg-[#059669] transition-all duration-200 shadow-xl shadow-[#10b981]/25 cursor-pointer min-h-[52px]"
+              >
+                <MessageCircle size={18} />
+                <span>{isEs ? '💬 Contactar a Teacher Ivan por WhatsApp' : '💬 Contact Teacher Ivan on WhatsApp'}</span>
+              </a>
+            </div>
             <p className="text-xs text-[#A7C7E7] font-medium flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-[#10b981]" />
               <span>{lp.heroFrictionReducer}</span>

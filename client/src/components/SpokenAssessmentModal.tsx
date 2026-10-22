@@ -47,7 +47,7 @@ export const SpokenAssessmentModal: React.FC = () => {
   return (
     <div
       id="spoken-assessment-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3153]/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3153]/80 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="spoken-assessment-modal-title"
@@ -57,10 +57,10 @@ export const SpokenAssessmentModal: React.FC = () => {
         }
       }}
     >
-      {/* Sleek, Single-Card Welcome Sheet (max-h-[85vh] overflow-hidden) */}
+      {/* Sleek, Single-Card Welcome Sheet */}
       <div
         id="spoken-assessment-modal-card"
-        className="relative w-full max-w-md max-h-[85vh] overflow-hidden rounded-3xl bg-[#12223a] text-[#FAFAFA] border-2 border-[#E09B30]/50 shadow-2xl p-6 sm:p-7 flex flex-col items-center text-center my-auto"
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-2xl p-5 box-border bg-[#12223a] text-[#FAFAFA] border-2 border-[#E09B30]/50 shadow-2xl flex flex-col items-center text-center my-auto"
       >
         {/* Top Close Button */}
         <button

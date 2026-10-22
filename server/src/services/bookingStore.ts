@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import { userStore } from './userStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -141,6 +142,7 @@ export class BookingStore {
     date: string; // YYYY-MM-DD
     startTime: BookingStartTime;
     learningGoal?: string;
+    maxWeeklyClasses?: number;
   }): Booking {
     // 1. Verify Day of Week (Monday to Friday only)
     const dayOfWeek = this.getDayOfWeek(data.date);
@@ -161,18 +163,56 @@ export class BookingStore {
       }
     }
 
-    // 4. Limit to 1 active booking per student per week
+    // 4. Verify Student Plan & Weekly Limit
+    const user = userStore.findById(data.studentId) || userStore.findByEmail(data.studentEmail);
+    const plan = user?.plan;
+    let allowedWeekly = data.maxWeeklyClasses;
+
+    if (allowedWeekly === undefined) {
+      if (user) {
+        if (user.role === 'admin') {
+          allowedWeekly = 99;
+        } else if (plan === 'free' || !plan) {
+          allowedWeekly = 0;
+        } else if (plan === 'essential') {
+          allowedWeekly = 1;
+        } else if (plan === 'pro') {
+          allowedWeekly = 2;
+        } else if (plan === 'executive') {
+          allowedWeekly = 3;
+        } else {
+          allowedWeekly = user.maxWeeklyClasses ?? 1;
+        }
+      } else {
+        // Fallback for tests or direct calls
+        allowedWeekly = 1;
+      }
+    }
+
+    if (allowedWeekly === 0) {
+      throw new Error(
+        'El plan Gratuito no incluye clases en vivo 1 a 1. Por favor activa un plan (Essential, Pro o Executive) por WhatsApp para agendar.'
+      );
+    }
+
+    // 5. Limit active bookings per student per week according to plan
     const targetWeekStart = this.getWeekStart(data.date);
-    const existingInWeek = Array.from(this.bookings.values()).find(
+    const existingInWeek = Array.from(this.bookings.values()).filter(
       (b) =>
         (b.studentId === data.studentId || b.studentEmail.toLowerCase() === data.studentEmail.toLowerCase()) &&
         this.getWeekStart(b.date) === targetWeekStart
     );
 
-    if (existingInWeek) {
-      throw new Error(
-        `You already have a class scheduled on ${existingInWeek.date} at ${existingInWeek.startTime}. Please reschedule or cancel it first.`
-      );
+    if (existingInWeek.length >= allowedWeekly) {
+      if (allowedWeekly === 1) {
+        throw new Error(
+          `You already have a class scheduled on ${existingInWeek[0].date} at ${existingInWeek[0].startTime}. Please reschedule or cancel it first.`
+        );
+      } else {
+        throw new Error(
+          `Has alcanzado el límite de ${allowedWeekly} clases para esta semana con tu plan actual. Por favor reprograma o cancela una clase previa.`
+        );
+      }
     }
 
     const newBooking: Booking = {

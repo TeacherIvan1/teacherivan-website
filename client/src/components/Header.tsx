@@ -94,7 +94,7 @@ export const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-[#12223a]/95 backdrop-blur-md border-b border-[#A7C7E7]/25 w-full select-none" id="app-header">
       {/* Primary Top Bar */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+      <div className="w-full max-w-full px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 overflow-hidden">
         {/* Left: Brand Lockup with Chibi Mascot */}
         <button
           onClick={() => {
@@ -308,17 +308,18 @@ export const Header: React.FC = () => {
               id="signup-free-nav-btn"
               type="button"
               onClick={() => openAuthModal('signup')}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-montserrat font-bold text-[11px] sm:text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 cursor-pointer shrink-0"
             >
-              <Sparkles size={13} />
-              <span>{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
+              <Sparkles size={12} />
+              <span className="hidden sm:inline">{isEs ? 'Registrarse Gratis' : 'Sign Up Free'}</span>
+              <span className="sm:hidden">{isEs ? 'Registro' : 'Sign Up'}</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Mobile Sub-Header Tab Bar (<768px): Guaranteed zero overflow */}
-      <div className="md:hidden border-t border-[#A7C7E7]/20 bg-[#1A3153]/95 px-2 py-1.5 flex items-center justify-around gap-1">
+      <div className="md:hidden border-t border-[#A7C7E7]/20 bg-[#1A3153]/95 w-full max-w-full px-2 py-1.5 flex items-center justify-around gap-1 overflow-x-auto no-scrollbar">
         {isAuthenticated ? (
           <>
             <button

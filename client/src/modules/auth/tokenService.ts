@@ -1,4 +1,5 @@
 import { getApiUrl } from '../../config/api';
+import { useAuthStore } from './authStore';
 
 export interface EphemeralTokenPayload {
   token: string;
@@ -12,6 +13,7 @@ export interface TokenResponse {
   success: boolean;
   data?: EphemeralTokenPayload;
   error?: string;
+  message?: string;
 }
 
 /**
@@ -20,18 +22,24 @@ export interface TokenResponse {
  */
 export async function requestEphemeralToken(model?: string): Promise<EphemeralTokenPayload> {
   const url = getApiUrl('/api/token');
+  const user = useAuthStore.getState().user;
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ model }),
+    body: JSON.stringify({
+      model,
+      userId: user?.id,
+      email: user?.email,
+    }),
   });
 
   const json: TokenResponse = await response.json();
 
   if (!response.ok || !json.success || !json.data) {
-    const errorMsg = json.error || `Failed to fetch token (HTTP ${response.status})`;
+    const errorMsg = json.message || json.error || `Failed to fetch token (HTTP ${response.status})`;
     throw new Error(errorMsg);
   }
 

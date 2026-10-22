@@ -10,6 +10,7 @@ import {
   Loader2,
   CheckCircle2,
   Lock,
+  Phone,
   KeyRound,
   ArrowRight,
   ArrowLeft,
@@ -67,6 +68,7 @@ export const StudentAuthModal: React.FC = () => {
   // Step 1 Form fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [country, setCountry] = useState<SupportedCountry | ''>('Bolivia');
@@ -118,6 +120,7 @@ export const StudentAuthModal: React.FC = () => {
 
     const trimmedName = fullName.trim();
     const trimmedEmail = email.trim();
+    const trimmedPhone = phoneNumber.trim();
 
     if (!trimmedName) {
       setValidationError(isEs ? 'Por favor ingresa tu nombre completo.' : 'Please enter your full name.');
@@ -125,6 +128,10 @@ export const StudentAuthModal: React.FC = () => {
     }
     if (!trimmedEmail || !trimmedEmail.includes('@') || !trimmedEmail.includes('.')) {
       setValidationError(isEs ? 'Por favor ingresa un correo electrónico válido.' : 'Please enter a valid email address.');
+      return;
+    }
+    if (!trimmedPhone) {
+      setValidationError(isEs ? 'Por favor ingresa tu número de celular.' : 'Please enter your phone number.');
       return;
     }
     if (!dateOfBirth) {
@@ -146,7 +153,14 @@ export const StudentAuthModal: React.FC = () => {
 
     const trimmedName = fullName.trim();
     const trimmedEmail = email.trim();
+    const trimmedPhone = phoneNumber.trim();
     const trimmedObjective = personalObjective.trim();
+
+    if (!trimmedPhone) {
+      setValidationError(isEs ? 'Por favor ingresa tu número de celular.' : 'Please enter your phone number.');
+      setStep(1);
+      return;
+    }
 
     if (!trimmedObjective) {
       setValidationError(
@@ -169,6 +183,7 @@ export const StudentAuthModal: React.FC = () => {
         await authenticateWithGoogle({
           email: trimmedEmail,
           fullName: trimmedName,
+          phoneNumber: trimmedPhone,
           dateOfBirth,
           country,
           learningGoals,
@@ -178,6 +193,7 @@ export const StudentAuthModal: React.FC = () => {
         await registerWithEmail({
           fullName: trimmedName,
           email: trimmedEmail,
+          phoneNumber: trimmedPhone,
           dateOfBirth,
           country,
           learningGoals,
@@ -215,14 +231,21 @@ export const StudentAuthModal: React.FC = () => {
     setValidationError(null);
 
     const trimmedEmail = email.trim();
+    const trimmedPhone = phoneNumber.trim();
+
     if (!trimmedEmail || !trimmedEmail.includes('@')) {
       setValidationError(isEs ? 'Por favor ingresa un correo válido.' : 'Please enter a valid email.');
+      return;
+    }
+    if (!trimmedPhone) {
+      setValidationError(isEs ? 'Por favor ingresa tu número de celular.' : 'Please enter your phone number.');
       return;
     }
 
     try {
       const signedInUser = await loginWithCredentials({
         email: trimmedEmail,
+        phoneNumber: trimmedPhone,
         password: password ? password.trim() : undefined,
       });
 
@@ -293,7 +316,7 @@ export const StudentAuthModal: React.FC = () => {
   return (
     <div
       id="student-auth-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1A3153]/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3153]/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
@@ -305,10 +328,10 @@ export const StudentAuthModal: React.FC = () => {
     >
       <div
         id="student-auth-modal-card"
-        className="relative w-full max-w-lg bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]"
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-2xl p-5 box-border bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30">
+        <div className="flex items-center justify-between pb-3 border-b border-[#A7C7E7]/30 text-[#1A3153]">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl bg-[#E09B30]/20 border border-[#E09B30] flex items-center justify-center text-[#E09B30]">
               <Sparkles size={18} />
@@ -316,7 +339,7 @@ export const StudentAuthModal: React.FC = () => {
             <div>
               <h2
                 id="auth-modal-title"
-                className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug"
+                className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug text-[#1A3153]"
               >
                 {isSignInMode
                   ? t.authModal.titleSignIn
@@ -324,7 +347,7 @@ export const StudentAuthModal: React.FC = () => {
                   ? t.authModal.step1Title
                   : t.authModal.step2Title}
               </h2>
-              <p className="text-[11px] text-[#A7C7E7]">Teacher Ivan • English Classes</p>
+              <p className="text-[11px] text-[#4A5568]">Teacher Ivan • English Classes</p>
             </div>
           </div>
 
@@ -332,7 +355,7 @@ export const StudentAuthModal: React.FC = () => {
             id="close-auth-modal-btn"
             type="button"
             onClick={closeAuthModal}
-            className="w-8 h-8 rounded-full bg-[#FAFAFA]/10 hover:bg-[#FAFAFA]/20 text-[#FAFAFA] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-[#1A3153]/10 hover:bg-[#1A3153]/20 text-[#1A3153] flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X size={16} />
@@ -340,7 +363,7 @@ export const StudentAuthModal: React.FC = () => {
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-4">
+        <div className="pt-4 overflow-y-auto space-y-4">
           {/* Custom Banner if opened from locked feature */}
           {authModalBanner && (
             <div
@@ -417,7 +440,7 @@ export const StudentAuthModal: React.FC = () => {
           )}
 
           {/* ========================================================================= */}
-          {/* SIGN IN FORM (Returning Students & Teacher Ivan Admin Login)              */}
+          {/* SIGN IN FORM (Standard Login for Returning Students & Admin)               */}
           {/* ========================================================================= */}
           {isSignInMode ? (
             <form onSubmit={handleSignInSubmit} className="space-y-4">
@@ -433,7 +456,25 @@ export const StudentAuthModal: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ivan@teacherivan.com or student email"
+                    placeholder={t.authModal.emailPlaceholder}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.phoneLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="tel"
+                    id="auth-signin-phone-input"
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder={t.authModal.phonePlaceholder}
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
@@ -454,10 +495,6 @@ export const StudentAuthModal: React.FC = () => {
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
-                <p className="text-[10px] text-[#4A5568]/80 mt-1 flex items-center gap-1">
-                  <KeyRound size={11} className="text-[#E09B30]" />
-                  <span>{t.authModal.passwordAdminNote}</span>
-                </p>
               </div>
 
               <button
@@ -554,6 +591,25 @@ export const StudentAuthModal: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t.authModal.emailPlaceholder}
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                  />
+                </div>
+              </div>
+
+              {/* Phone Number */}
+              <div>
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  {t.authModal.phoneLabel} <span className="text-[#E09B30]">*</span>
+                </label>
+                <div className="relative">
+                  <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <input
+                    type="tel"
+                    id="auth-phone-input"
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder={t.authModal.phonePlaceholder}
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>

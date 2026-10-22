@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AuthState, UserProfile, LearningGoals } from './types';
+import { AuthState, UserProfile, LearningGoals, StudentPlan } from './types';
 import { getApiUrl } from '../../config/api';
 import { useDevModeStore } from '../dev/devModeStore';
 
@@ -279,6 +279,81 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
       // Background sync with server
       get().syncWithServer().catch(() => {});
+    },
+
+    updateUserPlan: async (userId: string, plan: StudentPlan) => {
+      const res = await fetch(getApiUrl(`/api/users/${userId}/plan`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to update user plan');
+      }
+
+      const updatedUser: UserProfile = data.user;
+      const currentUser = get().user;
+      if (currentUser && currentUser.id === userId) {
+        safeSetItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+        set({ user: updatedUser });
+      }
+      return updatedUser;
+    },
+
+    checkAndIncrementSessionQuota: () => {
+      const { user } = get();
+      const todayIso = new Date().toISOString().split('T')[0];
+
+      // If unregistered / guest: track in localStorage
+      if (!user) {
+        const guestDateKey = 'teacherivan_guest_session_date';
+        const guestUsedKey = 'teacherivan_guest_session_used';
+        const lastDate = safeGetItem(guestDateKey);
+        let used = parseInt(safeGetItem(guestUsedKey) || '0', 10);
+        if (lastDate !== todayIso) {
+          used = 0;
+          safeSetItem(guestDateKey, todayIso);
+        }
+        if (used >= 5) {
+          return { allowed: false, remaining: 0, used, max: 5 };
+        }
+        used += 1;
+        safeSetItem(guestUsedKey, String(used));
+        return { allowed: true, remaining: 5 - used, used, max: 5 };
+      }
+
+      const plan = user.plan || (user.role === 'admin' ? 'executive' : 'free');
+      let max = user.maxDailySessions !== undefined ? user.maxDailySessions : (plan === 'essential' ? 10 : plan === 'free' ? 5 : -1);
+      if (user.role === 'admin' || plan === 'pro' || plan === 'executive') {
+        max = -1; // unlimited
+      }
+
+      let used = user.dailySessionsUsed || 0;
+      if (user.lastSessionDate !== todayIso) {
+        used = 0;
+      }
+
+      if (max !== -1 && used >= max) {
+        return { allowed: false, remaining: 0, used, max };
+      }
+
+      const newUsed = used + 1;
+      const updatedUser: UserProfile = {
+        ...user,
+        dailySessionsUsed: newUsed,
+        lastSessionDate: todayIso,
+      };
+
+      safeSetItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+      set({ user: updatedUser });
+
+      return {
+        allowed: true,
+        remaining: max === -1 ? 'unlimited' : Math.max(0, max - newUsed),
+        used: newUsed,
+        max,
+      };
     },
 
     signOut: () => {

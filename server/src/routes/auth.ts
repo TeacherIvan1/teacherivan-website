@@ -5,17 +5,20 @@ const router = Router();
 
 /**
  * POST /api/auth/register
- * Body: { fullName: string, email: string, dateOfBirth: string, country: string }
+ * Body: { fullName: string, email: string, phoneNumber: string, dateOfBirth: string, country: string }
  */
 router.post('/register', (req: Request, res: Response) => {
   try {
-    const { fullName, email, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
+    const { fullName, email, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
 
     if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
       return res.status(400).json({ error: 'Full name is required' });
     }
     if (!email || typeof email !== 'string' || !email.includes('@') || !email.includes('.')) {
       return res.status(400).json({ error: 'Valid email address is required' });
+    }
+    if (!phoneNumber || typeof phoneNumber !== 'string' || !phoneNumber.trim()) {
+      return res.status(400).json({ error: 'Phone number is required' });
     }
     if (!dateOfBirth || typeof dateOfBirth !== 'string' || !dateOfBirth.trim()) {
       return res.status(400).json({ error: 'Date of birth is required' });
@@ -27,6 +30,7 @@ router.post('/register', (req: Request, res: Response) => {
     const user = userStore.upsertUser({
       fullName,
       email,
+      phoneNumber,
       dateOfBirth,
       country,
       authProvider: 'email',
@@ -51,15 +55,18 @@ router.post('/register', (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/login
- * Body: { email: string, password?: string }
+ * Body: { email: string, phoneNumber?: string, password?: string }
  * Handles admin credential login (returning role: 'admin') and returning student login.
  */
 router.post('/login', (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body || {};
+    const { email, phoneNumber, password } = req.body || {};
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return res.status(400).json({ error: 'Valid email address is required' });
+    }
+    if (!phoneNumber || typeof phoneNumber !== 'string' || !phoneNumber.trim()) {
+      return res.status(400).json({ error: 'Phone number is required' });
     }
 
     const normEmail = userStore.normalizeEmail(email);
@@ -75,7 +82,9 @@ router.post('/login', (req: Request, res: Response) => {
         admin = userStore.upsertUser({
           fullName: 'Teacher Ivan (Admin)',
           email: normEmail,
+          phoneNumber: phoneNumber.trim(),
           role: 'admin',
+          plan: 'executive',
           profileCompleted: true,
         });
       }
@@ -94,10 +103,16 @@ router.post('/login', (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Account not found. Please register first.' });
     }
 
-    const token = userStore.createSessionToken(existing.id, existing.role || 'student');
+    // Update phone number if provided
+    if (phoneNumber && phoneNumber.trim()) {
+      userStore.updateUserProfile({ email: normEmail }, { phoneNumber: phoneNumber.trim() });
+    }
+
+    const freshUser = userStore.findByEmail(normEmail) || existing;
+    const token = userStore.createSessionToken(freshUser.id, freshUser.role || 'student');
     return res.status(200).json({
       status: 'ok',
-      user: existing,
+      user: freshUser,
       token,
     });
   } catch (err: unknown) {
@@ -114,7 +129,7 @@ router.post('/login', (req: Request, res: Response) => {
  */
 router.put('/profile', (req: Request, res: Response) => {
   try {
-    const { id, email, learningGoals, cefrLevel, fullName, country, dateOfBirth } = req.body || {};
+    const { id, email, learningGoals, cefrLevel, fullName, phoneNumber, country, dateOfBirth } = req.body || {};
 
     if (!id && !email) {
       return res.status(400).json({ error: 'Student ID or email is required to update profile' });
@@ -130,6 +145,7 @@ router.put('/profile', (req: Request, res: Response) => {
         learningGoals,
         cefrLevel: cefrLevel || learningGoals.targetLevel,
         fullName,
+        phoneNumber,
         country,
         dateOfBirth,
         profileCompleted: true,
@@ -153,11 +169,11 @@ router.put('/profile', (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/google
- * Body: { email: string, fullName: string, googleId?: string, dateOfBirth?: string, country?: string }
+ * Body: { email: string, fullName: string, phoneNumber?: string, googleId?: string, dateOfBirth?: string, country?: string }
  */
 router.post('/google', (req: Request, res: Response) => {
   try {
-    const { email, fullName, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
+    const { email, fullName, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return res.status(400).json({ error: 'Valid Google email is required' });
@@ -167,10 +183,13 @@ router.post('/google', (req: Request, res: Response) => {
 
     // If student already has completed profile
     if (existing && existing.profileCompleted && !learningGoals) {
+      if (phoneNumber && phoneNumber.trim()) {
+        userStore.updateUserProfile({ email }, { phoneNumber: phoneNumber.trim() });
+      }
       const token = userStore.createSessionToken(existing.id);
       return res.status(200).json({
         status: 'ok',
-        user: existing,
+        user: userStore.findByEmail(email) || existing,
         token,
         needsProfileCompletion: false,
       });
@@ -181,6 +200,7 @@ router.post('/google', (req: Request, res: Response) => {
       const user = userStore.upsertUser({
         fullName: fullName || existing?.fullName || 'Google Student',
         email,
+        phoneNumber: phoneNumber || existing?.phoneNumber,
         dateOfBirth,
         country,
         authProvider: 'google',
@@ -201,6 +221,7 @@ router.post('/google', (req: Request, res: Response) => {
     const tempUser = userStore.upsertUser({
       fullName: fullName || existing?.fullName || 'Google Student',
       email,
+      phoneNumber: phoneNumber || existing?.phoneNumber,
       authProvider: 'google',
     });
     const token = userStore.createSessionToken(tempUser.id);
@@ -232,6 +253,7 @@ router.post('/sync', (req: Request, res: Response) => {
     const user = userStore.upsertUser({
       fullName: userPayload.fullName,
       email: userPayload.email,
+      phoneNumber: userPayload.phoneNumber,
       dateOfBirth: userPayload.dateOfBirth,
       country: userPayload.country,
       authProvider: userPayload.authProvider || 'email',
@@ -250,6 +272,36 @@ router.post('/sync', (req: Request, res: Response) => {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[POST /api/auth/sync Error]:', msg);
     return res.status(500).json({ error: 'Internal server error during sync' });
+  }
+});
+
+/**
+ * PUT /api/auth/plan or /api/auth/:id/plan
+ * Manual Plan Assignment by Admin
+ */
+router.put('/:id/plan', (req: Request, res: Response) => {
+  try {
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+    const { plan } = req.body || {};
+
+    if (!['free', 'essential', 'pro', 'executive'].includes(plan)) {
+      return res.status(400).json({ error: 'Invalid plan. Allowed: free, essential, pro, executive' });
+    }
+
+    const updated = userStore.updateUserPlan(id, plan);
+    if (!updated) {
+      return res.status(404).json({ error: 'Student not found in database' });
+    }
+
+    return res.status(200).json({
+      status: 'ok',
+      user: updated,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[PUT /api/auth/:id/plan Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error updating user plan' });
   }
 });
 

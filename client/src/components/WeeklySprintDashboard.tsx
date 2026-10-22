@@ -28,6 +28,7 @@ import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { TEACHER_PHONE, getWhatsAppUrl } from '../config/contact';
 import { MandatoryGoalsModal } from './MandatoryGoalsModal';
+import { RiggedCharacter } from './RiggedCharacter';
 
 export interface WeeklySprintDashboardProps {
   compact?: boolean;
@@ -283,11 +284,12 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* Left: Chibi Teacher Ivan Avatar with Ambient Frame & Speech Bubble */}
         <div className="flex items-center gap-4 sm:gap-5 w-full lg:w-auto">
           <div className="relative shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30] p-1.5 flex items-center justify-center shadow-lg shadow-[#E09B30]/20">
-              <img
-                src="/assets/characters/ivan-pose-celebrate.svg"
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30] p-1 flex items-center justify-center shadow-lg shadow-[#E09B30]/20 overflow-hidden">
+              <RiggedCharacter
+                persona="teacher-ivan"
+                state="idle"
+                className="w-full h-full"
                 alt="Teacher Ivan Mascot"
-                className="w-full h-full object-contain filter drop-shadow-sm"
               />
             </div>
             <div className="absolute -bottom-1 -right-1 bg-[#E09B30] text-[#1A3153] p-1 rounded-full shadow-sm">

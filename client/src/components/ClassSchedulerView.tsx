@@ -67,6 +67,7 @@ export const ClassSchedulerView: React.FC = () => {
   const { t, isEs } = useTranslation();
 
   const [weekOffset, setWeekOffset] = useState<number>(0); // 0 = current, 1 = next
+  const [selectedMobileDayIndex, setSelectedMobileDayIndex] = useState<number>(0);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -82,9 +83,12 @@ export const ClassSchedulerView: React.FC = () => {
     const iso = formatIsoDate(d);
     const dayNamesEn = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const dayNamesEs = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const shortNamesEn = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    const shortNamesEs = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
     return {
       dateStr: iso,
       dayName: isEs ? dayNamesEs[i] : dayNamesEn[i],
+      shortName: isEs ? shortNamesEs[i] : shortNamesEn[i],
       displayDate: `${d.getDate()}/${d.getMonth() + 1}`,
     };
   });
@@ -110,13 +114,13 @@ export const ClassSchedulerView: React.FC = () => {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="py-12 px-4 max-w-4xl mx-auto w-full text-center space-y-4">
-        <div className="p-8 rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-xl space-y-4">
-          <CalendarDays size={48} className="mx-auto text-[#E09B30]" />
-          <h2 className="font-montserrat font-extrabold text-2xl text-[#FAFAFA]">
+      <div className="py-8 sm:py-12 px-3 sm:px-4 max-w-4xl mx-auto w-full text-center space-y-4">
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-xl space-y-4">
+          <CalendarDays size={44} className="mx-auto text-[#E09B30]" />
+          <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA]">
             {t.scheduling.title}
           </h2>
-          <p className="font-inter text-sm text-[#A7C7E7] max-w-md mx-auto">
+          <p className="font-inter text-xs sm:text-sm text-[#A7C7E7] max-w-md mx-auto">
             {t.scheduling.subtitle}
           </p>
           <button
@@ -131,22 +135,59 @@ export const ClassSchedulerView: React.FC = () => {
     );
   }
 
-  // Find user's active booking for this week
+  // Determine user's plan and weekly limits
+  const userPlan = user.plan || (user.role === 'admin' ? 'executive' : 'free');
+  const maxWeeklyClasses =
+    user.role === 'admin'
+      ? 3
+      : user.maxWeeklyClasses !== undefined
+      ? user.maxWeeklyClasses
+      : userPlan === 'executive'
+      ? 3
+      : userPlan === 'pro'
+      ? 2
+      : userPlan === 'essential'
+      ? 1
+      : 0;
+
+  // Find user's active bookings for this week
   const normUserEmail = user.email.toLowerCase().trim();
-  const myBooking = bookings.find(
+  const myBookings = bookings.filter(
     (b) => b.studentId === user.id || b.studentEmail.toLowerCase().trim() === normUserEmail
   );
+
+  const getPlanBadgeLabel = () => {
+    switch (userPlan) {
+      case 'essential':
+        return isEs ? 'Plan Essential (1 clase/sem)' : 'Essential Plan (1 class/wk)';
+      case 'pro':
+        return isEs ? 'Plan Pro (2 clases/sem)' : 'Pro Plan (2 classes/wk)';
+      case 'executive':
+        return isEs ? 'Plan Executive (3 clases/sem)' : 'Executive Plan (3 classes/wk)';
+      default:
+        return isEs ? 'Plan Gratuito (0 clases en vivo)' : 'Free Plan (0 live classes)';
+    }
+  };
 
   const handleBookSlot = async (dateStr: string, startTime: string) => {
     setActionError(null);
     setActionSuccess(null);
 
-    if (myBooking) {
-      setActionError(
-        isEs
-          ? `Ya tienes una clase agendada el ${myBooking.date} a las ${myBooking.startTime}. Reprograma primero si deseas cambiar de horario.`
-          : `You already have a class on ${myBooking.date} at ${myBooking.startTime}. Reschedule it first to pick another slot.`
-      );
+    // If Free Plan, prompt student to activate plan via WhatsApp
+    if (maxWeeklyClasses === 0 || userPlan === 'free') {
+      const upgradeMsg = isEs
+        ? 'El Plan Gratuito incluye 5 sesiones diarias de Simulador IA, pero no incluye clases en vivo 1 a 1. ¡Escríbele a Teacher Ivan por WhatsApp para activar tu plan Essential, Pro o Executive!'
+        : 'The Free Plan includes 5 daily AI Simulator sessions, but does not include 1-on-1 live classes. Message Teacher Ivan on WhatsApp to activate your Essential, Pro, or Executive plan!';
+      setActionError(upgradeMsg);
+      return;
+    }
+
+    // Check if user already booked maximum allowed classes for this week
+    if (myBookings.length >= maxWeeklyClasses) {
+      const limitMsg = isEs
+        ? `Has alcanzado tu límite semanal (${myBookings.length}/${maxWeeklyClasses} clases agendadas). Reprograma una clase existente si deseas cambiar de horario.`
+        : `You have reached your weekly limit (${myBookings.length}/${maxWeeklyClasses} classes booked). Reschedule an existing booking to pick a different time.`;
+      setActionError(limitMsg);
       return;
     }
 
@@ -227,44 +268,49 @@ export const ClassSchedulerView: React.FC = () => {
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(rawMsg)}`;
   };
 
+  const selectedMobileDay = weekDays[selectedMobileDayIndex] || weekDays[0];
+
   return (
     <div
       id="class-scheduler-view"
-      className="py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200"
+      className="py-4 sm:py-6 px-3 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-5 sm:gap-6 animate-in fade-in duration-200 overflow-hidden"
     >
       {/* Header Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#12223a] to-[#1A3153] border-2 border-[#E09B30]/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="p-4 sm:p-7 rounded-3xl bg-gradient-to-r from-[#12223a] to-[#1A3153] border-2 border-[#E09B30]/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/20 border border-[#E09B30] text-[#E09B30] text-xs font-montserrat font-bold uppercase tracking-wider">
-            <Sparkles size={14} />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/20 border border-[#E09B30] text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
+            <Sparkles size={13} />
             <span>1-on-1 Bichronous Coaching</span>
           </div>
-          <h1 className="font-montserrat font-extrabold text-2xl sm:text-3xl text-[#FAFAFA] tracking-tight">
+          <h1 className="font-montserrat font-extrabold text-xl sm:text-3xl text-[#FAFAFA] tracking-tight">
             {t.scheduling.title}
           </h1>
           <p className="font-inter text-xs sm:text-sm text-[#A7C7E7] max-w-2xl leading-relaxed">
             {t.scheduling.subtitle}
           </p>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-[#FAFAFA] pt-1">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-[#FAFAFA] pt-1">
             <span className="flex items-center gap-1.5 text-[#E09B30] font-semibold">
               <Clock size={14} />
               <span>{t.scheduling.boliviaTimeNotice}</span>
             </span>
-            <span className="flex items-center gap-1 text-[#A7C7E7]">
-              <ShieldCheck size={14} />
-              <span>Limit: 1 active class / week</span>
+            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 text-[#A7C7E7]">
+              <ShieldCheck size={13} className="text-[#E09B30]" />
+              <span className="font-bold text-[#FAFAFA]">{getPlanBadgeLabel()}</span>
+            </span>
+            <span className="text-[11px] text-[#A7C7E7]">
+              {myBookings.length} / {maxWeeklyClasses} {isEs ? 'clases agendadas' : 'classes booked'}
             </span>
           </div>
         </div>
 
         {/* Week Switcher Navigation */}
-        <div className="flex items-center gap-2 bg-[#1A3153] p-1.5 rounded-2xl border border-[#A7C7E7]/30 shadow-inner self-stretch md:self-auto justify-between">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#1A3153] p-1.5 rounded-2xl border border-[#A7C7E7]/30 shadow-inner self-stretch md:self-auto justify-between">
           <button
             type="button"
             id="scheduler-prev-week-btn"
             disabled={weekOffset === 0}
             onClick={() => setWeekOffset(0)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-montserrat font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-2 rounded-xl text-xs font-montserrat font-bold flex items-center gap-1 transition-all cursor-pointer ${
               weekOffset === 0
                 ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
                 : 'text-[#A7C7E7] hover:text-[#FAFAFA] disabled:opacity-40 disabled:cursor-not-allowed'
@@ -279,7 +325,7 @@ export const ClassSchedulerView: React.FC = () => {
             id="scheduler-next-week-btn"
             disabled={weekOffset === 1}
             onClick={() => setWeekOffset(1)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-montserrat font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-2 rounded-xl text-xs font-montserrat font-bold flex items-center gap-1 transition-all cursor-pointer ${
               weekOffset === 1
                 ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
                 : 'text-[#A7C7E7] hover:text-[#FAFAFA] disabled:opacity-40 disabled:cursor-not-allowed'
@@ -301,6 +347,37 @@ export const ClassSchedulerView: React.FC = () => {
         </div>
       </div>
 
+      {/* Free Plan Activation Banner (If user has 0 weekly classes) */}
+      {maxWeeklyClasses === 0 && (
+        <div
+          id="free-plan-upgrade-banner"
+          className="p-4 sm:p-5 rounded-2xl bg-[#E09B30]/15 border-2 border-[#E09B30] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg animate-in fade-in"
+        >
+          <div className="space-y-1">
+            <h3 className="font-montserrat font-extrabold text-sm sm:text-base text-[#FAFAFA] flex items-center gap-2">
+              <Sparkles size={16} className="text-[#E09B30]" />
+              <span>{isEs ? 'Activa tu Plan para Agendar Clases en Vivo' : 'Activate a Plan to Book Live Classes'}</span>
+            </h3>
+            <p className="text-xs text-[#A7C7E7] max-w-xl">
+              {isEs
+                ? 'Tu cuenta gratuita incluye 5 sesiones diarias de Simulador IA. Para reservar clases semanales 1 a 1 de 1 hora (14:00–20:00 Bolivia), activa tu plan Essential, Pro o Executive vía WhatsApp.'
+                : 'Your free account includes 5 daily AI Simulator sessions. To book weekly 1-hour live classes (14:00–20:00 Bolivia), activate your Essential, Pro, or Executive plan via WhatsApp.'}
+            </p>
+          </div>
+          <a
+            id="scheduler-activate-whatsapp-btn"
+            href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Deseo%20activar%20mi%20plan%20de%20clases%20en%20vivo%201%20a%201."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shrink-0 cursor-pointer"
+          >
+            <MessageCircle size={15} />
+            <span>{isEs ? 'Activar Plan por WhatsApp' : 'Activate Plan on WhatsApp'}</span>
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      )}
+
       {/* Notifications / Alerts */}
       {actionSuccess && (
         <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-400/40 text-emerald-200 text-xs flex items-center justify-between gap-3 animate-in fade-in">
@@ -319,68 +396,86 @@ export const ClassSchedulerView: React.FC = () => {
       )}
 
       {actionError && (
-        <div className="p-4 rounded-2xl bg-red-500/15 border border-red-400/40 text-red-200 text-xs flex items-center justify-between gap-3 animate-in fade-in">
+        <div className="p-4 rounded-2xl bg-red-500/15 border border-red-400/40 text-red-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
           <div className="flex items-center gap-2">
             <AlertCircle size={16} className="text-red-400 shrink-0" />
             <span>{actionError}</span>
           </div>
-          <button
-            type="button"
-            onClick={() => setActionError(null)}
-            className="text-xs underline hover:text-white cursor-pointer"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+            {(maxWeeklyClasses === 0 || userPlan === 'free') && (
+              <a
+                href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Quiero%20activar%20mi%20plan%20de%20clases%20de%20ingl%C3%A9s."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1 rounded-full bg-[#10b981] text-white font-montserrat font-bold text-[11px] uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+              >
+                <MessageCircle size={12} />
+                <span>WhatsApp</span>
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => setActionError(null)}
+              className="text-xs underline hover:text-white cursor-pointer px-1"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Active Student Booking Highlight Card */}
-      {myBooking ? (
-        <div
-          id="student-active-booking-card"
-          className="p-5 rounded-3xl bg-gradient-to-r from-[#E09B30]/20 via-[#1A3153] to-[#12223a] border-2 border-[#E09B30] shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-        >
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider">
-                {t.scheduling.yourClass}
-              </span>
-              <span className="text-xs text-[#FAFAFA] font-bold">
-                {myBooking.date} ({myBooking.dayOfWeek})
-              </span>
+      {/* Active Student Booking Highlight Cards */}
+      {myBookings.length > 0 ? (
+        <div className="space-y-3">
+          {myBookings.map((booking) => (
+            <div
+              key={booking.id}
+              id={`student-active-booking-${booking.id}`}
+              className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#E09B30]/20 via-[#1A3153] to-[#12223a] border-2 border-[#E09B30] shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider">
+                    {t.scheduling.yourClass}
+                  </span>
+                  <span className="text-xs text-[#FAFAFA] font-bold">
+                    {booking.date} ({booking.dayOfWeek})
+                  </span>
+                </div>
+                <p className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA] flex items-center gap-2">
+                  <Clock size={18} className="text-[#E09B30]" />
+                  <span>{booking.startTime} – {booking.endTime} (Bolivia Time)</span>
+                </p>
+                <p className="text-xs text-[#A7C7E7]">
+                  Goal: <span className="text-[#FAFAFA] font-semibold">{booking.learningGoal}</span>
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                <a
+                  id={`confirm-booking-whatsapp-btn-${booking.id}`}
+                  href={getWhatsAppConfirmationUrl(booking)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 md:flex-none px-5 py-2.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 cursor-pointer"
+                >
+                  <MessageCircle size={15} />
+                  <span>{t.scheduling.confirmWhatsApp}</span>
+                  <ExternalLink size={12} />
+                </a>
+
+                <button
+                  id={`reschedule-booking-btn-${booking.id}`}
+                  type="button"
+                  onClick={() => handleCancelBooking(booking.id)}
+                  disabled={isLoading}
+                  className="px-4 py-2.5 rounded-full bg-[#FAFAFA]/10 hover:bg-red-500/20 text-red-300 border border-red-400/30 font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+                >
+                  {t.scheduling.reschedule}
+                </button>
+              </div>
             </div>
-            <p className="font-montserrat font-extrabold text-lg text-[#FAFAFA] flex items-center gap-2">
-              <Clock size={18} className="text-[#E09B30]" />
-              <span>{myBooking.startTime} – {myBooking.endTime} (Bolivia Time)</span>
-            </p>
-            <p className="text-xs text-[#A7C7E7]">
-              Goal: <span className="text-[#FAFAFA] font-semibold">{myBooking.learningGoal}</span>
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            <a
-              id="confirm-booking-whatsapp-btn"
-              href={getWhatsAppConfirmationUrl(myBooking)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 md:flex-none px-5 py-2.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 cursor-pointer"
-            >
-              <MessageCircle size={15} />
-              <span>{t.scheduling.confirmWhatsApp}</span>
-              <ExternalLink size={12} />
-            </a>
-
-            <button
-              id="reschedule-booking-btn"
-              type="button"
-              onClick={() => handleCancelBooking(myBooking.id)}
-              disabled={isLoading}
-              className="px-4 py-2.5 rounded-full bg-[#FAFAFA]/10 hover:bg-red-500/20 text-red-300 border border-red-400/30 font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-            >
-              {t.scheduling.reschedule}
-            </button>
-          </div>
+          ))}
         </div>
       ) : (
         <div className="p-4 rounded-2xl bg-[#12223a] border border-[#A7C7E7]/25 text-xs text-[#A7C7E7] flex items-center gap-2.5">
@@ -389,9 +484,121 @@ export const ClassSchedulerView: React.FC = () => {
         </div>
       )}
 
-      {/* Monday–Friday Interactive Weekly Schedule Grid */}
-      <div className="rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-2xl p-4 sm:p-6 overflow-x-auto">
-        <div className="min-w-[680px]">
+      {/* ========================================================================= */}
+      {/* MOBILE DAY SELECTOR PILL BAR (<768px): ZERO HORIZONTAL OVERFLOW            */}
+      {/* ========================================================================= */}
+      <div className="md:hidden flex flex-col gap-3">
+        {/* Day Selector Pill Bar (Mon | Tue | Wed | Thu | Fri) */}
+        <div
+          id="mobile-scheduler-day-pills"
+          className="flex items-center justify-between gap-1 p-1 bg-[#1A3153] rounded-2xl border border-[#A7C7E7]/25 w-full"
+        >
+          {weekDays.map((d, idx) => {
+            const isSelected = selectedMobileDayIndex === idx;
+            return (
+              <button
+                key={d.dateStr}
+                type="button"
+                id={`mobile-day-pill-${idx}`}
+                onClick={() => setSelectedMobileDayIndex(idx)}
+                className={`flex-1 py-2 px-1 rounded-xl text-center transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#E09B30] text-[#1A3153] font-bold shadow-md'
+                    : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
+                }`}
+              >
+                <div className="text-xs font-montserrat font-extrabold truncate">
+                  {d.shortName}
+                </div>
+                <div className="text-[10px] opacity-80 font-mono mt-0.5">
+                  {d.displayDate}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected Day Header */}
+        <div className="flex items-center justify-between px-1 text-xs text-[#FAFAFA]">
+          <span className="font-montserrat font-bold text-[#E09B30]">
+            {selectedMobileDay.dayName} ({selectedMobileDay.displayDate})
+          </span>
+          <span className="text-[11px] text-[#A7C7E7]">14:00 – 20:00 Bolivia</span>
+        </div>
+
+        {/* 6 Time Slots Vertical List for the Selected Day */}
+        <div className="space-y-2.5">
+          {VALID_HOURS.map((hour) => {
+            const existingBooking = bookings.find(
+              (b) => b.date === selectedMobileDay.dateStr && b.startTime === hour.start
+            );
+            const isMySlot = Boolean(
+              existingBooking &&
+                (existingBooking.studentId === user.id ||
+                  existingBooking.studentEmail.toLowerCase().trim() === normUserEmail)
+            );
+            const isBookedByOther = Boolean(existingBooking && !isMySlot);
+
+            if (isMySlot) {
+              return (
+                <div
+                  key={`mobile-${selectedMobileDay.dateStr}-${hour.start}`}
+                  id={`mobile-slot-${selectedMobileDay.dateStr}-${hour.start.replace(':', '')}`}
+                  className="p-3.5 rounded-2xl bg-[#E09B30] text-[#1A3153] border-2 border-[#FAFAFA] shadow-md flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <UserCheck size={16} />
+                    <span className="font-montserrat font-extrabold text-xs">{hour.label}</span>
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    {t.scheduling.yourClass}
+                  </span>
+                </div>
+              );
+            }
+
+            if (isBookedByOther) {
+              return (
+                <div
+                  key={`mobile-${selectedMobileDay.dateStr}-${hour.start}`}
+                  id={`mobile-slot-${selectedMobileDay.dateStr}-${hour.start.replace(':', '')}`}
+                  className="p-3.5 rounded-2xl bg-[#1A3153]/40 border border-[#A7C7E7]/15 text-[#A7C7E7]/40 flex items-center justify-between select-none"
+                >
+                  <span className="font-montserrat font-semibold text-xs">{hour.label}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                    {t.scheduling.bookedSlot}
+                  </span>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={`mobile-${selectedMobileDay.dateStr}-${hour.start}`}
+                id={`mobile-slot-${selectedMobileDay.dateStr}-${hour.start.replace(':', '')}`}
+                type="button"
+                disabled={isLoading}
+                onClick={() => handleBookSlot(selectedMobileDay.dateStr, hour.start)}
+                className="w-full p-3.5 rounded-2xl bg-[#FAFAFA] text-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-2">
+                  <CalendarIcon size={14} className="text-[#E09B30]" />
+                  <span className="text-xs font-montserrat font-bold">{hour.label}</span>
+                </div>
+                <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#4A5568]">
+                  {t.scheduling.availableSlot}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* DESKTOP 5-COLUMN SCHEDULE GRID (>=768px): FULL WEEK VIEW                   */}
+      {/* ========================================================================= */}
+      <div className="hidden md:block rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-2xl p-6 overflow-hidden">
+        <div>
           {/* Day Columns Header */}
           <div className="grid grid-cols-5 gap-3 pb-4 border-b border-[#A7C7E7]/20 text-center">
             {weekDays.map((d) => (

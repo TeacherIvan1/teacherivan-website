@@ -81,12 +81,12 @@ export const WeeklyReportModal: React.FC = () => {
   return (
     <div
       id="weekly-report-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1A3153]/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3153]/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Weekly Pedagogical Progress Report"
     >
-      <div className="relative w-full max-w-2xl bg-[#12223a] border-2 border-[#E09B30]/50 rounded-3xl shadow-2xl p-6 sm:p-8 text-[#FAFAFA] flex flex-col gap-6 my-auto max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-2xl max-h-[88dvh] overflow-y-auto rounded-2xl p-4 sm:p-5 box-border bg-[#12223a] border-2 border-[#E09B30]/50 shadow-2xl text-[#FAFAFA] flex flex-col gap-6 my-auto">
         {/* Header Bar */}
         <div className="flex items-start justify-between gap-4 border-b border-[#A7C7E7]/20 pb-4">
           <div className="flex items-center gap-3">

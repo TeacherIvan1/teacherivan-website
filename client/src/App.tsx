@@ -262,12 +262,13 @@ export const App: React.FC = () => {
             )}
 
             <a
-              href={getWhatsAppUrl('Hola Teacher Ivan! Me gustaría consultar por clases 1 a 1 de inglés.')}
+              id="footer-direct-whatsapp-btn"
+              href="https://wa.me/59172878330"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#10b981] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+              className="px-4 py-2 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
             >
-              💬 WhatsApp ({TEACHER_PHONE})
+              <span>{isEs ? '💬 Contactar a Teacher Ivan por WhatsApp' : '💬 Contact Teacher Ivan on WhatsApp'}</span>
             </a>
           </div>
         </div>

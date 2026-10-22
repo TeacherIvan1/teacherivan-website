@@ -105,4 +105,28 @@ test('UserStore - registration, upsert and retrieval', (t) => {
 
   // 9. Verify total users (Admin + Maria + Carlos = 3)
   assert.equal(store.getAllUsers().length, 3);
+
+  // 10. Default plan for new student is 'free' with 5 sessions/day and 0 classes/week
+  assert.equal(user1.plan, 'free');
+  assert.equal(user1.maxDailySessions, 5);
+  assert.equal(user1.maxWeeklyClasses, 0);
+
+  // 11. Admin updates student plan to 'essential' (1 class/wk, 10 sessions/day)
+  const updatedToEssential = store.updateUserPlan(user1.id, 'essential');
+  assert.ok(updatedToEssential);
+  assert.equal(updatedToEssential?.plan, 'essential');
+  assert.equal(updatedToEssential?.maxWeeklyClasses, 1);
+  assert.equal(updatedToEssential?.maxDailySessions, 10);
+
+  // 12. Quota check & increment
+  const q1 = store.checkAndIncrementDailyQuota(user1.id);
+  assert.equal(q1.allowed, true);
+  assert.equal(q1.quota.used, 1);
+  assert.equal(q1.quota.max, 10);
+
+  // 13. Update to 'pro' (unlimited simulator: max -1, 2 classes/wk)
+  const updatedToPro = store.updateUserPlan(user1.id, 'pro');
+  assert.equal(updatedToPro?.plan, 'pro');
+  assert.equal(updatedToPro?.maxDailySessions, -1);
+  assert.equal(updatedToPro?.maxWeeklyClasses, 2);
 });

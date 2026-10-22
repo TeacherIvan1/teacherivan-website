@@ -106,7 +106,7 @@ export const StudentReportModal: React.FC = () => {
   return (
     <div
       id="student-report-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1A3153]/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3153]/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="student-report-title"
@@ -118,7 +118,7 @@ export const StudentReportModal: React.FC = () => {
     >
       <div
         id="student-report-modal-card"
-        className="relative w-full max-w-2xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]"
+        className="relative w-full max-w-2xl max-h-[88dvh] overflow-y-auto rounded-2xl p-4 sm:p-5 box-border bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30">

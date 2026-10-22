@@ -5,14 +5,23 @@ export interface LearningGoals {
   personalObjective: string;
 }
 
+export type StudentPlan = 'free' | 'essential' | 'pro' | 'executive';
+
 export interface UserProfile {
   id: string;
   fullName: string;
   email: string;
+  phoneNumber?: string;
   dateOfBirth: string;
   country: string;
   authProvider: 'email' | 'google';
   role?: 'student' | 'admin';
+  plan?: StudentPlan;
+  planUpdatedAt?: string;
+  maxWeeklyClasses?: number;
+  maxDailySessions?: number;
+  dailySessionsUsed?: number;
+  lastSessionDate?: string;
   profileCompleted?: boolean;
   learningGoals?: LearningGoals;
   cefrLevel?: string;
@@ -54,6 +63,7 @@ export interface AuthState {
   registerWithEmail: (data: {
     fullName: string;
     email: string;
+    phoneNumber: string;
     dateOfBirth: string;
     country: string;
     learningGoals?: LearningGoals;
@@ -62,13 +72,16 @@ export interface AuthState {
   authenticateWithGoogle: (data: {
     email: string;
     fullName: string;
+    phoneNumber?: string;
     dateOfBirth?: string;
     country?: string;
     learningGoals?: LearningGoals;
     profileCompleted?: boolean;
   }) => Promise<{ needsProfileCompletion: boolean }>;
-  loginWithCredentials: (data: { email: string; password?: string }) => Promise<UserProfile>;
+  loginWithCredentials: (data: { email: string; phoneNumber?: string; password?: string }) => Promise<UserProfile>;
   saveProfileGoals: (goals: LearningGoals) => Promise<UserProfile>;
+  updateUserPlan: (userId: string, plan: StudentPlan) => Promise<UserProfile>;
+  checkAndIncrementSessionQuota: () => { allowed: boolean; remaining: number | 'unlimited'; used: number; max: number };
   syncWithServer: () => Promise<void>;
   updateUserStats: (cefrLevel: string, lastScore: number) => void;
   signOut: () => void;

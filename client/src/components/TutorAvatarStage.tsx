@@ -3,6 +3,7 @@ import { Mic, Volume2, Sparkles, Radio } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { RiggedCharacter } from './RiggedCharacter';
 
 export interface TutorAvatarStageProps {
   className?: string;
@@ -147,21 +148,15 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
           </div>
         )}
 
-        {/* The 2D Chibi Avatar Illustration */}
+        {/* The 2D Rigged Chibi Avatar with Live Dynamic Audio Visemes */}
         <div
-          className={`relative z-10 transition-transform duration-300 ${
-            isSpeaking
-              ? 'animate-speaking scale-105'
-              : isListening
-              ? 'animate-attentive'
-              : 'animate-float'
-          }`}
+          className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 flex items-center justify-center transition-transform duration-300"
         >
-          <img
-            src={avatarSrc}
-            alt={`${tutorName} Chibi Avatar`}
-            className="w-40 h-40 sm:w-48 sm:h-48 md:w-52 md:h-52 object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.45)] select-none"
-            draggable={false}
+          <RiggedCharacter
+            persona={persona === 'emma' ? 'emma' : 'teacher-ivan'}
+            state={isSpeaking ? 'speaking' : isListening ? 'listening' : 'idle'}
+            className="w-full h-full"
+            alt={`${tutorName} Rigged Chibi Avatar`}
           />
         </div>
 
