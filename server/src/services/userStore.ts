@@ -47,6 +47,7 @@ export interface User {
   role?: 'student' | 'admin';
   plan?: StudentPlan;
   planUpdatedAt?: string;
+  planNotificationPending?: boolean;
   maxWeeklyClasses?: number;
   maxDailySessions?: number;
   dailySessionsUsed?: number;
@@ -77,7 +78,7 @@ export class UserStore {
       this.dataFilePath = path.join(dataDir, 'users.json');
     }
     this.loadFromDisk();
-    this.seedAdminUser();
+    this.seedDefaultUsers(!customPath);
   }
 
   public normalizeEmail(email: string): string {
@@ -89,12 +90,14 @@ export class UserStore {
     return username.trim().toLowerCase().replace(/^@/, '');
   }
 
-  private seedAdminUser(): void {
-    const normAdminEmail = this.normalizeEmail(ADMIN_EMAIL);
-    const existing = this.users.get(normAdminEmail);
+  public seedDefaultUsers(seedStudents = true): void {
     const todayIso = new Date().toISOString().split('T')[0];
 
-    if (!existing) {
+    // 1. Seed Teacher Ivan Admin user strictly if not already present
+    const normAdminEmail = this.normalizeEmail(ADMIN_EMAIL);
+    const existingAdmin = this.users.get(normAdminEmail);
+
+    if (!existingAdmin) {
       const adminUser: User = {
         id: 'usr_admin_ivan',
         username: 'ivan',
@@ -108,6 +111,7 @@ export class UserStore {
         role: 'admin',
         plan: 'executive',
         planUpdatedAt: new Date().toISOString(),
+        planNotificationPending: false,
         maxWeeklyClasses: 99,
         maxDailySessions: -1,
         dailySessionsUsed: 0,
@@ -127,15 +131,80 @@ export class UserStore {
       this.saveToDisk();
     } else {
       let changed = false;
-      if (existing.username !== 'ivan') {
-        existing.username = 'ivan';
+      if (existingAdmin.username !== 'ivan') {
+        existingAdmin.username = 'ivan';
         changed = true;
       }
-      if (existing.password !== ADMIN_PASSWORD) {
-        existing.password = ADMIN_PASSWORD;
+      if (existingAdmin.password !== ADMIN_PASSWORD) {
+        existingAdmin.password = ADMIN_PASSWORD;
         changed = true;
       }
       if (changed) {
+        this.saveToDisk();
+      }
+    }
+
+    // 2. Seed Default Demo Students strictly if their emails do NOT exist
+    if (seedStudents) {
+      const defaultStudents: Partial<User>[] = [
+        {
+          id: 'usr_seed_sofia',
+          username: 'sofia',
+          password: 'Sofia2026!',
+          fullName: 'Sofia Rodriguez',
+          email: 'sofia@example.com',
+          phoneNumber: '+591 72878330',
+          dateOfBirth: '1998-05-12',
+          country: 'Bolivia',
+          authProvider: 'email',
+          role: 'student',
+          plan: 'free',
+          planUpdatedAt: new Date().toISOString(),
+          planNotificationPending: false,
+          maxWeeklyClasses: 0,
+          maxDailySessions: 5,
+          dailySessionsUsed: 0,
+          lastSessionDate: todayIso,
+          profileCompleted: false,
+          cefrLevel: 'B1',
+          createdAt: '2026-10-22T02:51:48.386Z',
+        },
+        {
+          id: 'usr_seed_ana',
+          username: 'ana',
+          password: 'Student2026!',
+          fullName: 'Ana Morales',
+          email: 'ana@example.com',
+          phoneNumber: '+591 70000000',
+          dateOfBirth: '2000-01-01',
+          country: 'Bolivia',
+          authProvider: 'email',
+          role: 'student',
+          plan: 'free',
+          planUpdatedAt: new Date().toISOString(),
+          planNotificationPending: false,
+          maxWeeklyClasses: 0,
+          maxDailySessions: 5,
+          dailySessionsUsed: 0,
+          lastSessionDate: todayIso,
+          profileCompleted: false,
+          cefrLevel: 'B2',
+          lastScore: 88,
+          createdAt: '2026-10-22T15:19:42.837Z',
+        },
+      ];
+
+      let seedAdded = false;
+      for (const s of defaultStudents) {
+        if (s.email) {
+          const norm = this.normalizeEmail(s.email);
+          if (!this.users.has(norm)) {
+            this.users.set(norm, s as User);
+            seedAdded = true;
+          }
+        }
+      }
+      if (seedAdded) {
         this.saveToDisk();
       }
     }
@@ -196,7 +265,9 @@ export class UserStore {
         fs.mkdirSync(dir, { recursive: true });
       }
       const list = Array.from(this.users.values());
-      fs.writeFileSync(this.dataFilePath, JSON.stringify(list, null, 2), 'utf8');
+      const tmpPath = `${this.dataFilePath}.${Date.now()}.${Math.random().toString(36).substring(2, 8)}.tmp`;
+      fs.writeFileSync(tmpPath, JSON.stringify(list, null, 2), 'utf8');
+      fs.renameSync(tmpPath, this.dataFilePath);
     } catch (err) {
       console.error('[UserStore] Error writing users to disk:', err);
     }
@@ -396,6 +467,7 @@ export class UserStore {
       role: isAdmin ? 'admin' : 'student',
       plan: userPlan,
       planUpdatedAt: new Date().toISOString(),
+      planNotificationPending: false,
       maxWeeklyClasses: isAdmin ? 99 : planDefaults.maxWeeklyClasses,
       maxDailySessions: isAdmin ? -1 : planDefaults.maxDailySessions,
       dailySessionsUsed: 0,
@@ -425,6 +497,7 @@ export class UserStore {
       ...user,
       plan: newPlan,
       planUpdatedAt: new Date().toISOString(),
+      planNotificationPending: newPlan !== 'free',
       maxWeeklyClasses: user.role === 'admin' ? 99 : planDefaults.maxWeeklyClasses,
       maxDailySessions: user.role === 'admin' ? -1 : planDefaults.maxDailySessions,
     };
@@ -432,6 +505,173 @@ export class UserStore {
     this.users.set(normEmail, updated);
     this.saveToDisk();
     return updated;
+  }
+
+  public ackPlanNotification(userIdOrEmail: string): User | null {
+    let user: User | undefined = this.findById(userIdOrEmail);
+    if (!user) {
+      user = this.findByEmail(userIdOrEmail);
+    }
+    if (!user) return null;
+
+    user.planNotificationPending = false;
+    this.saveToDisk();
+    return user;
+  }
+
+  public syncClientUser(clientUser: Partial<User>): User {
+    const normEmail = this.normalizeEmail(clientUser.email || '');
+    if (!normEmail) {
+      throw new Error('Valid email required for sync');
+    }
+
+    const existing = this.users.get(normEmail);
+    const isAdmin = normEmail === this.normalizeEmail(ADMIN_EMAIL) || clientUser.role === 'admin';
+    const todayIso = new Date().toISOString().split('T')[0];
+
+    if (existing) {
+      // Server-Authoritative Plan Protection:
+      // If server already has a plan (or paid plan), NEVER overwrite with client's 'free'
+      let plan: StudentPlan = existing.plan || 'free';
+      let planUpdatedAt = existing.planUpdatedAt;
+      let planNotificationPending = existing.planNotificationPending;
+
+      if (isAdmin) {
+        plan = 'executive';
+      } else if (existing.plan && existing.plan !== 'free') {
+        // Server already has an approved paid plan: preserve it strictly
+        plan = existing.plan;
+      } else if (clientUser.plan && clientUser.plan !== 'free') {
+        // Client had an approved paid plan cached and server was free: adopt client's paid plan
+        plan = clientUser.plan;
+        planUpdatedAt = clientUser.planUpdatedAt || new Date().toISOString();
+        planNotificationPending = clientUser.planNotificationPending ?? false;
+      }
+
+      const planDefaults = getPlanDefaults(plan);
+
+      const updated: User = {
+        ...existing,
+        username: clientUser.username ? this.normalizeUsername(clientUser.username) : existing.username,
+        fullName: clientUser.fullName ? clientUser.fullName.trim() : existing.fullName,
+        phoneNumber: clientUser.phoneNumber !== undefined && clientUser.phoneNumber !== '' ? clientUser.phoneNumber.trim() : (existing.phoneNumber || ''),
+        dateOfBirth: clientUser.dateOfBirth ? clientUser.dateOfBirth.trim() : existing.dateOfBirth,
+        country: clientUser.country ? clientUser.country.trim() : existing.country,
+        learningGoals: clientUser.learningGoals || existing.learningGoals,
+        profileCompleted: clientUser.profileCompleted !== undefined ? clientUser.profileCompleted : existing.profileCompleted,
+        cefrLevel: clientUser.cefrLevel !== undefined ? clientUser.cefrLevel : existing.cefrLevel,
+        lastScore: clientUser.lastScore !== undefined ? clientUser.lastScore : existing.lastScore,
+        plan,
+        planUpdatedAt,
+        planNotificationPending,
+        maxWeeklyClasses: isAdmin ? 99 : (existing.maxWeeklyClasses !== undefined ? existing.maxWeeklyClasses : planDefaults.maxWeeklyClasses),
+        maxDailySessions: isAdmin ? -1 : (existing.maxDailySessions !== undefined ? existing.maxDailySessions : planDefaults.maxDailySessions),
+      };
+
+      this.users.set(normEmail, updated);
+      this.saveToDisk();
+      return updated;
+    }
+
+    // Ephemeral-safe Self-Healing: User does not exist on server (e.g. Render restarted container)
+    // Re-insert full student record preserving plan, learning goals, credentials, etc.
+    const chosenUsername = clientUser.username
+      ? this.normalizeUsername(clientUser.username)
+      : (this.normalizeUsername(normEmail.split('@')[0]) || 'student');
+    const userPlan: StudentPlan = isAdmin ? 'executive' : (clientUser.plan || 'free');
+    const planDefaults = getPlanDefaults(userPlan);
+
+    const newUser: User = {
+      id: clientUser.id || (isAdmin ? 'usr_admin_ivan' : `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`),
+      username: chosenUsername,
+      password: clientUser.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
+      fullName: clientUser.fullName ? clientUser.fullName.trim() : (isAdmin ? 'Teacher Ivan (Admin)' : 'Student'),
+      email: normEmail,
+      phoneNumber: clientUser.phoneNumber ? clientUser.phoneNumber.trim() : '',
+      dateOfBirth: clientUser.dateOfBirth ? clientUser.dateOfBirth.trim() : '',
+      country: clientUser.country ? clientUser.country.trim() : '',
+      authProvider: clientUser.authProvider || 'email',
+      role: isAdmin ? 'admin' : (clientUser.role || 'student'),
+      plan: userPlan,
+      planUpdatedAt: clientUser.planUpdatedAt || new Date().toISOString(),
+      planNotificationPending: clientUser.planNotificationPending ?? false,
+      maxWeeklyClasses: isAdmin ? 99 : planDefaults.maxWeeklyClasses,
+      maxDailySessions: isAdmin ? -1 : planDefaults.maxDailySessions,
+      dailySessionsUsed: clientUser.dailySessionsUsed || 0,
+      lastSessionDate: clientUser.lastSessionDate || todayIso,
+      profileCompleted: clientUser.profileCompleted !== undefined ? clientUser.profileCompleted : Boolean(clientUser.learningGoals),
+      learningGoals: clientUser.learningGoals,
+      cefrLevel: clientUser.cefrLevel,
+      lastScore: clientUser.lastScore,
+      createdAt: clientUser.createdAt || new Date().toISOString(),
+    };
+
+    this.users.set(normEmail, newUser);
+    this.saveToDisk();
+    return newUser;
+  }
+
+  public rehydrateRoster(incomingUsers: User[]): User[] {
+    if (!Array.isArray(incomingUsers) || incomingUsers.length === 0) {
+      return this.getAllUsers();
+    }
+
+    for (const incoming of incomingUsers) {
+      if (!incoming || !incoming.email) continue;
+      const normEmail = this.normalizeEmail(incoming.email);
+      const existing = this.users.get(normEmail);
+
+      if (!existing) {
+        // Missing student restored from Admin Roster Vault
+        this.users.set(normEmail, {
+          ...incoming,
+          email: normEmail,
+          username: incoming.username ? this.normalizeUsername(incoming.username) : this.normalizeUsername(normEmail.split('@')[0]),
+        });
+      } else {
+        // If incoming has a newer or higher plan, update
+        const existingIsFree = !existing.plan || existing.plan === 'free';
+        const incomingHasPaidPlan = incoming.plan && incoming.plan !== 'free';
+
+        const incomingDate = incoming.planUpdatedAt ? new Date(incoming.planUpdatedAt).getTime() : 0;
+        const existingDate = existing.planUpdatedAt ? new Date(existing.planUpdatedAt).getTime() : 0;
+
+        let planToUse = existing.plan;
+        let planUpdatedToUse = existing.planUpdatedAt;
+        let planNotificationPending = existing.planNotificationPending;
+
+        if (existingIsFree && incomingHasPaidPlan) {
+          planToUse = incoming.plan;
+          planUpdatedToUse = incoming.planUpdatedAt || new Date().toISOString();
+          planNotificationPending = incoming.planNotificationPending ?? false;
+        } else if (incomingHasPaidPlan && incomingDate > existingDate) {
+          planToUse = incoming.plan;
+          planUpdatedToUse = incoming.planUpdatedAt;
+          planNotificationPending = incoming.planNotificationPending ?? false;
+        }
+
+        const planDefaults = getPlanDefaults(planToUse);
+
+        this.users.set(normEmail, {
+          ...existing,
+          phoneNumber: existing.phoneNumber || incoming.phoneNumber,
+          dateOfBirth: existing.dateOfBirth || incoming.dateOfBirth,
+          country: existing.country || incoming.country,
+          learningGoals: existing.learningGoals || incoming.learningGoals,
+          profileCompleted: existing.profileCompleted || incoming.profileCompleted,
+          cefrLevel: existing.cefrLevel || incoming.cefrLevel,
+          lastScore: existing.lastScore !== undefined ? existing.lastScore : incoming.lastScore,
+          plan: planToUse,
+          planUpdatedAt: planUpdatedToUse,
+          planNotificationPending,
+          maxWeeklyClasses: existing.role === 'admin' ? 99 : planDefaults.maxWeeklyClasses,
+          maxDailySessions: existing.role === 'admin' ? -1 : planDefaults.maxDailySessions,
+        });
+      }
+    }
+
+    this.saveToDisk();
+    return this.getAllUsers();
   }
 
   public getDailyQuota(userIdOrEmail: string): { used: number; max: number; plan: StudentPlan } {

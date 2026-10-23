@@ -294,6 +294,31 @@ export const Header: React.FC = () => {
                 )}
               </div>
 
+              {/* Live Plan Status Badge */}
+              <div
+                id="header-plan-status-badge"
+                className={`text-[10px] font-montserrat font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-0.5 transition-all shadow-sm ${
+                  user.plan === 'executive'
+                    ? 'bg-gradient-to-r from-emerald-500 to-[#E09B30] text-[#1A3153] border border-[#E09B30]/50 font-black'
+                    : user.plan === 'pro'
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/20 font-black'
+                    : user.plan === 'essential'
+                    ? 'bg-[#A7C7E7]/25 text-[#A7C7E7] border border-[#A7C7E7]/50'
+                    : 'bg-[#1A3153] text-[#A7C7E7]/80 border border-[#A7C7E7]/30'
+                }`}
+                title={`Plan: ${(user.plan || 'free').toUpperCase()}`}
+              >
+                <span className="whitespace-nowrap">
+                  {user.plan === 'executive'
+                    ? 'EXECUTIVE • VIP'
+                    : user.plan === 'pro'
+                    ? (isEs ? 'PRO • ILIMITADO' : 'PRO • UNLIMITED')
+                    : user.plan === 'essential'
+                    ? (isEs ? 'ESSENTIAL • 1 CLASE/SEM' : 'ESSENTIAL • 1 CLASS/WK')
+                    : (isEs ? 'GRATIS (5/DÍA)' : 'FREE (5/DAY)')}
+                </span>
+              </div>
+
               {/* Sign Out / Salir Button */}
               <button
                 id="sign-out-btn"

@@ -58,6 +58,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     authModalMode: 'signup',
     authModalBanner: null,
     pendingGoogleProfile: null,
+    pendingPlanModal: null,
     isLoading: false,
     error: null,
 
@@ -278,27 +279,87 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     syncWithServer: async () => {
-      const { user } = get();
+      const { user, token } = get();
       if (!user || !user.email) return;
 
       try {
-        const res = await fetch(getApiUrl('/api/auth/sync'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user }),
+        let serverUser: UserProfile | null = null;
+        const resMe = await fetch(getApiUrl(`/api/auth/me?userId=${encodeURIComponent(user.id || user.email)}`), {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
+        if (resMe.ok) {
+          const jsonMe = await resMe.json();
+          if (jsonMe.user) serverUser = jsonMe.user;
+        }
 
-        if (res.ok) {
-          const json = await res.json();
-          if (json.user && json.token) {
-            safeSetItem(USER_STORAGE_KEY, JSON.stringify(json.user));
-            safeSetItem(TOKEN_STORAGE_KEY, json.token);
-            set({ user: json.user, token: json.token });
+        if (!serverUser) {
+          const resSync = await fetch(getApiUrl('/api/auth/sync'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user }),
+          });
+          if (resSync.ok) {
+            const jsonSync = await resSync.json();
+            if (jsonSync.user) serverUser = jsonSync.user;
+          }
+        }
+
+        if (serverUser) {
+          const currentPlan = serverUser.plan || 'free';
+          const ackKey = `ti_ack_plan_${serverUser.id}`;
+          const planVersion = `${currentPlan}_${serverUser.planUpdatedAt || ''}`;
+          const isAcked = safeGetItem(ackKey) === planVersion;
+
+          safeSetItem(USER_STORAGE_KEY, JSON.stringify(serverUser));
+          set({ user: serverUser });
+
+          if (currentPlan !== 'free' && (serverUser.planNotificationPending === true || !isAcked)) {
+            set({
+              pendingPlanModal: {
+                plan: currentPlan,
+                planUpdatedAt: serverUser.planUpdatedAt,
+              },
+            });
           }
         }
       } catch (err) {
         // Non-blocking sync failure on offline / sleep
       }
+    },
+
+    ackPlanNotification: async () => {
+      const { user, token } = get();
+      if (!user) return;
+      const currentPlan = user.plan || 'free';
+      const ackKey = `ti_ack_plan_${user.id}`;
+      const planVersion = `${currentPlan}_${user.planUpdatedAt || ''}`;
+      safeSetItem(ackKey, planVersion);
+
+      const updatedUser: UserProfile = { ...user, planNotificationPending: false };
+      safeSetItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+      set({ pendingPlanModal: null, user: updatedUser });
+
+      try {
+        await fetch(getApiUrl('/api/auth/ack-plan-notification'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ userId: user.id, email: user.email }),
+        });
+      } catch {}
+    },
+
+    dismissPlanModal: () => {
+      const { user } = get();
+      if (user) {
+        const currentPlan = user.plan || 'free';
+        const ackKey = `ti_ack_plan_${user.id}`;
+        const planVersion = `${currentPlan}_${user.planUpdatedAt || ''}`;
+        safeSetItem(ackKey, planVersion);
+      }
+      set({ pendingPlanModal: null });
     },
 
     updateUserStats: (cefrLevel: string, lastScore: number) => {
@@ -404,6 +465,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         isAuthenticated: false,
         isAuthModalOpen: false,
         pendingGoogleProfile: null,
+        pendingPlanModal: null,
       });
     },
   };

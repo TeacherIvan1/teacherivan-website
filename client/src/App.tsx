@@ -18,6 +18,7 @@ import { InteractiveGamesView } from './components/InteractiveGamesView';
 import { ClassSchedulerView } from './components/ClassSchedulerView';
 import { RegisteredStudentsTable } from './components/RegisteredStudentsTable';
 import { AdminBookingsTable } from './components/AdminBookingsTable';
+import { PlanApprovedModal } from './components/PlanApprovedModal';
 import { BrandLockup } from './components/BrandLockup';
 import { Terminal, Sparkles, BookOpen, Headphones, Calendar, Target } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
@@ -49,8 +50,30 @@ export const App: React.FC = () => {
     syncWithServer().catch(() => {});
   }, [syncWithServer]);
 
+  // Real-time Plan Approval Polling (8000ms) & on Window Focus
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const interval = setInterval(() => {
+      syncWithServer().catch(() => {});
+    }, 8000);
+
+    const handleFocus = () => {
+      syncWithServer().catch(() => {});
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isAuthenticated, syncWithServer]);
+
   return (
     <div className="min-h-screen bg-[#1A3153] text-[#FAFAFA] flex flex-col font-inter">
+      {/* Student Plan Approval Celebratory Pop-Up Modal */}
+      <PlanApprovedModal />
+
       {/* Student Sign-Up & Authentication Modal (Unified 2-Step Registration Flow) */}
       <StudentAuthModal />
 

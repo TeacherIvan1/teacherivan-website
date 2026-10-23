@@ -215,6 +215,23 @@ export async function generarControl(reelDir) {
 export async function renderizarReel(reelDir, options = {}) {
   const fps = options.fps || 60;
   const muestras = options.muestras || null;
+  const usarRemotion = options.usarRemotion !== false;
+
+  // Remotion React 60fps Engine como motor principal
+  if (usarRemotion && !muestras) {
+    try {
+      const { renderReelWithRemotion } = await import('../../scripts/render-remotion.mjs');
+      return await renderReelWithRemotion({
+        reelDir,
+        persona: options.persona || 'ivan',
+        fps,
+        quickTest: !!options.quickTest,
+      });
+    } catch (err) {
+      console.warn('[Modo Gratis] Remotion no disponible, usando Playwright fallback:', err.message);
+    }
+  }
+
   const reelHtml = path.join(reelDir, 'reel.html');
   const vozMp3 = path.join(reelDir, 'voz.mp3');
   const palabrasJson = path.join(reelDir, 'palabras.json');

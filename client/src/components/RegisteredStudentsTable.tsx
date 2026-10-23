@@ -13,15 +13,44 @@ export const RegisteredStudentsTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { isEs } = useTranslation();
   const updateUserPlan = useAuthStore((s) => s.updateUserPlan);
+  const currentUser = useAuthStore((s) => s.user);
 
   const fetchUsers = async () => {
     setIsLoading(true);
     setError(null);
     try {
+      // 1. If Admin has a cached roster vault, rehydrate server first
+      if (currentUser?.role === 'admin') {
+        try {
+          const cachedVault = localStorage.getItem('ti_admin_roster_vault');
+          const cachedBookings = localStorage.getItem('ti_admin_bookings_vault');
+          if (cachedVault) {
+            const parsedVault = JSON.parse(cachedVault);
+            const parsedBookings = cachedBookings ? JSON.parse(cachedBookings) : [];
+            if (Array.isArray(parsedVault) && parsedVault.length > 0) {
+              await fetch(getApiUrl('/api/users/rehydrate-roster'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ users: parsedVault, bookings: parsedBookings }),
+              });
+            }
+          }
+        } catch (vaultErr) {
+          console.warn('[Admin Roster Vault Rehydrate Notice]:', vaultErr);
+        }
+      }
+
+      // 2. Fetch authoritative user roster from server
       const res = await fetch(getApiUrl('/api/users/export'));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setUsers(data.users || []);
+      const fetchedUsers: UserProfile[] = data.users || [];
+      setUsers(fetchedUsers);
+
+      // 3. Save to Admin Roster Vault for ephemeral-safe persistence
+      if (currentUser?.role === 'admin' && fetchedUsers.length > 0) {
+        localStorage.setItem('ti_admin_roster_vault', JSON.stringify(fetchedUsers));
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
@@ -38,21 +67,26 @@ export const RegisteredStudentsTable: React.FC = () => {
     setUpdatingUserId(userId);
     setError(null);
     try {
-      await updateUserPlan(userId, newPlan);
-      setUsers((prev) =>
-        prev.map((u) => {
-          if (u.id !== userId) return u;
-          const maxDaily = newPlan === 'essential' ? 10 : newPlan === 'free' ? 5 : -1;
-          const maxWeekly = newPlan === 'executive' ? 3 : newPlan === 'pro' ? 2 : newPlan === 'essential' ? 1 : 0;
-          return {
-            ...u,
-            plan: newPlan,
-            maxDailySessions: maxDaily,
-            maxWeeklyClasses: maxWeekly,
-            planUpdatedAt: new Date().toISOString(),
-          };
-        })
-      );
+      const updatedUser = await updateUserPlan(userId, newPlan);
+      const updatedList = users.map((u) => {
+        if (u.id !== userId) return u;
+        const maxDaily = newPlan === 'essential' ? 10 : newPlan === 'free' ? 5 : -1;
+        const maxWeekly = newPlan === 'executive' ? 3 : newPlan === 'pro' ? 2 : newPlan === 'essential' ? 1 : 0;
+        return {
+          ...u,
+          plan: newPlan,
+          maxDailySessions: maxDaily,
+          maxWeeklyClasses: maxWeekly,
+          planUpdatedAt: updatedUser?.planUpdatedAt || new Date().toISOString(),
+          planNotificationPending: newPlan !== 'free',
+        };
+      });
+
+      setUsers(updatedList);
+      if (currentUser?.role === 'admin') {
+        localStorage.setItem('ti_admin_roster_vault', JSON.stringify(updatedList));
+      }
+
       setSuccessUserId(userId);
       setTimeout(() => {
         setSuccessUserId((curr) => (curr === userId ? null : curr));

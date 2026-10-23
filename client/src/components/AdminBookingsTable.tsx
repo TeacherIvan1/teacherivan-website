@@ -31,7 +31,11 @@ export const AdminBookingsTable: React.FC = () => {
       const res = await fetch(getApiUrl('/api/bookings/export'));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setBookings(data.bookings || []);
+      const fetchedBookings = data.bookings || [];
+      setBookings(fetchedBookings);
+      if (fetchedBookings.length > 0) {
+        localStorage.setItem('ti_admin_bookings_vault', JSON.stringify(fetchedBookings));
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);

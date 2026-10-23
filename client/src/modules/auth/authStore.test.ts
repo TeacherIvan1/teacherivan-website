@@ -136,3 +136,37 @@ test('authStore - banner support on openAuthModal', () => {
   store.closeAuthModal();
   assert.equal(useAuthStore.getState().isAuthModalOpen, false);
 });
+
+test('authStore - plan approval modal state and acknowledgment', async () => {
+  useAuthStore.setState({
+    user: {
+      id: 'usr_student_test',
+      fullName: 'Laura Ledezma',
+      email: 'laura.test@example.com',
+      dateOfBirth: '1995-04-10',
+      country: 'Bolivia',
+      authProvider: 'email',
+      role: 'student',
+      plan: 'pro',
+      planUpdatedAt: '2026-10-22T20:00:00.000Z',
+      planNotificationPending: true,
+      createdAt: new Date().toISOString(),
+    },
+    token: 'tok_test',
+    isAuthenticated: true,
+    pendingPlanModal: {
+      plan: 'pro',
+      planUpdatedAt: '2026-10-22T20:00:00.000Z',
+    },
+  });
+
+  assert.equal(useAuthStore.getState().pendingPlanModal?.plan, 'pro');
+
+  // Acknowledge notification
+  await useAuthStore.getState().ackPlanNotification();
+
+  assert.equal(useAuthStore.getState().pendingPlanModal, null);
+  assert.equal(useAuthStore.getState().user?.planNotificationPending, false);
+
+  useAuthStore.getState().signOut();
+});

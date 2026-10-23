@@ -190,3 +190,97 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   const davidFinalAuth = store.verifyUserCredentials('davidsmith', 'FinalSecretPass888!');
   assert.equal(davidFinalAuth.success, true);
 });
+
+test('UserStore - Plan approval notification, server-authoritative sync protection, and roster rehydration', (t) => {
+  const tmpPath = path.join(process.cwd(), `test_users_plan_${Date.now()}.json`);
+  const store = new UserStore(tmpPath);
+
+  t.after(() => {
+    if (fs.existsSync(tmpPath)) {
+      fs.unlinkSync(tmpPath);
+    }
+  });
+
+  // 1. Create a student with initial free plan
+  const student = store.upsertUser({
+    fullName: 'Laura Ledezma',
+    username: 'laura',
+    email: 'laura@example.com',
+    phoneNumber: '+591 71234567',
+    dateOfBirth: '1995-04-10',
+    country: 'Bolivia',
+    plan: 'free',
+  });
+  assert.equal(student.plan, 'free');
+  assert.equal(student.planNotificationPending, false);
+
+  // 2. Teacher Ivan approves student plan to 'pro'
+  const approved = store.updateUserPlan(student.id, 'pro');
+  assert.ok(approved);
+  assert.equal(approved.plan, 'pro');
+  assert.equal(approved.planNotificationPending, true);
+  assert.ok(approved.planUpdatedAt);
+
+  // 3. Server-authoritative sync protection on /api/auth/sync:
+  // When student sends their cached localStorage user object with plan: 'free',
+  // server must NEVER overwrite their approved 'pro' plan!
+  const synced = store.syncClientUser({
+    id: student.id,
+    email: 'laura@example.com',
+    fullName: 'Laura Ledezma Updated',
+    plan: 'free', // Stale cached client plan
+  });
+  assert.equal(synced.plan, 'pro');
+  assert.equal(synced.planNotificationPending, true);
+  assert.equal(synced.fullName, 'Laura Ledezma Updated');
+
+  // 4. Student acknowledges notification pop-up
+  const acked = store.ackPlanNotification(student.id);
+  assert.ok(acked);
+  assert.equal(acked.planNotificationPending, false);
+
+  // 5. Ephemeral-safe Self-Healing:
+  // Simulate returning student when user is missing from server (e.g. Render restart)
+  const missingEmail = 'newreturning@example.com';
+  const selfHealed = store.syncClientUser({
+    id: 'usr_returning_123',
+    email: missingEmail,
+    username: 'returningstudent',
+    fullName: 'Returning Student',
+    phoneNumber: '+591 79998888',
+    dateOfBirth: '1999-09-09',
+    country: 'Bolivia',
+    plan: 'essential',
+    planUpdatedAt: '2026-10-22T10:00:00.000Z',
+    planNotificationPending: false,
+    learningGoals: {
+      targetLevel: 'B1',
+      primaryGoal: 'Tech & Job Interviews',
+      focusSkill: 'Speaking Fluency & Pronunciation',
+      personalObjective: 'Self heal test',
+    },
+  });
+  assert.equal(selfHealed.id, 'usr_returning_123');
+  assert.equal(selfHealed.plan, 'essential');
+  assert.equal(store.findByEmail(missingEmail)?.fullName, 'Returning Student');
+
+  // 6. Admin Roster Vault Rehydration
+  const vaultedUsers = [
+    {
+      id: 'usr_vault_1',
+      username: 'vaultedstudent',
+      fullName: 'Vaulted Student',
+      email: 'vaulted@example.com',
+      dateOfBirth: '1992-01-01',
+      country: 'Bolivia',
+      authProvider: 'email' as const,
+      plan: 'pro' as const,
+      planUpdatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    },
+  ];
+  const rehydrated = store.rehydrateRoster(vaultedUsers);
+  assert.ok(rehydrated.some((u) => u.email === 'vaulted@example.com'));
+  const foundVaulted = store.findByEmail('vaulted@example.com');
+  assert.equal(foundVaulted?.plan, 'pro');
+});

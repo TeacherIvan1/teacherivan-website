@@ -29,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 // Utilities from local scripts
 import { generateAllPoses } from './scripts/prepare-svg-poses.mjs';
 import { renderReel } from './scripts/render-reel.mjs';
+import { renderReelWithRemotion } from './scripts/render-remotion.mjs';
 import { generarVoz, generarControl, renderizarReel, revisarReel, ejecutarTodo } from './reels-con-ia/scripts/modo_gratis_ivan.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -248,18 +249,34 @@ const TOOLS = [
   {
     name: 'render_split_screen_reel',
     description:
-      'Renders any storyboard JSON into an interactive HTML5/SVG 9:16 split-screen animation (1080x1920) and records it via Playwright video capture into ./media-pipeline/output/.',
+      'Renders any split-screen reel or storyboard using Remotion (React + TypeScript + Tailwind 1080x1920 @ 60fps) with synced word timestamps from palabras.json, voz.mp3 audio, and rigged SVG characters into ./media-pipeline/output/.',
     inputSchema: {
       type: 'object',
       properties: {
         storyboardId: {
           type: 'string',
-          description: 'Storyboard identifier or filename to render (e.g. "reel-01-ai-clone")',
+          description: 'Storyboard identifier or reel folder name to render (e.g. "reel-01-ai-clone" or "2026-10-20-clon-ia-ingles")',
+        },
+        carpetaReel: {
+          type: 'string',
+          description: 'Optional direct path to reel folder in Reels/reels/',
+        },
+        persona: {
+          type: 'string',
+          enum: ['ivan', 'emma'],
+          description: 'Tutor character avatar (ivan or emma)',
+          default: 'ivan',
         },
         quickTest: {
           type: 'boolean',
           description: 'Render a quick 3-second preview instead of the full duration',
           default: false,
+        },
+        engine: {
+          type: 'string',
+          enum: ['remotion', 'playwright'],
+          description: 'Video rendering engine (default: remotion)',
+          default: 'remotion',
         },
       },
       required: ['storyboardId'],
@@ -305,7 +322,7 @@ const TOOLS = [
   {
     name: 'compilar_reel_aprobado',
     description:
-      'Compila un reel aprobado en su carpeta de Reels: genera voz.mp3 (Gemini TTS $0.00 o audio en yo/), palabras.json (timestamps palabra por palabra), renderiza final.mp4 (1080x1920 @ 60fps con avatar Chibi SVG o tomas/) y ejecuta la revisión editorial con Gemini en revision.md.',
+      'Compila un reel aprobado en su carpeta de Reels: genera voz.mp3 (Gemini TTS $0.00 o audio en yo/), palabras.json (timestamps palabra por palabra), y renderiza final.mp4 en 9:16 vertical (1080x1920 @ 60fps) usando Remotion React Engine con sincronización cuadro a cuadro y avatar Chibi SVG rig animado.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -323,6 +340,16 @@ const TOOLS = [
           type: 'boolean',
           description: 'Usar modo gratuito 100% local/Gemini ($0.00)',
           default: true,
+        },
+        usarRemotion: {
+          type: 'boolean',
+          description: 'Renderizar con Remotion React 60fps Engine (por defecto true)',
+          default: true,
+        },
+        quickTest: {
+          type: 'boolean',
+          description: 'Render rápido de 3 segundos de verificación',
+          default: false,
         },
         muestras: {
           type: 'string',
@@ -398,9 +425,50 @@ async function handleToolCall(name, args = {}) {
     }
 
     case 'render_split_screen_reel': {
-      const { storyboardId, quickTest = false } = args;
-      if (!storyboardId) {
-        throw new Error('Missing required parameter: storyboardId');
+      const {
+        storyboardId,
+        carpetaReel,
+        persona = 'ivan',
+        quickTest = false,
+        engine = 'remotion',
+      } = args;
+
+      if (!storyboardId && !carpetaReel) {
+        throw new Error('Missing required parameter: storyboardId or carpetaReel');
+      }
+
+      let targetReelDir = carpetaReel;
+      if (!targetReelDir && storyboardId) {
+        const candidate = path.join(PIPELINE_DIR, 'Reels/reels', storyboardId);
+        if (fs.existsSync(candidate)) {
+          targetReelDir = candidate;
+        }
+      }
+
+      if (engine === 'remotion' || targetReelDir) {
+        const result = await renderReelWithRemotion({
+          reelDir: targetReelDir,
+          storyboardId: storyboardId || (targetReelDir ? path.basename(targetReelDir) : 'reel'),
+          persona,
+          quickTest,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text:
+                `🎬 Remotion 9:16 Split-Screen Reel Render Complete!\n` +
+                `  - Engine:     Remotion React (@remotion/cli 60fps)\n` +
+                `  - Video:      ${result.finalMp4} (${(result.sizeBytes / (1024 * 1024)).toFixed(2)} MB)\n` +
+                (result.posterPath ? `  - Hero Poster: ${result.posterPath}\n` : '') +
+                `  - Character:  ${result.character === 'emma' ? 'Coach Emma' : 'Teacher Ivan'}\n` +
+                `  - Timestamps: ${result.wordsCount} words synced from palabras.json\n` +
+                `  - Resolution: 1080x1920 (9:16 Vertical)\n` +
+                `  - Duration:   ${result.durationSeconds}s`,
+            },
+          ],
+        };
       }
 
       const result = await renderReel({ storyboardId, quickTest });
@@ -501,7 +569,15 @@ async function handleToolCall(name, args = {}) {
     }
 
     case 'compilar_reel_aprobado': {
-      const { carpetaReel, persona = 'ivan', usarModoGratis = true, muestras = null } = args;
+      const {
+        carpetaReel,
+        persona = 'ivan',
+        usarModoGratis = true,
+        usarRemotion = true,
+        quickTest = false,
+        muestras = null,
+      } = args;
+
       if (!carpetaReel) {
         throw new Error('Falta el parámetro obligatorio: carpetaReel');
       }
@@ -513,13 +589,24 @@ async function handleToolCall(name, args = {}) {
         else throw new Error(`No se encontró la carpeta del reel: ${carpetaReel}`);
       }
 
-      process.stderr.write(`[FilmCraft MCP] Compilando reel en ${targetDir} (Modo Gratis: ${usarModoGratis})...\n`);
+      process.stderr.write(`[FilmCraft MCP] Compilando reel en ${targetDir} (Motor: ${usarRemotion ? 'Remotion 60fps' : 'Playwright'})...\n`);
 
       const vozResult = await generarVoz(targetDir, { persona });
       const controlResult = await generarControl(targetDir);
-      const renderResult = await renderizarReel(targetDir, { muestras });
+
+      let renderResult;
+      if (usarRemotion) {
+        renderResult = await renderReelWithRemotion({
+          reelDir: targetDir,
+          persona,
+          quickTest,
+        });
+      } else {
+        renderResult = await renderizarReel(targetDir, { muestras });
+      }
+
       let revisionText = '';
-      if (!muestras) {
+      if (!muestras && !quickTest) {
         revisionText = await revisarReel(targetDir);
       }
 
@@ -528,12 +615,13 @@ async function handleToolCall(name, args = {}) {
           {
             type: 'text',
             text:
-              `🎬 Reel Compilado Exitosamente ($0.00 Gastados):\n` +
+              `🎬 Reel Compilado Exitosamente con Remotion React Engine ($0.00 Gastados):\n` +
               `  - Carpeta:     ${targetDir}\n` +
+              `  - Motor:       ${usarRemotion ? 'Remotion 9:16 (1080x1920 @ 60fps)' : 'Playwright HTML5'}\n` +
               `  - Audio Voz:   ${vozResult.audioPath} (${vozResult.durationSeconds.toFixed(1)}s)\n` +
               `  - Timestamps:  ${controlResult.length} palabras sincronizadas en palabras.json\n` +
               (renderResult.finalMp4 ? `  - Video Final: ${renderResult.finalMp4} (${(renderResult.sizeBytes / (1024 * 1024)).toFixed(2)} MB)\n` : '') +
-              (renderResult.muestrasDir ? `  - Muestras:    ${renderResult.muestrasDir}\n` : '') +
+              (renderResult.posterPath ? `  - Póster:      ${renderResult.posterPath}\n` : '') +
               (revisionText ? `  - Revisión:    ${path.join(targetDir, 'revision.md')} (Auditado con Gemini 3.8 Flash)\n` : ''),
           },
         ],

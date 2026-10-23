@@ -79,10 +79,27 @@ export class BookingStore {
         fs.mkdirSync(dir, { recursive: true });
       }
       const list = Array.from(this.bookings.values());
-      fs.writeFileSync(this.dataFilePath, JSON.stringify(list, null, 2), 'utf8');
+      const tmpPath = `${this.dataFilePath}.${Date.now()}.${Math.random().toString(36).substring(2, 8)}.tmp`;
+      fs.writeFileSync(tmpPath, JSON.stringify(list, null, 2), 'utf8');
+      fs.renameSync(tmpPath, this.dataFilePath);
     } catch (err) {
       console.error('[BookingStore] Error writing bookings to disk:', err);
     }
+  }
+
+  public rehydrateBookings(incomingBookings: Booking[]): Booking[] {
+    if (!Array.isArray(incomingBookings) || incomingBookings.length === 0) {
+      return this.getAllBookings();
+    }
+
+    for (const b of incomingBookings) {
+      if (b && b.id && !this.bookings.has(b.id)) {
+        this.bookings.set(b.id, b);
+      }
+    }
+
+    this.saveToDisk();
+    return this.getAllBookings();
   }
 
   public getAllBookings(): Booking[] {

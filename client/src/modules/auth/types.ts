@@ -19,6 +19,7 @@ export interface UserProfile {
   role?: 'student' | 'admin';
   plan?: StudentPlan;
   planUpdatedAt?: string;
+  planNotificationPending?: boolean;
   maxWeeklyClasses?: number;
   maxDailySessions?: number;
   dailySessionsUsed?: number;
@@ -52,6 +53,7 @@ export interface AuthState {
   authModalMode: 'signup' | 'signin' | 'recover_password' | 'complete_google_profile';
   authModalBanner: string | null;
   pendingGoogleProfile: { email: string; fullName: string } | null;
+  pendingPlanModal: { plan: StudentPlan; planUpdatedAt?: string } | null;
   isLoading: boolean;
   error: string | null;
 
@@ -96,6 +98,8 @@ export interface AuthState {
   updateUserPlan: (userId: string, plan: StudentPlan) => Promise<UserProfile>;
   checkAndIncrementSessionQuota: () => { allowed: boolean; remaining: number | 'unlimited'; used: number; max: number };
   syncWithServer: () => Promise<void>;
+  ackPlanNotification: () => Promise<void>;
+  dismissPlanModal: () => void;
   updateUserStats: (cefrLevel: string, lastScore: number) => void;
   signOut: () => void;
 }

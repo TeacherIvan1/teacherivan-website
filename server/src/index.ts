@@ -9,6 +9,7 @@ import authRouter from './routes/auth.js';
 import bookingRouter from './routes/bookings.js';
 import curriculumRouter from './routes/curriculum.js';
 import { userStore } from './services/userStore.js';
+import { bookingStore } from './services/bookingStore.js';
 
 // Resolve directory paths for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -86,6 +87,27 @@ app.get('/api/users/export', (_req, res) => {
     total: users.length,
     users,
   });
+});
+
+// POST /api/users/rehydrate-roster (Admin Roster Vault auto-recovery)
+app.post('/api/users/rehydrate-roster', (req, res) => {
+  try {
+    const { users, bookings } = req.body || {};
+    const mergedUsers = userStore.rehydrateRoster(users || []);
+    const mergedBookings = bookingStore.rehydrateBookings(bookings || []);
+
+    return res.status(200).json({
+      status: 'ok',
+      totalUsers: mergedUsers.length,
+      totalBookings: mergedBookings.length,
+      users: mergedUsers,
+      bookings: mergedBookings,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[POST /api/users/rehydrate-roster Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error rehydrating roster' });
+  }
 });
 
 // PUT /api/users/:id/plan (Admin manual plan update)

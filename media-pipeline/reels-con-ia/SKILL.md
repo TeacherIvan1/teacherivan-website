@@ -51,7 +51,7 @@ Todos están en `scripts/` de esta skill y leen las claves del `.env` de la carp
 | `control.py` | Whisper transcribe, compara con el guion y guarda los tiempos | centavos |
 | `avatar.py` | Toma del avatar con Seedance 2.5 vía Kie | ≈ US$ 0,33 por segundo |
 | `musica.py` | Dos versiones instrumentales con Suno vía Kie | ≈ US$ 0,07 |
-| `render.py` | Arma el video desde `reel.html` con la voz y la música | gratis |
+| `render.py` / `render-remotion.mjs` | Arma el video 9:16 vertical con Remotion (React + TypeScript + Tailwind @ 60fps) con la voz, timestamps y avatar SVG | gratis |
 | `revision.py` | Gemini mira el video y lista los problemas | centavos |
 
 Un reel de unos 40 segundos con dos tomas de avatar sale entre US$ 3 y 5. Casi todo es el avatar.

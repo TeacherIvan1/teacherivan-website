@@ -339,6 +339,82 @@ router.post('/google', (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/auth/me
+ * Headers: Authorization: Bearer <token>
+ * Query: ?userId=...
+ */
+router.get('/me', (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const queryId = (req.query.userId || req.query.id || req.query.email) as string | undefined;
+    let user = queryId ? (userStore.findById(queryId) || userStore.findByEmail(queryId)) : undefined;
+
+    if (!user && authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '').trim();
+      try {
+        const decoded = Buffer.from(token, 'base64').toString('utf8');
+        const parts = decoded.split(':');
+        if (parts.length >= 1) {
+          user = userStore.findById(parts[0]) || userStore.findByEmail(parts[0]);
+        }
+      } catch {}
+    }
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized / User not found' });
+    }
+
+    return res.status(200).json({
+      status: 'ok',
+      user,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[GET /api/auth/me Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * POST /api/auth/ack-plan-notification
+ * Body: { userId?: string, email?: string }
+ */
+router.post('/ack-plan-notification', (req: Request, res: Response) => {
+  try {
+    const { userId, email } = req.body || {};
+    const authHeader = req.headers.authorization;
+    const identifier = userId || email;
+
+    let user = identifier ? (userStore.findById(identifier) || userStore.findByEmail(identifier)) : undefined;
+
+    if (!user && authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '').trim();
+      try {
+        const decoded = Buffer.from(token, 'base64').toString('utf8');
+        const parts = decoded.split(':');
+        if (parts.length >= 1) {
+          user = userStore.findById(parts[0]) || userStore.findByEmail(parts[0]);
+        }
+      } catch {}
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updated = userStore.ackPlanNotification(user.id);
+    return res.status(200).json({
+      status: 'ok',
+      user: updated || user,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[POST /api/auth/ack-plan-notification Error]:', msg);
+    return res.status(500).json({ error: 'Internal server error acknowledging plan notification' });
+  }
+});
+
+/**
  * POST /api/auth/sync
  * Body: { user: User } or user fields
  */
@@ -349,18 +425,8 @@ router.post('/sync', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Valid user profile required for sync' });
     }
 
-    const user = userStore.upsertUser({
-      fullName: userPayload.fullName,
-      email: userPayload.email,
-      phoneNumber: userPayload.phoneNumber,
-      dateOfBirth: userPayload.dateOfBirth,
-      country: userPayload.country,
-      authProvider: userPayload.authProvider || 'email',
-      cefrLevel: userPayload.cefrLevel,
-      lastScore: userPayload.lastScore,
-    });
-
-    const token = userStore.createSessionToken(user.id);
+    const user = userStore.syncClientUser(userPayload);
+    const token = userStore.createSessionToken(user.id, user.role || 'student');
 
     return res.status(200).json({
       status: 'ok',

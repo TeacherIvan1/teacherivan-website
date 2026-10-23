@@ -38,7 +38,7 @@ test('BookingStore - slot validation, booking creation, double booking preventio
       store.createBooking({
         studentId: 'usr_1',
         studentName: 'Ana Gomez',
-        studentEmail: 'ana@example.com',
+        studentEmail: 'ana.gomez@test.com',
         studentCountry: 'Bolivia',
         date: '2026-10-31', // Saturday
         startTime: '15:00',
@@ -51,7 +51,7 @@ test('BookingStore - slot validation, booking creation, double booking preventio
   const booking1 = store.createBooking({
     studentId: 'usr_1',
     studentName: 'Ana Gomez',
-    studentEmail: 'ana@example.com',
+    studentEmail: 'ana.gomez@test.com',
     studentCountry: 'Bolivia',
     date: '2026-10-26', // Monday
     startTime: '15:00',
@@ -70,7 +70,7 @@ test('BookingStore - slot validation, booking creation, double booking preventio
       store.createBooking({
         studentId: 'usr_2',
         studentName: 'Carlos Silva',
-        studentEmail: 'carlos@example.com',
+        studentEmail: 'carlos.silva@test.com',
         studentCountry: 'Peru',
         date: '2026-10-26',
         startTime: '15:00',
@@ -85,7 +85,7 @@ test('BookingStore - slot validation, booking creation, double booking preventio
       store.createBooking({
         studentId: 'usr_1',
         studentName: 'Ana Gomez',
-        studentEmail: 'ana@example.com',
+        studentEmail: 'ana.gomez@test.com',
         studentCountry: 'Bolivia',
         date: '2026-10-28', // Wednesday in same week
         startTime: '16:00',
@@ -103,7 +103,7 @@ test('BookingStore - slot validation, booking creation, double booking preventio
   const rescheduled = store.createBooking({
     studentId: 'usr_1',
     studentName: 'Ana Gomez',
-    studentEmail: 'ana@example.com',
+    studentEmail: 'ana.gomez@test.com',
     studentCountry: 'Bolivia',
     date: '2026-10-28',
     startTime: '17:00',
