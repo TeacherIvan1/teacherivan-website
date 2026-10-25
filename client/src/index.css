@@ -79,6 +79,12 @@ html, body, #root {
   box-sizing: border-box;
 }
 
+@media (min-width: 1024px) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--brand-navy);

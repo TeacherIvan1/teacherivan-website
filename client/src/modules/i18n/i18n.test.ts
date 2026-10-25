@@ -266,8 +266,8 @@ describe('i18n Language Module', () => {
     const esLp = translations.es.landingPage;
 
     // 1. Hero 5 elements
-    assert.strictEqual(enLp.heroHeadline, 'Speak English confidently without freezing in real conversations');
-    assert.strictEqual(esLp.heroHeadline, 'Habla inglés con fluidez y sin bloqueos al conversar');
+    assert.strictEqual(enLp.heroHeadline, 'Teacher Ivan makes you speak. Not an academy on the clock, a partner in your fluency.');
+    assert.strictEqual(esLp.heroHeadline, 'Teacher Ivan destraba tu habla. No una academia por horas, un socio en tu fluidez.');
     assert.ok(enLp.heroSubhead.includes('Teacher Ivan'));
     assert.ok(esLp.heroSubhead.includes('Teacher Ivan'));
     assert.ok(enLp.heroPrimaryCta);
