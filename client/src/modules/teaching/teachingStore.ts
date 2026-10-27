@@ -53,6 +53,14 @@ export const INITIAL_SCENARIOS: LessonScenario[] = [
     targetVocabulary: ['ACADEMIC MERIT', 'FINANCIAL AID', 'EXTRACURRICULAR', 'LONG-TERM GOAL', 'CONTRIBUTION'],
     targetGrammar: ['Present Perfect for achievements (I have led...)', 'Future intentions & conditionals'],
   },
+  {
+    id: 'ielts-speaking',
+    title: 'IELTS Speaking',
+    category: 'Exam Preparation & Academics',
+    description: 'Simulate the 3 parts of the IELTS Speaking exam with natural follow-up questions and real-time fluency feedback.',
+    targetVocabulary: ['COHERENCE', 'LEXICAL RESOURCE', 'FLUENCY', 'COMPLEX STRUCTURES', 'IDIOMATIC'],
+    targetGrammar: ['Complex sentences (Although, Whereas)', 'Hypothetical conditionals (If I were to...)', 'Passive voice for formal context'],
+  },
 ];
 
 export const useTeachingStore = create<TeachingState>((set, get) => ({

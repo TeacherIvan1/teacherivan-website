@@ -49,9 +49,7 @@ screenshot_*.png
 coverage/
 
 # OS and Editor metadata
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# Local browser automation profiles
+.browser-profile/
+**/.browser-profile/
+

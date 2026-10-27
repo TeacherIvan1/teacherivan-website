@@ -71,7 +71,7 @@ export const CompactVoiceSimulator: React.FC = () => {
     if (plan === 'essential') {
       return isEs ? `Sesiones Diarias: ${used} / 10` : `Daily Sessions: ${used} / 10`;
     }
-    return isEs ? `Sesiones Diarias: ${used} / 5` : `Daily Sessions: ${used} / 5`;
+    return isEs ? `🎁 Noviembre Gratis: ${used} / 5` : `🎁 Free November: ${used} / 5`;
   };
 
   const handleStartSession = () => {
@@ -161,7 +161,7 @@ export const CompactVoiceSimulator: React.FC = () => {
     } else if (pillId === 'ielts') {
       setLevel('advanced');
       if (selectedScenarioId === 'diagnostic-placement') {
-        selectScenario('scholarship-interview');
+        selectScenario('ielts-speaking');
       }
     }
   };

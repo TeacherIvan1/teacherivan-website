@@ -23,6 +23,7 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useAuthStore } from '../modules/auth/authStore';
 import { LanguageToggle } from './LanguageToggle';
 import { BrandLockup } from './BrandLockup';
+import { NovemberPromoBanner } from './NovemberPromoBanner';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
@@ -93,6 +94,9 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-[#12223a]/95 backdrop-blur-md border-b border-[#A7C7E7]/25 w-full select-none" id="app-header">
+      {/* 🎁 Campaign Promotional Strip */}
+      <NovemberPromoBanner />
+
       {/* Primary Top Bar */}
       <div className="w-full max-w-full px-2 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-1 sm:gap-2 overflow-hidden">
         {/* Left: Brand Lockup with Chibi Mascot */}
@@ -304,9 +308,9 @@ export const Header: React.FC = () => {
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/20 font-black'
                     : user.plan === 'essential'
                     ? 'bg-[#A7C7E7]/25 text-[#A7C7E7] border border-[#A7C7E7]/50'
-                    : 'bg-[#1A3153] text-[#A7C7E7]/80 border border-[#A7C7E7]/30'
+                    : 'bg-[#E09B30]/20 text-[#E09B30] border border-[#E09B30]/50 font-black shadow-sm shadow-[#E09B30]/15'
                 }`}
-                title={`Plan: ${(user.plan || 'free').toUpperCase()}`}
+                title={user.plan === 'free' || !user.plan ? (isEs ? '🎁 Campaña Noviembre Gratis (5 sesiones/día)' : '🎁 Free November Campaign (5 sessions/day)') : `Plan: ${(user.plan || 'free').toUpperCase()}`}
               >
                 <span className="whitespace-nowrap">
                   {user.plan === 'executive'
@@ -315,7 +319,7 @@ export const Header: React.FC = () => {
                     ? (isEs ? 'PRO • ILIMITADO' : 'PRO • UNLIMITED')
                     : user.plan === 'essential'
                     ? (isEs ? 'ESSENTIAL • 1 CLASE/SEM' : 'ESSENTIAL • 1 CLASS/WK')
-                    : (isEs ? 'GRATIS (5/DÍA)' : 'FREE (5/DAY)')}
+                    : (isEs ? '🎁 NOVIEMBRE GRATIS (ACTIVO)' : '🎁 FREE NOVEMBER PASS')}
                 </span>
               </div>
 
