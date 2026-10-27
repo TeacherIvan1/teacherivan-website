@@ -4,19 +4,7 @@ import { getApiUrl } from '../config/api';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { TEACHER_PHONE } from '../config/contact';
 
-interface BookingRecord {
-  id: string;
-  studentId: string;
-  studentName: string;
-  studentEmail: string;
-  studentCountry: string;
-  date: string;
-  dayOfWeek: string;
-  startTime: string;
-  endTime: string;
-  learningGoal: string;
-  createdAt: string;
-}
+import { syncAndHealAdminData, saveAdminBookingsVault, BookingRecord } from '../modules/auth/vaultSync';
 
 export const AdminBookingsTable: React.FC = () => {
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
@@ -28,14 +16,9 @@ export const AdminBookingsTable: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(getApiUrl('/api/bookings/export'));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const fetchedBookings = data.bookings || [];
-      setBookings(fetchedBookings);
-      if (fetchedBookings.length > 0) {
-        localStorage.setItem('ti_admin_bookings_vault', JSON.stringify(fetchedBookings));
-      }
+      // Additive Union Sync: reads local vault, merges with server, self-heals server if needed
+      const { bookings: merged } = await syncAndHealAdminData();
+      setBookings(merged);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
@@ -80,6 +63,9 @@ export const AdminBookingsTable: React.FC = () => {
         method: 'DELETE',
       });
       if (res.ok) {
+        const updated = bookings.filter((b) => b.id !== id);
+        setBookings(updated);
+        saveAdminBookingsVault(updated);
         await fetchBookings();
       }
     } catch {}

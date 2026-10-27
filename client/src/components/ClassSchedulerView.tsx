@@ -18,6 +18,12 @@ import { useAuthStore } from '../modules/auth/authStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { getApiUrl } from '../config/api';
 import { TEACHER_PHONE } from '../config/contact';
+import {
+  getStudentBookingsCache,
+  addStudentBookingToCache,
+  removeStudentBookingFromCache,
+  mergeBookingsAdditive,
+} from '../modules/auth/vaultSync';
 
 export const VALID_HOURS = [
   { start: '14:00', end: '15:00', label: '14:00 – 15:00' },
@@ -98,11 +104,46 @@ export const ClassSchedulerView: React.FC = () => {
     setActionError(null);
     try {
       const res = await fetch(getApiUrl(`/api/bookings?weekStart=${mondayIso}`));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setBookings(data.bookings || []);
+      const data = res.ok ? await res.json() : { bookings: [] };
+      const serverBookings: Booking[] = data.bookings || [];
+
+      // Student-Side Booking Self-Healing:
+      // If student has cached bookings for this week missing from server, rehydrate them
+      const cached = getStudentBookingsCache();
+      const startDate = new Date(mondayIso);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 7);
+
+      const myCachedThisWeek = cached.filter((b) => {
+        const bDate = new Date(`${b.date}T00:00:00`);
+        return bDate >= startDate && bDate < endDate;
+      });
+
+      const missingOnServer = myCachedThisWeek.filter(
+        (mb) => !serverBookings.some((sb) => sb.id === mb.id)
+      );
+
+      if (missingOnServer.length > 0) {
+        console.log(`[ClassSchedulerView] Rehydrating ${missingOnServer.length} student bookings to server...`);
+        fetch(getApiUrl('/api/users/rehydrate-roster'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookings: missingOnServer }),
+        }).catch(() => {});
+      }
+
+      const merged = mergeBookingsAdditive(cached, serverBookings);
+      const weekMerged = merged.filter((b) => {
+        const bDate = new Date(`${b.date}T00:00:00`);
+        return bDate >= startDate && bDate < endDate;
+      });
+
+      setBookings(weekMerged);
     } catch (err: unknown) {
       console.error('[ClassSchedulerView] Error fetching bookings:', err);
+      // Fallback to local cache so user sees their bookings even offline
+      const cached = getStudentBookingsCache();
+      setBookings(cached);
     } finally {
       setIsLoading(false);
     }
@@ -212,6 +253,10 @@ export const ClassSchedulerView: React.FC = () => {
         throw new Error(data.error || 'Failed to book slot.');
       }
 
+      if (data.booking) {
+        addStudentBookingToCache(data.booking);
+      }
+
       setActionSuccess(t.scheduling.bookedSuccess);
       await fetchBookings();
     } catch (err: unknown) {
@@ -248,6 +293,8 @@ export const ClassSchedulerView: React.FC = () => {
       if (!res.ok || data.error) {
         throw new Error(data.error || 'Failed to cancel booking.');
       }
+
+      removeStudentBookingFromCache(bookingId);
 
       setActionSuccess(t.scheduling.cancelSuccess);
       await fetchBookings();

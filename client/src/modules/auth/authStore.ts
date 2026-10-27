@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { AuthState, UserProfile, LearningGoals, StudentPlan } from './types';
 import { getApiUrl } from '../../config/api';
 import { useDevModeStore } from '../dev/devModeStore';
+import { getStudentBookingsCache, saveStudentBookingsCache } from './vaultSync';
 
 const USER_STORAGE_KEY = 'teacherivan_auth_user';
 const TOKEN_STORAGE_KEY = 'teacherivan_auth_token';
@@ -292,16 +293,31 @@ export const useAuthStore = create<AuthState>((set, get) => {
           if (jsonMe.user) serverUser = jsonMe.user;
         }
 
+        const cachedBookings = getStudentBookingsCache();
         if (!serverUser) {
           const resSync = await fetch(getApiUrl('/api/auth/sync'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user }),
+            body: JSON.stringify({ user, bookings: cachedBookings }),
           });
           if (resSync.ok) {
             const jsonSync = await resSync.json();
             if (jsonSync.user) serverUser = jsonSync.user;
+            if (Array.isArray(jsonSync.bookings) && jsonSync.bookings.length > 0) {
+              saveStudentBookingsCache(jsonSync.bookings);
+            }
           }
+        } else if (cachedBookings.length > 0) {
+          fetch(getApiUrl('/api/auth/sync'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: serverUser, bookings: cachedBookings }),
+          }).then(async (r) => {
+            if (r.ok) {
+              const j = await r.json();
+              if (Array.isArray(j.bookings)) saveStudentBookingsCache(j.bookings);
+            }
+          }).catch(() => {});
         }
 
         if (serverUser) {

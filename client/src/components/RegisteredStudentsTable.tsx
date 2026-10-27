@@ -5,6 +5,8 @@ import { UserProfile, StudentPlan } from '../modules/auth/types';
 import { useAuthStore } from '../modules/auth/authStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 
+import { syncAndHealAdminData, saveAdminRosterVault } from '../modules/auth/vaultSync';
+
 export const RegisteredStudentsTable: React.FC = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,38 +21,9 @@ export const RegisteredStudentsTable: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. If Admin has a cached roster vault, rehydrate server first
-      if (currentUser?.role === 'admin') {
-        try {
-          const cachedVault = localStorage.getItem('ti_admin_roster_vault');
-          const cachedBookings = localStorage.getItem('ti_admin_bookings_vault');
-          if (cachedVault) {
-            const parsedVault = JSON.parse(cachedVault);
-            const parsedBookings = cachedBookings ? JSON.parse(cachedBookings) : [];
-            if (Array.isArray(parsedVault) && parsedVault.length > 0) {
-              await fetch(getApiUrl('/api/users/rehydrate-roster'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ users: parsedVault, bookings: parsedBookings }),
-              });
-            }
-          }
-        } catch (vaultErr) {
-          console.warn('[Admin Roster Vault Rehydrate Notice]:', vaultErr);
-        }
-      }
-
-      // 2. Fetch authoritative user roster from server
-      const res = await fetch(getApiUrl('/api/users/export'));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const fetchedUsers: UserProfile[] = data.users || [];
-      setUsers(fetchedUsers);
-
-      // 3. Save to Admin Roster Vault for ephemeral-safe persistence
-      if (currentUser?.role === 'admin' && fetchedUsers.length > 0) {
-        localStorage.setItem('ti_admin_roster_vault', JSON.stringify(fetchedUsers));
-      }
+      // Additive Union Sync: reads local vault, merges with server, self-heals server if needed
+      const { users: merged } = await syncAndHealAdminData();
+      setUsers(merged);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
@@ -84,7 +57,7 @@ export const RegisteredStudentsTable: React.FC = () => {
 
       setUsers(updatedList);
       if (currentUser?.role === 'admin') {
-        localStorage.setItem('ti_admin_roster_vault', JSON.stringify(updatedList));
+        saveAdminRosterVault(updatedList);
       }
 
       setSuccessUserId(userId);

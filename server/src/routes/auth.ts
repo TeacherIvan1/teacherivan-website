@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { userStore } from '../services/userStore.js';
+import { bookingStore } from '../services/bookingStore.js';
 
 const router = Router();
 
@@ -421,6 +422,8 @@ router.post('/ack-plan-notification', (req: Request, res: Response) => {
 router.post('/sync', (req: Request, res: Response) => {
   try {
     const userPayload = req.body?.user || req.body;
+    const incomingBookings = req.body?.bookings || req.body?.myBookings || [];
+
     if (!userPayload || !userPayload.email) {
       return res.status(400).json({ error: 'Valid user profile required for sync' });
     }
@@ -428,10 +431,23 @@ router.post('/sync', (req: Request, res: Response) => {
     const user = userStore.syncClientUser(userPayload);
     const token = userStore.createSessionToken(user.id, user.role || 'student');
 
+    // Self-healing student bookings from client cache
+    if (Array.isArray(incomingBookings) && incomingBookings.length > 0) {
+      const studentBookings = incomingBookings.filter(
+        (b) => b && (b.studentId === user.id || userStore.normalizeEmail(b.studentEmail) === userStore.normalizeEmail(user.email))
+      );
+      if (studentBookings.length > 0) {
+        bookingStore.rehydrateBookings(studentBookings);
+      }
+    }
+
+    const userBookings = bookingStore.getBookingsForStudent(user.id);
+
     return res.status(200).json({
       status: 'ok',
       user,
       token,
+      bookings: userBookings,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

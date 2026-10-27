@@ -110,6 +110,14 @@ export class BookingStore {
     });
   }
 
+  public getBookingsForStudent(studentIdOrEmail: string): Booking[] {
+    if (!studentIdOrEmail) return [];
+    const norm = studentIdOrEmail.trim().toLowerCase();
+    return this.getAllBookings().filter(
+      (b) => b.studentId === studentIdOrEmail || (b.studentEmail && b.studentEmail.toLowerCase() === norm)
+    );
+  }
+
   public getBookingsForWeek(weekStartIso: string): Booking[] {
     // Calculate week start and week end (7 days)
     const startDate = new Date(weekStartIso);

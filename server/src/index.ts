@@ -10,6 +10,7 @@ import bookingRouter from './routes/bookings.js';
 import curriculumRouter from './routes/curriculum.js';
 import { userStore } from './services/userStore.js';
 import { bookingStore } from './services/bookingStore.js';
+import { initRemoteBackup } from './services/remoteBackup.js';
 
 // Resolve directory paths for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -170,4 +171,9 @@ app.listen(port, () => {
     console.log(` -> Set GEMINI_API_KEY in server/.env or root .env to enable token minting`);
   }
   console.log(`======================================================\n`);
+
+  // Initialize Cloud Backup persistence (Gist / KV / Self-Healing)
+  initRemoteBackup().catch((err) => {
+    console.warn('[Remote Backup] Initialization notice:', err);
+  });
 });
