@@ -1,0 +1,16 @@
+{
+  "appId": "com.teacherivan.app",
+  "appName": "Teacher Ivan",
+  "webDir": "client/dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://teacherivan.com",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "ios": {
+    "preferredContentMode": "mobile"
+  }
+}

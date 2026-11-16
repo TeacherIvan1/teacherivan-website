@@ -1,0 +1,14 @@
+# Client local dependencies & build outputs
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# Environment secrets
+.env
+.env.*
+*.local
+!.env.example
+
+# Logs & temp
+*.log

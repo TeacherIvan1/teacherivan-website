@@ -1,0 +1,26 @@
+{
+  "name": "Teacher Ivan - AI English Coach",
+  "short_name": "Teacher Ivan",
+  "description": "Master Spoken English with personalized human coaching and 24/7 Gemini Live AI Voice Practice.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1A3153",
+  "theme_color": "#E09B30",
+  "categories": ["education", "language"],
+  "icons": [
+    {
+      "src": "/assets/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/teacher-ivan-rig.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

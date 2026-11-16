@@ -1,0 +1,34 @@
+{
+  "name": "gemini-live-tutor-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "node --import tsx --test src/modules/audio/interruption.test.ts src/modules/latency/latency.test.ts src/modules/report/report.test.ts src/modules/teaching/teaching.test.ts src/modules/i18n/i18n.test.ts src/modules/dev/devMode.test.ts src/modules/conversation/transcriptCleaner.test.ts src/modules/sprint/sprintStore.test.ts src/modules/auth/authStore.test.ts src/modules/auth/vaultSync.test.ts",
+    "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs"
+  },
+  "dependencies": {
+    "@astryxdesign/core": "^0.7.16",
+    "@astryxdesign/theme-neutral": "^0.7.16",
+    "@stylexjs/stylex": "^0.19.2",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@astryxdesign/cli": "^0.7.16",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.6.1",
+    "playwright": "^1.64.1",
+    "postcss": "^8.5.30",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}

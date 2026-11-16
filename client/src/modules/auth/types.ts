@@ -1,0 +1,105 @@
+export interface LearningGoals {
+  targetLevel: string; // 'A1' | 'A2' | 'B1' | 'B2' | 'C1 / IELTS'
+  primaryGoal: string; // 'Tech & Job Interviews' | 'University Scholarship' | 'IELTS Exam Prep' | 'Business & Executive English' | 'Daily Conversational Fluency'
+  focusSkill: string;  // 'Speaking Fluency & Pronunciation' | 'Grammar & Syntax Accuracy' | 'Professional Vocabulary & Collocations' | 'Listening Comprehension'
+  personalObjective: string;
+}
+
+export type StudentPlan = 'free' | 'essential' | 'pro' | 'executive';
+
+export interface UserProfile {
+  id: string;
+  username?: string;
+  fullName: string;
+  email: string;
+  phoneNumber?: string;
+  dateOfBirth: string;
+  country: string;
+  authProvider: 'email' | 'google';
+  role?: 'student' | 'admin';
+  plan?: StudentPlan;
+  planUpdatedAt?: string;
+  planNotificationPending?: boolean;
+  maxWeeklyClasses?: number;
+  maxDailySessions?: number;
+  dailySessionsUsed?: number;
+  lastSessionDate?: string;
+  profileCompleted?: boolean;
+  learningGoals?: LearningGoals;
+  cefrLevel?: string;
+  lastScore?: number;
+  createdAt: string;
+}
+
+export const SUPPORTED_COUNTRIES = [
+  'Bolivia',
+  'Mexico',
+  'Colombia',
+  'Peru',
+  'Argentina',
+  'Chile',
+  'Spain',
+  'USA',
+  'Other',
+] as const;
+
+export type SupportedCountry = (typeof SUPPORTED_COUNTRIES)[number];
+
+export interface AuthState {
+  user: UserProfile | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isAuthModalOpen: boolean;
+  authModalMode: 'signup' | 'signin' | 'recover_password' | 'complete_google_profile';
+  authModalBanner: string | null;
+  pendingGoogleProfile: { email: string; fullName: string } | null;
+  pendingPlanModal: { plan: StudentPlan; planUpdatedAt?: string } | null;
+  isLoading: boolean;
+  error: string | null;
+
+  openAuthModal: (
+    mode?: 'signup' | 'signin' | 'recover_password' | 'complete_google_profile',
+    pending?: { email: string; fullName: string },
+    banner?: string | null
+  ) => void;
+  closeAuthModal: () => void;
+  registerWithEmail: (data: {
+    username: string;
+    password?: string;
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    dateOfBirth: string;
+    country: string;
+    learningGoals?: LearningGoals;
+    profileCompleted?: boolean;
+  }) => Promise<void>;
+  authenticateWithGoogle: (data: {
+    email: string;
+    fullName: string;
+    phoneNumber?: string;
+    dateOfBirth?: string;
+    country?: string;
+    learningGoals?: LearningGoals;
+    profileCompleted?: boolean;
+  }) => Promise<{ needsProfileCompletion: boolean }>;
+  loginWithCredentials: (data: {
+    username?: string;
+    email?: string;
+    phoneNumber?: string;
+    password?: string;
+  }) => Promise<UserProfile>;
+  recoverPassword: (data: {
+    username: string;
+    verificationContact: string;
+    newPassword: string;
+  }) => Promise<void>;
+  saveProfileGoals: (goals: LearningGoals) => Promise<UserProfile>;
+  updateUserPlan: (userId: string, plan: StudentPlan) => Promise<UserProfile>;
+  checkAndIncrementSessionQuota: () => { allowed: boolean; remaining: number | 'unlimited'; used: number; max: number };
+  syncWithServer: () => Promise<void>;
+  ackPlanNotification: () => Promise<void>;
+  dismissPlanModal: () => void;
+  updateUserStats: (cefrLevel: string, lastScore: number) => void;
+  signOut: () => void;
+}

@@ -1,0 +1,173 @@
+/* ==============================================================================
+   Meta Astryx Design System - Custom Theme: Teacher Ivan
+   Platform: Teacher Ivan - English Classes & Real-Time AI Voice Tutor
+   Brand Spec (DESIGN.md):
+     - Primary / Surface Dark: Deep Navy #1A3153 (rgb(26, 49, 83))
+     - Accent / Interactive Primary: Warm Amber #E09B30 (rgb(224, 155, 48))
+     - Secondary / Subtle Border & Tag Surface: Soft Denim Blue #A7C7E7 (rgb(167, 199, 231))
+     - Body Copy / Muted Text: Neutral Slate #4A5568 (rgb(74, 85, 104))
+     - Background Light / Elevated Card Surface: Pure Off-White #FAFAFA (rgb(250, 250, 250))
+     - Typography: Montserrat (Headings & uppercase +15% badges) & Inter (Body & controls)
+   ============================================================================== */
+
+@layer reset, astryx-base, astryx-theme;
+
+:root,
+[data-astryx-theme="teacher-ivan"],
+[data-astryx-theme="neutral"] {
+  /* Brand Primitive Colors */
+  --astryx-navy-primary: #1A3153;
+  --astryx-navy-dark: #12223A;
+  --astryx-navy-light: #24416B;
+  --astryx-amber-primary: #E09B30;
+  --astryx-amber-hover: #C88624;
+  --astryx-amber-muted: rgba(224, 155, 48, 0.15);
+  --astryx-denim-primary: #A7C7E7;
+  --astryx-denim-border: #A7C7E7;
+  --astryx-denim-muted: rgba(167, 199, 231, 0.15);
+  --astryx-slate-body: #4A5568;
+  --astryx-offwhite-surface: #FAFAFA;
+
+  /* Astryx Semantic Color Tokens */
+  --color-background-surface: #FAFAFA;
+  --color-background-body: #FAFAFA;
+  --color-background-card: #FAFAFA;
+  --color-background-popover: #FAFAFA;
+  --color-background-muted: rgba(167, 199, 231, 0.12);
+  --color-background-inverted: #1A3153;
+
+  /* Surfaces & High-Contrast Institutional Zones */
+  --color-surface-dark: #1A3153;
+  --color-surface-dark-card: rgba(18, 34, 58, 0.95);
+  --color-surface-light: #FAFAFA;
+
+  /* Accent & Interactive */
+  --color-accent: #E09B30;
+  --color-accent-hover: #C88624;
+  --color-accent-muted: rgba(224, 155, 48, 0.15);
+  --color-neutral: rgba(74, 85, 104, 0.12);
+  --color-overlay: rgba(26, 49, 83, 0.65);
+  --color-overlay-hover: rgba(224, 155, 48, 0.08);
+  --color-overlay-pressed: rgba(224, 155, 48, 0.18);
+
+  /* Text Semantics */
+  --color-text-primary: #1A3153;
+  --color-text-secondary: #4A5568;
+  --color-text-muted: #718096;
+  --color-text-disabled: #A0AEC0;
+  --color-text-accent: #E09B30;
+  --color-on-dark: #FAFAFA;
+  --color-on-light: #1A3153;
+  --color-on-accent: #1A3153;
+
+  /* Status Tokens */
+  --color-info: #0074E2;
+  --color-info-muted: rgba(0, 116, 226, 0.15);
+  --color-on-info: #FAFAFA;
+  --color-success: #10B981;
+  --color-success-muted: rgba(16, 185, 129, 0.15);
+  --color-on-success: #FAFAFA;
+  --color-warning: #E09B30;
+  --color-warning-muted: rgba(224, 155, 48, 0.15);
+  --color-on-warning: #1A3153;
+  --color-error: #EF4444;
+  --color-error-muted: rgba(239, 68, 68, 0.15);
+  --color-on-error: #FAFAFA;
+
+  /* Text & Border Status */
+  --color-text-info: #0074E2;
+  --color-text-success: #10B981;
+  --color-text-warning: #E09B30;
+  --color-text-error: #EF4444;
+  --color-border-info: #0074E2;
+  --color-border-success: #10B981;
+  --color-border-warning: #E09B30;
+  --color-border-error: #EF4444;
+
+  /* Borders & Dividers */
+  --color-border: #A7C7E7;
+  --color-border-subtle: rgba(167, 199, 231, 0.4);
+  --color-border-emphasized: #1A3153;
+  --color-border-accent: #E09B30;
+
+  /* Astryx Typography Tokens */
+  --font-family-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-code: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+  /* Typography Scale */
+  --font-size-2xs: 0.6875rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing Scale (4px Base Unit) */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+
+  /* Astryx Border Radius */
+  --radius-none: 0px;
+  --radius-inner: 0.375rem;     /* 6px */
+  --radius-element: 0.5rem;      /* 8px */
+  --radius-container: 0.75rem;   /* 12px */
+  --radius-page: 1rem;           /* 16px */
+  --radius-full: 9999px;
+
+  /* Astryx Shadows */
+  --shadow-low: 0 1px 3px rgba(26, 49, 83, 0.08), 0 1px 2px rgba(26, 49, 83, 0.04);
+  --shadow-med: 0 4px 6px -1px rgba(26, 49, 83, 0.1), 0 2px 4px -1px rgba(26, 49, 83, 0.06);
+  --shadow-high: 0 10px 15px -3px rgba(26, 49, 83, 0.12), 0 4px 6px -2px rgba(26, 49, 83, 0.05);
+
+  /* Motion Timing */
+  --duration-fast: 150ms;
+  --duration-medium: 250ms;
+  --duration-slow: 400ms;
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Scoped Scope Override for Dark Institutional Simulator & High-Focus Zones */
+.astryx-dark-surface,
+[data-theme="dark"],
+.dark-institutional-zone {
+  --color-background-surface: #1A3153;
+  --color-background-body: #12223A;
+  --color-background-card: rgba(18, 34, 58, 0.95);
+  --color-background-popover: #1A3153;
+  --color-text-primary: #FAFAFA;
+  --color-text-secondary: #A7C7E7;
+  --color-text-muted: #718096;
+  --color-border: rgba(167, 199, 231, 0.25);
+  --color-border-emphasized: #E09B30;
+}
+
+/* Headings & Badges Discipline */
+.astryx-heading {
+  font-family: var(--font-family-heading);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.astryx-cefr-badge {
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.15em; /* Required +15% tracking */
+}

@@ -1,0 +1,13 @@
+# Server local dependencies & build outputs
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment secrets (STRICT - GEMINI API KEY LIVES ONLY HERE)
+.env
+.env.*
+*.local
+!.env.example
+
+# Logs & temp
+*.log
