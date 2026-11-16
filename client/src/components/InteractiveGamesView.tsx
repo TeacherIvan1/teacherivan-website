@@ -11,6 +11,7 @@ import {
   Flame,
   Award,
   Zap,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
@@ -420,8 +421,9 @@ export const InteractiveGamesView: React.FC = () => {
                   className="w-12 h-12 rounded-full bg-[#FAFAFA] p-1 shrink-0 object-contain shadow-md"
                 />
                 <div>
-                  <span className="text-[11px] font-mono text-[#f59e0b] uppercase font-bold tracking-wider block mb-1">
-                    ⚠️ {isEs ? 'Frase con Error Común' : 'Common Spanish Interference'}:
+                  <span className="text-[11px] font-mono text-[#f59e0b] uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
+                    <AlertTriangle size={13} className="text-[#f59e0b] shrink-0" />
+                    <span>{isEs ? 'Frase con Error Común:' : 'Common Spanish Interference:'}</span>
                   </span>
                   <p className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA] italic">
                     "{recastQuestions[currentRecastIndex].badSentence}"

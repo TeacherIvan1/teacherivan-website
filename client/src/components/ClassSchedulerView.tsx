@@ -13,6 +13,7 @@ import {
   CalendarDays,
   ShieldCheck,
   ExternalLink,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '../modules/auth/authStore';
 import { useTranslation } from '../modules/i18n/languageStore';
@@ -436,9 +437,10 @@ export const ClassSchedulerView: React.FC = () => {
           <button
             type="button"
             onClick={() => setActionSuccess(null)}
-            className="text-xs underline hover:text-white cursor-pointer"
+            className="text-xs hover:text-white cursor-pointer p-1"
+            aria-label="Close"
           >
-            ✕
+            <X size={14} />
           </button>
         </div>
       )}
@@ -464,9 +466,10 @@ export const ClassSchedulerView: React.FC = () => {
             <button
               type="button"
               onClick={() => setActionError(null)}
-              className="text-xs underline hover:text-white cursor-pointer px-1"
+              className="text-xs hover:text-white cursor-pointer p-1"
+              aria-label="Close"
             >
-              ✕
+              <X size={14} />
             </button>
           </div>
         </div>

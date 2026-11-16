@@ -402,7 +402,7 @@ export const StudentAuthModal: React.FC = () => {
     >
       <div
         id="student-auth-modal-card"
-        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[var(--radius-container)] p-4 sm:p-6 box-border bg-[#FAFAFA] text-[#1A3153] border border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[var(--radius-container)] p-4 sm:p-6 pb-6 sm:pb-8 box-border bg-[#FAFAFA] text-[#1A3153] border border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-[#A7C7E7]/30 text-[#1A3153]">
@@ -902,15 +902,15 @@ export const StudentAuthModal: React.FC = () => {
                     >
                       {SUPPORTED_COUNTRIES.map((c) => (
                         <option key={c} value={c}>
-                          {c === 'Bolivia' ? '🇧🇴 Bolivia' :
-                           c === 'Mexico' ? '🇲🇽 Mexico' :
-                           c === 'Colombia' ? '🇨🇴 Colombia' :
-                           c === 'Peru' ? '🇵🇪 Peru' :
-                           c === 'Argentina' ? '🇦🇷 Argentina' :
-                           c === 'Chile' ? '🇨🇱 Chile' :
-                           c === 'Spain' ? '🇪🇸 Spain' :
-                           c === 'USA' ? '🇺🇸 United States' :
-                           '🌐 Other'}
+                          {c === 'Bolivia' ? 'Bolivia (BO)' :
+                           c === 'Mexico' ? 'Mexico (MX)' :
+                           c === 'Colombia' ? 'Colombia (CO)' :
+                           c === 'Peru' ? 'Peru (PE)' :
+                           c === 'Argentina' ? 'Argentina (AR)' :
+                           c === 'Chile' ? 'Chile (CL)' :
+                           c === 'Spain' ? 'Spain (ES)' :
+                           c === 'USA' ? 'United States (US)' :
+                           'Other (Global)'}
                         </option>
                       ))}
                     </select>

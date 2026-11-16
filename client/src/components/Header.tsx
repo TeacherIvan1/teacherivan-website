@@ -79,20 +79,6 @@ export const Header: React.FC = () => {
     openAssessmentModal();
   };
 
-  const getCountryFlag = (country?: string): string => {
-    if (!country) return '🌐';
-    const c = country.toLowerCase();
-    if (c.includes('bolivia')) return '🇧🇴';
-    if (c.includes('mexico')) return '🇲🇽';
-    if (c.includes('colombia')) return '🇨🇴';
-    if (c.includes('peru')) return '🇵🇪';
-    if (c.includes('argentina')) return '🇦🇷';
-    if (c.includes('chile')) return '🇨🇱';
-    if (c.includes('spain') || c.includes('españa')) return '🇪🇸';
-    if (c.includes('usa') || c.includes('united states')) return '🇺🇸';
-    return '🌐';
-  };
-
   return (
     <header className="sticky top-0 z-40 bg-[#12223a]/95 backdrop-blur-md border-b border-[#A7C7E7]/25 w-full select-none" id="app-header">
       {/* 🎁 Campaign Promotional Strip */}
@@ -297,7 +283,7 @@ export const Header: React.FC = () => {
               {/* Live Plan Status Badge */}
               <div
                 id="header-plan-status-badge"
-                className={`text-[10px] font-montserrat font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-0.5 transition-all shadow-sm ${user.plan === 'executive'
+                className={`text-[10px] font-montserrat font-bold px-1.5 sm:px-2 py-0.5 rounded-full shrink-0 flex items-center gap-0.5 transition-all shadow-sm ${user.plan === 'executive'
                   ? 'bg-gradient-to-r from-emerald-500 to-[#E09B30] text-[#1A3153] border border-[#E09B30]/50 font-black'
                   : user.plan === 'pro'
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/20 font-black'
@@ -307,7 +293,16 @@ export const Header: React.FC = () => {
                   }`}
                 title={user.plan === 'free' || !user.plan ? (isEs ? 'Campaña Noviembre Gratis (5 sesiones/día)' : 'Free November Campaign (5 sessions/day)') : `Plan: ${(user.plan || 'free').toUpperCase()}`}
               >
-                <span className="whitespace-nowrap">
+                <span className="whitespace-nowrap sm:hidden">
+                  {user.plan === 'executive'
+                    ? 'EXEC'
+                    : user.plan === 'pro'
+                      ? 'PRO'
+                      : user.plan === 'essential'
+                        ? 'ESSENTIAL'
+                        : (isEs ? 'GRATIS' : 'FREE')}
+                </span>
+                <span className="whitespace-nowrap hidden sm:inline">
                   {user.plan === 'executive'
                     ? 'EXECUTIVE • VIP'
                     : user.plan === 'pro'

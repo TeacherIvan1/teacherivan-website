@@ -19,6 +19,7 @@ import {
   Layers,
   Check,
   TrendingUp,
+  XCircle,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
@@ -141,7 +142,7 @@ export const LandingPageView: React.FC = () => {
       name: t.pricingPlans.pro.name,
       target: t.pricingPlans.pro.target,
       price: currency === 'BOB' ? t.pricingPlans.pro.priceBob : t.pricingPlans.pro.priceUsd,
-      badge: isEs ? '⭐ FLAGSHIP / MÁS POPULAR' : '⭐ FLAGSHIP / MOST POPULAR',
+      badge: isEs ? 'FLAGSHIP / MÁS POPULAR' : 'FLAGSHIP / MOST POPULAR',
       features: [
         isEs ? '2 reuniones individuales por semana (60 min c/u)' : '2 live 1-on-1 meetings per week (60 min each)',
         isEs ? 'Acceso 24/7 ILIMITADO al Simulador de Voz IA' : 'Unlimited 24/7 Access to AI Voice Simulator',
@@ -284,11 +285,13 @@ export const LandingPageView: React.FC = () => {
         className="py-10 px-4 sm:px-6 bg-[#12223a] border-b border-[#A7C7E7]/25 text-center"
       >
         <div className="max-w-4xl mx-auto space-y-4">
-          <p className="font-montserrat font-semibold text-sm sm:text-base md:text-lg text-[#f87171] leading-relaxed">
-            ❌ {lp.problemLine}
+          <p className="font-montserrat font-semibold text-sm sm:text-base md:text-lg text-[#f87171] leading-relaxed flex items-center justify-center gap-2">
+            <XCircle size={18} className="text-[#f87171] shrink-0" />
+            <span>{lp.problemLine}</span>
           </p>
-          <p className="font-montserrat font-extrabold text-base sm:text-xl md:text-2xl text-[#FAFAFA] leading-relaxed">
-            ✨ <span className="text-[#E09B30]">{lp.solutionLine}</span>
+          <p className="font-montserrat font-extrabold text-base sm:text-xl md:text-2xl text-[#FAFAFA] leading-relaxed flex items-center justify-center gap-2">
+            <Sparkles size={18} className="text-[#E09B30] shrink-0" />
+            <span className="text-[#E09B30]">{lp.solutionLine}</span>
           </p>
         </div>
       </section>
@@ -394,7 +397,7 @@ export const LandingPageView: React.FC = () => {
 
                 <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A5568] pt-2">
                   <li className="flex items-start gap-2">
-                    <span className="text-red-500 font-bold shrink-0">✕</span>
+                    <XCircle size={15} className="text-red-500 shrink-0 mt-0.5" />
                     <span>
                       {isEs
                         ? '20 a 30 alumnos compitiendo por 2 minutos de participación al azar.'
@@ -402,7 +405,7 @@ export const LandingPageView: React.FC = () => {
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-red-500 font-bold shrink-0">✕</span>
+                    <XCircle size={15} className="text-red-500 shrink-0 mt-0.5" />
                     <span>
                       {isEs
                         ? '45 minutos de explicaciones gramaticales pasivas en pizarrón.'
@@ -410,7 +413,7 @@ export const LandingPageView: React.FC = () => {
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-red-500 font-bold shrink-0">✕</span>
+                    <XCircle size={15} className="text-red-500 shrink-0 mt-0.5" />
                     <span>
                       {isEs
                         ? 'Miedo al juicio grupal que paraliza la espontaneidad al hablar.'

@@ -11,6 +11,7 @@ import {
   Volume2,
   RotateCcw,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useDebugStore } from '../modules/debug/debugLogger';
@@ -261,8 +262,8 @@ export const TutorControls: React.FC = () => {
                 </div>
               )}
             </div>
-            <button onClick={clearError} title="Dismiss" style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', padding: 4 }}>
-              ✕
+            <button onClick={clearError} title="Dismiss" aria-label="Dismiss" style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', padding: 4 }}>
+              <X size={16} />
             </button>
           </div>
 

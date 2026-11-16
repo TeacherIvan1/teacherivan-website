@@ -15,6 +15,7 @@ import {
   AlertCircle,
   X,
   Lock,
+  User,
 } from 'lucide-react';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
@@ -479,7 +480,7 @@ export const CompactVoiceSimulator: React.FC = () => {
         {latestUserMsg && (
           <div className="flex items-start gap-2.5 text-xs sm:text-sm flex-row-reverse">
             <div className="w-6 h-6 rounded-full bg-[#A7C7E7] text-[#1A3153] flex items-center justify-center shrink-0 font-bold text-[11px]">
-              👤
+              <User size={13} className="text-[#1A3153]" />
             </div>
             <div className="flex-1 bg-[#1A3153]/50 rounded-xl rounded-tr-none p-2.5 border border-[#A7C7E7]/20 text-right">
               <div className="text-[10px] font-montserrat font-bold text-[#A7C7E7] mb-0.5">
@@ -600,9 +601,10 @@ export const CompactVoiceSimulator: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setQuotaError(null)}
-                className="text-xs underline hover:text-white cursor-pointer px-1"
+                className="text-xs hover:text-white cursor-pointer p-1"
+                aria-label="Close"
               >
-                ✕
+                <X size={14} />
               </button>
             </div>
           </div>

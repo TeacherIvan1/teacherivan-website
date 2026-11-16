@@ -54,6 +54,10 @@ test-screenshots/
 **/test-screenshots/
 coverage/
 
+# Local agent skills cache
+.agent/
+**/.agent/
+
 # OS and Editor metadata
 .DS_Store
 Thumbs.db
