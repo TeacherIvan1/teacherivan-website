@@ -213,7 +213,7 @@ export const App: React.FC = () => {
                 >
                   <span className="flex items-center gap-1.5">
                     <Headphones size={13} />
-                    <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
+                    <span>{isEs ? 'Tutor de Conversación' : 'Voice Tutor'}</span>
                   </span>
                 </button>
 
@@ -255,7 +255,7 @@ export const App: React.FC = () => {
                 >
                   <span className="flex items-center gap-1.5">
                     <Headphones size={13} />
-                    <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
+                    <span>{isEs ? 'Tutor de Conversación' : 'Voice Tutor'}</span>
                   </span>
                 </button>
 

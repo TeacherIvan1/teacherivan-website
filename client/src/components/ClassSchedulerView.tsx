@@ -219,8 +219,8 @@ export const ClassSchedulerView: React.FC = () => {
     // If Free Plan, prompt student to activate plan via WhatsApp
     if (maxWeeklyClasses === 0 || userPlan === 'free') {
       const upgradeMsg = isEs
-        ? 'El Plan Gratuito incluye 5 sesiones diarias de Simulador IA, pero no incluye clases en vivo 1 a 1. ¡Escríbele a Teacher Ivan por WhatsApp para activar tu plan Essential, Pro o Executive!'
-        : 'The Free Plan includes 5 daily AI Simulator sessions, but does not include 1-on-1 live classes. Message Teacher Ivan on WhatsApp to activate your Essential, Pro, or Executive plan!';
+        ? 'El Plan Gratuito incluye 5 sesiones diarias en el Laboratorio de Voz, pero no incluye clases en vivo 1 a 1. ¡Escríbele a Teacher Ivan por WhatsApp para activar tu plan Essential, Pro o Executive!'
+        : 'The Free Plan includes 5 daily Voice Lab sessions, but does not include 1-on-1 live classes. Message Teacher Ivan on WhatsApp to activate your Essential, Pro, or Executive plan!';
       setActionError(upgradeMsg);
       return;
     }
@@ -409,8 +409,8 @@ export const ClassSchedulerView: React.FC = () => {
             </h3>
             <p className="text-xs text-[#A7C7E7] max-w-xl">
               {isEs
-                ? 'Tu cuenta gratuita incluye 5 sesiones diarias de Simulador IA. Para reservar clases semanales 1 a 1 de 1 hora (14:00–20:00 Bolivia), activa tu plan Essential, Pro o Executive vía WhatsApp.'
-                : 'Your free account includes 5 daily AI Simulator sessions. To book weekly 1-hour live classes (14:00–20:00 Bolivia), activate your Essential, Pro, or Executive plan via WhatsApp.'}
+                ? 'Tu cuenta gratuita incluye 5 sesiones diarias en el Laboratorio de Voz. Para reservar clases semanales 1 a 1 de 1 hora (14:00–20:00 Bolivia), activa tu plan Essential, Pro o Executive vía WhatsApp.'
+                : 'Your free account includes 5 daily Voice Lab sessions. To book weekly 1-hour live classes (14:00–20:00 Bolivia), activate your Essential, Pro, or Executive plan via WhatsApp.'}
             </p>
           </div>
           <a

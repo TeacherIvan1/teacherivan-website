@@ -7,26 +7,26 @@ describe('i18n Language Module', () => {
   it('defaults to Spanish (es)', () => {
     const state = useLanguageStore.getState();
     assert.strictEqual(state.lang, 'es');
-    assert.strictEqual(state.translations.nav.voiceTutor, 'Tutor de Voz IA');
+    assert.strictEqual(state.translations.nav.voiceTutor, 'Tutor de Conversación Interactiva');
   });
 
   it('switches language cleanly to English (en)', () => {
     useLanguageStore.getState().setLang('en');
     const state = useLanguageStore.getState();
     assert.strictEqual(state.lang, 'en');
-    assert.strictEqual(state.translations.nav.voiceTutor, 'AI Voice Tutor');
-    assert.strictEqual(state.translations.howToUse.title, 'How to Use the Voice Tutor Simulator');
+    assert.strictEqual(state.translations.nav.voiceTutor, 'Interactive Conversation Tutor');
+    assert.strictEqual(state.translations.howToUse.title, 'How to Use the Voice Lab');
   });
 
   it('toggles back and forth between en and es', () => {
     useLanguageStore.getState().setLang('en');
     useLanguageStore.getState().toggleLang();
     assert.strictEqual(useLanguageStore.getState().lang, 'es');
-    assert.strictEqual(useLanguageStore.getState().translations.howToUse.title, 'Cómo Usar el Simulador de Voz');
+    assert.strictEqual(useLanguageStore.getState().translations.howToUse.title, 'Cómo Usar el Laboratorio de Voz');
 
     useLanguageStore.getState().toggleLang();
     assert.strictEqual(useLanguageStore.getState().lang, 'en');
-    assert.strictEqual(useLanguageStore.getState().translations.howToUse.title, 'How to Use the Voice Tutor Simulator');
+    assert.strictEqual(useLanguageStore.getState().translations.howToUse.title, 'How to Use the Voice Lab');
 
     // Reset back to default 'es'
     useLanguageStore.getState().setLang('es');
@@ -132,13 +132,13 @@ describe('i18n Language Module', () => {
 
   it('contains reassurance notice, doneSpeaking button, and dynamic placeholders in en and es', () => {
     // English transcript strings
-    assert.ok(translations.en.transcript.reassuranceNotice.includes('AI tutor listens to your real voice'));
+    assert.ok(translations.en.transcript.reassuranceNotice.includes('conversation tutor listens to your real voice'));
     assert.strictEqual(translations.en.transcript.doneSpeaking, 'Done Speaking');
     assert.ok(translations.en.transcript.placeholderConnectedIvan.includes('Teacher Ivan'));
     assert.ok(translations.en.transcript.placeholderConnectedEmma.includes('Emma'));
 
     // Spanish transcript strings
-    assert.ok(translations.es.transcript.reassuranceNotice.includes('El tutor IA escucha tu voz real'));
+    assert.ok(translations.es.transcript.reassuranceNotice.includes('El tutor de conversación escucha tu voz real'));
     assert.strictEqual(translations.es.transcript.doneSpeaking, 'Listo');
     assert.ok(translations.es.transcript.placeholderConnectedIvan.includes('Teacher Ivan'));
     assert.ok(translations.es.transcript.placeholderConnectedEmma.includes('Emma'));
@@ -148,8 +148,8 @@ describe('i18n Language Module', () => {
     // 5 Navigation Tabs
     assert.strictEqual(translations.en.nav.overview, 'Overview');
     assert.strictEqual(translations.es.nav.overview, 'Inicio');
-    assert.strictEqual(translations.en.nav.simulator, 'AI Simulator');
-    assert.strictEqual(translations.es.nav.simulator, 'Simulador IA');
+    assert.strictEqual(translations.en.nav.simulator, 'Voice Lab');
+    assert.strictEqual(translations.es.nav.simulator, 'Laboratorio de Voz');
     assert.strictEqual(translations.en.nav.resources, 'Resources');
     assert.strictEqual(translations.es.nav.resources, 'Recursos');
     assert.strictEqual(translations.en.nav.games, 'Games');

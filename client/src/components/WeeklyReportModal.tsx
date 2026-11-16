@@ -60,7 +60,7 @@ export const WeeklyReportModal: React.FC = () => {
       `🔥 *${isEs ? 'Progreso Semanal' : 'Weekly Habit Sprint'}:* ${stageCount}/5 ${isEs ? 'Días Completados' : 'Days Completed'} (+${totalXp} XP)`,
       `📚 *${isEs ? 'Recursos Completados' : 'Resources Completed'}:* ${completedReadings.length} ${isEs ? 'lecturas' : 'readings'}, ${completedVideos.length} ${isEs ? 'videos' : 'videos'}`,
       `🎮 *${isEs ? 'Precisión en Juegos' : 'Game Accuracy'}:* ${avgAccuracy}%`,
-      `🗣️ *${isEs ? 'Simulador de Voz IA' : 'AI Voice Simulator'}:* ${simulatorScore}/100 pts (${recentRecastsCount} recasts)`,
+      `🗣️ *${isEs ? 'Laboratorio de Voz' : 'Voice Lab'}:* ${simulatorScore}/100 pts (${recentRecastsCount} recasts)`,
       ``,
       `✍️ *${isEs ? 'Producción Escrita (Día 4)' : 'Written Response (Day 4)'}:*`,
       `"${day4Writing ? day4Writing.slice(0, 200) + (day4Writing.length > 200 ? '...' : '') : (isEs ? 'Sin entrega escrita aún' : 'No written submission yet')}"`,
@@ -165,7 +165,7 @@ export const WeeklyReportModal: React.FC = () => {
               </div>
               <div>
                 <span className="text-[11px] text-[#A7C7E7] block">
-                  {isEs ? 'Práctica Oral en Simulador IA' : 'AI Voice Simulator'}
+                  {isEs ? 'Práctica en Laboratorio de Voz' : 'Voice Lab Practice'}
                 </span>
                 <span className="font-montserrat font-bold text-sm text-[#FAFAFA]">
                   {simulatorScore}/100 pts • {recentRecastsCount} recasting

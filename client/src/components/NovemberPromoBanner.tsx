@@ -15,8 +15,8 @@ export const NovemberPromoBanner: React.FC = () => {
         'signup',
         undefined,
         isEs
-          ? '¡Campaña Noviembre Gratis! Registrate en 30 segundos y desbloqueá el Simulador de Voz IA + Tu Ruta de Micro-Aprendizaje.'
-          : 'Free November Campaign! Sign up in 30 seconds to unlock the AI Voice Simulator + Micro-Learning Path.'
+          ? '¡Campaña Noviembre Gratis! Registrate en 30 segundos y desbloqueá el Laboratorio de Voz 24/7 + Tu Ruta de Micro-Aprendizaje.'
+          : 'Free November Campaign! Sign up in 30 seconds to unlock the 24/7 Voice Lab + Micro-Learning Path.'
       );
     } else {
       setActiveView('simulator');
@@ -41,8 +41,8 @@ export const NovemberPromoBanner: React.FC = () => {
           </span>
           <span className="text-[#FAFAFA] font-medium">
             {isEs
-              ? 'Registrate en 30 segundos y desbloqueá el Simulador de Voz IA (Emma & Teacher Ivan) + Tu Ruta de Micro-Aprendizaje 100% Gratis todo noviembre →'
-              : 'Sign up in 30 seconds to unlock the 24/7 AI Voice Simulator (Emma & Teacher Ivan) + Your Micro-Learning Path 100% Free all November →'}
+              ? 'Registrate en 30 segundos y desbloqueá el Laboratorio de Voz 24/7 (Emma & Teacher Ivan) + Tu Ruta de Micro-Aprendizaje 100% Gratis todo noviembre →'
+              : 'Sign up in 30 seconds to unlock the 24/7 Voice Lab (Emma & Teacher Ivan) + Your Micro-Learning Path 100% Free all November →'}
           </span>
         </div>
 

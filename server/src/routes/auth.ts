@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { userStore } from '../services/userStore.js';
 import { bookingStore } from '../services/bookingStore.js';
+import { sheetsService } from '../services/sheetsService.js';
 
 const router = Router();
 
@@ -103,6 +104,11 @@ router.post('/register', (req: Request, res: Response) => {
     });
 
     const token = userStore.createSessionToken(user.id);
+
+    // Asynchronously append student to Google Sheet
+    sheetsService.appendStudentRegistration(user).catch((sheetErr) => {
+      console.warn('[Google Sheets] Async append registration notice:', sheetErr);
+    });
 
     return res.status(200).json({
       status: 'ok',

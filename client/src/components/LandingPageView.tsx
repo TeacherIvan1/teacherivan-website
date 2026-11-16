@@ -131,7 +131,7 @@ export const LandingPageView: React.FC = () => {
       badge: isEs ? '1 Clase 1-a-1 / sem' : '1 Live Class / wk',
       features: [
         isEs ? '1 reunión individual por semana (60 min)' : '1 live 1-on-1 meeting per week (60 min)',
-        isEs ? '10 sesiones de práctica diaria con IA' : '10 AI voice simulator practice sessions/day',
+        isEs ? '10 sesiones diarias en el Laboratorio de Voz' : '10 daily Voice Lab practice sessions',
         isEs ? 'Tracker de sprint de micro-aprendizaje 5 días' : '5-day micro-learning habit sprint tracker',
         isEs ? 'Feedback asíncrono de pronunciación semanal' : 'Weekly asynchronous speaking feedback',
       ],
@@ -145,9 +145,9 @@ export const LandingPageView: React.FC = () => {
       badge: isEs ? 'FLAGSHIP / MÁS POPULAR' : 'FLAGSHIP / MOST POPULAR',
       features: [
         isEs ? '2 reuniones individuales por semana (60 min c/u)' : '2 live 1-on-1 meetings per week (60 min each)',
-        isEs ? 'Acceso 24/7 ILIMITADO al Simulador de Voz IA' : 'Unlimited 24/7 Access to AI Voice Simulator',
+        isEs ? 'Acceso 24/7 ILIMITADO al Laboratorio de Voz' : 'Unlimited 24/7 Access to Voice Lab',
         isEs ? 'Micro-aprendizaje diario + Feedback de audio por WhatsApp' : 'Daily micro-learning + WhatsApp audio feedback',
-        isEs ? 'Reporte pedagógico semanal con avance MCER' : 'Weekly AI pedagogical progress report & CEFR tracking',
+        isEs ? 'Reporte pedagógico semanal con avance MCER' : 'Weekly pedagogical progress report & CEFR tracking',
       ],
       isPopular: true,
     },
@@ -159,7 +159,7 @@ export const LandingPageView: React.FC = () => {
       badge: isEs ? 'Executive Partner' : 'Executive Partner',
       features: [
         isEs ? '3 reuniones individuales por semana (60 min c/u)' : '3 live 1-on-1 meetings per week (60 min each)',
-        isEs ? 'Acceso 24/7 ILIMITADO al Simulador de Voz IA' : 'Unlimited 24/7 Access to AI Voice Simulator',
+        isEs ? 'Acceso 24/7 ILIMITADO al Laboratorio de Voz' : 'Unlimited 24/7 Access to Voice Lab',
         isEs ? 'Revisión de presentaciones y correos de trabajo real' : 'Workplace presentation & real email reviews',
         isEs ? 'Agenda prioritaria VIP y consultoría a demanda' : 'Executive impact metrics & VIP priority support',
       ],
@@ -341,7 +341,7 @@ export const LandingPageView: React.FC = () => {
                     0.0s
                   </span>
                   <span className="text-xs font-montserrat font-bold text-[#4A5568] uppercase tracking-wider">
-                    {isEs ? 'Latencia Nativa PCM' : 'PCM Native Latency'}
+                    {isEs ? 'Respuesta Inmediata' : 'Zero Speaking Delay'}
                   </span>
                 </div>
 
@@ -483,7 +483,7 @@ export const LandingPageView: React.FC = () => {
               <div className="p-6 sm:p-8 rounded-3xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-md space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#10b981] uppercase tracking-wider">
-                    [03 // 24/7 AI VOICE IMMERSION & MICRO-SPRINTS]
+                    [03 // 24/7 VOICE IMMERSION & MICRO-SPRINTS]
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-montserrat font-bold">
                     95% RETENTION
@@ -492,8 +492,8 @@ export const LandingPageView: React.FC = () => {
 
                 <h3 className="font-montserrat font-bold text-xl text-[#1A3153]">
                   {isEs
-                    ? 'Simulador de Voz IA 24/7 y Micro-Sprints Diarios'
-                    : '24/7 AI Voice Lab & Daily Micro-Learning Sprints'}
+                    ? 'Laboratorio de Voz 24/7 y Micro-Sprints Diarios'
+                    : '24/7 Voice Lab & Daily Micro-Learning Sprints'}
                 </h3>
 
                 {/* Progress bar scrub */}
@@ -512,8 +512,8 @@ export const LandingPageView: React.FC = () => {
                     <CheckCircle2 size={16} className="text-[#10b981] shrink-0 mt-0.5" />
                     <span>
                       {isEs
-                        ? 'Práctica ilimitada a cualquier hora con Emma y Teacher Ivan con audio nativo Gemini Live.'
-                        : 'Unlimited practice anytime with Emma & Teacher Ivan powered by Gemini Live native audio.'}
+                        ? 'Práctica ilimitada a cualquier hora con Emma y Teacher Ivan con audio conversacional en tiempo real.'
+                        : 'Unlimited practice anytime with Emma & Teacher Ivan with real-time natural conversational audio.'}
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -540,7 +540,7 @@ export const LandingPageView: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
-      {/* CH. 2 — THE FLAGSHIP AI VOICE LAB (EMBEDDED INTERACTIVE SIMULATOR)        */}
+      {/* CH. 2 — THE FLAGSHIP VOICE LAB (EMBEDDED INTERACTIVE SIMULATOR)           */}
       {/* ========================================================================= */}
       <section
         id="chapter-2-lab"
@@ -555,7 +555,7 @@ export const LandingPageView: React.FC = () => {
             </div>
 
             <div className="font-mono text-xs text-[#A7C7E7] uppercase tracking-wider">
-              [SYS.VOICE // GEMINI LIVE NATIVE PCM 24kHz // DUAL CHIBI RIGS]
+              {isEs ? '[SISTEMA DE VOZ // AUDIO NATURAL EN TIEMPO REAL // PERSONAJES CHIBI]' : '[SYS.VOICE // REAL-TIME NATURAL AUDIO // INTERACTIVE CHIBI RIGS]'}
             </div>
 
             <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
@@ -738,8 +738,8 @@ export const LandingPageView: React.FC = () => {
                   <td className="py-3 pl-4 text-[#A7C7E7]">Only isolated words</td>
                 </tr>
                 <tr>
-                  <td className="py-3 pr-4 font-semibold text-[#A7C7E7]">Live Native AI Voice</td>
-                  <td className="py-3 px-4 font-bold text-[#10b981]">Gemini Live PCM 24kHz</td>
+                  <td className="py-3 pr-4 font-semibold text-[#A7C7E7]">{isEs ? 'Inmersión Oral Continua' : 'Spoken Immersion Engine'}</td>
+                  <td className="py-3 px-4 font-bold text-[#10b981]">{isEs ? 'Laboratorio de Voz 24/7' : '24/7 Voice Lab'}</td>
                   <td className="py-3 px-4 text-[#f87171]">None</td>
                   <td className="py-3 pl-4 text-[#A7C7E7]">Robotic TTS (high lag)</td>
                 </tr>
@@ -942,7 +942,7 @@ export const LandingPageView: React.FC = () => {
                   <RiggedCharacter persona="teacher-ivan" state="listening" className="w-full h-full" />
                 </div>
                 <div className="w-full py-2 px-3 rounded-xl bg-[#12223a] border border-[#A7C7E7]/25 text-left mb-2">
-                  <span className="text-[9px] font-mono font-bold text-[#10b981] block">● Connected (Gemini Live)</span>
+                  <span className="text-[9px] font-mono font-bold text-[#10b981] block">● {isEs ? 'Conectado (Laboratorio de Voz)' : 'Connected (Voice Lab)'}</span>
                   <span className="text-[11px] font-inter text-[#FAFAFA]">"Tell me about your project..."</span>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-[#A7C7E7] font-montserrat font-bold">

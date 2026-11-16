@@ -5,7 +5,8 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { ChibiSceneShowcase } from './ChibiSceneShowcase';
 
 export const OverviewCorePillars: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
+  const isEs = lang === 'es';
   const setActiveView = useNavigationStore((s) => s.setActiveView);
 
   return (
@@ -128,15 +129,15 @@ export const OverviewCorePillars: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-4xl mx-auto pt-4 text-center">
         <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[#1A3153]/60 border border-[#A7C7E7]/20 text-xs text-[#FAFAFA]">
           <CheckCircle2 size={16} className="text-[#10b981] shrink-0" />
-          <span>Zero Grammatical Anxiety</span>
+          <span>{isEs ? 'Cero Ansiedad Gramatical' : 'Zero Grammatical Anxiety'}</span>
         </div>
         <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[#1A3153]/60 border border-[#A7C7E7]/20 text-xs text-[#FAFAFA]">
           <CheckCircle2 size={16} className="text-[#E09B30] shrink-0" />
-          <span>Native Google Gemini Live Audio</span>
+          <span>{isEs ? 'Audio Natural en Tiempo Real' : 'Real-Time Natural Voice Audio'}</span>
         </div>
         <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[#1A3153]/60 border border-[#A7C7E7]/20 text-xs text-[#FAFAFA]">
           <CheckCircle2 size={16} className="text-[#10b981] shrink-0" />
-          <span>Personalized Audio Recasts</span>
+          <span>{isEs ? 'Recasting de Audio Personalizado' : 'Personalized Audio Recasts'}</span>
         </div>
       </div>
     </section>

@@ -8,6 +8,7 @@ import reportRouter from './routes/report.js';
 import authRouter from './routes/auth.js';
 import bookingRouter from './routes/bookings.js';
 import curriculumRouter from './routes/curriculum.js';
+import sheetsRouter from './routes/sheets.js';
 import { userStore } from './services/userStore.js';
 import { bookingStore } from './services/bookingStore.js';
 import { initRemoteBackup } from './services/remoteBackup.js';
@@ -79,6 +80,7 @@ app.use('/api/report', reportRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/bookings', bookingRouter);
 app.use('/api/curriculum', curriculumRouter);
+app.use('/api/sheets', sheetsRouter);
 
 // GET /api/users/export
 app.get('/api/users/export', (_req, res) => {

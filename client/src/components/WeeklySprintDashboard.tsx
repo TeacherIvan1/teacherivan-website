@@ -115,8 +115,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         es: 'Domina conectores formales y estructuras gramaticales para enlazar tus ideas con fluidez.',
       },
       {
-        en: 'Practice your target scenario with real-time feedback using Gemini Live native audio.',
-        es: 'Practica tu escenario objetivo en tiempo real con audio nativo de Gemini Live.',
+        en: 'Practice your target scenario with real-time feedback in the Voice Lab.',
+        es: 'Practica tu escenario objetivo en tiempo real en el Laboratorio de Voz.',
       },
       {
         en: `Draft an 80–120 word response directly addressing: "${personalObjective}".`,
@@ -631,8 +631,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 </h5>
                 <p className="font-inter text-xs text-[#A7C7E7] leading-relaxed">
                   {isEs
-                    ? `Activa el simulador de voz de Gemini Live. Practica responder con naturalidad aplicando las colocaciones de la semana: ${activeDayData.collocations.join(', ')}.`
-                    : `Launch Gemini Live native voice tutor. Speak freely applying your weekly collocations: ${activeDayData.collocations.join(', ')}.`}
+                    ? `Activa el laboratorio de voz interactivo. Practica responder con naturalidad aplicando las colocaciones de la semana: ${activeDayData.collocations.join(', ')}.`
+                    : `Launch your interactive voice tutor. Speak freely applying your weekly collocations: ${activeDayData.collocations.join(', ')}.`}
                 </p>
               </div>
 

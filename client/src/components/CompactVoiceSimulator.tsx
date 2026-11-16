@@ -198,7 +198,7 @@ export const CompactVoiceSimulator: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-[10px] font-montserrat font-bold uppercase tracking-wider mb-1">
             <Radio size={11} className="text-[#10b981] animate-pulse" />
-            <span>Google Gemini Live Native Voice</span>
+            <span>{isEs ? 'Laboratorio de Voz 24/7 • Audio Natural' : '24/7 Voice Lab • Natural Audio'}</span>
           </div>
           <h1 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA] tracking-tight">
             {t.compactSimulator.title}

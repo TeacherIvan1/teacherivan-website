@@ -49,8 +49,8 @@ export const PlanApprovedModal: React.FC = () => {
         },
         {
           icon: <Headphones className="text-[#E09B30] shrink-0" size={18} />,
-          en: 'Unlimited 24/7 AI Voice Simulator Sessions',
-          es: 'Sesiones Ilimitadas 24/7 en el Simulador de Voz con IA',
+          en: 'Unlimited 24/7 Voice Lab Practice Sessions',
+          es: 'Sesiones Ilimitadas 24/7 en el Laboratorio de Voz',
         },
         {
           icon: <Award className="text-[#E09B30] shrink-0" size={18} />,
@@ -69,8 +69,8 @@ export const PlanApprovedModal: React.FC = () => {
         },
         {
           icon: <Headphones className="text-[#E09B30] shrink-0" size={18} />,
-          en: 'Unlimited 24/7 AI Voice Simulator Sessions',
-          es: 'Sesiones Ilimitadas 24/7 en el Simulador de Voz con IA',
+          en: 'Unlimited 24/7 Voice Lab Practice Sessions',
+          es: 'Sesiones Ilimitadas 24/7 en el Laboratorio de Voz',
         },
         {
           icon: <MessageSquare className="text-[#E09B30] shrink-0" size={18} />,
@@ -89,8 +89,8 @@ export const PlanApprovedModal: React.FC = () => {
       },
       {
         icon: <Headphones className="text-[#E09B30] shrink-0" size={18} />,
-        en: '10 AI Voice Simulator Sessions/Day',
-        es: '10 Sesiones Diarias en el Simulador de Voz con IA',
+        en: '10 Voice Lab Practice Sessions/Day',
+        es: '10 Sesiones Diarias en el Laboratorio de Voz',
       },
       {
         icon: <BookOpen className="text-[#E09B30] shrink-0" size={18} />,

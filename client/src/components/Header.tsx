@@ -118,7 +118,7 @@ export const Header: React.FC = () => {
               <span>{isEs ? 'Mi Ruta (Micro-Learning)' : 'My Path (Micro-Learning)'}</span>
             </button>
 
-            {/* Tab 2: Simulador IA */}
+            {/* Tab 2: Tutor de Voz */}
             <button
               id="nav-tab-simulator"
               onClick={() => setActiveView('simulator')}
@@ -128,7 +128,7 @@ export const Header: React.FC = () => {
                 }`}
             >
               <Headphones size={14} />
-              <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
+              <span>{isEs ? 'Tutor de Conversación' : 'Voice Tutor'}</span>
             </button>
 
             {/* Tab 3: Recursos & Juegos */}
@@ -168,7 +168,7 @@ export const Header: React.FC = () => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
               <Headphones size={14} />
-              <span>{isEs ? 'Simulador IA' : 'AI Simulator'}</span>
+              <span>{isEs ? 'Tutor de Voz' : 'Voice Tutor'}</span>
             </button>
 
             <button

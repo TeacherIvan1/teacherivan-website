@@ -11,7 +11,7 @@ export const SpokenAssessmentModal: React.FC = () => {
   const selectScenario = useTeachingStore((s) => s.selectScenario);
   const { startSession, status } = useConversationStore();
   const setActiveView = useNavigationStore((s) => s.setActiveView);
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   // Preset to diagnostic placement scenario whenever modal opens
   useEffect(() => {
@@ -145,7 +145,7 @@ export const SpokenAssessmentModal: React.FC = () => {
         {/* Micro Privacy Guarantee */}
         <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#A7C7E7]/60 mt-4">
           <ShieldCheck size={12} className="text-[#10b981]" />
-          <span>Google Gemini Live Native Audio • No Sign-up</span>
+          <span>{lang === 'es' ? 'Audio Natural en Tiempo Real • Sin Registro' : 'Real-Time Natural Audio • No Sign-up'}</span>
         </div>
       </div>
     </div>

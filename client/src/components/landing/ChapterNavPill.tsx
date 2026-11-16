@@ -70,8 +70,8 @@ export const ChapterNavPill: React.FC<ChapterNavPillProps> = ({ onStartVoiceTest
     {
       id: 'lab',
       targetId: 'chapter-2-lab',
-      labelEn: 'Ch. 2 — AI Voice Lab',
-      labelEs: 'Ch. 2 — Simulador IA',
+      labelEn: 'Ch. 2 — Voice Lab',
+      labelEs: 'Ch. 2 — Laboratorio de Voz',
     },
     {
       id: 'plans',

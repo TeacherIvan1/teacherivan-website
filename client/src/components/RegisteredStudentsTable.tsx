@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, RefreshCw, Mail, Calendar, Globe, Award, Download, CheckCircle2, Phone, Sparkles } from 'lucide-react';
+import { Users, RefreshCw, Mail, Calendar, Globe, Award, Download, CheckCircle2, Phone, Sparkles, FileSpreadsheet } from 'lucide-react';
 import { getApiUrl } from '../config/api';
 import { UserProfile, StudentPlan } from '../modules/auth/types';
 import { useAuthStore } from '../modules/auth/authStore';
@@ -13,9 +13,56 @@ export const RegisteredStudentsTable: React.FC = () => {
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [successUserId, setSuccessUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sheetsStatus, setSheetsStatus] = useState<{
+    configured: boolean;
+    sheetId?: string;
+    mode: string;
+    totalSynced: number;
+    lastSyncTime?: string;
+  } | null>(null);
+  const [isSyncingSheets, setIsSyncingSheets] = useState(false);
+  const [sheetsNotice, setSheetsNotice] = useState<string | null>(null);
   const { isEs } = useTranslation();
   const updateUserPlan = useAuthStore((s) => s.updateUserPlan);
   const currentUser = useAuthStore((s) => s.user);
+
+  const fetchSheetsStatus = async () => {
+    try {
+      const res = await fetch(getApiUrl('/api/sheets/status'));
+      if (res.ok) {
+        const data = await res.json();
+        setSheetsStatus(data);
+      }
+    } catch {}
+  };
+
+  const handleSyncGoogleSheets = async () => {
+    setIsSyncingSheets(true);
+    setSheetsNotice(null);
+    try {
+      const res = await fetch(getApiUrl('/api/sheets/sync'), {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSheetsNotice(
+          isEs
+            ? `✓ Sincronizados ${data.synced} estudiantes con Google Sheets (${data.mode})`
+            : `✓ Synced ${data.synced} students with Google Sheets (${data.mode})`
+        );
+        fetchSheetsStatus();
+      } else {
+        const err = await res.text();
+        setSheetsNotice(isEs ? `Aviso de sincronización: ${err}` : `Sync notice: ${err}`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setSheetsNotice(`Error syncing: ${msg}`);
+    } finally {
+      setIsSyncingSheets(false);
+      setTimeout(() => setSheetsNotice(null), 5000);
+    }
+  };
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -24,6 +71,7 @@ export const RegisteredStudentsTable: React.FC = () => {
       // Additive Union Sync: reads local vault, merges with server, self-heals server if needed
       const { users: merged } = await syncAndHealAdminData();
       setUsers(merged);
+      fetchSheetsStatus();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
@@ -154,7 +202,33 @@ export const RegisteredStudentsTable: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+          {/* Google Sheets Sync Button */}
+          <button
+            type="button"
+            onClick={handleSyncGoogleSheets}
+            disabled={isSyncingSheets || users.length === 0}
+            className={`px-3 py-1.5 rounded-xl border text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 ${
+              sheetsStatus?.configured
+                ? 'border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/20'
+                : 'border-[#A7C7E7]/30 text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#1A3153]'
+            }`}
+            title={
+              sheetsStatus?.configured
+                ? `Google Sheets (${sheetsStatus.mode}): ${sheetsStatus.sheetId || 'Active'}`
+                : 'Google Sheets integration active in local buffer mode'
+            }
+          >
+            <FileSpreadsheet size={13} className={isSyncingSheets ? 'animate-spin text-emerald-400' : 'text-emerald-400'} />
+            <span>
+              {isSyncingSheets
+                ? (isEs ? 'Sincronizando...' : 'Syncing...')
+                : sheetsStatus?.configured
+                ? (isEs ? 'Sincronizar Sheets' : 'Sync Sheets')
+                : (isEs ? 'Google Sheets' : 'Google Sheets')}
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={fetchUsers}
@@ -175,6 +249,22 @@ export const RegisteredStudentsTable: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {sheetsNotice && (
+        <div className="my-2 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 flex items-center justify-between animate-in fade-in">
+          <span>{sheetsNotice}</span>
+          {sheetsStatus?.sheetId && sheetsStatus.sheetId !== 'AppsScriptWebhook' && (
+            <a
+              href={`https://docs.google.com/spreadsheets/d/${sheetsStatus.sheetId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-emerald-300 underline font-bold ml-2 hover:text-white"
+            >
+              {isEs ? 'Abrir Google Sheet ↗' : 'Open Google Sheet ↗'}
+            </a>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="my-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300">
