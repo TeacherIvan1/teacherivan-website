@@ -20,6 +20,8 @@ import {
   TrendingUp,
   Layers,
   HelpCircle,
+  Flame,
+  Globe,
 } from 'lucide-react';
 import { useSprintStore, CEFRLevel } from '../modules/sprint/sprintStore';
 import { useAuthStore } from '../modules/auth/authStore';
@@ -77,17 +79,17 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
   const userCountry = user?.country || 'Bolivia';
 
   const getCountryFlag = (country?: string): string => {
-    if (!country) return '🌐';
+    if (!country) return 'Bolivia';
     const c = country.toLowerCase();
-    if (c.includes('bolivia')) return '🇧🇴 Bolivia';
-    if (c.includes('mexico')) return '🇲🇽 Mexico';
-    if (c.includes('colombia')) return '🇨🇴 Colombia';
-    if (c.includes('peru')) return '🇵🇪 Peru';
-    if (c.includes('argentina')) return '🇦🇷 Argentina';
-    if (c.includes('chile')) return '🇨🇱 Chile';
-    if (c.includes('spain') || c.includes('españa')) return '🇪🇸 Spain';
-    if (c.includes('usa') || c.includes('united states')) return '🇺🇸 USA';
-    return `🌐 ${country}`;
+    if (c.includes('bolivia')) return 'Bolivia';
+    if (c.includes('mexico')) return 'Mexico';
+    if (c.includes('colombia')) return 'Colombia';
+    if (c.includes('peru')) return 'Peru';
+    if (c.includes('argentina')) return 'Argentina';
+    if (c.includes('chile')) return 'Chile';
+    if (c.includes('spain') || c.includes('españa')) return 'Spain';
+    if (c.includes('usa') || c.includes('united states')) return 'USA';
+    return country;
   };
 
   const pDays = personalizedSprint?.days || [];
@@ -189,7 +191,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
 
     saveDay4Writing(localWriting, feedback);
     completeStage(3); // Complete Day 4
-    setWritingStatus(isEs ? '¡Entregado con éxito! Día 4 completado ✓ (+25 XP)' : 'Submitted successfully! Day 4 completed ✓ (+25 XP)');
+    setWritingStatus(isEs ? '¡Entregado con éxito! Día 4 completado (+25 XP)' : 'Submitted successfully! Day 4 completed (+25 XP)');
     setTimeout(() => setWritingStatus(null), 4000);
   };
 
@@ -223,8 +225,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
   // WhatsApp summary payload for D5
   const generateWhatsAppReportMessage = () => {
     const text = isEs
-      ? `Hola Teacher Ivan! Te comparto mi reporte semanal de progreso:\n\n👤 Estudiante: ${studentName}\n🎯 Nivel Objetivo: ${targetLevel}\n📌 Meta Principal: ${primaryGoal}\n🚀 Objetivo Específico: "${personalObjective}"\n📈 Hábito Semanal: ${completedStages.length}/5 Días Completados (+${totalXp} XP)\n📝 Redacción Día 4: ${localWriting ? `"${localWriting.substring(0, 100)}..."` : 'Completada'}\n\n¡Listo para afinar detalles en nuestra próxima clase 1-a-1!`
-      : `Hi Teacher Ivan! Here is my weekly micro-learning sprint report:\n\n👤 Student: ${studentName}\n🎯 Target Level: ${targetLevel}\n📌 Primary Goal: ${primaryGoal}\n🚀 Specific Objective: "${personalObjective}"\n📈 Weekly Habit: ${completedStages.length}/5 Days Completed (+${totalXp} XP)\n📝 Day 4 Writing: ${localWriting ? `"${localWriting.substring(0, 100)}..."` : 'Completed'}\n\nReady to refine fluency in our upcoming 1-on-1 session!`;
+      ? `Hola Teacher Ivan! Te comparto mi reporte semanal de progreso:\n\n• Estudiante: ${studentName}\n• Nivel Objetivo: ${targetLevel}\n• Meta Principal: ${primaryGoal}\n• Objetivo Específico: "${personalObjective}"\n• Hábito Semanal: ${completedStages.length}/5 Días Completados (+${totalXp} XP)\n• Redacción Día 4: ${localWriting ? `"${localWriting.substring(0, 100)}..."` : 'Completada'}\n\nListo para afinar detalles en nuestra próxima clase 1-a-1!`
+      : `Hi Teacher Ivan! Here is my weekly micro-learning sprint report:\n\n• Student: ${studentName}\n• Target Level: ${targetLevel}\n• Primary Goal: ${primaryGoal}\n• Specific Objective: "${personalObjective}"\n• Weekly Habit: ${completedStages.length}/5 Days Completed (+${totalXp} XP)\n• Day 4 Writing: ${localWriting ? `"${localWriting.substring(0, 100)}..."` : 'Completed'}\n\nReady to refine fluency in our upcoming 1-on-1 session!`;
     return getWhatsAppUrl(text);
   };
 
@@ -265,7 +267,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
     );
   }
 
-  // Full Rich Dashboard for '🎯 Mi Ruta (Micro-Learning)'
+  // Full Rich Dashboard for 'Mi Ruta (Micro-Learning)'
   return (
     <div id="student-microlearning-dashboard" className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-8 animate-in fade-in duration-200">
       {/* Edit Goals Modal Modal Instance */}
@@ -302,8 +304,9 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#1A3153] tracking-tight">
                 {studentName}
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153]/10 border border-[#A7C7E7] text-xs font-montserrat font-bold text-[#4A5568]">
-                {getCountryFlag(userCountry)}
+              <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153]/10 border border-[#A7C7E7] text-xs font-montserrat font-bold text-[#4A5568] inline-flex items-center gap-1">
+                <Globe size={11} className="text-[#4A5568]" />
+                <span>{getCountryFlag(userCountry)}</span>
               </span>
               <span className="px-3 py-0.5 rounded-full bg-[#1A3153] text-[#E09B30] text-xs font-montserrat font-extrabold tracking-wider uppercase">
                 {targetLevel}
@@ -331,7 +334,10 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             </div>
             <div className="flex justify-between items-center text-[11px] text-[#4A5568]">
               <span className="font-semibold">+{totalXp} XP {isEs ? 'ganados' : 'earned'}</span>
-              <span className="font-bold text-[#10b981]">🔥 {completedStages.length} {isEs ? 'días de racha' : 'day streak'}</span>
+              <span className="font-bold text-[#10b981] inline-flex items-center gap-1">
+                <Flame size={12} className="text-[#E09B30]" />
+                <span>{completedStages.length} {isEs ? 'días de racha' : 'day streak'}</span>
+              </span>
             </div>
           </div>
 
@@ -456,7 +462,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               <span>{dayTabs[selectedDay].label}: {dayTabs[selectedDay].type}</span>
               {completedStages.includes(selectedDay) && (
                 <span className="text-[#10b981] flex items-center gap-1 font-bold">
-                  ✓ {isEs ? 'Completado' : 'Completed'}
+                  <CheckCircle2 size={13} className="text-[#10b981]" />
+                  <span>{isEs ? 'Completado' : 'Completed'}</span>
                 </span>
               )}
             </div>
@@ -600,7 +607,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               id="d2-mark-complete-btn"
               onClick={() => {
                 completeStage(1);
-                setD2Feedback(isEs ? '¡Día 2 validado y completado! ✓ (+25 XP)' : 'Day 2 validated and completed! ✓ (+25 XP)');
+                setD2Feedback(isEs ? '¡Día 2 validado y completado! (+25 XP)' : 'Day 2 validated and completed! (+25 XP)');
               }}
               className="py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#10b981] hover:bg-[#059669] text-[#FAFAFA] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
@@ -785,7 +792,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                     {isEs ? 'Redacción' : 'Writing'}
                   </span>
                   <span className="font-montserrat font-black text-xl text-[#10b981]">
-                    {completedStages.includes(3) ? '✓ 100%' : 'Pendiente'}
+                    {completedStages.includes(3) ? '100%' : 'Pendiente'}
                   </span>
                 </div>
               </div>

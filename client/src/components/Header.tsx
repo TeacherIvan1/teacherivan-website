@@ -81,7 +81,7 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-[#12223a]/95 backdrop-blur-md border-b border-[#A7C7E7]/25 w-full select-none" id="app-header">
-      {/* 🎁 Campaign Promotional Strip */}
+      {/* Campaign Promotional Strip */}
       <NovemberPromoBanner />
 
       {/* Primary Top Bar */}

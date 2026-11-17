@@ -269,7 +269,7 @@ export async function syncAndHealAdminData(): Promise<{
           bookings: mergedBookings,
         }),
       });
-      console.log('[VaultSync] ✓ Server successfully rehydrated.');
+      console.log('[VaultSync] Server successfully rehydrated.');
     } catch (rehydrateErr) {
       console.warn('[VaultSync] Rehydrate post notice:', rehydrateErr);
     }

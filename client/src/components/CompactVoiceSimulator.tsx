@@ -244,7 +244,7 @@ export const CompactVoiceSimulator: React.FC = () => {
       <div className="bg-[#12223a]/90 backdrop-blur-md rounded-2xl border border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-3 shadow-md">
         {/* Row A: Tutor Persona Pill & Level Pill Selector */}
         <div className="flex flex-wrap items-center justify-between gap-3 w-full max-w-full overflow-hidden">
-          {/* Tutor Persona Toggle: [👨‍🏫 Ivan | 👩‍🏫 Emma] */}
+          {/* Tutor Persona Toggle: [Ivan | Emma] */}
           <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
             <button
               type="button"

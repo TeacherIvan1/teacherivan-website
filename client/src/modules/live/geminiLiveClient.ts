@@ -228,7 +228,7 @@ export class GeminiLiveClient {
               debugLog(
                 'websocket',
                 'warn',
-                `⚡ User barge-in detected! Model output interrupted. In-flight chunks invalidated (turnId: ${this.currentTurnId}).`
+                `User barge-in detected! Model output interrupted. In-flight chunks invalidated (turnId: ${this.currentTurnId}).`
               );
               latencyTracker.cancelCurrentTurn();
               this.callbacks.onInterrupted?.(this.currentTurnId);

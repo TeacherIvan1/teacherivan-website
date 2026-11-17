@@ -20,7 +20,7 @@ import { RegisteredStudentsTable } from './components/RegisteredStudentsTable';
 import { AdminBookingsTable } from './components/AdminBookingsTable';
 import { PlanApprovedModal } from './components/PlanApprovedModal';
 import { BrandLockup } from './components/BrandLockup';
-import { Terminal, Sparkles, BookOpen, Headphones, Calendar, Target } from 'lucide-react';
+import { Terminal, Sparkles, BookOpen, Headphones, Calendar, Target, MessageCircle } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { TEACHER_PHONE, getWhatsAppUrl } from './config/contact';
 import { useTranslation } from './modules/i18n/languageStore';
@@ -94,24 +94,24 @@ export const App: React.FC = () => {
           /* REGISTERED USERS VIEW: ROUTED STUDENT WORKSPACE                          */
           /* ========================================================================= */
           <div className="flex-1 flex flex-col animate-in fade-in duration-200">
-            {/* VIEW 1: 🎯 MI RUTA (MICRO-LEARNING 5-DAY SPRINT DASHBOARD) */}
+            {/* VIEW 1: MI RUTA (MICRO-LEARNING 5-DAY SPRINT DASHBOARD) */}
             {activeView === 'path' ? (
               <div id="view-path" className="flex flex-col animate-in fade-in duration-200">
                 <WeeklySprintDashboard />
               </div>
             ) : activeView === 'resources' ? (
-              /* VIEW 2: 📚 RECURSOS & JUEGOS */
+              /* VIEW 2: RECURSOS & JUEGOS */
               <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
                 <EducationalResourcesView />
                 <InteractiveGamesView />
               </div>
             ) : activeView === 'schedule' ? (
-              /* VIEW 3: 📅 AGENDAR CLASE (14:00 - 20:00 Bolivia Time) */
+              /* VIEW 3: AGENDAR CLASE (14:00 - 20:00 Bolivia Time) */
               <div id="view-schedule" className="flex flex-col animate-in fade-in duration-200">
                 <ClassSchedulerView />
               </div>
             ) : (
-              /* VIEW 4: 🎙️ SIMULADOR IA (Full Unlocked Simulator Model) */
+              /* VIEW 4: SIMULADOR IA (Full Unlocked Simulator Model) */
               <div id="view-simulator" className="py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200">
                 {/* Developer Mode Banner Notification (if active) */}
                 {showDevMode && (
@@ -291,7 +291,8 @@ export const App: React.FC = () => {
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
             >
-              <span>{isEs ? '💬 Contactar a Teacher Ivan por WhatsApp' : '💬 Contact Teacher Ivan on WhatsApp'}</span>
+              <MessageCircle size={14} />
+              <span>{isEs ? 'Contactar a Teacher Ivan por WhatsApp' : 'Contact Teacher Ivan on WhatsApp'}</span>
             </a>
           </div>
         </div>

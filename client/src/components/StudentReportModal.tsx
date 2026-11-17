@@ -13,6 +13,7 @@ import {
   ArrowRight,
   ExternalLink,
   BarChart3,
+  Lightbulb,
 } from 'lucide-react';
 import { useReportStore } from '../modules/report/reportStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
@@ -392,8 +393,9 @@ export const StudentReportModal: React.FC = () => {
                         </div>
 
                         {err.explanation && (
-                          <p className="text-[11px] text-[#4A5568] px-1 italic">
-                            💡 {err.explanation}
+                          <p className="text-[11px] text-[#4A5568] px-1 italic flex items-center gap-1.5">
+                            <Lightbulb size={12} className="text-[#E09B30] shrink-0" />
+                            <span>{err.explanation}</span>
                           </p>
                         )}
                       </div>
@@ -475,9 +477,10 @@ export const StudentReportModal: React.FC = () => {
                       {vocabItems.map((word, wIdx) => (
                         <span
                           key={wIdx}
-                          className="px-2 py-0.5 rounded-full bg-[#A7C7E7]/25 border border-[#A7C7E7] text-[11px] font-semibold text-[#1A3153]"
+                          className="px-2 py-0.5 rounded-full bg-[#A7C7E7]/25 border border-[#A7C7E7] text-[11px] font-semibold text-[#1A3153] inline-flex items-center gap-1"
                         >
-                          ✓ {word}
+                          <CheckCircle2 size={11} className="text-[#10b981]" />
+                          <span>{word}</span>
                         </span>
                       ))}
                     </div>

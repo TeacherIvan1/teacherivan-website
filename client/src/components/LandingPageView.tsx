@@ -368,7 +368,7 @@ export const LandingPageView: React.FC = () => {
             {/* Right Column: Architectural Cards with Scroll-Scrubbed Progress Bars */}
             <div className="lg:col-span-7 space-y-6">
               {/* Card 1: Traditional Academies (30% STT) */}
-              <div className="p-6 sm:p-8 rounded-3xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-md space-y-4">
+              <div className="slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#f87171] uppercase tracking-wider">
                     [01 // TRADITIONAL ACADEMIES]
@@ -424,7 +424,7 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Card 2: Teacher Ivan 1-on-1 Bichronous Coaching (78% STT) */}
-              <div className="p-6 sm:p-8 rounded-3xl bg-[#1A3153] text-[#FAFAFA] border-2 border-[#E09B30] shadow-xl space-y-4 relative overflow-hidden">
+              <div className="slab-3d-dark p-6 sm:p-8 rounded-3xl text-[#FAFAFA] border-2 border-[#E09B30] space-y-4 relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#E09B30] uppercase tracking-wider">
                     [02 // TEACHER IVAN BICHRONOUS COACHING]
@@ -480,7 +480,7 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Card 3: 24/7 AI Voice Immersion & Daily Micro-Learning (95% Reflex Retention) */}
-              <div className="p-6 sm:p-8 rounded-3xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-md space-y-4">
+              <div className="slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#10b981] uppercase tracking-wider">
                     [03 // 24/7 VOICE IMMERSION & MICRO-SPRINTS]
@@ -568,7 +568,7 @@ export const LandingPageView: React.FC = () => {
           </div>
 
           {/* Embedded Interactive Simulator Console */}
-          <div className="rounded-3xl bg-[#12223a] border-2 border-[#A7C7E7]/30 shadow-2xl overflow-hidden p-2 sm:p-5">
+          <div className="slab-3d-dark rounded-3xl border-2 border-[#A7C7E7]/30 shadow-2xl overflow-hidden p-2 sm:p-5">
             <CompactVoiceSimulator />
           </div>
 
@@ -658,8 +658,8 @@ export const LandingPageView: React.FC = () => {
                 key={p.id}
                 className={`p-7 rounded-3xl flex flex-col justify-between transition-all duration-200 ${
                   p.isPopular
-                    ? 'bg-gradient-to-b from-[#1A3153] to-[#12223a] border-2 border-[#E09B30] shadow-2xl transform md:-translate-y-2'
-                    : 'bg-[#12223a]/90 border border-[#A7C7E7]/30 shadow-xl'
+                    ? 'slab-3d-dark border-2 border-[#E09B30] shadow-2xl transform md:-translate-y-2'
+                    : 'slab-3d-dark shadow-xl'
                 }`}
               >
                 <div>
@@ -705,7 +705,7 @@ export const LandingPageView: React.FC = () => {
                   rel="noopener noreferrer"
                   className={`w-full py-3.5 px-4 rounded-full font-montserrat font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
                     p.isPopular
-                      ? 'bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] shadow-[#E09B30]/30'
+                      ? 'btn-3d-amber'
                       : 'bg-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 text-[#FAFAFA]'
                   }`}
                 >

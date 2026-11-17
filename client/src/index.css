@@ -66,6 +66,11 @@
   --radius-full: 9999px;
   
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Motionmaxxing Measured Easing Curves */
+  --ease-soft-land: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap-settle: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-accel-exit: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
 *, *::before, *::after {
@@ -1284,5 +1289,96 @@ body {
 .animate-pulse-glow-amber {
   animation: pulseGlowAmber 2.5s ease-in-out infinite;
 }
+
+/* ==============================================================================
+   Motionmaxxing & Taste-Skill 3D Slabs, Perspective & Sheen Utilities
+   ============================================================================== */
+
+.perspective-1400 {
+  perspective: 1400px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+.translate-z-40 {
+  transform: translateZ(40px);
+}
+
+.translate-z-50 {
+  transform: translateZ(50px);
+}
+
+.slab-3d-dark {
+  background: linear-gradient(145deg, rgba(26, 49, 83, 0.9) 0%, rgba(18, 34, 58, 0.95) 100%);
+  border: 1px solid rgba(167, 199, 231, 0.22);
+  box-shadow: 0 20px 40px -15px rgba(10, 20, 36, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.4s var(--ease-soft-land), box-shadow 0.4s var(--ease-soft-land), border-color 0.3s ease;
+}
+
+.slab-3d-dark:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 50px -15px rgba(10, 20, 36, 0.75), 0 0 24px rgba(224, 155, 48, 0.16);
+  border-color: rgba(224, 155, 48, 0.4);
+}
+
+.slab-3d-light {
+  background: #FAFAFA;
+  border: 1px solid rgba(167, 199, 231, 0.35);
+  box-shadow: 0 16px 36px -12px rgba(26, 49, 83, 0.08), 0 2px 6px rgba(26, 49, 83, 0.04), inset 0 1px 0 #ffffff;
+  transition: transform 0.4s var(--ease-soft-land), box-shadow 0.4s var(--ease-soft-land), border-color 0.3s ease;
+}
+
+.slab-3d-light:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 46px -12px rgba(26, 49, 83, 0.14);
+  border-color: #E09B30;
+}
+
+.btn-3d-amber {
+  background: linear-gradient(180deg, #F0AB3D 0%, #E09B30 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(224, 155, 48, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: #1A3153;
+  font-weight: 700;
+  transition: transform 0.2s var(--ease-soft-land), box-shadow 0.2s var(--ease-soft-land);
+}
+
+.btn-3d-amber:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(224, 155, 48, 0.45);
+}
+
+.btn-3d-amber:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(224, 155, 48, 0.35);
+}
+
+.sheen-surface {
+  position: relative;
+  overflow: hidden;
+}
+
+.sheen-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.06) 50%, transparent 60%);
+  pointer-events: none;
+}
+
 
 

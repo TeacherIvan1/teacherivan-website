@@ -63,9 +63,9 @@ export const SessionArchitectureSection: React.FC = () => {
           <ChibiSceneShowcase
             imageSrc="/assets/chibi-online-coach.png"
             altText="Teacher Ivan Online Live Coaching Session"
-            badge1Text="Quick Recast! 💡"
+            badge1Text="Quick Recast!"
             badge1Icon="recast"
-            badge2Text="Active Speaking >75% 🗣️"
+            badge2Text="Active Speaking >75%"
             badge2Icon="cefr"
             caption="60-Minute Synchronous Session: Real-time correction and personalized pronunciation modeling"
           />

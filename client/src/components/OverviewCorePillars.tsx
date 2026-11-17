@@ -38,9 +38,9 @@ export const OverviewCorePillars: React.FC = () => {
           <ChibiSceneShowcase
             imageSrc="/assets/chibi-online-coach.png"
             altText="Teacher Ivan Online Live Coaching Session with Headset"
-            badge1Text="Live 1-on-1 Mentorship 🎧"
+            badge1Text="Live 1-on-1 Mentorship"
             badge1Icon="recast"
-            badge2Text="Active Speaking >75% 🗣️"
+            badge2Text="Active Speaking >75%"
             badge2Icon="cefr"
             caption="1-on-1 Live Coaching: Real-time correction and personalized pronunciation modeling"
           />

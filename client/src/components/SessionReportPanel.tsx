@@ -484,8 +484,9 @@ export const SessionReportPanel: React.FC = () => {
               </div>
               <div className="tag-cloud">
                 {currentReport.vocabularyUsed.map((vocab, idx) => (
-                  <span key={idx} className="tag-pill" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' }}>
-                    ✓ {vocab}
+                  <span key={idx} className="tag-pill inline-flex items-center gap-1" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' }}>
+                    <CheckCircle2 size={12} className="text-[#38bdf8]" />
+                    <span>{vocab}</span>
                   </span>
                 ))}
               </div>

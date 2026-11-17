@@ -63,6 +63,8 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+look/
+**/look/
 
 # Local browser automation profiles
 .browser-profile/

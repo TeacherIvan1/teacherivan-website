@@ -47,8 +47,8 @@ export const RegisteredStudentsTable: React.FC = () => {
         const data = await res.json();
         setSheetsNotice(
           isEs
-            ? `✓ Sincronizados ${data.synced} estudiantes con Google Sheets (${data.mode})`
-            : `✓ Synced ${data.synced} students with Google Sheets (${data.mode})`
+            ? `Sincronizados ${data.synced} estudiantes con Google Sheets (${data.mode})`
+            : `Synced ${data.synced} students with Google Sheets (${data.mode})`
         );
         fetchSheetsStatus();
       } else {

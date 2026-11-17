@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export type RigState = 'idle' | 'listening' | 'speaking';
 export type RigPersona = 'teacher-ivan' | 'emma';
@@ -36,6 +36,7 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
   const assetPath = persona === 'teacher-ivan' ? '/assets/teacher-ivan-rig.svg' : '/assets/emma-rig.svg';
   const [svgMarkup, setSvgMarkup] = useState<string>(() => svgMarkupCache[assetPath] || '');
   const [isBlinking, setIsBlinking] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 1. Fetch & cache SVG markup with immediate persona synchronisation
   useEffect(() => {
@@ -68,7 +69,7 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
     };
   }, [assetPath]);
 
-  // 2. Natural procedural blinking interval (every 3.2 to 4.2 seconds)
+  // 2. Natural procedural blinking interval (every 3.2 to 4.5 seconds)
   useEffect(() => {
     if (!animateBlink) return;
     let blinkTimer: ReturnType<typeof setTimeout>;
@@ -93,12 +94,123 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
     };
   }, [animateBlink]);
 
+  // 3. Locked Native SVG Transform Procedural Loop
+  // Uses native SVG transform="rotate(deg, cx, cy)" to guarantee zero arm detachment across all browser rendering engines
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !svgMarkup) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const rightArm = svg.querySelector<SVGGElement>('#right-arm-gesture');
+    const leftArm = svg.querySelector<SVGGElement>('#left-arm-prop');
+    const headGroup = svg.querySelector<SVGGElement>('#head-group');
+    const mouthSmile = svg.querySelector<SVGGElement>('#mouth-smile');
+    const mouthIdle = svg.querySelector<SVGGElement>('#mouth-idle');
+    const mouthTalk = svg.querySelector<SVGGElement>('#mouth-talk-open');
+    const eyesOpen = svg.querySelector<SVGGElement>('#eyes-open');
+    const eyesBlink = svg.querySelector<SVGGElement>('#eyes-blink');
+
+    // Pivot points verified from SVG viewBox 0 0 600 600
+    const RIGHT_ARM_PIVOT = '358, 332';
+    const LEFT_ARM_PIVOT = '242, 332';
+    const HEAD_PIVOT = '300, 310';
+
+    // Check reduced motion preference
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      if (rightArm) rightArm.setAttribute('transform', `rotate(0, ${RIGHT_ARM_PIVOT})`);
+      if (leftArm) leftArm.setAttribute('transform', `rotate(0, ${LEFT_ARM_PIVOT})`);
+      if (headGroup) headGroup.setAttribute('transform', `rotate(0, ${HEAD_PIVOT})`);
+      return;
+    }
+
+    let rafId: number;
+
+    const animateFrame = () => {
+      const t = performance.now() / 1000;
+      const breathY = Math.sin(t * 1.5) * 1.5;
+
+      if (state === 'speaking') {
+        // Natural cadence arm gesture: rotate between -2deg and -6deg around locked shoulder pivot
+        const armAngle = -2 + Math.sin(t * 3.8) * -3.5;
+        if (rightArm) rightArm.setAttribute('transform', `rotate(${armAngle.toFixed(2)}, ${RIGHT_ARM_PIVOT})`);
+        
+        // Left arm holding prop subtle follow-through
+        const leftAngle = Math.sin(t * 2.1) * 1.2;
+        if (leftArm) leftArm.setAttribute('transform', `rotate(${leftAngle.toFixed(2)}, ${LEFT_ARM_PIVOT})`);
+
+        // Head tilt with conversational rhythm
+        const headTilt = Math.sin(t * 2.6) * 1.6;
+        if (headGroup) {
+          headGroup.setAttribute(
+            'transform',
+            `translate(0, ${(breathY * 0.7).toFixed(2)}) rotate(${headTilt.toFixed(2)}, ${HEAD_PIVOT})`
+          );
+        }
+
+        // Speaking viseme sync
+        if (mouthTalk) mouthTalk.style.opacity = '1';
+        if (mouthSmile) mouthSmile.style.opacity = '0';
+        if (mouthIdle) mouthIdle.style.opacity = '0';
+      } else if (state === 'listening') {
+        // Attentive tilt towards listener
+        if (rightArm) rightArm.setAttribute('transform', `rotate(0, ${RIGHT_ARM_PIVOT})`);
+        if (leftArm) leftArm.setAttribute('transform', `rotate(0, ${LEFT_ARM_PIVOT})`);
+        if (headGroup) {
+          headGroup.setAttribute(
+            'transform',
+            `translate(0, ${(breathY * 0.5).toFixed(2)}) rotate(2.5, ${HEAD_PIVOT})`
+          );
+        }
+
+        if (mouthTalk) mouthTalk.style.opacity = '0';
+        if (mouthSmile) mouthSmile.style.opacity = '1';
+        if (mouthIdle) mouthIdle.style.opacity = '0';
+      } else {
+        // Idle gentle breathing
+        const headTilt = Math.sin(t * 1.2) * 0.9;
+        if (rightArm) rightArm.setAttribute('transform', `rotate(0, ${RIGHT_ARM_PIVOT})`);
+        if (leftArm) leftArm.setAttribute('transform', `rotate(0, ${LEFT_ARM_PIVOT})`);
+        if (headGroup) {
+          headGroup.setAttribute(
+            'transform',
+            `translate(0, ${breathY.toFixed(2)}) rotate(${headTilt.toFixed(2)}, ${HEAD_PIVOT})`
+          );
+        }
+
+        if (mouthTalk) mouthTalk.style.opacity = '0';
+        if (mouthSmile) mouthSmile.style.opacity = '1';
+        if (mouthIdle) mouthIdle.style.opacity = '0';
+      }
+
+      // Eye blink state sync
+      if (eyesOpen && eyesBlink) {
+        eyesOpen.style.opacity = isBlinking ? '0' : '1';
+        eyesBlink.style.opacity = isBlinking ? '1' : '0';
+      }
+
+      rafId = requestAnimationFrame(animateFrame);
+    };
+
+    rafId = requestAnimationFrame(animateFrame);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [svgMarkup, state, isBlinking]);
+
   const stateClass = `rig-state-${state}`;
-  const blinkClass = isBlinking ? 'rig-blinking' : '';
 
   return (
     <div
-      className={`rig-character-wrapper relative inline-block select-none ${stateClass} ${blinkClass} ${className}`}
+      ref={containerRef}
+      className={`rig-character-wrapper relative inline-block select-none ${stateClass} ${className}`}
       role="img"
       aria-label={alt || (persona === 'teacher-ivan' ? 'Teacher Ivan Chibi Avatar' : 'Coach Emma Chibi Avatar')}
     >
@@ -112,120 +224,15 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
 
         .rig-character-wrapper .rig-layer {
           transform-box: view-box;
-          transition: transform 0.22s ease-out, opacity 0.15s ease-in-out;
+          transition: opacity 0.15s ease-in-out;
         }
 
-        /* ------------------------------------------------------------------ */
-        /* SPEAKING STATE DYNAMICS                                            */
-        /* ------------------------------------------------------------------ */
-        .rig-character-wrapper.rig-state-speaking #mouth-talk-open {
-          opacity: 1 !important;
-          animation: rigMouthViseme 0.24s ease-in-out infinite alternate !important;
-        }
-        .rig-character-wrapper.rig-state-speaking #mouth-smile,
-        .rig-character-wrapper.rig-state-speaking #mouth-idle {
-          opacity: 0 !important;
-        }
-        .rig-character-wrapper.rig-state-speaking #right-arm-gesture {
-          animation: rigArmTalk 1.6s ease-in-out infinite alternate !important;
-        }
-        .rig-character-wrapper.rig-state-speaking #head-group {
-          animation: rigHeadTalk 1.1s ease-in-out infinite alternate !important;
-        }
         .rig-character-wrapper.rig-state-speaking #bg-aura {
           animation: rigAuraActive 1.4s ease-in-out infinite alternate !important;
         }
 
-        /* ------------------------------------------------------------------ */
-        /* LISTENING STATE DYNAMICS                                           */
-        /* ------------------------------------------------------------------ */
-        .rig-character-wrapper.rig-state-listening #mouth-talk-open {
-          opacity: 0 !important;
-        }
-        .rig-character-wrapper.rig-state-listening #mouth-smile {
-          opacity: 1 !important;
-        }
-        .rig-character-wrapper.rig-state-listening #mouth-idle {
-          opacity: 0 !important;
-        }
-        .rig-character-wrapper.rig-state-listening #head-group {
-          transform: rotate(3deg) translateY(-2px) !important;
-        }
         .rig-character-wrapper.rig-state-listening #bg-aura {
           animation: rigAuraListening 2.2s ease-in-out infinite alternate !important;
-        }
-
-        /* ------------------------------------------------------------------ */
-        /* IDLE STATE DYNAMICS                                                */
-        /* ------------------------------------------------------------------ */
-        .rig-character-wrapper.rig-state-idle #mouth-talk-open {
-          opacity: 0 !important;
-        }
-        .rig-character-wrapper.rig-state-idle #mouth-smile {
-          opacity: 1 !important;
-        }
-        .rig-character-wrapper.rig-state-idle #mouth-idle {
-          opacity: 0 !important;
-        }
-        .rig-character-wrapper.rig-state-idle #head-group {
-          animation: rigHeadIdle 3.8s ease-in-out infinite alternate !important;
-        }
-
-        /* ------------------------------------------------------------------ */
-        /* BLINKING OVERRIDE                                                  */
-        /* ------------------------------------------------------------------ */
-        .rig-character-wrapper.rig-blinking #eyes-open {
-          opacity: 0 !important;
-        }
-        .rig-character-wrapper.rig-blinking #eyes-blink {
-          opacity: 1 !important;
-        }
-
-        /* ------------------------------------------------------------------ */
-        /* KEYFRAME ANIMATIONS                                                */
-        /* ------------------------------------------------------------------ */
-        @keyframes rigMouthViseme {
-          0% {
-            transform: scaleY(0.7) translateY(1px);
-            transform-origin: 300px 285px;
-          }
-          100% {
-            transform: scaleY(1.18) translateY(-1px);
-            transform-origin: 300px 285px;
-          }
-        }
-
-        @keyframes rigArmTalk {
-          0% {
-            transform: rotate(0deg);
-            transform-origin: 358px 332px;
-          }
-          100% {
-            transform: rotate(-9deg) translateY(-4px);
-            transform-origin: 358px 332px;
-          }
-        }
-
-        @keyframes rigHeadTalk {
-          0% {
-            transform: rotate(-1deg) translateY(0);
-            transform-origin: 300px 310px;
-          }
-          100% {
-            transform: rotate(1.5deg) translateY(-2px);
-            transform-origin: 300px 310px;
-          }
-        }
-
-        @keyframes rigHeadIdle {
-          0% {
-            transform: translateY(0);
-            transform-origin: 300px 310px;
-          }
-          100% {
-            transform: translateY(-3px);
-            transform-origin: 300px 310px;
-          }
         }
 
         @keyframes rigAuraActive {

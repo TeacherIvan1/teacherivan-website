@@ -168,10 +168,10 @@ describe('i18n Language Module', () => {
     assert.strictEqual(translations.es.asyncSprint.badgeNeuroplastic, 'Retención Neuroplástica');
     assert.strictEqual(translations.en.asyncSprint.badgeZeroCommute, 'Zero Commute Time');
     assert.strictEqual(translations.es.asyncSprint.badgeZeroCommute, 'Sin Pérdida de Tiempo en Traslados');
-    assert.strictEqual(translations.en.asyncSprint.showcaseBadge1, '5-Day Voice Sprint 🚀');
-    assert.strictEqual(translations.es.asyncSprint.showcaseBadge1, 'Sprint de Voz de 5 Días 🚀');
-    assert.strictEqual(translations.en.asyncSprint.showcaseBadge2, 'Daily 10–15m Micro-Habit ⏱️');
-    assert.strictEqual(translations.es.asyncSprint.showcaseBadge2, 'Micro-Hábito Diario 10–15m ⏱️');
+    assert.strictEqual(translations.en.asyncSprint.showcaseBadge1, '5-Day Voice Sprint');
+    assert.strictEqual(translations.es.asyncSprint.showcaseBadge1, 'Sprint de Voz de 5 Días');
+    assert.strictEqual(translations.en.asyncSprint.showcaseBadge2, 'Daily 10–15m Micro-Habit');
+    assert.strictEqual(translations.es.asyncSprint.showcaseBadge2, 'Micro-Hábito Diario 10–15m');
     assert.ok(translations.en.asyncSprint.showcaseCaption.includes('Collaborative Asynchronous Sprints'));
     assert.ok(translations.es.asyncSprint.showcaseCaption.includes('Sprints Asíncronos Colaborativos'));
     assert.ok(translations.en.asyncSprint.day1Highlight);
@@ -266,8 +266,8 @@ describe('i18n Language Module', () => {
     const esLp = translations.es.landingPage;
 
     // 1. Hero 5 elements
-    assert.strictEqual(enLp.heroHeadline, 'Teacher Ivan makes you speak. Not an academy on the clock, a partner in your fluency.');
-    assert.strictEqual(esLp.heroHeadline, 'Teacher Ivan destraba tu habla. No una academia por horas, un socio en tu fluidez.');
+    assert.strictEqual(enLp.heroHeadline, 'Speak English fluently without freezing in real conversations.');
+    assert.strictEqual(esLp.heroHeadline, 'Hablá inglés con fluidez y sin bloqueos al conversar.');
     assert.ok(enLp.heroSubhead.includes('Teacher Ivan'));
     assert.ok(esLp.heroSubhead.includes('Teacher Ivan'));
     assert.ok(enLp.heroPrimaryCta);

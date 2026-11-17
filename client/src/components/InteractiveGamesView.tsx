@@ -508,7 +508,7 @@ export const InteractiveGamesView: React.FC = () => {
                   : `You solved all recast questions with ${recastCorrectCount} correct answers. Automatic fluency reflexes updated!`}
               </p>
               <div className="inline-block px-4 py-2 rounded-full bg-[#E09B30]/20 text-[#E09B30] font-montserrat font-bold text-sm">
-                +75 XP • {isEs ? 'Día 2 del Sprint Completado ✓' : 'Sprint Day 2 Stage Complete ✓'}
+                +75 XP • {isEs ? 'Día 2 del Sprint Completado' : 'Sprint Day 2 Stage Complete'}
               </div>
 
               <div>

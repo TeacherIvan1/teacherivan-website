@@ -52,17 +52,17 @@ export const WeeklyReportModal: React.FC = () => {
 
   const buildStructuredReportMessage = (): string => {
     return [
-      `📊 *${t.sprintDashboard.reportTitle}*`,
-      `👨‍🎓 *${isEs ? 'Estudiante' : 'Student'}:* ${profile.studentName || 'Estudiante'}`,
-      `🎯 *${isEs ? 'Nivel MCER' : 'CEFR Level'}:* ${profile.cefrLevel} | *${isEs ? 'Escenario' : 'Scenario'}:* ${profile.focusScenario}`,
-      `💡 *${isEs ? 'Competencia Clave' : 'Focus Area'}:* ${profile.weakCompetency}`,
+      `*${t.sprintDashboard.reportTitle}*`,
+      `• *${isEs ? 'Estudiante' : 'Student'}:* ${profile.studentName || 'Estudiante'}`,
+      `• *${isEs ? 'Nivel MCER' : 'CEFR Level'}:* ${profile.cefrLevel} | *${isEs ? 'Escenario' : 'Scenario'}:* ${profile.focusScenario}`,
+      `• *${isEs ? 'Competencia Clave' : 'Focus Area'}:* ${profile.weakCompetency}`,
       ``,
-      `🔥 *${isEs ? 'Progreso Semanal' : 'Weekly Habit Sprint'}:* ${stageCount}/5 ${isEs ? 'Días Completados' : 'Days Completed'} (+${totalXp} XP)`,
-      `📚 *${isEs ? 'Recursos Completados' : 'Resources Completed'}:* ${completedReadings.length} ${isEs ? 'lecturas' : 'readings'}, ${completedVideos.length} ${isEs ? 'videos' : 'videos'}`,
-      `🎮 *${isEs ? 'Precisión en Juegos' : 'Game Accuracy'}:* ${avgAccuracy}%`,
-      `🗣️ *${isEs ? 'Laboratorio de Voz' : 'Voice Lab'}:* ${simulatorScore}/100 pts (${recentRecastsCount} recasts)`,
+      `• *${isEs ? 'Progreso Semanal' : 'Weekly Habit Sprint'}:* ${stageCount}/5 ${isEs ? 'Días Completados' : 'Days Completed'} (+${totalXp} XP)`,
+      `• *${isEs ? 'Recursos Completados' : 'Resources Completed'}:* ${completedReadings.length} ${isEs ? 'lecturas' : 'readings'}, ${completedVideos.length} ${isEs ? 'videos' : 'videos'}`,
+      `• *${isEs ? 'Precisión en Juegos' : 'Game Accuracy'}:* ${avgAccuracy}%`,
+      `• *${isEs ? 'Laboratorio de Voz' : 'Voice Lab'}:* ${simulatorScore}/100 pts (${recentRecastsCount} recasts)`,
       ``,
-      `✍️ *${isEs ? 'Producción Escrita (Día 4)' : 'Written Response (Day 4)'}:*`,
+      `• *${isEs ? 'Producción Escrita (Día 4)' : 'Written Response (Day 4)'}:*`,
       `"${day4Writing ? day4Writing.slice(0, 200) + (day4Writing.length > 200 ? '...' : '') : (isEs ? 'Sin entrega escrita aún' : 'No written submission yet')}"`,
       ``,
       `Teacher Ivan, ${isEs ? 'este es mi resumen de la semana para coordinar mi próxima clase 1 a 1!' : 'here is my weekly progress summary to schedule our next 1-on-1 session!'}`,
@@ -220,8 +220,9 @@ export const WeeklyReportModal: React.FC = () => {
         {/* Day 4 Writing Preview */}
         {day4Writing && (
           <div className="p-4 rounded-2xl bg-[#1A3153]/60 border border-[#A7C7E7]/25 space-y-2">
-            <span className="text-[11px] font-bold text-[#E09B30] uppercase tracking-wider block">
-              ✍️ {isEs ? 'Muestra de Escritura Funcional (Día 4)' : 'Day 4 Written Sample'}
+            <span className="text-[11px] font-bold text-[#E09B30] uppercase tracking-wider flex items-center gap-1.5">
+              <PenTool size={13} className="text-[#E09B30]" />
+              <span>{isEs ? 'Muestra de Escritura Funcional (Día 4)' : 'Day 4 Written Sample'}</span>
             </span>
             <p className="font-inter text-xs text-[#FAFAFA] italic leading-relaxed bg-[#12223a]/80 p-3 rounded-xl border border-[#A7C7E7]/15">
               "{day4Writing}"

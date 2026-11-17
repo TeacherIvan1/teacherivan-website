@@ -17,9 +17,9 @@ export interface ChibiSceneShowcaseProps {
 export const ChibiSceneShowcase: React.FC<ChibiSceneShowcaseProps> = ({
   imageSrc,
   altText,
-  badge1Text = 'Quick Recast! 💡',
+  badge1Text = 'Quick Recast!',
   badge1Icon = 'recast',
-  badge2Text = 'CEFR B2+ 🎯',
+  badge2Text = 'CEFR B2+',
   badge2Icon = 'cefr',
   badge1Position = 'top-left',
   badge2Position = 'bottom-right',
