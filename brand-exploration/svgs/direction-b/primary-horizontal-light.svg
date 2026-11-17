@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="720" height="160" role="img" aria-labelledby="dir-b-light-title">
+  <title id="dir-b-light-title">Teacher Ivan - Dual-Sync Conduit (Horizontal Light)</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;900&amp;family=Inter:wght@500;600;700&amp;display=swap');
+      .font-heading-semi { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; }
+      .font-heading-black { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 900; }
+      .font-sub { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; }
+    </style>
+  </defs>
+
+  <g id="logo-icon-mark" transform="translate(16, 16) scale(0.5)">
+    <g id="mark-bg-slab">
+      <rect x="20" y="24" width="216" height="216" rx="48" fill="#091326" />
+      <rect x="20" y="16" width="216" height="216" rx="48" fill="#1A3153" stroke="#A7C7E7" stroke-width="3" stroke-opacity="0.35" />
+    </g>
+    <g id="mark-conduit-human">
+      <path d="M 128 124 C 92 82 46 86 46 124 C 46 162 92 166 128 124" fill="none" stroke="#7EAEE0" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <g id="mark-conduit-ai">
+      <path d="M 128 124 C 164 166 210 162 210 124 C 210 86 164 82 128 124" fill="none" stroke="#E09B30" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <g id="mark-spark-nexus">
+      <path d="M 128 104 Q 128 124 148 124 Q 128 124 128 144 Q 128 124 108 124 Q 128 124 128 104 Z" fill="#FAFAFA" />
+      <circle cx="128" cy="124" r="5" fill="#E09B30" />
+    </g>
+  </g>
+
+  <!-- Wordmark Section Light -->
+  <g id="wordmark-group" transform="translate(164, 30)">
+    <text x="0" y="60" letter-spacing="-0.02em">
+      <tspan class="font-heading-semi" font-size="50" fill="#4A5568">Teacher </tspan>
+      <tspan class="font-heading-black" font-size="52" fill="#1A3153">Ivan</tspan>
+      <tspan class="font-heading-black" font-size="52" fill="#E09B30">.</tspan>
+    </text>
+    <g id="badge-descriptor" transform="translate(2, 82)">
+      <rect x="0" y="0" width="254" height="26" rx="6" fill="#FAFAFA" stroke="#1A3153" stroke-width="1.4" stroke-opacity="0.25" />
+      <circle cx="14" cy="13" r="4" fill="#1A3153" />
+      <text x="26" y="17.5" class="font-sub" font-size="11.5" letter-spacing="0.14em" fill="#4A5568">BICHRONIC ENGLISH COACHING</text>
+    </g>
+  </g>
+</svg>

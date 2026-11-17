@@ -58,7 +58,7 @@ export const TrustSection: React.FC = () => {
             >
               <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30] p-3 flex items-center justify-center shadow-xl shadow-[#E09B30]/20 relative overflow-hidden">
                 <img
-                  src="/assets/logo.svg"
+                  src="/assets/teacher-ivan.svg"
                   alt="Teacher Ivan Official Coach"
                   className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-300"
                 />

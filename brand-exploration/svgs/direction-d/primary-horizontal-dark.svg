@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="720" height="160" role="img" aria-labelledby="dir-d-dark-title">
+  <title id="dir-d-dark-title">Teacher Ivan - Recast Prism (Horizontal Dark)</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&amp;family=JetBrains+Mono:wght@600;700&amp;display=swap');
+      .font-heading { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 900; }
+      .font-mono { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+    </style>
+    <linearGradient id="d-arrow-grad-h" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2B750" />
+      <stop offset="100%" stop-color="#E09B30" />
+    </linearGradient>
+  </defs>
+
+  <g id="logo-icon-mark" transform="translate(16, 16) scale(0.5)">
+    <g id="mark-keycap-slab">
+      <rect x="24" y="32" width="208" height="208" rx="42" fill="#091326" />
+      <rect x="24" y="24" width="208" height="208" rx="42" fill="#1A3153" stroke="#A7C7E7" stroke-width="3" stroke-opacity="0.35" />
+    </g>
+    <g id="mark-recast-input">
+      <rect x="58" y="112" width="10" height="32" rx="5" fill="#A7C7E7" fill-opacity="0.6" />
+      <rect x="76" y="94" width="10" height="68" rx="5" fill="#A7C7E7" fill-opacity="0.8" />
+      <rect x="94" y="106" width="10" height="44" rx="5" fill="#A7C7E7" />
+    </g>
+    <line x1="116" y1="84" x2="116" y2="172" stroke="#E09B30" stroke-width="2.5" stroke-dasharray="4 4" />
+    <g id="mark-recast-arrow">
+      <path d="M 136 78 L 186 128 L 136 178 L 152 178 L 202 128 L 152 78 Z" fill="url(#d-arrow-grad-h)" />
+      <circle cx="164" cy="128" r="5" fill="#FAFAFA" />
+    </g>
+  </g>
+
+  <!-- Wordmark Section Tech-Editorial -->
+  <g id="wordmark-group" transform="translate(164, 28)">
+    <text x="0" y="62" class="font-heading" font-size="52" letter-spacing="-0.03em" fill="#FAFAFA">
+      TEACHER IVAN
+    </text>
+    <!-- Monospace Terminal Tag -->
+    <g id="badge-descriptor" transform="translate(2, 84)">
+      <rect x="0" y="0" width="248" height="26" rx="5" fill="#12223a" stroke="#E09B30" stroke-width="1.2" stroke-opacity="0.4" />
+      <text x="124" y="17.5" text-anchor="middle" class="font-mono" font-size="11" letter-spacing="0.08em" fill="#E09B30">[ &gt;75% STT // VOICE LAB ]</text>
+    </g>
+  </g>
+</svg>

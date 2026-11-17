@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="dir-c-icon-title">
+  <title id="dir-c-icon-title">Teacher Ivan - Iconic Chibi Crest Icon</title>
+  <defs>
+    <linearGradient id="c-shield" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3960" />
+      <stop offset="100%" stop-color="#12223a" />
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Shield Crest Outer 3D Base -->
+  <g id="mark-crest-base" style="transform-origin: 128px 128px;">
+    <!-- Midnight 3D Drop Lip -->
+    <path d="M 128 26 C 196 26 226 40 226 40 C 226 150 180 214 128 242 C 76 214 30 150 30 40 C 30 40 60 26 128 26 Z" fill="#091326" />
+    <!-- Navy Shield Face -->
+    <path d="M 128 18 C 196 18 226 32 226 32 C 226 142 180 206 128 234 C 76 206 30 142 30 32 C 30 32 60 18 128 18 Z" fill="url(#c-shield)" stroke="#E09B30" stroke-width="4" stroke-linejoin="round" />
+    <!-- Inner Accent Ring -->
+    <path d="M 128 28 C 184 28 212 40 212 40 C 212 134 172 192 128 218 C 84 192 44 134 44 40 C 44 40 72 28 128 28 Z" fill="none" stroke="#A7C7E7" stroke-width="1.8" stroke-dasharray="6 4" stroke-opacity="0.6" />
+  </g>
+
+  <!-- 2. Teacher Ivan Iconic Silhouette Features -->
+  <g id="mark-chibi-silhouette" style="transform-origin: 128px 130px;">
+    <!-- Warm Peach Chibi Head Silhouette -->
+    <path d="M 76 116 C 72 164 88 182 128 182 C 168 182 184 164 180 116 C 180 78 160 64 128 64 C 96 64 76 78 76 116 Z" fill="#FFCC99" stroke="#1A3153" stroke-width="4.5" />
+
+    <!-- Swept Espresso Hair with Signature Cowlick -->
+    <path d="M 74 116 C 66 94 74 70 94 56 C 114 42 144 40 168 48 C 190 56 192 84 184 112 C 174 98 156 90 134 92 C 112 94 92 104 74 116 Z" fill="#4E3426" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
+    <!-- Golden Crown Sheen Curve -->
+    <path d="M 104 56 C 124 48 152 50 172 58" fill="none" stroke="#E09B30" stroke-width="3.5" stroke-linecap="round" />
+
+    <!-- Confident Chibi Eyes (Bolded for Favicon Scale) -->
+    <ellipse cx="106" cy="122" rx="8" ry="11" fill="#1A3153" />
+    <circle cx="104" cy="118" r="3.8" fill="#FAFAFA" />
+    <ellipse cx="150" cy="122" rx="8" ry="11" fill="#1A3153" />
+    <circle cx="148" cy="118" r="3.8" fill="#FAFAFA" />
+
+    <!-- Confident Smirk -->
+    <path d="M 118 144 Q 128 150 142 141" fill="none" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 3. Coach Headset Boom with Glowing Amber Mic -->
+  <g id="mark-mic-boom" style="transform-origin: 128px 146px;">
+    <!-- Headband / Earpiece -->
+    <rect x="62" y="108" width="14" height="24" rx="6" fill="#1A3153" stroke="#FAFAFA" stroke-width="2" />
+    <circle cx="69" cy="120" r="3" fill="#E09B30" />
+    <!-- Curved Microphone Boom extending to mouth -->
+    <path d="M 69 126 C 72 152 98 158 126 152" fill="none" stroke="#FAFAFA" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Active Amber Microphone Capsule -->
+    <rect x="126" y="146" width="16" height="11" rx="5" fill="#E09B30" stroke="#1A3153" stroke-width="2" />
+  </g>
+</svg>

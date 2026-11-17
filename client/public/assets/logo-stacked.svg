@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480" role="img" aria-labelledby="dir-a-stacked-title">
+  <title id="dir-a-stacked-title">Teacher Ivan - Bicronic Resonance Monogram (Stacked Lockup)</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&amp;family=Inter:wght@600;700&amp;display=swap');
+      .font-heading { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 900; }
+      .font-sub { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; }
+    </style>
+  </defs>
+
+  <!-- Centered Icon Mark (200x200 at x=140, y=40) -->
+  <g id="logo-icon-mark" transform="translate(140, 40) scale(0.78125)">
+    <g id="mark-bg-slab">
+      <rect x="20" y="28" width="216" height="216" rx="48" fill="#091326" />
+      <rect x="20" y="20" width="216" height="216" rx="48" fill="#1A3153" stroke="#A7C7E7" stroke-width="3" stroke-opacity="0.35" />
+      <path d="M 64 22 L 192 22" stroke="#FAFAFA" stroke-width="2" stroke-linecap="round" stroke-opacity="0.4" />
+    </g>
+    <g id="mark-primary-geometry">
+      <rect x="52" y="52" width="88" height="24" rx="6" fill="#FAFAFA" />
+      <rect x="84" y="76" width="24" height="124" rx="6" fill="#FAFAFA" />
+    </g>
+    <g id="mark-acoustic-bridge">
+      <line x1="108" y1="116" x2="148" y2="116" stroke="#E09B30" stroke-width="7" stroke-linecap="round" />
+      <line x1="108" y1="138" x2="148" y2="138" stroke="#A7C7E7" stroke-width="7" stroke-linecap="round" />
+      <line x1="108" y1="160" x2="148" y2="160" stroke="#E09B30" stroke-width="7" stroke-linecap="round" />
+    </g>
+    <g id="mark-amber-spark">
+      <rect x="148" y="76" width="24" height="124" rx="6" fill="#E09B30" />
+      <circle cx="160" cy="56" r="10" fill="#E09B30" />
+      <circle cx="160" cy="56" r="17" fill="none" stroke="#E09B30" stroke-width="2.5" stroke-dasharray="4 3" />
+    </g>
+  </g>
+
+  <!-- Centered Wordmark -->
+  <g id="wordmark-group">
+    <text x="240" y="304" text-anchor="middle" class="font-heading" font-size="44" letter-spacing="-0.02em" fill="#FAFAFA">
+      TEACHER
+    </text>
+    <text x="240" y="356" text-anchor="middle" class="font-heading" font-size="52" letter-spacing="-0.02em" fill="#E09B30">
+      IVAN
+    </text>
+    <!-- Descriptor Pill -->
+    <g id="badge-descriptor" transform="translate(120, 386)">
+      <rect x="0" y="0" width="240" height="28" rx="14" fill="#12223a" stroke="#A7C7E7" stroke-width="1.2" stroke-opacity="0.3" />
+      <circle cx="16" cy="14" r="4.5" fill="#10B981" />
+      <text x="130" y="18.5" text-anchor="middle" class="font-sub" font-size="11" letter-spacing="0.16em" fill="#A7C7E7">ENGLISH FLUENCY LAB</text>
+    </g>
+  </g>
+</svg>

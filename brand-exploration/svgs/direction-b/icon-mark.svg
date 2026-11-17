@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="dir-b-icon-title">
+  <title id="dir-b-icon-title">Teacher Ivan - Dual-Sync Conduit Icon</title>
+  <defs>
+    <linearGradient id="b-denim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C2DCF5" />
+      <stop offset="100%" stop-color="#7EAEE0" />
+    </linearGradient>
+    <linearGradient id="b-amber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2B750" />
+      <stop offset="100%" stop-color="#D98A1B" />
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Ambient Dark Studio Glow -->
+  <g id="mark-bg-slab">
+    <rect x="20" y="24" width="216" height="216" rx="48" fill="#091326" />
+    <rect x="20" y="16" width="216" height="216" rx="48" fill="#1A3153" stroke="#A7C7E7" stroke-width="2" stroke-opacity="0.3" />
+  </g>
+
+  <!-- 2. Left Conduit: Human 1-on-1 Mentorship Arc (Soft Denim Blue) -->
+  <g id="mark-conduit-human" style="transform-origin: 96px 124px;">
+    <!-- Smooth continuous conduit loop -->
+    <path d="M 128 124 C 92 82 46 86 46 124 C 46 162 92 166 128 124" fill="none" stroke="url(#b-denim)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- 3. Right Conduit: 24/7 AI Voice Lab Arc (Warm Amber) -->
+  <g id="mark-conduit-ai" style="transform-origin: 160px 124px;">
+    <!-- Over-under weave with optical knockout clearance -->
+    <path d="M 128 124 C 164 166 210 162 210 124 C 210 86 164 82 128 124" fill="none" stroke="url(#b-amber)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- 4. Central Vocal Spark Nexus (Meeting of Human Mentorship & Live AI) -->
+  <g id="mark-spark-nexus" style="transform-origin: 128px 124px;">
+    <!-- Core luminous 4-point diamond star -->
+    <path d="M 128 104 Q 128 124 148 124 Q 128 124 128 144 Q 128 124 108 124 Q 128 124 128 104 Z" fill="#FAFAFA" />
+    <circle cx="128" cy="124" r="4.5" fill="#E09B30" />
+    <!-- Dual pulse rings -->
+    <circle cx="128" cy="124" r="18" fill="none" stroke="#FAFAFA" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="3 3" />
+  </g>
+</svg>

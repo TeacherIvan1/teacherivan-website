@@ -15,7 +15,7 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
   variant = 'dark',
   size = 'md',
   className = '',
-  altText = 'Teacher Ivan Chibi Mascot',
+  altText = 'Teacher Ivan Official Logo',
 }) => {
   const isLight = variant === 'light';
 
@@ -42,15 +42,15 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 sm:gap-3 select-none ${className}`}
+      className={`inline-flex items-center gap-1.5 sm:gap-3 select-none group cursor-pointer ${className}`}
       data-testid="official-brand-lockup"
     >
-      {/* Brand Mascot (Teacher Ivan Chibi character) with preserved aspect ratio */}
+      {/* Master Bicronic Resonance Monogram with snapSettle hover micro-interaction */}
       <div className={`relative flex-shrink-0 ${mascotDimensions} flex items-center justify-center`}>
         <img
           src="/assets/logo.svg"
           alt={altText}
-          className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-200 hover:scale-105"
+          className="w-full h-full object-contain filter drop-shadow-md transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:drop-shadow-[0_6px_14px_rgba(224,155,48,0.45)]"
           loading="eager"
         />
       </div>
@@ -59,7 +59,7 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
       <div className="flex flex-col justify-center leading-none text-left">
         {/* Line 1: Teacher Ivan on a single line (never wraps) */}
         <div
-          className={`font-montserrat font-bold tracking-tight whitespace-nowrap ${primaryTextSize} ${
+          className={`font-montserrat font-bold tracking-tight whitespace-nowrap transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 ${primaryTextSize} ${
             isLight ? 'text-[#1A3153]' : 'text-[#FAFAFA]'
           }`}
         >
@@ -68,7 +68,7 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
 
         {/* Line 2: ENGLISH CLASSES in uppercase, geometric sans-serif (Montserrat), tracking-[0.25em] (hidden on <640px for sm) */}
         <div
-          className={`font-montserrat uppercase font-semibold tracking-[0.22em] sm:tracking-[0.25em] whitespace-nowrap ${sublineTextSize} mt-0.5 md:mt-1 ${
+          className={`font-montserrat uppercase font-semibold tracking-[0.22em] sm:tracking-[0.25em] whitespace-nowrap transition-colors duration-200 ${sublineTextSize} mt-0.5 md:mt-1 ${
             size === 'sm' ? 'hidden sm:block' : ''
           } ${isLight ? 'text-[#4A5568]' : 'text-[#A7C7E7]'}`}
         >

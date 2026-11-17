@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="720" height="160" role="img" aria-labelledby="dir-c-light-title">
+  <title id="dir-c-light-title">Teacher Ivan - Iconic Chibi Crest (Horizontal Light)</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&amp;family=Inter:wght@600;700&amp;display=swap');
+      .font-heading { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 900; }
+      .font-sub { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+  <g id="logo-icon-mark" transform="translate(16, 16) scale(0.5)">
+    <g id="mark-crest-base">
+      <path d="M 128 26 C 196 26 226 40 226 40 C 226 150 180 214 128 242 C 76 214 30 150 30 40 C 30 40 60 26 128 26 Z" fill="#091326" />
+      <path d="M 128 18 C 196 18 226 32 226 32 C 226 142 180 206 128 234 C 76 206 30 142 30 32 C 30 32 60 18 128 18 Z" fill="#1A3153" stroke="#E09B30" stroke-width="4" stroke-linejoin="round" />
+    </g>
+    <g id="mark-chibi-silhouette">
+      <path d="M 76 116 C 72 164 88 182 128 182 C 168 182 184 164 180 116 C 180 78 160 64 128 64 C 96 64 76 78 76 116 Z" fill="#FFCC99" stroke="#1A3153" stroke-width="4.5" />
+      <path d="M 74 116 C 66 94 74 70 94 56 C 114 42 144 40 168 48 C 190 56 192 84 184 112 C 174 98 156 90 134 92 C 112 94 92 104 74 116 Z" fill="#4E3426" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
+      <ellipse cx="106" cy="122" rx="7" ry="10" fill="#1A3153" />
+      <ellipse cx="150" cy="122" rx="7" ry="10" fill="#1A3153" />
+      <path d="M 118 144 Q 128 150 142 141" fill="none" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+    </g>
+    <g id="mark-mic-boom">
+      <rect x="62" y="108" width="14" height="24" rx="6" fill="#1A3153" stroke="#FAFAFA" stroke-width="2" />
+      <path d="M 69 126 C 72 152 98 158 126 152" fill="none" stroke="#FAFAFA" stroke-width="3.5" stroke-linecap="round" />
+      <rect x="126" y="146" width="16" height="11" rx="5" fill="#E09B30" stroke="#1A3153" stroke-width="2" />
+    </g>
+  </g>
+
+  <!-- Wordmark Section Light -->
+  <g id="wordmark-group" transform="translate(164, 28)">
+    <text x="0" y="62" class="font-heading" font-size="52" letter-spacing="-0.02em" fill="#1A3153">
+      TEACHER IVAN
+    </text>
+    <g id="badge-descriptor" transform="translate(2, 80) rotate(-1.5)">
+      <rect x="0" y="0" width="224" height="26" rx="13" fill="#E09B30" />
+      <text x="112" y="17.5" text-anchor="middle" class="font-sub" font-size="11" letter-spacing="0.14em" fill="#1A3153">VOICE LAB &amp; COACHING</text>
+    </g>
+  </g>
+</svg>

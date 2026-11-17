@@ -32,7 +32,7 @@ export const TutorPersonaSelector: React.FC<TutorPersonaSelectorProps> = ({
         voiceBadge: t.persona.teacherIvan.voiceLabel,
         role: t.persona.teacherIvan.role,
         desc: t.persona.teacherIvan.desc,
-        avatarSrc: '/assets/logo.svg',
+        avatarSrc: '/assets/teacher-ivan.svg',
         voiceName: 'Puck',
         genderLabel: 'Male',
       },

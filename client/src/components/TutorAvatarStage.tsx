@@ -29,7 +29,7 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
 
   // 2. Select avatar asset & metadata
   const isIvan = persona === 'teacher-ivan';
-  const avatarSrc = isIvan ? '/assets/logo.svg' : '/assets/emma.svg';
+  const avatarSrc = isIvan ? '/assets/teacher-ivan.svg' : '/assets/emma.svg';
   const tutorName = isIvan ? t.persona.teacherIvan.name : t.persona.emma.name;
   const voiceBadge = isIvan ? 'Puck (Male)' : 'Aoede (Female)';
 

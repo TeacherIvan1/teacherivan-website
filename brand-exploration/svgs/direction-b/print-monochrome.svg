@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="720" height="160" role="img" aria-labelledby="dir-b-mono-title">
+  <title id="dir-b-mono-title">Teacher Ivan - Dual-Sync Conduit (Print Monochrome)</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;900&amp;family=Inter:wght@500;600;700&amp;display=swap');
+      .font-heading-semi { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; }
+      .font-heading-black { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 900; }
+      .font-sub { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; }
+    </style>
+  </defs>
+
+  <g id="logo-icon-mark" transform="translate(16, 16) scale(0.5)">
+    <!-- Solid Silhouette Slab -->
+    <rect x="20" y="16" width="216" height="216" rx="48" fill="#1A3153" />
+    <path d="M 128 124 C 92 82 46 86 46 124 C 46 162 92 166 128 124" fill="none" stroke="#FAFAFA" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Over-under cut gap -->
+    <path d="M 128 124 C 164 166 210 162 210 124 C 210 86 164 82 128 124" fill="none" stroke="#FAFAFA" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 128 104 Q 128 124 148 124 Q 128 124 128 144 Q 128 124 108 124 Q 128 124 128 104 Z" fill="#1A3153" />
+  </g>
+
+  <g id="wordmark-group" transform="translate(164, 30)">
+    <text x="0" y="60" letter-spacing="-0.02em">
+      <tspan class="font-heading-semi" font-size="50" fill="#1A3153">Teacher </tspan>
+      <tspan class="font-heading-black" font-size="52" fill="#1A3153">Ivan.</tspan>
+    </text>
+    <g id="badge-descriptor" transform="translate(2, 82)">
+      <rect x="0" y="0" width="254" height="26" rx="6" fill="none" stroke="#1A3153" stroke-width="1.5" />
+      <text x="127" y="17.5" text-anchor="middle" class="font-sub" font-size="11.5" letter-spacing="0.14em" fill="#1A3153">BICHRONIC ENGLISH COACHING</text>
+    </g>
+  </g>
+</svg>

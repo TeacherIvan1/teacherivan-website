@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="dir-d-icon-title">
+  <title id="dir-d-icon-title">Teacher Ivan - Recast Prism Keycap Icon</title>
+  <defs>
+    <linearGradient id="d-slab-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3960" />
+      <stop offset="100%" stop-color="#12223a" />
+    </linearGradient>
+    <linearGradient id="d-arrow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2B750" />
+      <stop offset="100%" stop-color="#E09B30" />
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Physical 3D Tactile Keycap Slab -->
+  <g id="mark-keycap-slab" style="transform-origin: 128px 128px;">
+    <!-- 8px Midnight Extruded Lip -->
+    <rect x="24" y="32" width="208" height="208" rx="42" fill="#091326" />
+    <!-- Navy Keycap Face -->
+    <rect x="24" y="24" width="208" height="208" rx="42" fill="url(#d-slab-grad)" stroke="#A7C7E7" stroke-width="2.2" stroke-opacity="0.35" />
+    <!-- Top-edge tactile chamfer -->
+    <path d="M 64 26 L 192 26" stroke="#FAFAFA" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.3" />
+  </g>
+
+  <!-- 2. Hesitant Input Audio Bars (Soft Denim #A7C7E7) -->
+  <g id="mark-recast-input" style="transform-origin: 80px 128px;">
+    <!-- Hesitant / broken voice waves entering the portal -->
+    <rect x="58" y="112" width="10" height="32" rx="5" fill="#A7C7E7" fill-opacity="0.55" />
+    <rect x="76" y="94" width="10" height="68" rx="5" fill="#A7C7E7" fill-opacity="0.75" />
+    <rect x="94" y="106" width="10" height="44" rx="5" fill="#A7C7E7" fill-opacity="0.9" />
+  </g>
+
+  <!-- 3. Central Recast Threshold Line -->
+  <line x1="116" y1="84" x2="116" y2="172" stroke="#E09B30" stroke-width="2" stroke-dasharray="4 4" stroke-opacity="0.65" />
+
+  <!-- 4. Bold Forward Recast Arrow (Warm Amber #E09B30: > for >75% STT & Fluency) -->
+  <g id="mark-recast-arrow" style="transform-origin: 160px 128px;">
+    <!-- Geometric Chevron Arrow > -->
+    <path d="M 136 78 L 186 128 L 136 178 L 152 178 L 202 128 L 152 78 Z" fill="url(#d-arrow-grad)" stroke="#FAFAFA" stroke-width="1.5" stroke-opacity="0.4" />
+    <!-- Floating Luminous Core -->
+    <circle cx="164" cy="128" r="5" fill="#FAFAFA" />
+  </g>
+</svg>

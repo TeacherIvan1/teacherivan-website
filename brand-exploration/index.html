@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Ivan // Brand Identity &amp; Logo System Exploration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-navy: #1A3153;
+      --brand-navy-dark: #12223a;
+      --brand-midnight: #091326;
+      --brand-amber: #E09B30;
+      --brand-amber-hover: #c88624;
+      --brand-denim: #A7C7E7;
+      --brand-slate: #4A5568;
+      --brand-offwhite: #FAFAFA;
+      --brand-emerald: #10B981;
+
+      --font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --ease-soft-land: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-snap-settle: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-accel-exit: cubic-bezier(0.7, 0, 0.84, 0);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--brand-midnight);
+      color: var(--brand-offwhite);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
+
+    /* Top Sticky Header */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(18, 34, 58, 0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(167, 199, 231, 0.2);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand-emerald);
+      box-shadow: 0 0 10px var(--brand-emerald);
+    }
+
+    .nav-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: var(--brand-offwhite);
+    }
+
+    .nav-subtitle {
+      font-size: 0.8rem;
+      color: var(--brand-denim);
+      font-weight: 500;
+    }
+
+    .jump-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .jump-pill {
+      background: var(--brand-navy);
+      border: 1px solid rgba(167, 199, 231, 0.3);
+      color: var(--brand-offwhite);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s var(--ease-soft-land);
+    }
+
+    .jump-pill:hover, .jump-pill.active {
+      background: var(--brand-amber);
+      color: var(--brand-navy);
+      border-color: var(--brand-amber);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(26, 49, 83, 0.9) 0%, rgba(9, 19, 38, 0.95) 100%);
+      border: 1px solid rgba(167, 199, 231, 0.25);
+      border-radius: 24px;
+      padding: 40px 32px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(224, 155, 48, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(224, 155, 48, 0.15);
+      border: 1px solid rgba(224, 155, 48, 0.35);
+      color: var(--brand-amber);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .hero-desc {
+      color: var(--brand-denim);
+      font-size: 1rem;
+      max-width: 840px;
+      line-height: 1.6;
+    }
+
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .principle-box {
+      background: rgba(18, 34, 58, 0.85);
+      border: 1px solid rgba(167, 199, 231, 0.18);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+
+    .principle-title {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--brand-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .principle-text {
+      font-size: 0.8rem;
+      color: var(--brand-denim);
+      line-height: 1.45;
+    }
+
+    /* Direction Section Layout */
+    .direction-card {
+      background: rgba(18, 34, 58, 0.95);
+      border: 1px solid rgba(167, 199, 231, 0.25);
+      border-radius: 28px;
+      padding: 36px 32px;
+      margin-bottom: 48px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: border-color 0.3s ease;
+    }
+
+    .direction-card:hover {
+      border-color: rgba(224, 155, 48, 0.45);
+    }
+
+    .direction-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(167, 199, 231, 0.15);
+    }
+
+    .dir-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--brand-amber);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .dir-name {
+      font-family: var(--font-heading);
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--brand-offwhite);
+      letter-spacing: -0.015em;
+    }
+
+    .dir-metaphor {
+      font-size: 0.9rem;
+      color: var(--brand-denim);
+      max-width: 640px;
+      margin-top: 4px;
+    }
+
+    .action-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-anim {
+      background: linear-gradient(180deg, #F0AB3D 0%, #E09B30 100%);
+      color: var(--brand-navy);
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 10px 18px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(224, 155, 48, 0.35);
+      transition: transform 0.2s var(--ease-soft-land), box-shadow 0.2s var(--ease-soft-land);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-anim:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(224, 155, 48, 0.45);
+    }
+
+    .btn-anim:active {
+      transform: translateY(1px);
+    }
+
+    /* Context Switcher Tabs inside each Direction */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      background: rgba(9, 19, 38, 0.85);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(167, 199, 231, 0.2);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--brand-denim);
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--brand-offwhite);
+    }
+
+    .tab-btn.active {
+      background: var(--brand-navy);
+      color: var(--brand-amber);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Stage Presentation Panes */
+    .stage-wrapper {
+      position: relative;
+      border-radius: 20px;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background 0.3s ease;
+      padding: 32px 24px;
+    }
+
+    .stage-dark {
+      background: #1A3153;
+      border: 1px solid rgba(167, 199, 231, 0.3);
+    }
+
+    .stage-light {
+      background: #FAFAFA;
+      border: 1px solid rgba(26, 49, 83, 0.2);
+      color: #1A3153;
+    }
+
+    .stage-nav-preview {
+      background: #12223a;
+      border: 1px solid rgba(167, 199, 231, 0.3);
+      padding: 0;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+
+    .mockup-navbar {
+      background: rgba(18, 34, 58, 0.95);
+      border-bottom: 1px solid rgba(167, 199, 231, 0.2);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .mockup-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--brand-denim);
+    }
+
+    .mockup-cta {
+      background: var(--brand-amber);
+      color: var(--brand-navy);
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stage-avatar-preview {
+      background: #091326;
+      border: 1px solid rgba(167, 199, 231, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #1A3153;
+      border: 4px solid var(--brand-amber);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      box-shadow: 0 0 24px rgba(224, 155, 48, 0.35);
+      position: relative;
+    }
+
+    .avatar-live-indicator {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--brand-emerald);
+      border: 3px solid #091326;
+    }
+
+    .stage-favicon-preview {
+      background: #1E293B;
+      border: 1px solid rgba(167, 199, 231, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .browser-tab-simulation {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0F172A;
+      border: 1px solid rgba(167, 199, 231, 0.25);
+      border-radius: 8px;
+      padding: 6px 16px;
+      max-width: 260px;
+    }
+
+    .favicon-scales-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 32px;
+      margin-top: 10px;
+    }
+
+    .favicon-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .favicon-box span {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--brand-denim);
+    }
+
+    .stage-worksheet-preview {
+      background: #E2E8F0;
+      border: 1px solid #CBD5E1;
+      padding: 24px;
+      color: #1A3153;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .worksheet-paper {
+      background: #FFFFFF;
+      border: 1px solid #94A3B8;
+      border-radius: 4px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 580px;
+      padding: 24px 28px;
+      font-size: 0.8rem;
+    }
+
+    .worksheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #1A3153;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* Grid Details & Scalability Ladder */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .spec-card {
+      background: rgba(9, 19, 38, 0.7);
+      border: 1px solid rgba(167, 199, 231, 0.15);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+
+    .spec-card h4 {
+      font-family: var(--font-heading);
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--brand-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .spec-card p, .spec-card li {
+      font-size: 0.8rem;
+      color: var(--brand-denim);
+      line-height: 1.5;
+    }
+
+    .spec-card ul {
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+
+    /* Motionmaxxing Animation Keyframes */
+    @keyframes logoSoftLand {
+      0% {
+        opacity: 0;
+        transform: scale(0.6) translateY(28px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.04) translateY(-3px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes sparkPulse {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.95;
+      }
+    }
+
+    .anim-active #mark-bg-slab {
+      animation: logoSoftLand 1.1s var(--ease-snap-settle) forwards;
+    }
+
+    .anim-active #mark-primary-geometry,
+    .anim-active #mark-conduit-human,
+    .anim-active #mark-chibi-silhouette,
+    .anim-active #mark-recast-input {
+      animation: logoSoftLand 1.2s var(--ease-soft-land) 0.1s both;
+    }
+
+    .anim-active #mark-amber-spark,
+    .anim-active #mark-conduit-ai,
+    .anim-active #mark-spark-nexus,
+    .anim-active #mark-mic-boom,
+    .anim-active #mark-recast-arrow {
+      animation: sparkPulse 0.9s var(--ease-snap-settle) 0.3s both;
+    }
+
+    .anim-active #wordmark-group {
+      animation: logoSoftLand 1.1s var(--ease-soft-land) 0.2s both;
+    }
+
+    /* Master Spec & Voting Form */
+    .master-specs-section {
+      background: rgba(18, 34, 58, 0.95);
+      border: 1px solid rgba(167, 199, 231, 0.25);
+      border-radius: 28px;
+      padding: 36px 32px;
+      margin-top: 48px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    th {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      color: var(--brand-amber);
+      border-bottom: 1px solid rgba(167, 199, 231, 0.3);
+      padding: 12px 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.75rem;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(167, 199, 231, 0.12);
+      color: var(--brand-offwhite);
+    }
+
+    .color-swatch {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      margin-right: 8px;
+      vertical-align: middle;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .voting-box {
+      margin-top: 32px;
+      padding: 24px;
+      background: rgba(9, 19, 38, 0.85);
+      border: 1px solid var(--brand-amber);
+      border-radius: 18px;
+    }
+
+    .voting-title {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--brand-amber);
+      margin-bottom: 12px;
+    }
+
+    .dir-select-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .dir-radio-label {
+      background: var(--brand-navy);
+      border: 1px solid rgba(167, 199, 231, 0.3);
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: var(--font-heading);
+      font-size: 0.82rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .dir-radio-label:hover {
+      border-color: var(--brand-amber);
+    }
+
+    .dir-radio-label input[type="radio"]:checked + span {
+      color: var(--brand-amber);
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      height: 90px;
+      background: #12223a;
+      border: 1px solid rgba(167, 199, 231, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--brand-offwhite);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      resize: vertical;
+    }
+
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--brand-amber);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <header class="top-nav">
+    <div class="brand-title-group">
+      <span class="live-dot"></span>
+      <div>
+        <div class="nav-title">TEACHER IVAN // BRAND IDENTITY SYSTEM</div>
+        <div class="nav-subtitle">Bicronic Fluency Method • 4 Exploratory Directions</div>
+      </div>
+    </div>
+    <div class="jump-pills">
+      <a href="#dir-a" class="jump-pill">A: Resonance Monogram</a>
+      <a href="#dir-b" class="jump-pill">B: Dual-Sync Conduit</a>
+      <a href="#dir-c" class="jump-pill">C: Iconic Chibi Crest</a>
+      <a href="#dir-d" class="jump-pill">D: Recast Prism</a>
+      <a href="#master-specs" class="jump-pill" style="border-color: var(--brand-amber); color: var(--brand-amber);">Design Specs</a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Executive Overview Banner -->
+    <section class="hero-banner">
+      <span class="hero-kicker">Brand Identity Exploration • Stop Gate Review</span>
+      <h1 class="hero-title">Engineering the Visual Voice of Teacher Ivan</h1>
+      <p class="hero-desc">
+        A logo is an <strong>identifier, not an explanation</strong>. Built on mathematical vector geometry, modular stroke ratios, and figure-ground closure, these 4 conceptual directions embody the <strong>Bicronic Method</strong> (>75% active student speaking + 24/7 AI Voice Lab). Each direction has been tested across 16px/24px favicons, 1080×1080 social media avatars, live web headers, and single-ink legal worksheets.
+      </p>
+
+      <div class="principles-grid">
+        <div class="principle-box">
+          <div class="principle-title">1. Anti-Cliché Law</div>
+          <div class="principle-text">Strictly zero generic graduation caps, open books, apples, chalkboards, lightbulbs, or speech bubbles with flags.</div>
+        </div>
+        <div class="principle-box">
+          <div class="principle-title">2. Favicon Squint Test</div>
+          <div class="principle-text">Every standalone mark maintains a stroke-to-viewBox ratio &ge; 12% to guarantee immediate recognition at 24×24px and 16×16px.</div>
+        </div>
+        <div class="principle-box">
+          <div class="principle-title">3. Motionmaxxing Rigs</div>
+          <div class="principle-text">Structured with semantic, seek-safe &lt;g id="..."&gt; layers for seamless 1.2s softLand + snapSettle Remotion video stings.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================== -->
+    <!-- DIRECTION A: The Bicronic Resonance Monogram                             -->
+    <!-- ======================================================================== -->
+    <section id="dir-a" class="direction-card">
+      <div class="direction-header">
+        <div>
+          <div class="dir-badge">// DIRECTION A • MONOGRAM / GEOMETRIC EMBLEM</div>
+          <h2 class="dir-name">The Bicronic Resonance Monogram</h2>
+          <p class="dir-metaphor">
+            The structural white pillar of <strong>T</strong> (human pedagogical mentorship) fused with an active Warm Amber acoustic frequency column forming the <strong>I</strong> (24/7 Voice Lab fluency). Together they form a locked architectural <strong>T•I</strong> monogram connected by live audio frequency bridges.
+          </p>
+        </div>
+        <div class="action-controls">
+          <button class="btn-anim" onclick="triggerAnimation('stage-a')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play 3D Intro Sting
+          </button>
+        </div>
+      </div>
+
+      <!-- Context Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchContext('a', 'dark', this)">Dark Studio (Navbar/Hero)</button>
+        <button class="tab-btn" onclick="switchContext('a', 'light', this)">Light Paper (#FAFAFA)</button>
+        <button class="tab-btn" onclick="switchContext('a', 'navbar', this)">Live Website Header</button>
+        <button class="tab-btn" onclick="switchContext('a', 'avatar', this)">1080×1080 Social Avatar</button>
+        <button class="tab-btn" onclick="switchContext('a', 'favicon', this)">16px &amp; 24px Favicon Stress Test</button>
+        <button class="tab-btn" onclick="switchContext('a', 'worksheet', this)">Print Monochrome (Legal Sheet)</button>
+      </div>
+
+      <!-- Interactive Stage -->
+      <div id="stage-a" class="stage-wrapper stage-dark">
+        <!-- Default Content: Horizontal Dark -->
+        <div class="content-pane" id="pane-a-dark" style="max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-a/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane" id="pane-a-light" style="display: none; max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-a/primary-horizontal-light.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane stage-nav-preview" id="pane-a-navbar" style="display: none; width: 100%;">
+          <div class="mockup-navbar">
+            <div style="width: 200px;">
+              <object data="./svgs/direction-a/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object>
+            </div>
+            <div class="mockup-links">
+              <span>Methodology</span>
+              <span>Voice Lab</span>
+              <span>Pricing</span>
+              <span>Student Portal</span>
+            </div>
+            <div class="mockup-cta">Start 90s Test &rarr;</div>
+          </div>
+        </div>
+        <div class="content-pane stage-avatar-preview" id="pane-a-avatar" style="display: none;">
+          <div class="avatar-circle">
+            <object data="./svgs/direction-a/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object>
+            <div class="avatar-live-indicator" title="24/7 AI Voice Lab Active"></div>
+          </div>
+          <div style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 800; color: var(--brand-offwhite);">@teacher_ivan_english_</div>
+        </div>
+        <div class="content-pane stage-favicon-preview" id="pane-a-favicon" style="display: none;">
+          <div class="browser-tab-simulation">
+            <div style="width: 16px; height: 16px;"><object data="./svgs/direction-a/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+            <span style="font-size: 0.72rem; color: #E2E8F0; font-family: var(--font-body); font-weight: 500;">Teacher Ivan • Fluency Lab</span>
+          </div>
+          <div class="favicon-scales-row">
+            <div class="favicon-box">
+              <div style="width: 16px; height: 16px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-a/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>16×16px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 24px; height: 24px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-a/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>24×24px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 32px; height: 32px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-a/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>32×32px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 48px; height: 48px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-a/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>48×48px</span>
+            </div>
+          </div>
+        </div>
+        <div class="content-pane stage-worksheet-preview" id="pane-a-worksheet" style="display: none; width: 100%;">
+          <div class="worksheet-paper">
+            <div class="worksheet-header">
+              <div style="width: 220px;"><object data="./svgs/direction-a/print-monochrome.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object></div>
+              <div style="text-align: right; font-size: 0.75rem; color: #4A5568;">
+                <div><strong>STUDENT DOSSIER // DAY 04</strong></div>
+                <div>CEFR B2.2 Advanced Speaking Assessment</div>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: #64748B; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
+              Student Name: ____________________ Date: ________ Score: ____/100
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spec Details -->
+      <div class="specs-grid">
+        <div class="spec-card">
+          <h4>Geometric Craft</h4>
+          <p>Built inside a 216×216px squircle (radius 48px) with a physical 8px 3D bevel (#091326). Consistent 24px vertical stems with 7px acoustic bridge bars maintain optimal density.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Typography Pairing</h4>
+          <p>Montserrat 900 Black (-0.03em tracking) for TEACHER IVAN, with the dot of I in Warm Amber (#E09B30). Descriptor: Inter 600 SemiBold (+0.16em tracking) with green live-sync dot.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Deliverables Available</h4>
+          <ul>
+            <li><a href="./svgs/direction-a/primary-horizontal-dark.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-dark.svg</a></li>
+            <li><a href="./svgs/direction-a/primary-horizontal-light.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-light.svg</a></li>
+            <li><a href="./svgs/direction-a/stacked-lockup.svg" target="_blank" style="color: var(--brand-amber);">stacked-lockup.svg</a></li>
+            <li><a href="./svgs/direction-a/icon-mark.svg" target="_blank" style="color: var(--brand-amber);">icon-mark.svg</a></li>
+            <li><a href="./svgs/direction-a/print-monochrome.svg" target="_blank" style="color: var(--brand-amber);">print-monochrome.svg</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================== -->
+    <!-- DIRECTION B: The Dual-Sync Conduit                                       -->
+    <!-- ======================================================================== -->
+    <section id="dir-b" class="direction-card">
+      <div class="direction-header">
+        <div>
+          <div class="dir-badge">// DIRECTION B • CONTINUOUS CONDUIT / INFINITY LOOP</div>
+          <h2 class="dir-name">The Dual-Sync Conduit</h2>
+          <p class="dir-metaphor">
+            Two interlocking isometric ribbon arcs: Soft Denim (human 1-on-1 mentorship) and Warm Amber (24/7 AI Voice Lab) converging at a central 4-point vocal spark nexus. Embodying the <strong>Bicronic Method</strong> as an uninterrupted fluency loop.
+          </p>
+        </div>
+        <div class="action-controls">
+          <button class="btn-anim" onclick="triggerAnimation('stage-b')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play 3D Intro Sting
+          </button>
+        </div>
+      </div>
+
+      <!-- Context Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchContext('b', 'dark', this)">Dark Studio (Navbar/Hero)</button>
+        <button class="tab-btn" onclick="switchContext('b', 'light', this)">Light Paper (#FAFAFA)</button>
+        <button class="tab-btn" onclick="switchContext('b', 'navbar', this)">Live Website Header</button>
+        <button class="tab-btn" onclick="switchContext('b', 'avatar', this)">1080×1080 Social Avatar</button>
+        <button class="tab-btn" onclick="switchContext('b', 'favicon', this)">16px &amp; 24px Favicon Stress Test</button>
+        <button class="tab-btn" onclick="switchContext('b', 'worksheet', this)">Print Monochrome (Legal Sheet)</button>
+      </div>
+
+      <!-- Interactive Stage -->
+      <div id="stage-b" class="stage-wrapper stage-dark">
+        <div class="content-pane" id="pane-b-dark" style="max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-b/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane" id="pane-b-light" style="display: none; max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-b/primary-horizontal-light.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane stage-nav-preview" id="pane-b-navbar" style="display: none; width: 100%;">
+          <div class="mockup-navbar">
+            <div style="width: 200px;">
+              <object data="./svgs/direction-b/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object>
+            </div>
+            <div class="mockup-links">
+              <span>Methodology</span>
+              <span>Voice Lab</span>
+              <span>Pricing</span>
+              <span>Student Portal</span>
+            </div>
+            <div class="mockup-cta">Start 90s Test &rarr;</div>
+          </div>
+        </div>
+        <div class="content-pane stage-avatar-preview" id="pane-b-avatar" style="display: none;">
+          <div class="avatar-circle">
+            <object data="./svgs/direction-b/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object>
+            <div class="avatar-live-indicator" title="24/7 AI Voice Lab Active"></div>
+          </div>
+          <div style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 800; color: var(--brand-offwhite);">@teacher_ivan_english_</div>
+        </div>
+        <div class="content-pane stage-favicon-preview" id="pane-b-favicon" style="display: none;">
+          <div class="browser-tab-simulation">
+            <div style="width: 16px; height: 16px;"><object data="./svgs/direction-b/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+            <span style="font-size: 0.72rem; color: #E2E8F0; font-family: var(--font-body); font-weight: 500;">Teacher Ivan • Dual Conduit</span>
+          </div>
+          <div class="favicon-scales-row">
+            <div class="favicon-box">
+              <div style="width: 16px; height: 16px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-b/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>16×16px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 24px; height: 24px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-b/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>24×24px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 32px; height: 32px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-b/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>32×32px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 48px; height: 48px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-b/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>48×48px</span>
+            </div>
+          </div>
+        </div>
+        <div class="content-pane stage-worksheet-preview" id="pane-b-worksheet" style="display: none; width: 100%;">
+          <div class="worksheet-paper">
+            <div class="worksheet-header">
+              <div style="width: 220px;"><object data="./svgs/direction-b/print-monochrome.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object></div>
+              <div style="text-align: right; font-size: 0.75rem; color: #4A5568;">
+                <div><strong>STUDENT DOSSIER // DAY 04</strong></div>
+                <div>CEFR B2.2 Advanced Speaking Assessment</div>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: #64748B; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
+              Student Name: ____________________ Date: ________ Score: ____/100
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <h4>Geometric Craft</h4>
+          <p>26px continuous ribbon width with optical knockout clearance at crossing point. Linear / ElevenLabs caliber visual weight that holds up in 1-color print mode.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Typography Pairing</h4>
+          <p>Editorial mixed-weight lockup: <em>Teacher</em> in Montserrat SemiBold (weight 600) + <strong>Ivan</strong> in Montserrat Black (weight 900) with amber period (<strong>Teacher Ivan.</strong>).</p>
+        </div>
+        <div class="spec-card">
+          <h4>Deliverables Available</h4>
+          <ul>
+            <li><a href="./svgs/direction-b/primary-horizontal-dark.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-dark.svg</a></li>
+            <li><a href="./svgs/direction-b/primary-horizontal-light.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-light.svg</a></li>
+            <li><a href="./svgs/direction-b/stacked-lockup.svg" target="_blank" style="color: var(--brand-amber);">stacked-lockup.svg</a></li>
+            <li><a href="./svgs/direction-b/icon-mark.svg" target="_blank" style="color: var(--brand-amber);">icon-mark.svg</a></li>
+            <li><a href="./svgs/direction-b/print-monochrome.svg" target="_blank" style="color: var(--brand-amber);">print-monochrome.svg</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================== -->
+    <!-- DIRECTION C: The Iconic Chibi Crest                                      -->
+    <!-- ======================================================================== -->
+    <section id="dir-c" class="direction-card">
+      <div class="direction-header">
+        <div>
+          <div class="dir-badge">// DIRECTION C • EMBLEM / CHARACTER SYNERGY</div>
+          <h2 class="dir-name">The Iconic Chibi Crest</h2>
+          <p class="dir-metaphor">
+            Distilled geometric crest of Teacher Ivan's signature silhouette: swept hair with signature cowlick, warm skin tone, confident anime smirk, and glowing amber headset boom mic. Engineered to pair 1:1 with our chibi rigs (<code>teacher-ivan-rig.svg</code> and <code>emma-rig.svg</code>) without small-scale clutter.
+          </p>
+        </div>
+        <div class="action-controls">
+          <button class="btn-anim" onclick="triggerAnimation('stage-c')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play 3D Intro Sting
+          </button>
+        </div>
+      </div>
+
+      <!-- Context Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchContext('c', 'dark', this)">Dark Studio (Navbar/Hero)</button>
+        <button class="tab-btn" onclick="switchContext('c', 'light', this)">Light Paper (#FAFAFA)</button>
+        <button class="tab-btn" onclick="switchContext('c', 'navbar', this)">Live Website Header</button>
+        <button class="tab-btn" onclick="switchContext('c', 'avatar', this)">1080×1080 Social Avatar</button>
+        <button class="tab-btn" onclick="switchContext('c', 'favicon', this)">16px &amp; 24px Favicon Stress Test</button>
+        <button class="tab-btn" onclick="switchContext('c', 'worksheet', this)">Print Monochrome (Legal Sheet)</button>
+      </div>
+
+      <!-- Interactive Stage -->
+      <div id="stage-c" class="stage-wrapper stage-dark">
+        <div class="content-pane" id="pane-c-dark" style="max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-c/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane" id="pane-c-light" style="display: none; max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-c/primary-horizontal-light.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane stage-nav-preview" id="pane-c-navbar" style="display: none; width: 100%;">
+          <div class="mockup-navbar">
+            <div style="width: 200px;">
+              <object data="./svgs/direction-c/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object>
+            </div>
+            <div class="mockup-links">
+              <span>Methodology</span>
+              <span>Voice Lab</span>
+              <span>Pricing</span>
+              <span>Student Portal</span>
+            </div>
+            <div class="mockup-cta">Start 90s Test &rarr;</div>
+          </div>
+        </div>
+        <div class="content-pane stage-avatar-preview" id="pane-c-avatar" style="display: none;">
+          <div class="avatar-circle">
+            <object data="./svgs/direction-c/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object>
+            <div class="avatar-live-indicator" title="24/7 AI Voice Lab Active"></div>
+          </div>
+          <div style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 800; color: var(--brand-offwhite);">@teacher_ivan_english_</div>
+        </div>
+        <div class="content-pane stage-favicon-preview" id="pane-c-favicon" style="display: none;">
+          <div class="browser-tab-simulation">
+            <div style="width: 16px; height: 16px;"><object data="./svgs/direction-c/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+            <span style="font-size: 0.72rem; color: #E2E8F0; font-family: var(--font-body); font-weight: 500;">Teacher Ivan • Chibi Crest</span>
+          </div>
+          <div class="favicon-scales-row">
+            <div class="favicon-box">
+              <div style="width: 16px; height: 16px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-c/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>16×16px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 24px; height: 24px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-c/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>24×24px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 32px; height: 32px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-c/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>32×32px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 48px; height: 48px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-c/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>48×48px</span>
+            </div>
+          </div>
+        </div>
+        <div class="content-pane stage-worksheet-preview" id="pane-c-worksheet" style="display: none; width: 100%;">
+          <div class="worksheet-paper">
+            <div class="worksheet-header">
+              <div style="width: 220px;"><object data="./svgs/direction-c/print-monochrome.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object></div>
+              <div style="text-align: right; font-size: 0.75rem; color: #4A5568;">
+                <div><strong>STUDENT DOSSIER // DAY 04</strong></div>
+                <div>CEFR B2.2 Advanced Speaking Assessment</div>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: #64748B; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
+              Student Name: ____________________ Date: ________ Score: ____/100
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <h4>Geometric Craft</h4>
+          <p>Thick 4px contour strokes with minimum interior detail size &ge; 8px. The shield contour, swept hair cowlick, and boom mic read instantly at 24px favicon size.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Typography Pairing</h4>
+          <p>Athletic/editorial lockup: Montserrat 800 ExtraBold uppercase with a tilted -1.5&deg; Warm Amber pill badge reading <em>VOICE LAB &amp; COACHING</em> in Navy #1A3153.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Deliverables Available</h4>
+          <ul>
+            <li><a href="./svgs/direction-c/primary-horizontal-dark.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-dark.svg</a></li>
+            <li><a href="./svgs/direction-c/primary-horizontal-light.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-light.svg</a></li>
+            <li><a href="./svgs/direction-c/stacked-lockup.svg" target="_blank" style="color: var(--brand-amber);">stacked-lockup.svg</a></li>
+            <li><a href="./svgs/direction-c/icon-mark.svg" target="_blank" style="color: var(--brand-amber);">icon-mark.svg</a></li>
+            <li><a href="./svgs/direction-c/print-monochrome.svg" target="_blank" style="color: var(--brand-amber);">print-monochrome.svg</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================== -->
+    <!-- DIRECTION D: The Recast Prism / Speech Portal                            -->
+    <!-- ======================================================================== -->
+    <section id="dir-d" class="direction-card">
+      <div class="direction-header">
+        <div>
+          <div class="dir-badge">// DIRECTION D • 3D TACTILE KEYCAP / SPEECH PORTAL</div>
+          <h2 class="dir-name">The Recast Prism / Speech Portal</h2>
+          <p class="dir-metaphor">
+            A tactile 3D isometric keyboard keycap / voice portal: hesitant fragmented student waves enter on the left in Soft Denim (#A7C7E7) and exit on the right transformed into a bold, fluent Warm Amber forward arrow (<strong>&gt;</strong> for <strong>&gt;75% Active Speaking Time</strong>).
+          </p>
+        </div>
+        <div class="action-controls">
+          <button class="btn-anim" onclick="triggerAnimation('stage-d')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play 3D Intro Sting
+          </button>
+        </div>
+      </div>
+
+      <!-- Context Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchContext('d', 'dark', this)">Dark Studio (Navbar/Hero)</button>
+        <button class="tab-btn" onclick="switchContext('d', 'light', this)">Light Paper (#FAFAFA)</button>
+        <button class="tab-btn" onclick="switchContext('d', 'navbar', this)">Live Website Header</button>
+        <button class="tab-btn" onclick="switchContext('d', 'avatar', this)">1080×1080 Social Avatar</button>
+        <button class="tab-btn" onclick="switchContext('d', 'favicon', this)">16px &amp; 24px Favicon Stress Test</button>
+        <button class="tab-btn" onclick="switchContext('d', 'worksheet', this)">Print Monochrome (Legal Sheet)</button>
+      </div>
+
+      <!-- Interactive Stage -->
+      <div id="stage-d" class="stage-wrapper stage-dark">
+        <div class="content-pane" id="pane-d-dark" style="max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-d/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane" id="pane-d-light" style="display: none; max-width: 680px; width: 100%;">
+          <object data="./svgs/direction-d/primary-horizontal-light.svg" type="image/svg+xml" style="width: 100%; height: auto; display: block;"></object>
+        </div>
+        <div class="content-pane stage-nav-preview" id="pane-d-navbar" style="display: none; width: 100%;">
+          <div class="mockup-navbar">
+            <div style="width: 200px;">
+              <object data="./svgs/direction-d/primary-horizontal-dark.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object>
+            </div>
+            <div class="mockup-links">
+              <span>Methodology</span>
+              <span>Voice Lab</span>
+              <span>Pricing</span>
+              <span>Student Portal</span>
+            </div>
+            <div class="mockup-cta">Start 90s Test &rarr;</div>
+          </div>
+        </div>
+        <div class="content-pane stage-avatar-preview" id="pane-d-avatar" style="display: none;">
+          <div class="avatar-circle">
+            <object data="./svgs/direction-d/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object>
+            <div class="avatar-live-indicator" title="24/7 AI Voice Lab Active"></div>
+          </div>
+          <div style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 800; color: var(--brand-offwhite);">@teacher_ivan_english_</div>
+        </div>
+        <div class="content-pane stage-favicon-preview" id="pane-d-favicon" style="display: none;">
+          <div class="browser-tab-simulation">
+            <div style="width: 16px; height: 16px;"><object data="./svgs/direction-d/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+            <span style="font-size: 0.72rem; color: #E2E8F0; font-family: var(--font-body); font-weight: 500;">Teacher Ivan • Recast Portal</span>
+          </div>
+          <div class="favicon-scales-row">
+            <div class="favicon-box">
+              <div style="width: 16px; height: 16px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-d/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>16×16px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 24px; height: 24px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-d/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>24×24px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 32px; height: 32px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-d/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>32×32px</span>
+            </div>
+            <div class="favicon-box">
+              <div style="width: 48px; height: 48px; border: 1px dashed rgba(255,255,255,0.2);"><object data="./svgs/direction-d/icon-mark.svg" type="image/svg+xml" style="width: 100%; height: 100%;"></object></div>
+              <span>48×48px</span>
+            </div>
+          </div>
+        </div>
+        <div class="content-pane stage-worksheet-preview" id="pane-d-worksheet" style="display: none; width: 100%;">
+          <div class="worksheet-paper">
+            <div class="worksheet-header">
+              <div style="width: 220px;"><object data="./svgs/direction-d/print-monochrome.svg" type="image/svg+xml" style="width: 100%; height: auto;"></object></div>
+              <div style="text-align: right; font-size: 0.75rem; color: #4A5568;">
+                <div><strong>STUDENT DOSSIER // DAY 04</strong></div>
+                <div>CEFR B2.2 Advanced Speaking Assessment</div>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: #64748B; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
+              Student Name: ____________________ Date: ________ Score: ____/100
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <h4>Geometric Craft</h4>
+          <p>Tactile 8px physical extruded bevel (#091326). Direct 1:1 aesthetic parity with our Motionmaxxing 3D video slabs and Remotion components.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Typography Pairing</h4>
+          <p>High-contrast tech-editorial lockup: Montserrat 900 Black + JetBrains Mono bracketed descriptor tag: <code>[ &gt;75% STT // VOICE LAB ]</code>.</p>
+        </div>
+        <div class="spec-card">
+          <h4>Deliverables Available</h4>
+          <ul>
+            <li><a href="./svgs/direction-d/primary-horizontal-dark.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-dark.svg</a></li>
+            <li><a href="./svgs/direction-d/primary-horizontal-light.svg" target="_blank" style="color: var(--brand-amber);">primary-horizontal-light.svg</a></li>
+            <li><a href="./svgs/direction-d/stacked-lockup.svg" target="_blank" style="color: var(--brand-amber);">stacked-lockup.svg</a></li>
+            <li><a href="./svgs/direction-d/icon-mark.svg" target="_blank" style="color: var(--brand-amber);">icon-mark.svg</a></li>
+            <li><a href="./svgs/direction-d/print-monochrome.svg" target="_blank" style="color: var(--brand-amber);">print-monochrome.svg</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================== -->
+    <!-- MASTER COLOR & TYPOGRAPHY SPECIFICATIONS TABLE                           -->
+    <!-- ======================================================================== -->
+    <section id="master-specs" class="master-specs-section">
+      <div class="dir-badge">// DESIGN TOKENS &amp; IDENTITY SPECIFICATIONS</div>
+      <h2 class="dir-name" style="margin-bottom: 12px;">Official Brand System Tokens</h2>
+      <p style="color: var(--brand-denim); font-size: 0.88rem; max-width: 800px;">
+        Harmonized across Meta Astryx, Taste Skill (2.5.1), and Remotion 3D pipelines. All tokens meet strict WCAG 2.1 AA/AAA contrast ratios.
+      </p>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Token Name</th>
+              <th>Color Preview</th>
+              <th>HEX Code</th>
+              <th>RGB / HSL</th>
+              <th>Semantic Role</th>
+              <th>WCAG Contrast vs Dark / Light</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Primary Navy</strong></td>
+              <td><span class="color-swatch" style="background: #1A3153;"></span>#1A3153</td>
+              <td><code>rgb(26, 49, 83)</code></td>
+              <td>Institutional Anchor, Brand Dark Surface</td>
+              <td>11.2:1 vs #FAFAFA (AAA)</td>
+            </tr>
+            <tr>
+              <td><strong>Midnight Lip</strong></td>
+              <td><span class="color-swatch" style="background: #091326;"></span>#091326</td>
+              <td><code>rgb(9, 19, 38)</code></td>
+              <td>3D Bevel Lip, Physical Extrusion Depth</td>
+              <td>16.8:1 vs #FAFAFA (AAA)</td>
+            </tr>
+            <tr>
+              <td><strong>Warm Amber</strong></td>
+              <td><span class="color-swatch" style="background: #E09B30;"></span>#E09B30</td>
+              <td><code>rgb(224, 155, 48)</code></td>
+              <td>Interactive Primary, AI Voice Frequency Spark</td>
+              <td>7.4:1 vs #1A3153 (AAA)</td>
+            </tr>
+            <tr>
+              <td><strong>Soft Denim</strong></td>
+              <td><span class="color-swatch" style="background: #A7C7E7;"></span>#A7C7E7</td>
+              <td><code>rgb(167, 199, 231)</code></td>
+              <td>Architectural Hairline Borders, Human Conduit</td>
+              <td>8.1:1 vs #1A3153 (AAA)</td>
+            </tr>
+            <tr>
+              <td><strong>Pure Off-White</strong></td>
+              <td><span class="color-swatch" style="background: #FAFAFA;"></span>#FAFAFA</td>
+              <td><code>rgb(250, 250, 250)</code></td>
+              <td>Typography High Contrast, Paper Cards</td>
+              <td>11.2:1 vs #1A3153 (AAA)</td>
+            </tr>
+            <tr>
+              <td><strong>Active Emerald</strong></td>
+              <td><span class="color-swatch" style="background: #10B981;"></span>#10B981</td>
+              <td><code>rgb(16, 185, 129)</code></td>
+              <td>Live Voice Lab Online Indicator, Progress</td>
+              <td>4.8:1 vs #1A3153 (AA)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Interactive Direction Selector & Feedback Box -->
+      <div class="voting-box">
+        <h3 class="voting-title">Selection &amp; Feedback Form</h3>
+        <p style="color: var(--brand-denim); font-size: 0.85rem; margin-bottom: 16px;">
+          Select your preferred direction and record any architectural or typographic adjustments:
+        </p>
+
+        <div class="dir-select-row">
+          <label class="dir-radio-label">
+            <input type="radio" name="directionChoice" value="Direction A: The Bicronic Resonance Monogram" checked>
+            <span>Direction A: Resonance Monogram</span>
+          </label>
+          <label class="dir-radio-label">
+            <input type="radio" name="directionChoice" value="Direction B: The Dual-Sync Conduit">
+            <span>Direction B: Dual-Sync Conduit</span>
+          </label>
+          <label class="dir-radio-label">
+            <input type="radio" name="directionChoice" value="Direction C: The Iconic Chibi Crest">
+            <span>Direction C: Iconic Chibi Crest</span>
+          </label>
+          <label class="dir-radio-label">
+            <input type="radio" name="directionChoice" value="Direction D: The Recast Prism / Portal">
+            <span>Direction D: Recast Prism</span>
+          </label>
+        </div>
+
+        <textarea id="feedbackNotes" class="feedback-textarea" placeholder="Optional refinements (e.g. adjust tracking, soften corner radius, modify descriptor text)..."></textarea>
+
+        <button class="btn-anim" onclick="copySelectionSummary()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy Direction Selection Summary to Clipboard
+        </button>
+        <span id="copyFeedback" style="margin-left: 14px; font-size: 0.8rem; color: var(--brand-emerald); font-weight: 700; display: none;">Copied to clipboard!</span>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Context Switcher Logic
+    function switchContext(direction, context, btn) {
+      // Update Tab Bar Active State
+      const parentBar = btn.closest('.tab-bar');
+      parentBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Update Stage Wrapper Class
+      const stage = document.getElementById('stage-' + direction);
+      stage.className = 'stage-wrapper';
+
+      if (context === 'dark') stage.classList.add('stage-dark');
+      else if (context === 'light') stage.classList.add('stage-light');
+      else if (context === 'navbar') stage.classList.add('stage-nav-preview');
+      else if (context === 'avatar') stage.classList.add('stage-avatar-preview');
+      else if (context === 'favicon') stage.classList.add('stage-favicon-preview');
+      else if (context === 'worksheet') stage.classList.add('stage-worksheet-preview');
+
+      // Hide all panes for this direction
+      stage.querySelectorAll('.content-pane').forEach(p => p.style.display = 'none');
+
+      // Show requested pane
+      const targetPane = document.getElementById('pane-' + direction + '-' + context);
+      if (targetPane) {
+        targetPane.style.display = (context === 'navbar' || context === 'worksheet') ? 'block' : 'flex';
+      }
+    }
+
+    // Motionmaxxing Keyframe Trigger
+    function triggerAnimation(stageId) {
+      const stage = document.getElementById(stageId);
+      stage.classList.remove('anim-active');
+      void stage.offsetWidth; // Force reflow
+      stage.classList.add('anim-active');
+      setTimeout(() => {
+        stage.classList.remove('anim-active');
+      }, 1500);
+    }
+
+    // Selection Copying
+    function copySelectionSummary() {
+      const selected = document.querySelector('input[name="directionChoice"]:checked').value;
+      const notes = document.getElementById('feedbackNotes').value.trim();
+      const summary = {
+        chosenDirection: selected,
+        timestamp: new Date().toISOString(),
+        refinementNotes: notes || 'No adjustments specified. Proceed with complete brand kit rollout.'
+      };
+
+      navigator.clipboard.writeText(JSON.stringify(summary, null, 2)).then(() => {
+        const feedback = document.getElementById('copyFeedback');
+        feedback.style.display = 'inline';
+        setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+      });
+    }
+  </script>
+</body>
+</html>

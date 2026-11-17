@@ -17,9 +17,39 @@
 - **Body Copy:** `Inter`, Regular (400).
 - **Descriptors, Badges & CTAs:** `Montserrat`, Bold, UPPERCASE with `tracking-wider` (+15% letter spacing) for CEFR levels (A1–B2, IELTS) and buttons.
 
-## 4. Brand Graphic Elements
-- **Speech Bubbles:** Containers for pronunciation tips, instant AI feedback, and "Word of the Day". Background `#FAFAFA` with `#A7C7E7` border.
-- **Brand Mascot:** Chibi/anime-style Teacher Ivan character. Always maintain original proportions and minimum clear space equal to the height of the letter "T". Minimum digital width: `160px`.
+## 4. Brand Identity & Primary Logo System (The Bicronic Resonance Monogram)
+
+### 4.1 Concept & Architectural Rationale
+The primary visual identity for **Teacher Ivan (`teacherivan.com`)** is the **Bicronic Resonance Monogram (Direction A)**, engineered using the `kaankiziltug/logo-design-skill` and Astryx design tokens:
+- **Monolithic `T` Pillar (`#FAFAFA` Off-White):** Represents the structural foundation, institutional authority, and rigor of Teacher Ivan's live 1-on-1 human coaching.
+- **Dynamic Resonant `I` Column (`#E09B30` Warm Amber):** Represents the 24/7 AI Voice Practice Lab (powered by Gemini Live), crowned with an acoustic spark dot (`r=10px`) and dashed harmonic orbital aura (`stroke-dasharray="4 3"`).
+- **Triple Acoustic Frequency Bridge:** Three horizontal conduits connecting the `T` and `I` stems (`#E09B30` and `#A7C7E7` at $y=116, 138, 160$), symbolizing the bidirectional acoustic feedback loop between coach, student, and AI tutor.
+- **Tactile 3D Squircle Base:** A precision rounded squircle ($216\times 216\text{px}, rx=48\text{px}$) extruded with a 3D bottom bevel lip (`#091326`), ambient studio navy face (`#1E3960` $\to$ `#142642`), Soft Denim rim stroke (`#A7C7E7`, $2\text{px}$), and top edge specular sheen.
+
+### 4.2 Production SVG Asset Suite
+All official production SVGs are compiled with 100% integer coordinates, semantic group IDs, and embedded web fonts:
+- **Icon Mark / Favicon:** `/assets/logo.svg` & `/assets/favicon.svg` (256×256 viewBox, standalone squircle emblem).
+- **Primary Horizontal Lockup (Dark):** `/assets/logo-horizontal-dark.svg` (800×200 viewBox, optimized for `#1A3153` headers).
+- **Primary Horizontal Lockup (Light):** `/assets/logo-horizontal-light.svg` (800×200 viewBox, optimized for `#FAFAFA` light mode).
+- **Stacked Emblem Lockup:** `/assets/logo-stacked.svg` (500×500 viewBox, centered mark + two-line wordmark).
+- **Monochrome Print / High-Contrast:** `/assets/logo-print.svg` (500×500 viewBox, 100% single-ink `#1A3153` for 8.5"×14" worksheets).
+
+### 4.3 Separation of Concerns: Brand Logo vs. Character Mascot
+- **Institutional Brand Identity (The Monogram):** Used for browser favicons, navigation headers, legal badges, trust seals, application icons, and official stationery.
+- **Character Personas (The Rigged Duo):** Teacher Ivan (`/assets/teacher-ivan.svg` / `teacher-ivan-rig.svg`) and Emma (`/assets/emma.svg` / `emma-rig.svg`) represent the interactive voice coaches inside the Live Voice Lab, diagnostic modals, and social video carousels.
+
+### 4.4 Geometric Grid, Clear Space & Scale Limits
+- **ViewBox Grid:** Standard 256×256 unit square with minimum stroke thickness $\ge 7\text{px}$ for sub-elements.
+- **Clear Space:** Minimum isolation zone equal to $0.5X$ (where $X = 88\text{px}$, the width of the `T` crossbar) on all sides.
+- **Scale Boundaries:**
+  - Favicon / App Tab: $16\times 16\text{px}$ – $32\times 32\text{px}$ (retains high legibility).
+  - Mobile Navbar: $28\times 28\text{px}$ minimum mark height.
+  - Desktop Header: $40\times 40\text{px}$ – $48\times 48\text{px}$ mark height.
+  - Social Profile Avatar: $960\times 960\text{px}$ circular crop within $1080\times 1080\text{px}$ canvas.
+- **Strict Brand Rules:**
+  - DO NOT alter the aspect ratio or skew the squircle.
+  - DO NOT change the hue of the Warm Amber `#E09B30` resonant column or frequency bridge.
+  - DO NOT apply external heavy drop-shadows that conceal the extruded `#091326` 3D bottom bevel lip.
 
 ## 5. Motionmaxxing Video & 3D Production Standards
 - **Governing Specification:** See `./media-pipeline/VIDEO-STYLE-GUIDE.md` and `./reference-repos/motionmaxxing/SKILL.md`.
