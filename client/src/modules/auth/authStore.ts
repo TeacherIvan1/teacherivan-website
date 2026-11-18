@@ -438,8 +438,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
 
       const plan = user.plan || (user.role === 'admin' ? 'executive' : 'free');
-      let max = user.maxDailySessions !== undefined ? user.maxDailySessions : (plan === 'essential' ? 10 : plan === 'free' ? 5 : -1);
-      if (user.role === 'admin' || plan === 'pro' || plan === 'executive') {
+      let max = user.maxDailySessions !== undefined ? user.maxDailySessions : (plan === 'free' ? 5 : -1);
+      if (user.role === 'admin' || plan === 'essential' || plan === 'pro' || plan === 'executive') {
         max = -1; // unlimited
       }
 

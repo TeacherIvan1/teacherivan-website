@@ -14,10 +14,51 @@ import {
   AlertCircle,
   HelpCircle,
   Calendar,
+  Printer,
+  FileText,
+  RefreshCw,
+  Layers,
+  Bookmark,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
+import { useAuthStore } from '../modules/auth/authStore';
+import { getApiUrl } from '../config/api';
+
+export interface CustomResourceCollocation {
+  term: string;
+  phonetic?: string;
+  definitionEn: string;
+  definitionEs: string;
+  example: string;
+}
+
+export interface CustomResourceQuiz {
+  question: string;
+  questionEs: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface CustomResource {
+  id: string;
+  topic: string;
+  targetLevel: string;
+  resourceType: 'article_collocations' | 'dialogue_script' | 'vocab_phrasal_deck' | 'worksheet';
+  title: string;
+  titleEs: string;
+  content: string;
+  collocations: CustomResourceCollocation[];
+  comprehensionChecks: CustomResourceQuiz[];
+  practiceTip: string;
+  practiceTipEs: string;
+  generatedBy: 'gemini' | 'deterministic-fallback';
+  createdAt: string;
+}
 
 export interface Collocation {
   term: string;
@@ -71,6 +112,129 @@ export const EducationalResourcesView: React.FC = () => {
   // Listening Micro-Lesson Modal State
   const [activeListening, setActiveListening] = useState<ListeningItem | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  // Module A: Custom Resource Studio State
+  const { user } = useAuthStore();
+  const [customTopic, setCustomTopic] = useState('');
+  const [customType, setCustomType] = useState<
+    'article_collocations' | 'dialogue_script' | 'vocab_phrasal_deck' | 'worksheet'
+  >('article_collocations');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [savedResources, setSavedResources] = useState<CustomResource[]>(() => {
+    try {
+      const key = user ? `ti_custom_resources_${user.id}` : 'ti_custom_resources_guest';
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [activeCustomResource, setActiveCustomResource] = useState<CustomResource | null>(null);
+  const [activeCustomQuizAnswers, setActiveCustomQuizAnswers] = useState<Record<number, number>>({});
+  const [activeCustomQuizSubmitted, setActiveCustomQuizSubmitted] = useState(false);
+  const [playingCustomTerm, setPlayingCustomTerm] = useState<string | null>(null);
+
+  const handlePlayCustomAudio = (text: string) => {
+    setPlayingCustomTerm(text);
+    handleSpeak(text);
+    setTimeout(() => setPlayingCustomTerm(null), 1500);
+  };
+
+  const handleGenerateCustomResource = async () => {
+    if (!customTopic.trim()) return;
+    setIsGenerating(true);
+    setGenerateError(null);
+    try {
+      const res = await fetch(getApiUrl('/api/curriculum/generate-custom-resource'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: customTopic.trim(),
+          targetLevel: user?.learningGoals?.targetLevel || 'B2',
+          resourceType: customType,
+          studentGoal: user?.learningGoals?.personalObjective || user?.learningGoals?.primaryGoal || 'Spoken English Mastery',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to generate custom resource.');
+      }
+      const newResource: CustomResource = data.resource;
+      const updated = [newResource, ...savedResources.filter((r) => r.id !== newResource.id)].slice(0, 20);
+      setSavedResources(updated);
+      try {
+        const key = user ? `ti_custom_resources_${user.id}` : 'ti_custom_resources_guest';
+        localStorage.setItem(key, JSON.stringify(updated));
+      } catch {}
+      setActiveCustomResource(newResource);
+      setActiveCustomQuizAnswers({});
+      setActiveCustomQuizSubmitted(false);
+      setCustomTopic('');
+    } catch (err: unknown) {
+      setGenerateError(err instanceof Error ? err.message : 'Error generating resource');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handlePrintResource = (res: CustomResource) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${res.title} - Teacher Ivan English Classes</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 30px; color: #111; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+            h1 { color: #1A3153; border-bottom: 2px solid #E09B30; padding-bottom: 8px; font-size: 22px; }
+            .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; background: #eee; font-size: 11px; font-weight: bold; margin-bottom: 12px; }
+            .content { white-space: pre-wrap; font-size: 13px; margin-bottom: 24px; }
+            .section-title { font-size: 15px; font-weight: bold; color: #1A3153; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+            .collocation-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 8px; border-radius: 6px; }
+            .term { font-weight: bold; color: #1A3153; }
+            .phonetic { color: #666; font-size: 12px; }
+            .example { font-style: italic; color: #333; margin-top: 4px; }
+            .quiz-box { margin-bottom: 12px; padding: 8px; border-left: 3px solid #E09B30; }
+            .footer { margin-top: 40px; font-size: 11px; color: #777; border-top: 1px solid #eee; padding-top: 10px; text-align: center; }
+            @media print { button { display: none; } }
+          </style>
+        </head>
+        <body>
+          <div class="badge">Teacher Ivan English Classes • CEFR ${res.targetLevel} • ${res.resourceType.toUpperCase()}</div>
+          <h1>${res.title}</h1>
+          <p style="color: #555; font-size: 13px;">${res.titleEs}</p>
+          <div class="section-title">Passage / Scenario Content</div>
+          <div class="content">${res.content}</div>
+          <div class="section-title">Key Collocations & High-Frequency Structures</div>
+          ${res.collocations.map((c) => `
+            <div class="collocation-box">
+              <span class="term">${c.term}</span> <span class="phonetic">${c.phonetic || ''}</span>
+              <div><strong>EN:</strong> ${c.definitionEn} | <strong>ES:</strong> ${c.definitionEs}</div>
+              <div class="example">"${c.example}"</div>
+            </div>
+          `).join('')}
+          <div class="section-title">Comprehension & Error Correction Checks</div>
+          ${res.comprehensionChecks.map((q, idx) => `
+            <div class="quiz-box">
+              <div><strong>${idx + 1}. ${q.question}</strong></div>
+              <div style="font-size: 12px; color: #555;">${q.questionEs}</div>
+              <ul style="margin: 6px 0; padding-left: 20px; font-size: 13px;">
+                ${q.options.map((opt) => `<li>${opt}</li>`).join('')}
+              </ul>
+              <div style="font-size: 11px; color: #666; font-style: italic;">Answer/Key: ${q.explanation}</div>
+            </div>
+          `).join('')}
+          <div class="footer">Teacher Ivan English Classes • https://teacherivan.com • 24/7 AI Voice Lab & Bicronic 1-on-1 Coaching</div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
 
   const readings: ReadingItem[] = [
     {
@@ -463,6 +627,333 @@ export const EducationalResourcesView: React.FC = () => {
           <Calendar size={14} />
           <span>{t.scheduling.quickBookBtn}</span>
         </button>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* MODULE A: ON-DEMAND CUSTOM RESOURCE STUDIO                                */}
+      {/* ========================================================================= */}
+      <div
+        id="custom-resource-studio"
+        className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#091326] via-[#12223a] to-[#1A3153] border-2 border-[#E09B30]/40 shadow-2xl space-y-6"
+      >
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[#A7C7E7]/20 pb-4">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
+              <Sparkles size={14} />
+              <span>{isEs ? 'Estudio de Recursos Personalizados a Demanda' : 'On-Demand Custom Resource Studio'}</span>
+            </div>
+            <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA]">
+              {isEs ? 'Genera Material a Medida para Cualquier Situación' : 'Generate Custom Material for Any Scenario'}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#A7C7E7] max-w-2xl">
+              {isEs
+                ? 'Escribe tu tema profesional o desafío (ej. "Negociación Salarial", "Incident Post-Mortem", "M&A Due Diligence") y obtén un artículo con colocaciones, un guion de diálogo o una ficha imprimible generada por IA.'
+                : 'Enter your workplace scenario (e.g. "Salary Negotiation", "Incident Post-Mortem", "M&A Due Diligence") and generate tailored articles, dialogues, or printable worksheets.'}
+            </p>
+          </div>
+
+          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-montserrat font-bold uppercase shrink-0">
+            {isEs ? 'Acceso Ilimitado' : 'Unlimited Access'}
+          </span>
+        </div>
+
+        {/* Input & Type Selection Controls */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              id="custom-resource-topic-input"
+              value={customTopic}
+              onChange={(e) => setCustomTopic(e.target.value)}
+              placeholder={isEs ? 'Ej: Technical Interview for Silicon Valley, Incident Post-Mortem...' : 'E.g., Technical Interview for Silicon Valley, Incident Post-Mortem...'}
+              className="flex-1 px-4 py-3 rounded-2xl bg-[#1A3153] border border-[#A7C7E7]/30 text-white placeholder-[#A7C7E7]/60 text-sm focus:outline-none focus:border-[#E09B30]"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleGenerateCustomResource();
+              }}
+            />
+
+            <button
+              type="button"
+              id="generate-custom-resource-btn"
+              disabled={isGenerating || !customTopic.trim()}
+              onClick={handleGenerateCustomResource}
+              className="px-6 py-3 rounded-2xl bg-[#E09B30] hover:bg-[#c88624] disabled:opacity-50 text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#E09B30]/20 cursor-pointer shrink-0"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span>{isEs ? 'Generando...' : 'Generating...'}</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={15} />
+                  <span>{isEs ? 'Generar Recurso con IA' : 'Generate with AI'}</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Quick Preset Topic Pills */}
+          <div className="flex items-center gap-2 flex-wrap text-xs text-[#A7C7E7]">
+            <span className="font-semibold text-xs text-[#FAFAFA]">{isEs ? 'Ideas Rápidas:' : 'Quick Ideas:'}</span>
+            {['Salary Negotiation', 'Incident Post-Mortem', 'M&A Due Diligence', 'Cross-Border Team Sync'].map((idea) => (
+              <button
+                key={idea}
+                type="button"
+                onClick={() => setCustomTopic(idea)}
+                className="px-2.5 py-1 rounded-lg bg-[#1A3153] hover:bg-[#A7C7E7]/20 border border-[#A7C7E7]/30 text-xs text-[#FAFAFA] cursor-pointer transition-colors"
+              >
+                {idea}
+              </button>
+            ))}
+          </div>
+
+          {/* Resource Type Selector Pills */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            {[
+              { id: 'article_collocations', label: isEs ? 'Artículo + Colocaciones' : 'Article & Collocations', icon: BookOpen },
+              { id: 'dialogue_script', label: isEs ? 'Guion de Diálogo' : 'Dialogue Script', icon: FileText },
+              { id: 'vocab_phrasal_deck', label: isEs ? 'Deck de Vocabulario' : 'Phrasal Verb Deck', icon: Layers },
+              { id: 'worksheet', label: isEs ? 'Ficha Imprimible' : 'Printable Worksheet', icon: Printer },
+            ].map((t) => {
+              const Icon = t.icon;
+              const isSelected = customType === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setCustomType(t.id as any)}
+                  className={`p-3 rounded-2xl border text-left font-montserrat font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] shadow-md font-black'
+                      : 'bg-[#1A3153]/70 text-[#A7C7E7] hover:text-[#FAFAFA] border-[#A7C7E7]/25'
+                  }`}
+                >
+                  <Icon size={15} />
+                  <span>{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {generateError && (
+          <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-400 text-red-200 text-xs flex items-center gap-2">
+            <AlertCircle size={15} className="shrink-0" />
+            <span>{generateError}</span>
+          </div>
+        )}
+
+        {/* ACTIVE GENERATED RESOURCE DISPLAY */}
+        {activeCustomResource && (
+          <div
+            id="active-custom-resource-card"
+            className="p-6 rounded-3xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#E09B30] shadow-2xl space-y-5 animate-in fade-in duration-200"
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#A7C7E7]/30 pb-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153] text-[#E09B30] text-xs font-montserrat font-black uppercase">
+                    CEFR {activeCustomResource.targetLevel}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153]/10 text-[#4A5568] text-xs font-montserrat font-bold uppercase">
+                    {activeCustomResource.resourceType.replace('_', ' ')}
+                  </span>
+                </div>
+                <h3 className="font-montserrat font-extrabold text-xl text-[#1A3153]">
+                  {activeCustomResource.title}
+                </h3>
+                <p className="text-xs text-[#4A5568]">{activeCustomResource.titleEs}</p>
+              </div>
+
+              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handlePrintResource(activeCustomResource)}
+                  className="px-3 py-1.5 rounded-xl bg-[#1A3153] text-[#FAFAFA] hover:bg-[#12223a] text-xs font-montserrat font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  title="Print / Save Low-Ink PDF"
+                >
+                  <Printer size={13} />
+                  <span>{isEs ? 'Imprimir Ficha' : 'Print Worksheet'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveCustomResource(null)}
+                  className="p-1.5 text-[#4A5568] hover:text-[#1A3153] rounded-lg hover:bg-slate-200 cursor-pointer"
+                  title="Close"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content Passage */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-[#A7C7E7]/40 font-inter text-sm text-[#1A3153] leading-relaxed whitespace-pre-wrap">
+              {activeCustomResource.content}
+            </div>
+
+            {/* Key Collocations with Audio TTS Pronunciation */}
+            {activeCustomResource.collocations && activeCustomResource.collocations.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+                  <Volume2 size={15} className="text-[#E09B30]" />
+                  <span>{isEs ? 'Colocaciones Clave (Escucha y Repite):' : 'Key Collocations (Listen & Repeat):'}</span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {activeCustomResource.collocations.map((c, cIdx) => (
+                    <div
+                      key={cIdx}
+                      className="p-3.5 rounded-2xl bg-white border border-[#A7C7E7]/50 shadow-sm flex flex-col justify-between gap-2"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-montserrat font-bold text-sm text-[#1A3153]">{c.term}</span>
+                          <button
+                            type="button"
+                            onClick={() => handlePlayCustomAudio(c.term)}
+                            className="p-1 rounded-lg bg-[#E09B30]/15 hover:bg-[#E09B30] text-[#1A3153] transition-colors cursor-pointer"
+                            title="Listen pronunciation"
+                          >
+                            <Volume2 size={14} />
+                          </button>
+                        </div>
+                        {c.phonetic && <span className="text-[11px] font-mono text-[#4A5568] block mb-1">{c.phonetic}</span>}
+                        <p className="text-xs text-[#4A5568]">
+                          <strong>EN:</strong> {c.definitionEn}
+                        </p>
+                        <p className="text-xs text-[#4A5568]">
+                          <strong>ES:</strong> {c.definitionEs}
+                        </p>
+                      </div>
+                      <p className="text-xs italic text-[#1A3153] border-t border-slate-100 pt-1.5">
+                        "{c.example}"
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3 Interactive Comprehension / Recast Checks */}
+            {activeCustomResource.comprehensionChecks && activeCustomResource.comprehensionChecks.length > 0 && (
+              <div className="space-y-4 pt-2 border-t border-[#A7C7E7]/30">
+                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+                  <CheckCircle2 size={15} className="text-[#10b981]" />
+                  <span>{isEs ? 'Verificación de Comprensión y Errores:' : 'Comprehension & Error Correction Checks:'}</span>
+                </h4>
+
+                <div className="space-y-3">
+                  {activeCustomResource.comprehensionChecks.map((q, qIdx) => {
+                    const answered = activeCustomQuizAnswers[qIdx] !== undefined;
+                    const selected = activeCustomQuizAnswers[qIdx];
+                    const isCorrect = selected === q.correctIndex;
+
+                    return (
+                      <div key={qIdx} className="p-4 rounded-2xl bg-white border border-[#A7C7E7]/40 space-y-2">
+                        <div className="font-montserrat font-bold text-xs text-[#1A3153]">
+                          {qIdx + 1}. {q.question}
+                        </div>
+                        {q.questionEs && <div className="text-[11px] text-[#4A5568]">{q.questionEs}</div>}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          {q.options.map((opt, oIdx) => {
+                            const isThisSelected = selected === oIdx;
+                            return (
+                              <button
+                                key={oIdx}
+                                type="button"
+                                onClick={() => {
+                                  setActiveCustomQuizAnswers((prev) => ({ ...prev, [qIdx]: oIdx }));
+                                }}
+                                className={`p-2.5 rounded-xl border text-left text-xs font-medium transition-all cursor-pointer ${
+                                  answered
+                                    ? oIdx === q.correctIndex
+                                      ? 'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold'
+                                      : isThisSelected
+                                      ? 'bg-red-100 border-red-300 text-red-900'
+                                      : 'bg-slate-50 border-slate-200 text-slate-500'
+                                    : isThisSelected
+                                    ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] font-bold'
+                                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-[#1A3153]'
+                                }`}
+                              >
+                                {opt}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {answered && (
+                          <div className={`text-xs p-2.5 rounded-xl flex items-center gap-2 ${isCorrect ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-900'}`}>
+                            {isCorrect ? <CheckCircle2 size={14} className="text-emerald-600" /> : <AlertCircle size={14} className="text-amber-600" />}
+                            <span>{q.explanation}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Practice Tip + Action Bar */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#1A3153] to-[#12223a] text-white flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="space-y-0.5 text-center sm:text-left">
+                <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
+                  {isEs ? 'Desafío en el Laboratorio de Voz:' : 'Voice Lab Speaking Challenge:'}
+                </span>
+                <p className="text-xs text-[#A7C7E7]">
+                  {isEs ? activeCustomResource.practiceTipEs : activeCustomResource.practiceTip}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveView('simulator')}
+                className="px-5 py-2.5 rounded-full bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-md shrink-0"
+              >
+                <Headphones size={14} />
+                <span>{isEs ? 'Practicar en Voz 24/7' : 'Practice in Voice Lab'}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Previously Generated Resources Library */}
+        {savedResources.length > 0 && !activeCustomResource && (
+          <div className="space-y-3 pt-2">
+            <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#A7C7E7] flex items-center gap-1.5">
+              <Bookmark size={14} className="text-[#E09B30]" />
+              <span>{isEs ? 'Tus Recursos Generados Recientemente:' : 'Your Recently Generated Resources:'}</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {savedResources.slice(0, 6).map((res) => (
+                <div
+                  key={res.id}
+                  onClick={() => {
+                    setActiveCustomResource(res);
+                    setActiveCustomQuizAnswers({});
+                    setActiveCustomQuizSubmitted(false);
+                  }}
+                  className="p-4 rounded-2xl bg-[#1A3153]/80 hover:bg-[#1A3153] border border-[#A7C7E7]/25 hover:border-[#E09B30] transition-all cursor-pointer flex flex-col justify-between gap-2 shadow-sm"
+                >
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] text-[#A7C7E7] font-mono mb-1">
+                      <span className="uppercase">{res.resourceType.replace('_', ' ')}</span>
+                      <span className="text-[#E09B30] font-bold">CEFR {res.targetLevel}</span>
+                    </div>
+                    <h5 className="font-montserrat font-bold text-xs text-[#FAFAFA] line-clamp-2">
+                      {res.title}
+                    </h5>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-[#E09B30] font-montserrat font-semibold pt-1 border-t border-[#A7C7E7]/10">
+                    <span>{isEs ? 'Abrir Recurso' : 'Open Resource'}</span>
+                    <ArrowRight size={12} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filter Strip */}

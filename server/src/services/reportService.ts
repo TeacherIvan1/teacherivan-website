@@ -74,35 +74,35 @@ export function matchRecommendedPlan(
     return {
       id: 'essential',
       name: 'Programa Essential',
-      priceBob: '480 – 580 BOB/mes',
-      priceUsd: '$75 – $95 USD/mo',
+      priceBob: '300 BOB/mes',
+      priceUsd: '$45 USD/mo',
       reason:
-        'Tu nivel actual requiere consolidar estructuras orales básicas y superar el bloqueo inicial con 4 sesiones en vivo mensuales y práctica 24/7 con el Tutor de Voz IA.',
-      whatsappMessage: `Hola Teacher Ivan! Completé mi diagnóstico de inglés hablado con puntaje de ${overallScore}/100 (Nivel ${cefrLevel}). Me gustaría inscribirme al Programa Essential.`,
+        'Tu nivel actual se beneficia de consolidar vocabulario y estructuras con el Laboratorio de Voz IA 24/7 de forma 100% autónoma y generación ilimitada de recursos a medida.',
+      whatsappMessage: `Hola Teacher Ivan! Completé mi diagnóstico de inglés hablado con puntaje de ${overallScore}/100 (Nivel ${cefrLevel}). Me gustaría inscribirme al Programa Essential (300 BOB / $45 USD).`,
     };
   }
 
   if (cefrLevel === 'C1' || overallScore >= 85) {
     return {
       id: 'executive',
-      name: 'Executive Partner',
-      priceBob: '1,100 – 1,400 BOB/mes',
-      priceUsd: '$220 – $300 USD/mo',
+      name: 'Programa Executive (Inmersión Diaria)',
+      priceBob: '850 BOB/mes',
+      priceUsd: '$125 USD/mo',
       reason:
-        'Posees un dominio avanzado del idioma. El programa Executive Partner te brindará ensayos de presentaciones de alto impacto, revisión de correos reales y métricas de impacto laboral.',
-      whatsappMessage: `Hola Teacher Ivan! Completé mi diagnóstico de inglés hablado con puntaje de ${overallScore}/100 (Nivel ${cefrLevel}). Me gustaría postular al programa Executive Partner.`,
+        'Posees un dominio avanzado del idioma. El programa Executive te brinda 5 clases 1-a-1 semanales (Lun–Vie), ensayos de presentaciones de alto impacto, simulaciones de entrevistas en USD y revisión de correos reales.',
+      whatsappMessage: `Hola Teacher Ivan! Completé mi diagnóstico de inglés hablado con puntaje de ${overallScore}/100 (Nivel ${cefrLevel}). Me gustaría postular al Programa Executive (850 BOB / $125 USD).`,
     };
   }
 
   // Flagship / recommended for B1-B2 intermediate
   return {
     id: 'pro',
-    name: 'Programa Pro (Recomendado)',
-    priceBob: '650 – 850 BOB/mes',
-    priceUsd: '$120 – $160 USD/mo',
+    name: 'Programa Pro (3 Clases/Sem — Más Elegido)',
+    priceBob: '580 BOB/mes',
+    priceUsd: '$85 USD/mo',
     reason:
-      'Tu nivel intermedio es ideal para el Programa Pro: 4 sesiones en vivo de 60m (>75% STT), micro-asignaciones diarias con feedback por audio en WhatsApp y reportes semanales con IA.',
-    whatsappMessage: `Hola Teacher Ivan! Completé mi diagnóstico de inglés hablado con puntaje de ${overallScore}/100 (Nivel ${cefrLevel}). Me gustaría inscribirme al Programa Pro.`,
+      'Tu nivel intermedio es ideal para el Programa Pro: 3 clases 1-a-1 en vivo por semana (>75% STT), Laboratorio de Voz 24/7 ilimitado, micro-aprendizaje diario y reportes analíticos semanales.',
+    whatsappMessage: `Hola Teacher Ivan! Completé mi diagnóstico de inglés hablado con puntaje de ${overallScore}/100 (Nivel ${cefrLevel}). Me gustaría inscribirme al Programa Pro (580 BOB / $85 USD).`,
   };
 }
 

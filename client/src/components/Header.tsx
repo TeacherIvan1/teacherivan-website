@@ -304,12 +304,12 @@ export const Header: React.FC = () => {
                 </span>
                 <span className="whitespace-nowrap hidden sm:inline">
                   {user.plan === 'executive'
-                    ? 'EXECUTIVE • VIP'
+                    ? (isEs ? 'EXECUTIVE • 5 CLASES/SEM VIP' : 'EXECUTIVE • 5 CLASSES/WK VIP')
                     : user.plan === 'pro'
-                      ? (isEs ? 'PRO • ILIMITADO' : 'PRO • UNLIMITED')
+                      ? (isEs ? 'PRO • 3 CLASES/SEM + 24/7' : 'PRO • 3 CLASSES/WK + 24/7')
                       : user.plan === 'essential'
-                        ? (isEs ? 'ESSENTIAL • 1 CLASE/SEM' : 'ESSENTIAL • 1 CLASS/WK')
-                        : (isEs ? 'NOVIEMBRE GRATIS (ACTIVO)' : 'FREE NOVEMBER PASS')}
+                        ? (isEs ? 'ESSENTIAL • AUTÓNOMO 24/7' : 'ESSENTIAL • AUTONOMOUS 24/7')
+                        : (isEs ? 'FREE • 5 SESIONES/DÍA' : 'FREE • 5 SESSIONS/DAY')}
                 </span>
               </div>
 

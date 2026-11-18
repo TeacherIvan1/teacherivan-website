@@ -44,6 +44,26 @@ export const PlanApprovedModal: React.FC = () => {
       return [
         {
           icon: <Calendar className="text-[#E09B30] shrink-0" size={18} />,
+          en: '5 Live 1-on-1 Classes/Week (Mon–Fri 14:00–20:00)',
+          es: '5 Clases en Vivo 1-a-1 por Semana (Lun–Vie 14:00–20:00)',
+        },
+        {
+          icon: <Headphones className="text-[#E09B30] shrink-0" size={18} />,
+          en: 'Unlimited 24/7 Voice Lab Practice Sessions',
+          es: 'Sesiones Ilimitadas 24/7 en el Laboratorio de Voz',
+        },
+        {
+          icon: <Award className="text-[#E09B30] shrink-0" size={18} />,
+          en: 'Executive Workplace Rehearsals & VIP Direct WhatsApp Line',
+          es: 'Ensayos Laborales Ejecutivos y Línea Directa VIP por WhatsApp',
+        },
+      ];
+    }
+
+    if (plan === 'pro') {
+      return [
+        {
+          icon: <Calendar className="text-[#E09B30] shrink-0" size={18} />,
           en: '3 Live 1-on-1 Classes/Week (Mon–Fri 14:00–20:00)',
           es: '3 Clases en Vivo 1-a-1 por Semana (Lun–Vie 14:00–20:00)',
         },
@@ -53,29 +73,9 @@ export const PlanApprovedModal: React.FC = () => {
           es: 'Sesiones Ilimitadas 24/7 en el Laboratorio de Voz',
         },
         {
-          icon: <Award className="text-[#E09B30] shrink-0" size={18} />,
-          en: 'Executive Presentation, Negotiation & Email Coaching',
-          es: 'Coaching Ejecutivo en Presentaciones, Negociación y Redacción',
-        },
-      ];
-    }
-
-    if (plan === 'pro') {
-      return [
-        {
-          icon: <Calendar className="text-[#E09B30] shrink-0" size={18} />,
-          en: '2 Live 1-on-1 Classes/Week (Mon–Fri 14:00–20:00)',
-          es: '2 Clases en Vivo 1-a-1 por Semana (Lun–Vie 14:00–20:00)',
-        },
-        {
-          icon: <Headphones className="text-[#E09B30] shrink-0" size={18} />,
-          en: 'Unlimited 24/7 Voice Lab Practice Sessions',
-          es: 'Sesiones Ilimitadas 24/7 en el Laboratorio de Voz',
-        },
-        {
-          icon: <MessageSquare className="text-[#E09B30] shrink-0" size={18} />,
-          en: 'Daily Micro-Learning & WhatsApp Audio Feedback',
-          es: 'Micro-Aprendizaje Diario y Feedback de Audio por WhatsApp',
+          icon: <BookOpen className="text-[#E09B30] shrink-0" size={18} />,
+          en: 'Unlimited Custom Resource Studio & Pedagogical Progress Reports',
+          es: 'Estudio Ilimitado de Recursos Personalizados y Reporte Pedagógico',
         },
       ];
     }
@@ -83,19 +83,19 @@ export const PlanApprovedModal: React.FC = () => {
     // Default to essential perks
     return [
       {
-        icon: <Calendar className="text-[#E09B30] shrink-0" size={18} />,
-        en: '1 Live 1-on-1 Class/Week (Mon–Fri 14:00–20:00)',
-        es: '1 Clase en Vivo 1-a-1 por Semana (Lun–Vie 14:00–20:00)',
-      },
-      {
         icon: <Headphones className="text-[#E09B30] shrink-0" size={18} />,
-        en: '10 Voice Lab Practice Sessions/Day',
-        es: '10 Sesiones Diarias en el Laboratorio de Voz',
+        en: '100% Autonomous 24/7 AI Voice Lab Access',
+        es: 'Acceso 100% Autónomo al Laboratorio de Voz 24/7',
       },
       {
         icon: <BookOpen className="text-[#E09B30] shrink-0" size={18} />,
-        en: 'Personalized Micro-Learning Route (D1–D5)',
-        es: 'Ruta Personalizada de Micro-Aprendizaje (D1–D5)',
+        en: 'Unlimited Custom Resource Generator & Low-Ink Worksheets',
+        es: 'Generador Ilimitado de Recursos y Fichas Descargables',
+      },
+      {
+        icon: <Award className="text-[#E09B30] shrink-0" size={18} />,
+        en: 'Personalized 5-Day Micro-Learning Route & Interactive Skill Drills',
+        es: 'Ruta Personalizada de 5 Días y Desafíos Interactivos',
       },
     ];
   };
@@ -192,26 +192,44 @@ export const PlanApprovedModal: React.FC = () => {
 
         {/* Primary CTA Buttons */}
         <div className="w-full flex flex-col sm:flex-row gap-3 pt-1">
-          {/* Button 1: Schedule Live Class Now */}
-          <button
-            id="modal-schedule-class-btn"
-            type="button"
-            onClick={handleScheduleClick}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-[#E09B30]/30 cursor-pointer"
-          >
-            <Calendar size={15} />
-            <span>{isEs ? 'Agendar Mi Clase 1-a-1 Ahora' : 'Schedule My Live Class Now'}</span>
-            <ArrowRight size={14} />
-          </button>
+          {plan === 'pro' || plan === 'executive' ? (
+            <button
+              id="modal-schedule-class-btn"
+              type="button"
+              onClick={handleScheduleClick}
+              className="flex-1 py-3 px-4 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-[#E09B30]/30 cursor-pointer"
+            >
+              <Calendar size={15} />
+              <span>{isEs ? 'Agendar Mi Clase 1-a-1 Ahora' : 'Schedule My Live Class Now'}</span>
+              <ArrowRight size={14} />
+            </button>
+          ) : (
+            <button
+              id="modal-start-voice-btn"
+              type="button"
+              onClick={async () => {
+                await ackPlanNotification();
+                setActiveView('simulator');
+              }}
+              className="flex-1 py-3 px-4 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-[#E09B30]/30 cursor-pointer"
+            >
+              <Headphones size={15} />
+              <span>{isEs ? 'Practicar en Laboratorio 24/7' : 'Practice in 24/7 Voice Lab'}</span>
+              <ArrowRight size={14} />
+            </button>
+          )}
 
-          {/* Button 2: Start Practicing */}
+          {/* Button 2: Start Practicing / My Path */}
           <button
             id="modal-start-practicing-btn"
             type="button"
-            onClick={handleStartPracticingClick}
+            onClick={async () => {
+              await ackPlanNotification();
+              setActiveView('path');
+            }}
             className="py-3 px-4 rounded-xl bg-transparent hover:bg-[#FAFAFA]/5 text-[#A7C7E7] hover:text-[#FAFAFA] border border-[#A7C7E7]/40 font-montserrat font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer"
           >
-            <span>{isEs ? 'Comenzar a Practicar' : 'Start Practicing'}</span>
+            <span>{isEs ? 'Explorar Mi Ruta' : 'Explore My Path'}</span>
           </button>
         </div>
       </div>

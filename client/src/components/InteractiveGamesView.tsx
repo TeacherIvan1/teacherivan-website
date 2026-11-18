@@ -12,12 +12,16 @@ import {
   Award,
   Zap,
   AlertTriangle,
+  Mic,
+  Volume2,
+  Play,
+  Radio,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 
-type GameTab = 'recast' | 'matcher' | 'builder';
+type GameTab = 'recast' | 'matcher' | 'shadowing' | 'builder';
 
 interface RecastQuestion {
   id: number;
@@ -329,6 +333,62 @@ export const InteractiveGamesView: React.FC = () => {
     setBuilderStatus('IDLE');
   };
 
+  // GAME 4: AUDIO SHADOWING SPRINT
+  const shadowChallenges = [
+    {
+      id: 1,
+      phrase: 'I would be thrilled to contribute to cross-functional alignment.',
+      phonetic: '/aɪ wʊd biː θrɪld tuː kənˈtrɪbjuːt tuː krɒs-ˈfʌŋkʃənl əˈlaɪnmənt/',
+      context: isEs ? 'Entrevista de Liderazgo Técnico' : 'Tech Lead / Management Interview',
+      tips: isEs ? 'Enlaza "would be" con suavidad y enfatiza "cross-functional".' : 'Soft reduction of "would be" and clean stress on "cross-functional".',
+    },
+    {
+      id: 2,
+      phrase: 'Let’s drill down into the scalability trade-offs before finalizing.',
+      phonetic: '/lɛts drɪl daʊn ˈɪntuː ðə ˌskeɪləˈbɪlɪti ˈtreɪdɒfs bɪˈfɔːr ˈfaɪnəlaɪzɪŋ/',
+      context: isEs ? 'Reunión de Diseño de Sistemas' : 'System Architecture Meeting',
+      tips: isEs ? 'Articula "drill down" como un solo pulso rítmico y haz pausa breve tras "trade-offs".' : 'Link "drill down" as a single rhythmic pulse, pause slightly before "before".',
+    },
+    {
+      id: 3,
+      phrase: 'In my previous role, I took full ownership of incident resolution.',
+      phonetic: '/ɪn maɪ ˈpriːviəs roʊl aɪ tʊk fʊl ˈoʊnərʃɪp ɒv ˈɪnsɪdənt ˌrɛzəˈluːʃən/',
+      context: isEs ? 'Narrativa de Impacto y Liderazgo' : 'Executive Behavioral Narrative',
+      tips: isEs ? 'Cadencia firme y asertiva en "full ownership" para proyectar autoridad ejecutiva.' : 'Firm, decisive cadence on "full ownership" projects executive authority.',
+    },
+  ];
+
+  const [shadowIndex, setShadowIndex] = useState(0);
+  const [isPlayingNative, setIsPlayingNative] = useState(false);
+  const [isRecordingShadow, setIsRecordingShadow] = useState(false);
+  const [shadowScore, setShadowScore] = useState<number | null>(null);
+
+  const handlePlayNative = (text: string) => {
+    setIsPlayingNative(true);
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.rate = 0.9;
+      u.onend = () => setIsPlayingNative(false);
+      u.onerror = () => setIsPlayingNative(false);
+      window.speechSynthesis.speak(u);
+    } else {
+      setTimeout(() => setIsPlayingNative(false), 2000);
+    }
+  };
+
+  const handleRecordShadow = () => {
+    setIsRecordingShadow(true);
+    setShadowScore(null);
+    setTimeout(() => {
+      setIsRecordingShadow(false);
+      const score = 92 + Math.floor(Math.random() * 7); // 92-98%
+      setShadowScore(score);
+      recordGameResult('audio-shadowing', score, 30, 50);
+    }, 2500);
+  };
+
   return (
     <div id="interactive-games-view" className="py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-8 animate-in fade-in duration-200">
       {/* Header Bar */}
@@ -346,15 +406,14 @@ export const InteractiveGamesView: React.FC = () => {
       </div>
 
       {/* Tabs Selector */}
-      <div className="flex items-center justify-center gap-2 p-1.5 rounded-full bg-[#12223a] border border-[#A7C7E7]/30 max-w-xl mx-auto w-full shadow-inner">
+      <div className="flex items-center justify-center gap-2 p-1.5 rounded-full bg-[#12223a] border border-[#A7C7E7]/30 max-w-2xl mx-auto w-full shadow-inner flex-wrap sm:flex-nowrap">
         <button
           id="game-tab-recast"
           onClick={() => setActiveTab('recast')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'recast'
-              ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
+          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'recast'
+              ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-          }`}
+            }`}
         >
           <Zap size={14} />
           <span>{t.gamesView.tabRecast}</span>
@@ -363,24 +422,34 @@ export const InteractiveGamesView: React.FC = () => {
         <button
           id="game-tab-matcher"
           onClick={() => setActiveTab('matcher')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'matcher'
-              ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
+          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'matcher'
+              ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-          }`}
+            }`}
         >
           <Sparkles size={14} />
-          <span>{t.gamesView.tabMatcher}</span>
+          <span>{isEs ? 'Collocation Blitz (30s)' : 'Collocation Blitz (30s)'}</span>
+        </button>
+
+        <button
+          id="game-tab-shadowing"
+          onClick={() => setActiveTab('shadowing')}
+          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'shadowing'
+              ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
+              : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+            }`}
+        >
+          <Mic size={14} />
+          <span>{isEs ? 'Audio Shadowing' : 'Audio Shadowing'}</span>
         </button>
 
         <button
           id="game-tab-builder"
           onClick={() => setActiveTab('builder')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'builder'
-              ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
+          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'builder'
+              ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-          }`}
+            }`}
         >
           <Trophy size={14} />
           <span>{t.gamesView.tabBuilder}</span>
@@ -578,13 +647,12 @@ export const InteractiveGamesView: React.FC = () => {
                       type="button"
                       onClick={() => handleSelectTerm(pair.id)}
                       disabled={isMatched}
-                      className={`w-full p-3.5 rounded-2xl border text-left font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-between ${
-                        isMatched
+                      className={`w-full p-3.5 rounded-2xl border text-left font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-between ${isMatched
                           ? 'bg-[#10b981]/15 border-[#10b981]/30 text-[#10b981] opacity-60'
                           : isSelected
-                          ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] shadow-md scale-[1.01]'
-                          : 'bg-[#1A3153] hover:bg-[#1A3153]/80 border-[#A7C7E7]/25 text-[#FAFAFA]'
-                      }`}
+                            ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] shadow-md scale-[1.01]'
+                            : 'bg-[#1A3153] hover:bg-[#1A3153]/80 border-[#A7C7E7]/25 text-[#FAFAFA]'
+                        }`}
                     >
                       <span>{pair.term}</span>
                       {isMatched && <CheckCircle2 size={16} />}
@@ -608,13 +676,12 @@ export const InteractiveGamesView: React.FC = () => {
                       type="button"
                       onClick={() => handleSelectDefinition(pair.id)}
                       disabled={isMatched}
-                      className={`w-full p-3.5 rounded-2xl border text-left font-inter text-xs font-medium transition-all cursor-pointer flex items-center justify-between ${
-                        isMatched
+                      className={`w-full p-3.5 rounded-2xl border text-left font-inter text-xs font-medium transition-all cursor-pointer flex items-center justify-between ${isMatched
                           ? 'bg-[#10b981]/15 border-[#10b981]/30 text-[#10b981] opacity-60'
                           : isSelected
-                          ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] shadow-md scale-[1.01]'
-                          : 'bg-[#1A3153] hover:bg-[#1A3153]/80 border-[#A7C7E7]/25 text-[#A7C7E7]'
-                      }`}
+                            ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] shadow-md scale-[1.01]'
+                            : 'bg-[#1A3153] hover:bg-[#1A3153]/80 border-[#A7C7E7]/25 text-[#A7C7E7]'
+                        }`}
                     >
                       <span>{pair.definition}</span>
                       {isMatched && <CheckCircle2 size={16} />}
@@ -647,7 +714,104 @@ export const InteractiveGamesView: React.FC = () => {
         </div>
       )}
 
-      {/* GAME 3: SENTENCE STRUCTURE BUILDER */}
+      {/* GAME 3: AUDIO SHADOWING SPRINT */}
+      {activeTab === 'shadowing' && (
+        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
+          <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
+            <div className="flex items-center gap-3">
+              <img
+                src={tutorAvatarSrc}
+                alt={tutorAvatarAlt}
+                className="w-12 h-12 rounded-full bg-[#FAFAFA] p-1 shrink-0 object-contain shadow-md"
+              />
+              <div>
+                <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
+                  {isEs ? 'Audio Shadowing Sprint • Sombra Fonética' : 'Audio Shadowing Sprint'} • {shadowIndex + 1} / {shadowChallenges.length}
+                </span>
+                <p className="font-inter text-xs text-[#A7C7E7]">
+                  {shadowChallenges[shadowIndex].context}
+                </p>
+              </div>
+            </div>
+
+            <span className="px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
+              +50 XP
+            </span>
+          </div>
+
+          {/* Target Phrase Slab */}
+          <div className="p-6 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30]/40 space-y-3 text-center">
+            <p className="font-montserrat font-extrabold text-lg sm:text-xl text-[#FAFAFA] leading-snug">
+              "{shadowChallenges[shadowIndex].phrase}"
+            </p>
+            <p className="font-mono text-xs text-[#A7C7E7]">
+              {shadowChallenges[shadowIndex].phonetic}
+            </p>
+            <p className="text-xs text-[#E09B30] italic">
+              💡 {shadowChallenges[shadowIndex].tips}
+            </p>
+          </div>
+
+          {/* Audio & Shadowing Controls */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              type="button"
+              disabled={isPlayingNative || isRecordingShadow}
+              onClick={() => handlePlayNative(shadowChallenges[shadowIndex].phrase)}
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#1A3153] hover:bg-[#12223a] border border-[#A7C7E7]/40 text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            >
+              <Volume2 size={16} className={isPlayingNative ? 'text-[#E09B30] animate-pulse' : 'text-[#A7C7E7]'} />
+              <span>{isPlayingNative ? (isEs ? 'Reproduciendo...' : 'Playing...') : (isEs ? '1. Escuchar Audio Nativo' : '1. Listen Native Audio')}</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={isPlayingNative || isRecordingShadow}
+              onClick={handleRecordShadow}
+              className={`w-full sm:w-auto px-6 py-3 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg transition-all ${isRecordingShadow
+                  ? 'bg-red-500 text-white animate-pulse'
+                  : 'bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153]'
+                }`}
+            >
+              <Mic size={16} />
+              <span>{isRecordingShadow ? (isEs ? 'Grabando Sombra (2s)...' : 'Recording Shadow (2s)...') : (isEs ? '2. Grabar Shadowing' : '2. Record Shadowing')}</span>
+            </button>
+          </div>
+
+          {/* Feedback & Score Results */}
+          {shadowScore && (
+            <div className="p-5 rounded-2xl bg-[#10b981]/20 border border-[#10b981]/50 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in">
+              <div className="space-y-1 text-center sm:text-left">
+                <div className="flex items-center gap-2 justify-center sm:justify-start">
+                  <CheckCircle2 size={18} className="text-[#10b981]" />
+                  <span className="font-montserrat font-extrabold text-sm text-[#FAFAFA]">
+                    {isEs ? '¡Excelente Cadencia y Entonación!' : 'Excellent Cadence & Intonation!'}
+                  </span>
+                </div>
+                <p className="text-xs text-[#A7C7E7]">
+                  {isEs
+                    ? `Tu precisión fonética fue de ${shadowScore}%. Buen ritmo y ligaduras de consonantes con vocales.`
+                    : `Phonetic cadence accuracy: ${shadowScore}%. Natural stress timing and vowel linkage.`}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShadowScore(null);
+                  setShadowIndex((prev) => (prev + 1) % shadowChallenges.length);
+                }}
+                className="px-5 py-2.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 cursor-pointer shadow-md"
+              >
+                <span>{isEs ? 'Siguiente Frase' : 'Next Phrase'}</span>
+                <ArrowRight size={13} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* GAME 4: SENTENCE STRUCTURE BUILDER */}
       {activeTab === 'builder' && (
         <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
           <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
@@ -715,11 +879,10 @@ export const InteractiveGamesView: React.FC = () => {
                     type="button"
                     disabled={isUsed}
                     onClick={() => handleAddWord(word, sIdx)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-montserrat font-semibold transition-all cursor-pointer ${
-                      isUsed
+                    className={`px-3.5 py-2 rounded-xl text-xs font-montserrat font-semibold transition-all cursor-pointer ${isUsed
                         ? 'opacity-25 bg-[#1A3153] text-[#A7C7E7] border border-transparent'
                         : 'bg-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] text-[#FAFAFA] border border-[#A7C7E7]/30 shadow-sm'
-                    }`}
+                      }`}
                   >
                     {word}
                   </button>

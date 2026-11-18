@@ -65,14 +65,11 @@ export const CompactVoiceSimulator: React.FC = () => {
 
   const getDailySessionBadge = (): string => {
     const plan = user?.plan || (user?.role === 'admin' ? 'executive' : 'free');
-    if (user?.role === 'admin' || plan === 'pro' || plan === 'executive') {
+    if (user?.role === 'admin' || plan === 'essential' || plan === 'pro' || plan === 'executive') {
       return isEs ? 'Sesiones Diarias: Ilimitadas' : 'Daily Sessions: Unlimited';
     }
     const todayIso = new Date().toISOString().split('T')[0];
     const used = user?.lastSessionDate === todayIso ? (user?.dailySessionsUsed || 0) : 0;
-    if (plan === 'essential') {
-      return isEs ? `Sesiones Diarias: ${used} / 10` : `Daily Sessions: ${used} / 10`;
-    }
     return isEs ? `Noviembre Gratis: ${used} / 5` : `Free November: ${used} / 5`;
   };
 

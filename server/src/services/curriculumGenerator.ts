@@ -572,3 +572,430 @@ CRITICAL RULES:
   console.info('[CurriculumGenerator] Returning deterministic fallback sprint');
   return getDeterministicSprint(goals);
 }
+
+// =========================================================================
+// ON-DEMAND CUSTOM RESOURCE GENERATOR (For Essential 300 BOB, Pro & Exec)
+// =========================================================================
+
+export type ResourceType =
+  | 'article_collocations'
+  | 'dialogue_script'
+  | 'vocab_phrasal_deck'
+  | 'worksheet';
+
+export interface CustomResourceRequest {
+  topic: string;
+  targetLevel?: string;
+  resourceType?: ResourceType;
+  studentGoal?: string;
+}
+
+export interface CustomResourceResult {
+  id: string;
+  topic: string;
+  targetLevel: string;
+  resourceType: ResourceType;
+  title: string;
+  titleEs: string;
+  content: string;
+  collocations: Array<{
+    term: string;
+    phonetic?: string;
+    definitionEn: string;
+    definitionEs: string;
+    example: string;
+  }>;
+  comprehensionChecks: Array<{
+    question: string;
+    questionEs: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  }>;
+  practiceTip: string;
+  practiceTipEs: string;
+  generatedBy: 'gemini' | 'deterministic-fallback';
+  createdAt: string;
+}
+
+export function getDeterministicCustomResource(req: CustomResourceRequest): CustomResourceResult {
+  const topic = (req.topic || 'Professional Communication').trim();
+  const level = req.targetLevel || 'B2';
+  const type: ResourceType = req.resourceType || 'article_collocations';
+  const id = `res_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+  if (type === 'dialogue_script') {
+    return {
+      id,
+      topic,
+      targetLevel: level,
+      resourceType: type,
+      title: `Active Speaking Simulation: ${topic}`,
+      titleEs: `Simulación Activa de Conversación: ${topic}`,
+      content: `[Scenario: High-stakes dialogue practicing direct communication and fluent turn-taking]\n\n` +
+        `Teacher Ivan: "Thanks for taking the time to sync today. Regarding our focus on ${topic}, where do you see the biggest challenge right now?"\n\n` +
+        `Student: "To be completely candid, my main hurdle is formulating spontaneous arguments without pausing to translate from Spanish."\n\n` +
+        `Teacher Ivan: "That's completely natural. The key is leaning into modular sentence stems rather than building every clause from scratch. How would you pitch your core idea in 30 seconds?"\n\n` +
+        `Student: "If I had to distill it, the primary advantage is accelerating execution while eliminating unnecessary friction across the entire workflow."\n\n` +
+        `Teacher Ivan: "Spot on! That phrasing — 'accelerating execution while eliminating friction' — sounds crisp, authoritative, and native."`,
+      collocations: [
+        {
+          term: 'to be completely candid',
+          phonetic: '/tə biː kəmˈpliːtli ˈkændɪd/',
+          definitionEn: 'Speaking honestly and directly without sugarcoating',
+          definitionEs: 'Para ser completamente sincero/directo',
+          example: 'To be completely candid, our deadline is extremely tight.',
+        },
+        {
+          term: 'distill the core idea',
+          phonetic: '/dɪˈstɪl ðə kɔːr aɪˈdɪə/',
+          definitionEn: 'To extract the essential meaning or key message',
+          definitionEs: 'Sintetizar la idea central',
+          example: 'Can you distill the core idea into one elevator pitch?',
+        },
+        {
+          term: 'eliminate friction',
+          phonetic: '/ɪˈlɪmɪneɪt ˈfrɪkʃən/',
+          definitionEn: 'To remove obstacles, delays, or misunderstandings',
+          definitionEs: 'Eliminar fricciones o trabas',
+          example: 'Clear documentation helps eliminate friction between teams.',
+        },
+      ],
+      comprehensionChecks: [
+        {
+          question: 'What does "to be completely candid" signal in professional discourse?',
+          questionEs: '¿Qué señala "to be completely candid" en una conversación profesional?',
+          options: ['An apology for a mistake', 'A direct, honest perspective', 'An intention to quit', 'A request for permission'],
+          correctIndex: 1,
+          explanation: '"To be candid" establishes high trust and transparent communication.',
+        },
+        {
+          question: 'Which collocation best replaces "make things faster without problems"?',
+          questionEs: '¿Qué colocación reemplaza mejor "hacer las cosas más rápido sin problemas"?',
+          options: ['Do fast without pain', 'Accelerate execution while eliminating friction', 'Run quick with zero trouble', 'Hurry up cleanly'],
+          correctIndex: 1,
+          explanation: 'It uses formal, high-impact executive vocabulary.',
+        },
+        {
+          question: 'How should the student practice this dialogue with the 24/7 Voice Lab?',
+          questionEs: '¿Cómo debería el estudiante practicar este diálogo en el Laboratorio de Voz?',
+          options: ['Reading silently', 'Speaking aloud focusing on rhythm and pitch', 'Writing it 10 times', 'Translating each word'],
+          correctIndex: 1,
+          explanation: 'Active vocal production builds oral reflexes and muscle memory.',
+        },
+      ],
+      practiceTip: 'Read the dialogue out loud with Emma or Teacher Ivan in the Voice Lab, matching the intonation of each question.',
+      practiceTipEs: 'Lee el diálogo en voz alta con Emma o Teacher Ivan en el Laboratorio de Voz, imitando la entonación natural de cada frase.',
+      generatedBy: 'deterministic-fallback',
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  if (type === 'vocab_phrasal_deck') {
+    return {
+      id,
+      topic,
+      targetLevel: level,
+      resourceType: type,
+      title: `High-Frequency Phrasal & Idiom Deck: ${topic}`,
+      titleEs: `Baraja de Phrasal Verbs y Colocaciones: ${topic}`,
+      content: `Targeted vocabulary deck engineered for ${level} fluency in the context of "${topic}". Focus on combining these seamlessly into spontaneous speech.`,
+      collocations: [
+        {
+          term: 'drill down into',
+          phonetic: '/drɪl daʊn ˈɪntuː/',
+          definitionEn: 'To examine or analyze something in deeper detail',
+          definitionEs: 'Profundizar en un análisis o detalle',
+          example: 'Let’s drill down into the conversion metrics before finalizing.',
+        },
+        {
+          term: 'bridge the gap',
+          phonetic: '/brɪdʒ ðə ɡæp/',
+          definitionEn: 'To connect or reconcile two differing perspectives or states',
+          definitionEs: 'Cerrar la brecha o acortar distancias',
+          example: 'Our Bicronic Method bridges the gap between passive study and active fluency.',
+        },
+        {
+          term: 'pave the way for',
+          phonetic: '/peɪv ðə weɪ fɔːr/',
+          definitionEn: 'To create favorable conditions for future success',
+          definitionEs: 'Allanar el camino para algo nuevo',
+          example: 'Daily oral practice paves the way for effortless speaking.',
+        },
+      ],
+      comprehensionChecks: [
+        {
+          question: 'If you want to investigate a bottleneck thoroughly, you:',
+          questionEs: 'Si quieres investigar un cuello de botella a fondo, tú:',
+          options: ['Drill down into it', 'Look over it lightly', 'Back away from it', 'Brush off it'],
+          correctIndex: 0,
+          explanation: '"Drill down into" signifies in-depth investigation.',
+        },
+        {
+          question: 'What does "bridge the gap" mean in a learning context?',
+          questionEs: '¿Qué significa "bridge the gap" en un contexto de aprendizaje?',
+          options: ['Build a physical bridge', 'Overcome the divide between knowledge and practice', 'Stop studying', 'Memorize grammar rules'],
+          correctIndex: 1,
+          explanation: 'It means connecting theoretical knowledge with real-time performance.',
+        },
+        {
+          question: 'Select the correct sentence using "pave the way":',
+          questionEs: 'Selecciona la oración correcta usando "pave the way":',
+          options: [
+            'This breakthrough will pave the way for international contracts.',
+            'He paved the way by walking on the grass.',
+            'Pave the way your coffee please.',
+            'The way was paved to the door.',
+          ],
+          correctIndex: 0,
+          explanation: 'It figuratively describes opening doors for future achievements.',
+        },
+      ],
+      practiceTip: 'Create 2 personalized sentences for each collocation applying them directly to your work or daily life.',
+      practiceTipEs: 'Crea 2 oraciones personalizadas para cada término aplicándolas directamente a tu trabajo o vida diaria.',
+      generatedBy: 'deterministic-fallback',
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  if (type === 'worksheet') {
+    return {
+      id,
+      topic,
+      targetLevel: level,
+      resourceType: type,
+      title: `Error-Correction & Recast Worksheet: ${topic}`,
+      titleEs: `Ficha de Corrección y Recast: ${topic}`,
+      content: `Printable and interactive diagnostic worksheet targeting common interference errors made by Spanish speakers when discussing "${topic}".`,
+      collocations: [
+        {
+          term: 'depend on (NOT depend of)',
+          phonetic: '/dɪˈpɛnd ɒn/',
+          definitionEn: 'Preposition rule: things depend ON something, never of',
+          definitionEs: 'Depender DE en español se traduce como depend ON en inglés',
+          example: 'Our promotion depends on our spoken performance.',
+        },
+        {
+          term: 'make a decision (NOT take a decision)',
+          phonetic: '/meɪk ə dɪˈsɪʒən/',
+          definitionEn: 'Collocation rule: English speakers MAKE decisions',
+          definitionEs: 'Tomar una decisión se dice MAKE a decision (nunca take)',
+          example: 'We need to make a firm decision before Friday.',
+        },
+        {
+          term: 'explain to someone (NOT explain someone)',
+          phonetic: '/ɪkˈspleɪn tuː/',
+          definitionEn: 'Preposition requirement: explain requires "to" before the person',
+          definitionEs: 'Explicar a alguien requiere la preposición "to"',
+          example: 'Could you explain the process to me again?',
+        },
+      ],
+      comprehensionChecks: [
+        {
+          question: 'Which sentence is grammatically natural in English?',
+          questionEs: '¿Cuál oración es gramaticalmente natural en inglés?',
+          options: [
+            'It depends of the budget.',
+            'It depends on the budget.',
+            'It depends at the budget.',
+            'It depends from the budget.',
+          ],
+          correctIndex: 1,
+          explanation: 'Always use "depend on".',
+        },
+        {
+          question: 'Choose the correct business collocation:',
+          questionEs: 'Elige la colocación profesional correcta:',
+          options: ['We took an important decision.', 'We made an important decision.', 'We did a decision.', 'We gave a decision.'],
+          correctIndex: 1,
+          explanation: 'In English we "make" decisions, proposals, and mistakes.',
+        },
+        {
+          question: 'Identify the error: "He explained me the whole system."',
+          questionEs: 'Identifica el error: "He explained me the whole system."',
+          options: [
+            'System is misspelled',
+            'Needs "to": "He explained to me the whole system"',
+            'Explained must be explain',
+            'No error',
+          ],
+          correctIndex: 1,
+          explanation: 'Explain must be followed by "to [person]".',
+        },
+      ],
+      practiceTip: 'Print this low-ink sheet using the "Print Worksheet" button below or record yourself recasting each corrected sentence in the Voice Lab.',
+      practiceTipEs: 'Imprime esta ficha usando el botón "Imprimir Ficha" abajo o grábate reformulando cada oración corregida en el Laboratorio de Voz.',
+      generatedBy: 'deterministic-fallback',
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  // Default: article_collocations
+  return {
+    id,
+    topic,
+    targetLevel: level,
+    resourceType: type,
+    title: `Mastery Passage & Collocations: ${topic}`,
+    titleEs: `Artículo de Dominio y Colocaciones: ${topic}`,
+    content: `When navigating complex situations in "${topic}", spoken fluency hinges on rapid structural assembly rather than exhaustive vocabulary memorization. In high-stakes meetings or cross-border technical dialogues, professionals who articulate their viewpoints concisely consistently outperform those who hesitate while searching for individual words.\n\n` +
+      `By anchoring your speech around proven collocations, you sidestep cognitive overload and deliver your insights with natural confidence. As you read this passage, pay close attention to how rhythmic phrasing and deliberate pauses create authority and trust.`,
+    collocations: [
+      {
+        term: 'hinges on',
+        phonetic: '/ˈhɪndʒɪz ɒn/',
+        definitionEn: 'Depends completely on a central factor',
+        definitionEs: 'Depende decisivamente de un factor central',
+        example: 'Our team’s success hinges on real-time collaboration.',
+      },
+      {
+        term: 'articulate viewpoints concisely',
+        phonetic: '/ɑːrˈtɪkjʊleɪt ˈvjuːpɔɪnts kənˈsaɪsli/',
+        definitionEn: 'To express opinions clearly using few, well-chosen words',
+        definitionEs: 'Articular puntos de vista de manera concisa y clara',
+        example: 'He articulated his viewpoints concisely during the presentation.',
+      },
+      {
+        term: 'cognitive overload',
+        phonetic: '/ˈkɒɡnɪtɪv ˈoʊvərloʊd/',
+        definitionEn: 'Mental exhaustion caused by too much simultaneous processing',
+        definitionEs: 'Sobrecarga mental por exceso de procesamiento',
+        example: 'Memorizing collocations prevents cognitive overload when speaking.',
+      },
+    ],
+    comprehensionChecks: [
+      {
+        question: 'According to the passage, what does spoken fluency primarily hinge on?',
+        questionEs: 'Según el texto, ¿de qué depende principalmente la fluidez hablada?',
+        options: [
+          'Memorizing entire dictionaries',
+          'Rapid structural assembly and modular phrasing',
+          'Speaking as fast as humanly possible',
+          'Avoiding talking to native speakers',
+        ],
+        correctIndex: 1,
+        explanation: 'Fluency is built on assembling structures rapidly without overthinking.',
+      },
+      {
+        question: 'What is the primary benefit of anchoring your speech around collocations?',
+        questionEs: '¿Cuál es el beneficio principal de anclar tu habla en colocaciones?',
+        options: [
+          'It eliminates cognitive overload',
+          'It replaces the need to practice',
+          'It changes your accent to British',
+          'It avoids grammar entirely',
+        ],
+        correctIndex: 0,
+        explanation: 'Collocations automate phrase construction, freeing mental bandwidth.',
+      },
+      {
+        question: 'What does "to articulate viewpoints concisely" mean?',
+        questionEs: '¿Qué significa "to articulate viewpoints concisely"?',
+        options: [
+          'To speak loudly and aggressively',
+          'To express ideas clearly and without rambling',
+          'To write long academic papers',
+          'To stay quiet in meetings',
+        ],
+        correctIndex: 1,
+        explanation: 'It denotes speaking with clarity, brevity, and authority.',
+      },
+    ],
+    practiceTip: 'Click any collocation to listen to native pronunciation, then challenge yourself to summarize this passage in 3 spoken sentences.',
+    practiceTipEs: 'Haz clic en cualquier colocación para escuchar su pronunciación nativa, luego resume el texto en 3 oraciones habladas.',
+    generatedBy: 'deterministic-fallback',
+    createdAt: new Date().toISOString(),
+  };
+}
+
+export async function generateCustomResource(req: CustomResourceRequest): Promise<CustomResourceResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return getDeterministicCustomResource(req);
+  }
+
+  const CANDIDATE_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
+  const ai = new GoogleGenAI({ apiKey });
+
+  const prompt = `You are Teacher Ivan, an elite bilingual English tutor and curriculum designer.
+Generate an on-demand, highly engaging custom learning resource tailored to the student's request.
+
+REQUEST PARAMETERS:
+- Topic / Situation: "${req.topic}"
+- Target CEFR Level: ${req.targetLevel || 'B2'}
+- Resource Type: ${req.resourceType || 'article_collocations'}
+- Student Learning Objective: "${req.studentGoal || 'Spoken English Mastery'}"
+
+OUTPUT SCHEMA (Return strictly JSON):
+{
+  "title": "string in English (punchy, motivational)",
+  "titleEs": "string in Spanish",
+  "content": "Rich string content formatted with markdown for paragraph breaks. If article: 180-250 words engaging passage. If dialogue: 6-8 turn realistic conversation. If deck: intro and context. If worksheet: 5 clear error cases with context.",
+  "collocations": [
+    {
+      "term": "string (high-frequency phrase or phrasal verb)",
+      "phonetic": "string (IPA phonetic transcription)",
+      "definitionEn": "string in English",
+      "definitionEs": "string in Spanish",
+      "example": "string (realistic sentence using the collocation)"
+    }
+  ],
+  "comprehensionChecks": [
+    {
+      "question": "string in English",
+      "questionEs": "string in Spanish",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "string explaining why the answer is correct"
+    }
+  ],
+  "practiceTip": "A concrete 1-sentence action item for the student to practice in Teacher Ivan's 24/7 Voice Lab",
+  "practiceTipEs": "Consejo práctico en español de 1 oración para practicar en el Laboratorio de Voz 24/7"
+}
+
+CRITICAL CONSTRAINTS:
+1. Provide exactly 3 collocations and exactly 3 comprehension checks.
+2. Return ONLY valid JSON with zero surrounding commentary or backticks.
+3. Keep the tone encouraging, direct, and professional.`;
+
+  for (const model of CANDIDATE_MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          temperature: 0.4,
+          responseMimeType: 'application/json',
+        },
+      });
+
+      const text = response.text?.trim() || '';
+      if (!text) continue;
+
+      const cleanJson = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '');
+      const parsed = JSON.parse(cleanJson);
+
+      if (parsed && parsed.title && parsed.content && Array.isArray(parsed.collocations)) {
+        return {
+          id: `res_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          topic: req.topic,
+          targetLevel: req.targetLevel || 'B2',
+          resourceType: req.resourceType || 'article_collocations',
+          title: parsed.title,
+          titleEs: parsed.titleEs || parsed.title,
+          content: parsed.content,
+          collocations: parsed.collocations,
+          comprehensionChecks: parsed.comprehensionChecks || [],
+          practiceTip: parsed.practiceTip || 'Practice this aloud in the Voice Lab.',
+          practiceTipEs: parsed.practiceTipEs || 'Practica esto en voz alta en el Laboratorio de Voz.',
+          generatedBy: 'gemini',
+          createdAt: new Date().toISOString(),
+        };
+      }
+    } catch (err) {
+      console.warn(`[CustomResourceGenerator] Model ${model} failed:`, err instanceof Error ? err.message : err);
+    }
+  }
+
+  return getDeterministicCustomResource(req);
+}

@@ -77,8 +77,8 @@ describe('ReportService - Plan Recommendation Engine', () => {
   it('recommends Executive Partner for C1 or score >= 85', () => {
     const plan = matchRecommendedPlan('C1', 92);
     assert.strictEqual(plan.id, 'executive');
-    assert.strictEqual(plan.name, 'Executive Partner');
-    assert.ok(plan.whatsappMessage.includes('Executive Partner'));
+    assert.ok(plan.name.includes('Executive'));
+    assert.ok(plan.whatsappMessage.includes('Executive'));
     assert.ok(plan.whatsappMessage.includes('92/100'));
   });
 });

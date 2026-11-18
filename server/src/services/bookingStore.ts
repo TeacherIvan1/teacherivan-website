@@ -200,13 +200,16 @@ export class BookingStore {
         } else if (plan === 'free' || !plan) {
           allowedWeekly = 0;
         } else if (plan === 'essential') {
-          allowedWeekly = 1;
+          // Essential (300 BOB) is 100% autonomous 24/7 Voice Lab + Custom Resources (0 live 1-on-1 classes)
+          allowedWeekly = 0;
         } else if (plan === 'pro') {
-          allowedWeekly = 2;
-        } else if (plan === 'executive') {
+          // Pro (580 BOB) includes 3 live 1-on-1 classes per week
           allowedWeekly = 3;
+        } else if (plan === 'executive') {
+          // Executive (850 BOB) includes 5 live 1-on-1 classes per week (daily Mon–Fri)
+          allowedWeekly = 5;
         } else {
-          allowedWeekly = user.maxWeeklyClasses ?? 1;
+          allowedWeekly = user.maxWeeklyClasses ?? 0;
         }
       } else {
         // Fallback for tests or direct calls
@@ -215,8 +218,13 @@ export class BookingStore {
     }
 
     if (allowedWeekly === 0) {
+      if (plan === 'essential') {
+        throw new Error(
+          'El Plan Essential (300 BOB) es 100% autónomo (Laboratorio de Voz 24/7 y Recursos Ilimitados). Para agendar clases en vivo 1 a 1, actualiza al Plan Pro (580 BOB — 3 clases/sem) o Executive (850 BOB — 5 clases/sem).'
+        );
+      }
       throw new Error(
-        'El plan Gratuito no incluye clases en vivo 1 a 1. Por favor activa un plan (Essential, Pro o Executive) por WhatsApp para agendar.'
+        'El plan Gratuito no incluye clases en vivo 1 a 1. Por favor activa el Plan Pro (580 BOB — 3 clases/sem) o Executive (850 BOB — 5 clases/sem) por WhatsApp para agendar.'
       );
     }
 

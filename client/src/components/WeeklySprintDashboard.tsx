@@ -22,6 +22,10 @@ import {
   HelpCircle,
   Flame,
   Globe,
+  Radio,
+  Video,
+  Check,
+  Headphones,
 } from 'lucide-react';
 import { useSprintStore, CEFRLevel } from '../modules/sprint/sprintStore';
 import { useAuthStore } from '../modules/auth/authStore';
@@ -29,6 +33,7 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { TEACHER_PHONE, getWhatsAppUrl } from '../config/contact';
+import { getStudentBookingsCache } from '../modules/auth/vaultSync';
 import { MandatoryGoalsModal } from './MandatoryGoalsModal';
 import { RiggedCharacter } from './RiggedCharacter';
 
@@ -77,6 +82,19 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
     user?.learningGoals?.personalObjective ||
     'Prepare for high-stakes interviews and speak English without mental translation.';
   const userCountry = user?.country || 'Bolivia';
+
+  const userPlan = user?.plan || (user?.role === 'admin' ? 'executive' : 'free');
+  const isHybrid = userPlan === 'pro' || userPlan === 'executive' || user?.role === 'admin';
+  const targetClassesCount = userPlan === 'executive' || user?.role === 'admin' ? 5 : userPlan === 'pro' ? 3 : 0;
+
+  const [roadmapMode, setRoadmapMode] = useState<'sprint' | 'hybrid'>(isHybrid ? 'hybrid' : 'sprint');
+
+  // Active bookings cache for this student
+  const cachedBookings = getStudentBookingsCache();
+  const normEmail = (user?.email || '').toLowerCase().trim();
+  const studentBookings = cachedBookings.filter(
+    (b) => b.studentId === user?.id || (user?.email && b.studentEmail.toLowerCase().trim() === normEmail)
+  );
 
   const getCountryFlag = (country?: string): string => {
     if (!country) return 'Bolivia';
@@ -277,14 +295,20 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
       />
 
       {/* ========================================================================= */}
-      {/* 1. PERSONALIZED GOAL HEADER CARD (#FAFAFA CARD WITH #A7C7E7 BORDER)        */}
+      {/* 1. TOP COMMAND HEADER SLAB (.slab-3d-dark ARCHITECTURAL HERO)              */}
       {/* ========================================================================= */}
       <div
         id="personalized-goal-header-card"
-        className="p-6 sm:p-8 rounded-3xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden"
+        className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#091326] via-[#12223a] to-[#1A3153] text-[#FAFAFA] border-2 border-[#E09B30]/40 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden"
       >
-        {/* Left: Chibi Teacher Ivan Avatar with Ambient Frame & Speech Bubble */}
-        <div className="flex items-center gap-4 sm:gap-5 w-full lg:w-auto">
+        {/* Subtle Ambient Glow */}
+        <div
+          className="absolute -top-12 -left-12 w-48 h-48 rounded-full pointer-events-none opacity-20"
+          style={{ background: 'radial-gradient(circle, #E09B30 0%, transparent 70%)', filter: 'blur(30px)' }}
+        />
+
+        {/* Left: Chibi Mascot with Ambient Frame & Dynamic Reactive Status Pill */}
+        <div className="flex items-center gap-4 sm:gap-5 w-full lg:w-auto relative z-10">
           <div className="relative shrink-0">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30] p-1 flex items-center justify-center shadow-lg shadow-[#E09B30]/20 overflow-hidden">
               <RiggedCharacter
@@ -299,40 +323,66 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#1A3153] tracking-tight">
+              <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA] tracking-tight">
                 {studentName}
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153]/10 border border-[#A7C7E7] text-xs font-montserrat font-bold text-[#4A5568] inline-flex items-center gap-1">
-                <Globe size={11} className="text-[#4A5568]" />
+              <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#A7C7E7] inline-flex items-center gap-1">
+                <Globe size={11} className="text-[#E09B30]" />
                 <span>{getCountryFlag(userCountry)}</span>
               </span>
-              <span className="px-3 py-0.5 rounded-full bg-[#1A3153] text-[#E09B30] text-xs font-montserrat font-extrabold tracking-wider uppercase">
-                {targetLevel}
+              {/* CEFR Level Badge */}
+              <span className="px-3 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] text-xs font-montserrat font-black tracking-wider uppercase">
+                {targetLevel} • {targetLevel === 'C1' ? (isEs ? 'AVANZADO' : 'ADVANCED') : targetLevel.startsWith('B') ? (isEs ? 'INTERMEDIO' : 'INTERMEDIATE') : (isEs ? 'INICIAL' : 'FOUNDATION')}
+              </span>
+              {/* Active Plan Badge */}
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-montserrat font-extrabold tracking-wider uppercase border ${
+                userPlan === 'executive'
+                  ? 'bg-gradient-to-r from-emerald-500 to-[#E09B30] text-[#1A3153] border-[#E09B30]'
+                  : userPlan === 'pro'
+                  ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30]'
+                  : userPlan === 'essential'
+                  ? 'bg-[#A7C7E7]/20 text-[#A7C7E7] border-[#A7C7E7]/40'
+                  : 'bg-[#E09B30]/20 text-[#E09B30] border-[#E09B30]/40'
+              }`}>
+                {userPlan === 'executive'
+                  ? 'EXECUTIVE • 5 CLASES/SEM VIP'
+                  : userPlan === 'pro'
+                  ? 'PRO • 3 CLASES/SEM + 24/7'
+                  : userPlan === 'essential'
+                  ? 'ESSENTIAL • AUTÓNOMO 24/7'
+                  : 'FREE • 5 SESIONES/DÍA'}
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm font-inter text-[#4A5568] leading-relaxed max-w-md">
-              <strong className="text-[#1A3153]">{primaryGoal}</strong> • "{personalObjective}"
-            </p>
+            {/* Dynamic Reactive Status Pill */}
+            <div className="flex items-center gap-2 pt-0.5 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-[10px] font-mono text-emerald-300 font-bold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{isEs ? 'Inmersión Asincrónica 24/7 Activa' : '24/7 Async Immersion Active'}</span>
+              </span>
+              <span className="text-xs text-[#A7C7E7] font-medium">
+                <strong className="text-[#FAFAFA]">{primaryGoal}</strong> • "{personalObjective}"
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Right: Weekly Progress Bar + Edit Goals Button */}
-        <div className="flex flex-col sm:flex-row lg:flex-col items-center lg:items-end justify-between gap-3 w-full lg:w-auto shrink-0">
+        <div className="flex flex-col sm:flex-row lg:flex-col items-center lg:items-end justify-between gap-3 w-full lg:w-auto shrink-0 relative z-10">
           <div className="w-full sm:w-64 lg:w-64 space-y-1.5 text-center lg:text-right">
-            <div className="flex justify-between text-xs font-montserrat font-bold text-[#1A3153]">
+            <div className="flex justify-between text-xs font-montserrat font-bold text-[#FAFAFA]">
               <span>{t.microLearning.progressLabel}</span>
               <span className="text-[#E09B30] font-black">{completedStages.length}/5 ({progressPercentage}%)</span>
             </div>
-            <div className="w-full h-3 rounded-full bg-[#E2E8F0] overflow-hidden p-0.5">
+            <div className="w-full h-3 rounded-full bg-[#1A3153] border border-[#A7C7E7]/25 overflow-hidden p-0.5">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-[#E09B30] to-[#10b981] transition-all duration-700 shadow-sm"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
-            <div className="flex justify-between items-center text-[11px] text-[#4A5568]">
+            <div className="flex justify-between items-center text-[11px] text-[#A7C7E7]">
               <span className="font-semibold">+{totalXp} XP {isEs ? 'ganados' : 'earned'}</span>
               <span className="font-bold text-[#10b981] inline-flex items-center gap-1">
                 <Flame size={12} className="text-[#E09B30]" />
@@ -346,7 +396,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               type="button"
               id="edit-student-goals-btn"
               onClick={() => setIsEditGoalsOpen(true)}
-              className="px-4 py-2 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] hover:bg-slate-100 text-[#1A3153] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[#A7C7E7]/30 bg-[#1A3153] hover:bg-[#1A3153]/80 text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
               <Edit3 size={13} className="text-[#E09B30]" />
               <span>{t.microLearning.editGoals}</span>
@@ -364,6 +414,191 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Mode Switcher for Pro & Executive Students */}
+      {isHybrid && (
+        <div className="flex items-center gap-2 p-1 rounded-2xl bg-[#12223a] border border-[#A7C7E7]/25 w-fit">
+          <button
+            type="button"
+            id="tab-hybrid-schedule-btn"
+            onClick={() => setRoadmapMode('hybrid')}
+            className={`px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+              roadmapMode === 'hybrid'
+                ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
+                : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+            }`}
+          >
+            <Video size={14} />
+            <span>{isEs ? `Cronograma Híbrido (${targetClassesCount} Clases + 24/7)` : `Hybrid Roadmap (${targetClassesCount} Classes + 24/7)`}</span>
+          </button>
+          <button
+            type="button"
+            id="tab-autonomous-sprint-btn"
+            onClick={() => setRoadmapMode('sprint')}
+            className={`px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+              roadmapMode === 'sprint'
+                ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
+                : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+            }`}
+          >
+            <Target size={14} />
+            <span>{isEs ? 'Ruta Autónoma D1–D5' : 'Autonomous Sprint D1–D5'}</span>
+          </button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* HYBRID SCHEDULE ROADMAP (INTERLEAVING PRE-CLASS, 1-ON-1, RECASTS)         */}
+      {/* ========================================================================= */}
+      {roadmapMode === 'hybrid' && isHybrid && (
+        <div id="hybrid-schedule-section" className="space-y-4 animate-in fade-in duration-200">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#A7C7E7]/20 pb-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
+                  <Sparkles size={14} />
+                  <span>{isEs ? 'Método Bicrónico: Motor 1 + Motor 2' : 'Bicronic Method: Engine 1 + Engine 2'}</span>
+                </div>
+                <h3 className="font-montserrat font-extrabold text-lg sm:text-xl text-[#FAFAFA]">
+                  {isEs ? `Tu Ruta Híbrida Semanal (${studentBookings.length}/${targetClassesCount} Clases Agendadas)` : `Your Weekly Hybrid Roadmap (${studentBookings.length}/${targetClassesCount} Classes Booked)`}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveView('schedule')}
+                className="px-4 py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+              >
+                <Calendar size={13} />
+                <span>{isEs ? 'Agendar / Gestionar Clases' : 'Book / Manage Classes'}</span>
+              </button>
+            </div>
+
+            {/* 4 Dynamic Hybrid Roadmap Nodes */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* NODE 1: Pre-Class Preparation */}
+              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/20 text-[#A7C7E7] text-[10px] font-montserrat font-bold uppercase">
+                      Paso 1 • Pre-Clase
+                    </span>
+                    <Clock size={14} className="text-[#A7C7E7]" />
+                  </div>
+                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                    {isEs ? 'Inmersión Pre-Clase (Colocaciones)' : 'Pre-Class Target Collocations'}
+                  </h4>
+                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                    {isEs
+                      ? 'Revisa el vocabulario clave y los temas que discutirás con Teacher Ivan en tu sesión en vivo.'
+                      : 'Review target vocabulary and topics to debate with Teacher Ivan in your live session.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedDay(0);
+                    setRoadmapMode('sprint');
+                  }}
+                  className="w-full py-2 rounded-xl bg-[#12223a] hover:bg-[#12223a]/80 text-[#E09B30] border border-[#E09B30]/40 text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>{isEs ? 'Ver Colocaciones →' : 'View Collocations →'}</span>
+                </button>
+              </div>
+
+              {/* NODE 2: Live 1-on-1 Coaching (3x or 5x/wk) */}
+              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#E09B30] flex flex-col justify-between gap-4 shadow-lg shadow-[#E09B30]/10">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] text-[10px] font-montserrat font-black uppercase">
+                      Paso 2 • {targetClassesCount}x / Semana
+                    </span>
+                    <Video size={14} className="text-[#E09B30]" />
+                  </div>
+                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                    {isEs ? 'Mentoría 1 a 1 en Vivo (Zoom/Meet)' : '1-on-1 Live Coaching Session'}
+                  </h4>
+                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                    {studentBookings.length > 0 ? (
+                      isEs
+                        ? `Tienes ${studentBookings.length} clase(s) programada(s): ${studentBookings.map((b) => `${b.dayOfWeek} ${b.startTime}`).join(', ')} (Hora Bolivia).`
+                        : `You have ${studentBookings.length} booking(s): ${studentBookings.map((b) => `${b.dayOfWeek} ${b.startTime}`).join(', ')} (Bolivia Time).`
+                    ) : (
+                      isEs
+                        ? `Aún no has agendado tus ${targetClassesCount} clases de esta semana (Lun–Vie 14:00–20:00).`
+                        : `You have not scheduled your ${targetClassesCount} classes for this week (Mon–Fri 14:00–20:00).`
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveView('schedule')}
+                  className="w-full py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <Calendar size={13} />
+                  <span>{isEs ? 'Ir al Calendario →' : 'Go to Calendar →'}</span>
+                </button>
+              </div>
+
+              {/* NODE 3: Post-Class Recast Fixation (24/7 Voice Lab) */}
+              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-montserrat font-bold uppercase">
+                      Paso 3 • Post-Clase
+                    </span>
+                    <Headphones size={14} className="text-emerald-400" />
+                  </div>
+                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                    {isEs ? 'Fijación de Recasts en Voz 24/7' : 'Post-Class Recast Fixation'}
+                  </h4>
+                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                    {isEs
+                      ? 'Reformula en el Laboratorio de Voz los errores detectados durante tu clase en vivo para automatizar reflejos.'
+                      : 'Rehearse and recast errors flagged during your live session inside the 24/7 Voice Lab.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveView('simulator')}
+                  className="w-full py-2 rounded-xl bg-[#12223a] hover:bg-[#12223a]/80 text-emerald-400 border border-emerald-400/40 text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <Mic size={13} />
+                  <span>{isEs ? 'Practicar en Voz 24/7 →' : 'Practice in 24/7 Voice →'}</span>
+                </button>
+              </div>
+
+              {/* NODE 4: Weekly Milestone & WhatsApp Sync */}
+              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-[10px] font-montserrat font-bold uppercase">
+                      Paso 4 • Cierre Semanal
+                    </span>
+                    <Award size={14} className="text-[#E09B30]" />
+                  </div>
+                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                    {isEs ? 'Reporte Pedagógico y Sync' : 'Pedagogical Report & Sync'}
+                  </h4>
+                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                    {isEs
+                      ? 'Revisa tus métricas de tiempo de habla (>75% STT) y sincroniza tu avance con Teacher Ivan vía WhatsApp.'
+                      : 'Review your Student Talking Time (>75% STT) and sync your weekly report with Teacher Ivan on WhatsApp.'}
+                  </p>
+                </div>
+                <a
+                  href={generateWhatsAppReportMessage()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <MessageCircle size={13} />
+                  <span>{isEs ? 'Sync WhatsApp →' : 'WhatsApp Sync →'}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 2. INTERACTIVE 5-DAY VISUAL JOURNEY STEPPER (D1 TO D5)                    */}

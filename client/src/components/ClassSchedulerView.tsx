@@ -182,15 +182,13 @@ export const ClassSchedulerView: React.FC = () => {
   const userPlan = user.plan || (user.role === 'admin' ? 'executive' : 'free');
   const maxWeeklyClasses =
     user.role === 'admin'
-      ? 3
+      ? 5
       : user.maxWeeklyClasses !== undefined
       ? user.maxWeeklyClasses
       : userPlan === 'executive'
-      ? 3
+      ? 5
       : userPlan === 'pro'
-      ? 2
-      : userPlan === 'essential'
-      ? 1
+      ? 3
       : 0;
 
   // Find user's active bookings for this week
@@ -202,11 +200,11 @@ export const ClassSchedulerView: React.FC = () => {
   const getPlanBadgeLabel = () => {
     switch (userPlan) {
       case 'essential':
-        return isEs ? 'Plan Essential (1 clase/sem)' : 'Essential Plan (1 class/wk)';
+        return isEs ? 'Plan Essential (Autónomo 24/7 • 0 clases en vivo)' : 'Essential Plan (Autonomous 24/7 • 0 live classes)';
       case 'pro':
-        return isEs ? 'Plan Pro (2 clases/sem)' : 'Pro Plan (2 classes/wk)';
+        return isEs ? 'Plan Pro (3 clases/sem)' : 'Pro Plan (3 classes/wk)';
       case 'executive':
-        return isEs ? 'Plan Executive (3 clases/sem)' : 'Executive Plan (3 classes/wk)';
+        return isEs ? 'Plan Executive (5 clases/sem)' : 'Executive Plan (5 classes/wk)';
       default:
         return isEs ? 'Plan Gratuito (0 clases en vivo)' : 'Free Plan (0 live classes)';
     }
@@ -216,11 +214,15 @@ export const ClassSchedulerView: React.FC = () => {
     setActionError(null);
     setActionSuccess(null);
 
-    // If Free Plan, prompt student to activate plan via WhatsApp
-    if (maxWeeklyClasses === 0 || userPlan === 'free') {
-      const upgradeMsg = isEs
-        ? 'El Plan Gratuito incluye 5 sesiones diarias en el Laboratorio de Voz, pero no incluye clases en vivo 1 a 1. ¡Escríbele a Teacher Ivan por WhatsApp para activar tu plan Essential, Pro o Executive!'
-        : 'The Free Plan includes 5 daily Voice Lab sessions, but does not include 1-on-1 live classes. Message Teacher Ivan on WhatsApp to activate your Essential, Pro, or Executive plan!';
+    // If Free Plan or Essential, prompt student to activate/upgrade plan via WhatsApp
+    if (maxWeeklyClasses === 0 || userPlan === 'free' || userPlan === 'essential') {
+      const upgradeMsg = userPlan === 'essential'
+        ? (isEs
+            ? 'El Plan Essential es 100% autónomo (Laboratorio de Voz 24/7 y Recursos Ilimitados), pero no incluye clases en vivo 1 a 1. ¡Escríbele a Teacher Ivan por WhatsApp para hacer upgrade a Pro (3 clases/sem) o Executive (5 clases/sem)!'
+            : 'The Essential Plan is 100% autonomous (24/7 Voice Lab and Unlimited Resources), but does not include 1-on-1 live classes. Message Teacher Ivan on WhatsApp to upgrade to Pro (3 classes/wk) or Executive (5 classes/wk)!')
+        : (isEs
+            ? 'El Plan Gratuito incluye 5 sesiones diarias en el Laboratorio de Voz, pero no incluye clases en vivo 1 a 1. ¡Escríbele a Teacher Ivan por WhatsApp para activar tu plan Pro (3 clases/sem) o Executive (5 clases/sem)!'
+            : 'The Free Plan includes 5 daily Voice Lab sessions, but does not include 1-on-1 live classes. Message Teacher Ivan on WhatsApp to activate your Pro (3 classes/wk) or Executive (5 classes/wk) plan!');
       setActionError(upgradeMsg);
       return;
     }
@@ -396,32 +398,48 @@ export const ClassSchedulerView: React.FC = () => {
         </div>
       </div>
 
-      {/* Free Plan Activation Banner (If user has 0 weekly classes) */}
+      {/* Upgrade Banner (If user has 0 weekly classes: Essential or Free) */}
       {maxWeeklyClasses === 0 && (
         <div
           id="free-plan-upgrade-banner"
-          className="p-4 sm:p-5 rounded-2xl bg-[#E09B30]/15 border-2 border-[#E09B30] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg animate-in fade-in"
+          className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#12223a] to-[#1A3153] border-2 border-[#E09B30] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl animate-in fade-in"
         >
           <div className="space-y-1">
             <h3 className="font-montserrat font-extrabold text-sm sm:text-base text-[#FAFAFA] flex items-center gap-2">
               <Sparkles size={16} className="text-[#E09B30]" />
-              <span>{isEs ? 'Activa tu Plan para Agendar Clases en Vivo' : 'Activate a Plan to Book Live Classes'}</span>
+              <span>
+                {userPlan === 'essential'
+                  ? (isEs ? 'Plan Essential: Inmersión 100% Autónoma 24/7' : 'Essential Plan: 100% Autonomous 24/7 Immersion')
+                  : (isEs ? 'Activa tu Plan para Agendar Clases en Vivo' : 'Activate a Plan to Book Live Classes')}
+              </span>
             </h3>
             <p className="text-xs text-[#A7C7E7] max-w-xl">
-              {isEs
-                ? 'Tu cuenta gratuita incluye 5 sesiones diarias en el Laboratorio de Voz. Para reservar clases semanales 1 a 1 de 1 hora (14:00–20:00 Bolivia), activa tu plan Essential, Pro o Executive vía WhatsApp.'
-                : 'Your free account includes 5 daily Voice Lab sessions. To book weekly 1-hour live classes (14:00–20:00 Bolivia), activate your Essential, Pro, or Executive plan via WhatsApp.'}
+              {userPlan === 'essential'
+                ? (isEs
+                    ? 'Tu Plan Essential incluye acceso 24/7 ilimitado al Laboratorio de Voz IA y Estudio de Recursos. Para sumar clases en vivo 1 a 1 de 60 min con Teacher Ivan (3 clases/sem en Plan Pro o 5 clases/sem en Executive), haz upgrade vía WhatsApp.'
+                    : 'Your Essential Plan includes unlimited 24/7 Voice Lab access and Custom Resource Studio. To add 1-on-1 live 60-min classes with Teacher Ivan (3 classes/wk in Pro or 5 classes/wk in Executive), upgrade via WhatsApp.')
+                : (isEs
+                    ? 'Tu cuenta gratuita incluye 5 sesiones diarias en el Laboratorio de Voz. Para reservar clases semanales 1 a 1 de 1 hora (14:00–20:00 Bolivia), activa tu plan Pro (3 clases/sem) o Executive (5 clases/sem) vía WhatsApp.'
+                    : 'Your free account includes 5 daily Voice Lab sessions. To book weekly 1-hour live classes (14:00–20:00 Bolivia), activate your Pro (3 classes/wk) or Executive (5 classes/wk) plan via WhatsApp.')}
             </p>
           </div>
           <a
             id="scheduler-activate-whatsapp-btn"
-            href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Deseo%20activar%20mi%20plan%20de%20clases%20en%20vivo%201%20a%201."
+            href={
+              userPlan === 'essential'
+                ? 'https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Tengo%20el%20Plan%20Essential%20y%20quiero%20hacer%20upgrade%20para%20clases%20en%20vivo%201%20a%201.'
+                : 'https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Deseo%20activar%20mi%20plan%20de%20clases%20en%20vivo%201%20a%201.'
+            }
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-2.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shrink-0 cursor-pointer"
           >
             <MessageCircle size={15} />
-            <span>{isEs ? 'Activar Plan por WhatsApp' : 'Activate Plan on WhatsApp'}</span>
+            <span>
+              {userPlan === 'essential'
+                ? (isEs ? 'Upgrade a Pro / Executive por WhatsApp' : 'Upgrade to Pro / Executive on WhatsApp')
+                : (isEs ? 'Activar Plan por WhatsApp' : 'Activate Plan on WhatsApp')}
+            </span>
             <ExternalLink size={12} />
           </a>
         </div>
