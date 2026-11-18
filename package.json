@@ -14,7 +14,11 @@
     "build": "npm run build -w server && npm run build -w client",
     "build:server": "npm run build -w server",
     "build:client": "npm run build -w client",
-    "test": "npm run test -w client"
+    "test": "npm run test -w client",
+    "campaign:audit": "npm run campaign:audit --prefix media-pipeline",
+    "campaign:dry-run": "npm run campaign:dry-run --prefix media-pipeline",
+    "campaign:stage-queue": "npm run campaign:stage-queue --prefix media-pipeline",
+    "campaign:retry-failed": "npm run campaign:retry-failed --prefix media-pipeline"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
