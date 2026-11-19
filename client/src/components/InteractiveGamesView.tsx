@@ -747,8 +747,9 @@ export const InteractiveGamesView: React.FC = () => {
             <p className="font-mono text-xs text-[#A7C7E7]">
               {shadowChallenges[shadowIndex].phonetic}
             </p>
-            <p className="text-xs text-[#E09B30] italic">
-              💡 {shadowChallenges[shadowIndex].tips}
+            <p className="text-xs text-[#E09B30] italic flex items-center justify-center gap-1.5">
+              <Sparkles size={12} className="text-[#E09B30] shrink-0" />
+              <span>{shadowChallenges[shadowIndex].tips}</span>
             </p>
           </div>
 

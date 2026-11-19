@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Header } from './components/Header';
+import { NovemberPromoBanner } from './components/NovemberPromoBanner';
 import { LandingPageView } from './components/LandingPageView';
 import { CompactVoiceSimulator } from './components/CompactVoiceSimulator';
 import { SessionReportPanel } from './components/SessionReportPanel';
@@ -79,6 +80,9 @@ export const App: React.FC = () => {
 
       {/* Spoken Assessment Diagnostic Modal (Non-blocking, triggerable) */}
       <SpokenAssessmentModal />
+
+      {/* Campaign Promotional Strip */}
+      <NovemberPromoBanner />
 
       {/* Official Platform Header with Auth & View Navigation */}
       <Header />

@@ -24,11 +24,11 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useAuthStore } from '../modules/auth/authStore';
 import { LanguageToggle } from './LanguageToggle';
 import { BrandLockup } from './BrandLockup';
-import { NovemberPromoBanner } from './NovemberPromoBanner';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
   const status = useConversationStore((s) => s.status);
   const { t, isEs } = useTranslation();
   const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
@@ -36,6 +36,40 @@ export const Header: React.FC = () => {
   const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, openAuthModal, signOut } = useAuthStore();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Find whether we are currently over a dark chapter
+      const darkSections = ['chapter-1-bicronic', 'chapter-2-voicelab', 'chapter-4-faq', 'flagship-simulator-section'];
+      let isDark = false;
+      const scrollY = window.scrollY + 75;
+
+      for (const id of darkSections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollY >= top && scrollY < top + height) {
+            isDark = true;
+            break;
+          }
+        }
+      }
+
+      if (isAuthenticated && activeView !== 'path') {
+        isDark = true;
+      }
+
+      setCurrentTheme(isDark ? 'dark' : 'light');
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isAuthenticated, activeView]);
 
   useEffect(() => {
     let mounted = true;
@@ -80,12 +114,21 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#12223a]/95 backdrop-blur-md border-b border-[#A7C7E7]/25 w-full select-none" id="app-header">
-      {/* Campaign Promotional Strip */}
-      <NovemberPromoBanner />
-
+    <header
+      id="app-navbar"
+      data-theme={currentTheme}
+      className={`sticky top-0 z-50 w-full h-[68px] select-none transition-colors duration-300 flex items-center ${
+        currentTheme === 'light'
+          ? 'bg-[#FAFAFA]/85 text-[#1A3153] border-b border-[rgba(26,49,83,0.12)]'
+          : 'bg-[#1A3153]/85 text-[#FAFAFA] border-b border-[rgba(167,199,231,0.22)]'
+      }`}
+      style={{
+        backdropFilter: 'saturate(1.4) blur(14px)',
+        WebkitBackdropFilter: 'saturate(1.4) blur(14px)',
+      }}
+    >
       {/* Primary Top Bar */}
-      <div className="w-full max-w-full px-2 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-1 sm:gap-2 overflow-hidden">
+      <div className="w-full max-w-full px-2 sm:px-6 flex items-center justify-between gap-1 sm:gap-2 overflow-hidden">
         {/* Left: Brand Lockup with Chibi Mascot */}
         <button
           onClick={() => {
@@ -160,45 +203,83 @@ export const Header: React.FC = () => {
         ) : (
           <nav className="hidden md:flex items-center gap-1.5 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
             <button
-              id="guest-nav-simulator"
+              id="guest-nav-model"
               onClick={() => {
-                const el = document.getElementById('flagship-simulator-section');
+                const el = document.getElementById('chapter-1-bicronic');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
-              <Headphones size={14} />
-              <span>{isEs ? 'Tutor de Voz' : 'Voice Tutor'}</span>
+              <span>{isEs ? '01 Método' : '01 Method'}</span>
+            </button>
+
+            <button
+              id="guest-nav-simulator"
+              onClick={() => {
+                const el = document.getElementById('chapter-2-voicelab');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+            >
+              <Headphones size={13} />
+              <span>{isEs ? '02 Voice Lab' : '02 Voice Lab'}</span>
             </button>
 
             <button
               id="guest-nav-pricing"
               onClick={() => {
-                const el = document.getElementById('faq-pricing-section');
+                const el = document.getElementById('chapter-3-plans');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
-              <BookOpen size={14} />
-              <span>{isEs ? 'Planes & Precios' : 'Plans & Pricing'}</span>
+              <BookOpen size={13} />
+              <span>{isEs ? '03 Planes' : '03 Plans'}</span>
             </button>
 
             <button
-              id="guest-nav-schedule"
+              id="guest-nav-faq"
               onClick={() => {
-                const el = document.getElementById('faq-pricing-section');
+                const el = document.getElementById('chapter-4-faq');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5 transition-all cursor-pointer"
             >
-              <Calendar size={14} />
-              <span>{isEs ? 'Clases 1 a 1' : '1-on-1 Classes'}</span>
+              <span>{isEs ? '04 FAQ' : '04 FAQ'}</span>
             </button>
           </nav>
         )}
 
         {/* Right: Controls, Authentication & Language Switcher (<768px guaranteed fit) */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {/* Theme Toggle (Light <-> Dark) */}
+          <button
+            id="theme-toggle-btn"
+            type="button"
+            onClick={() => setCurrentTheme(currentTheme === 'light' ? 'dark' : 'light')}
+            className="p-1 sm:p-1.5 rounded-full hover:bg-current/10 transition-colors text-current opacity-80 hover:opacity-100 cursor-pointer"
+            title={currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            aria-label="Toggle theme"
+          >
+            {currentTheme === 'light' ? (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            )}
+          </button>
+
           {/* Language Switcher (EN | ES) */}
           <LanguageToggle id="header-lang-toggle" showIcon={false} />
 
@@ -326,15 +407,26 @@ export const Header: React.FC = () => {
               </button>
             </div>
           ) : (
-            <button
-              id="signin-nav-btn"
-              type="button"
-              onClick={() => openAuthModal('signin')}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] font-montserrat font-bold transition-all duration-200 shadow-sm cursor-pointer shrink-0 flex items-center gap-1"
-            >
-              <UserIcon size={12} />
-              <span>{isEs ? 'Entrar' : 'Sign In'}</span>
-            </button>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                id="signin-nav-btn"
+                type="button"
+                onClick={() => openAuthModal('signin')}
+                className="text-xs px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg border border-current/25 hover:bg-current/10 font-montserrat font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1"
+              >
+                <UserIcon size={12} />
+                <span>{isEs ? 'Entrar' : 'Sign In'}</span>
+              </button>
+
+              <button
+                id="guest-nav-assessment"
+                type="button"
+                onClick={handleTakeAssessment}
+                className="btn-3d-amber px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider cursor-pointer shrink-0 shadow-sm"
+              >
+                {isEs ? 'Test 90s' : '90s Test'}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -435,3 +527,4 @@ export const Header: React.FC = () => {
 };
 
 export default Header;
+export { Header as Navbar };

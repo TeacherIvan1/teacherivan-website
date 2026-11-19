@@ -201,7 +201,10 @@ export const EducationalResourcesView: React.FC = () => {
           </style>
         </head>
         <body>
-          <div class="badge">Teacher Ivan English Classes • CEFR ${res.targetLevel} • ${res.resourceType.toUpperCase()}</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1A3153; padding-bottom: 12px; margin-bottom: 16px;">
+            <img src="/assets/logo-print-monochrome.svg" alt="Teacher Ivan Logo" height="38" style="object-fit: contain;" />
+            <div class="badge" style="margin: 0;">Teacher Ivan English Classes • CEFR ${res.targetLevel} • ${res.resourceType.toUpperCase()}</div>
+          </div>
           <h1>${res.title}</h1>
           <p style="color: #555; font-size: 13px;">${res.titleEs}</p>
           <div class="section-title">Passage / Scenario Content</div>

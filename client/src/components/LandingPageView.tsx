@@ -25,10 +25,19 @@ import { useTranslation } from '../modules/i18n/languageStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useAuthStore } from '../modules/auth/authStore';
 import { CompactVoiceSimulator } from './CompactVoiceSimulator';
-import { HeroCanvasStage } from './landing/HeroCanvasStage';
+import { Hero3DStage } from './landing/Hero3DStage';
+import { PricingSection } from './PricingSection';
+import { RemotionLoopVideo } from './RemotionLoopVideo';
+import { ChapterRail } from './ChapterRail';
+import { CornerCoachWidget } from './CornerCoachWidget';
 import { ChapterNavPill } from './landing/ChapterNavPill';
 import { RiggedCharacter } from './RiggedCharacter';
 import { getWhatsAppUrl } from '../config/contact';
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const AndroidIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -47,7 +56,6 @@ export const LandingPageView: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const { openAuthModal } = useAuthStore();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [currency, setCurrency] = useState<'BOB' | 'USD'>('BOB');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showIosModal, setShowIosModal] = useState<boolean>(false);
   const [showAndroidModal, setShowAndroidModal] = useState<boolean>(false);
@@ -73,6 +81,65 @@ export const LandingPageView: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Desktop GSAP ScrollTrigger + Lenis Smooth Scrolling Choreography (Section 5.2 of Design.md)
+  useEffect(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      const lenis = new Lenis({
+        duration: 1.15,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+
+      lenis.on('scroll', ScrollTrigger.update);
+      const tickerCallback = (time: number) => {
+        lenis.raf(time * 1000);
+      };
+      gsap.ticker.add(tickerCallback);
+      gsap.ticker.lagSmoothing(0);
+
+      // Hero -> Ch 01 -> Ch 02 background crossfade
+      gsap.to('#chapter-1-bicronic', {
+        scrollTrigger: {
+          trigger: '#chapter-1-bicronic',
+          start: 'top 65%',
+          endTrigger: '#chapter-2-voicelab',
+          end: 'top 25%',
+          scrub: 0.6,
+        },
+        backgroundColor: '#1A3153',
+        color: '#FAFAFA',
+      });
+
+      // Quick Recast popout card animation in Ch 02
+      gsap.fromTo(
+        '#recast-popout-card',
+        { scale: 1.0, x: 0 },
+        {
+          scale: 1.08,
+          x: -32,
+          duration: 0.5,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#chapter-2-voicelab',
+            start: 'top 60%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+      return () => {
+        gsap.ticker.remove(tickerCallback);
+        lenis.destroy();
+      };
+    });
+
+    return () => {
+      mm.revert();
+    };
   }, []);
 
   const handleDownloadAndroid = async () => {
@@ -122,51 +189,6 @@ export const LandingPageView: React.FC = () => {
     { q: lp.faq4Q, a: lp.faq4A },
   ];
 
-  const plans = [
-    {
-      id: 'essential',
-      name: t.pricingPlans.essential.name,
-      target: t.pricingPlans.essential.target,
-      price: currency === 'BOB' ? t.pricingPlans.essential.priceBob : t.pricingPlans.essential.priceUsd,
-      badge: isEs ? '100% Autónomo • 0 Clases' : '100% Autonomous • 0 Live Classes',
-      features: [
-        isEs ? 'Acceso 100% Autónomo al Laboratorio de Voz 24/7' : '100% Autonomous 24/7 AI Voice Lab Access',
-        isEs ? 'Generador Ilimitado de Recursos y Fichas de Práctica' : 'Unlimited Custom Resource & Practice Studio',
-        isEs ? 'Ruta de Micro-Aprendizaje de 5 Días y Desafíos Diarios' : '5-Day Micro-Learning Route & Daily Drills',
-        isEs ? '0 Clases en Vivo (Dominio Asincrónico a tu Ritmo)' : '0 Live Classes (Self-Paced Async Mastery)',
-      ],
-      isPopular: false,
-    },
-    {
-      id: 'pro',
-      name: t.pricingPlans.pro.name,
-      target: t.pricingPlans.pro.target,
-      price: currency === 'BOB' ? t.pricingPlans.pro.priceBob : t.pricingPlans.pro.priceUsd,
-      badge: isEs ? 'FLAGSHIP / 3 CLASES/SEM' : 'FLAGSHIP / 3 CLASSES/WK',
-      features: [
-        isEs ? '3 clases individuales por semana (60 min c/u)' : '3 live 1-on-1 meetings per week (60 min each)',
-        isEs ? 'Acceso 24/7 ILIMITADO al Laboratorio de Voz' : 'Unlimited 24/7 Access to Voice Lab',
-        isEs ? 'Estudio Ilimitado de Recursos Personalizados y Fichas' : 'Unlimited Custom Resource Studio & Worksheets',
-        isEs ? 'Reporte pedagógico semanal con avance MCER' : 'Weekly pedagogical progress report & CEFR tracking',
-      ],
-      isPopular: true,
-    },
-    {
-      id: 'executive',
-      name: t.pricingPlans.executive.name,
-      target: t.pricingPlans.executive.target,
-      price: currency === 'BOB' ? t.pricingPlans.executive.priceBob : t.pricingPlans.executive.priceUsd,
-      badge: isEs ? 'VIP / 5 CLASES/SEM' : 'VIP / 5 CLASSES/WK',
-      features: [
-        isEs ? '5 clases individuales por semana (Lunes a Viernes 60 min c/u)' : '5 live 1-on-1 meetings per week (Mon–Fri 60 min each)',
-        isEs ? 'Acceso 24/7 ILIMITADO al Laboratorio de Voz' : 'Unlimited 24/7 Access to Voice Lab',
-        isEs ? 'Revisión de presentaciones y correos de trabajo real' : 'Workplace presentation & real email reviews',
-        isEs ? 'Agenda prioritaria VIP y línea directa por WhatsApp' : 'Executive impact metrics & VIP priority support',
-      ],
-      isPopular: false,
-    },
-  ];
-
   return (
     <div
       id="landing-page-view"
@@ -183,99 +205,14 @@ export const LandingPageView: React.FC = () => {
         />
       </div>
 
+      {/* Fixed Desktop Chapter Progress Rail & Docked Corner Coach */}
+      <ChapterRail />
+      <CornerCoachWidget onLaunchVoiceLab={handleStartVoiceTest} />
+
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (EDITORIAL ARCHITECTURE + RELOAD VARIATION STAGE)         */}
+      {/* 0. HERO STAGE (DAYLIGHT ARCHITECTURE + LIT 3D VOICE WAVEFORM SLAB)         */}
       {/* ========================================================================= */}
-      <section
-        id="hero-section"
-        className="relative bg-gradient-to-b from-[#1A3153] via-[#12223a] to-[#12223a] border-b border-[#A7C7E7]/25 text-[#FAFAFA] pt-12 pb-16 md:pt-20 md:pb-24 px-4 sm:px-6 lg:px-12 overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 relative z-10">
-          {/* Left Column: Monumental Headline, Subhead, Primary Action & Badges */}
-          <div className="flex-1 text-center lg:text-left max-w-2xl">
-            {/* Architectural Trust Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1A3153] border border-[#E09B30]/40 mb-6 shadow-sm text-xs font-montserrat font-bold text-[#E09B30] uppercase tracking-[0.15em]">
-              <Sparkles size={13} className="text-[#E09B30]" />
-              <span>{lp.heroTrustSignal}</span>
-            </div>
-
-            {/* Monumental Headline */}
-            <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.1] mb-6 tracking-tight text-[#FAFAFA]">
-              {lp.heroHeadline}
-            </h1>
-
-            {/* Editorial Subhead */}
-            <p className="font-inter text-base sm:text-lg text-[#A7C7E7] mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              {lp.heroSubhead}
-            </p>
-
-            {/* Primary Action Buttons */}
-            <div className="flex flex-col items-center lg:items-start gap-3.5">
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                <button
-                  id="hero-primary-cta-btn"
-                  type="button"
-                  onClick={handleStartVoiceTest}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full font-montserrat font-extrabold text-xs sm:text-sm uppercase tracking-[0.15em] bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 transform hover:-translate-y-0.5 shadow-xl shadow-[#E09B30]/35 cursor-pointer min-h-[52px]"
-                >
-                  <Mic size={18} className="text-[#1A3153]" />
-                  <span>{lp.heroPrimaryCta}</span>
-                  <ArrowRight size={16} />
-                </button>
-
-                <a
-                  id="hero-direct-whatsapp-btn"
-                  href="https://wa.me/59172878330"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full font-montserrat font-bold text-xs sm:text-sm uppercase tracking-wider bg-[#10b981] text-[#FAFAFA] hover:bg-[#059669] transition-all duration-200 shadow-xl shadow-[#10b981]/25 cursor-pointer min-h-[52px]"
-                >
-                  <MessageCircle size={18} />
-                  <span>{isEs ? 'WhatsApp Teacher Ivan' : 'Chat on WhatsApp'}</span>
-                </a>
-              </div>
-
-              {/* Friction Reducer */}
-              <p className="text-xs text-[#A7C7E7] font-medium flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#10b981]" />
-                <span>{lp.heroFrictionReducer}</span>
-              </p>
-
-              {/* Mobile App Quick Access Buttons */}
-              <div className="flex flex-wrap items-center gap-2 pt-2">
-                <span className="text-[11px] font-mono font-bold text-[#A7C7E7] uppercase tracking-wider">
-                  {isEs ? 'APP NATIVA:' : 'NATIVE APP:'}
-                </span>
-                <button
-                  id="hero-download-android-btn"
-                  type="button"
-                  onClick={handleDownloadAndroid}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#12223a] hover:bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] transition-all cursor-pointer shadow-sm hover:border-[#3ddc84]"
-                  title="Download for Android"
-                >
-                  <AndroidIcon className="w-3.5 h-3.5 text-[#3ddc84]" />
-                  <span>Android</span>
-                </button>
-                <button
-                  id="hero-download-ios-btn"
-                  type="button"
-                  onClick={handleDownloadIos}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#12223a] hover:bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] transition-all cursor-pointer shadow-sm hover:border-[#E09B30]"
-                  title="Download for iOS"
-                >
-                  <AppleIcon className="w-3.5 h-3.5 text-[#FAFAFA]" />
-                  <span>iOS</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Interactive Halftone / Dither Canvas Hero Stage (3 Reload Variations) */}
-          <div className="w-full lg:w-auto flex justify-center flex-shrink-0">
-            <HeroCanvasStage onStartVoiceTest={handleStartVoiceTest} />
-          </div>
-        </div>
-      </section>
+      <Hero3DStage onStartVoiceTest={handleStartVoiceTest} />
 
       {/* ========================================================================= */}
       {/* ARCHITECTURAL PROBLEM → SOLUTION HAIRLINE STRIP                           */}
@@ -300,8 +237,8 @@ export const LandingPageView: React.FC = () => {
       {/* CH. 1 — THE BICHRONOUS MODEL (SPLIT-SCREEN STICKY PIN ON DESKTOP)          */}
       {/* ========================================================================= */}
       <section
-        id="chapter-1-model"
-        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#FAFAFA] text-[#1A3153] border-b border-[#1A3153]/15"
+        id="chapter-1-bicronic"
+        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#FAFAFA] text-[#1A3153] border-b border-[#1A3153]/15 transition-colors duration-300"
       >
         <div className="max-w-7xl mx-auto">
           {/* Split-Screen Layout (Sticky pinned left column on lg: >=1024px) */}
@@ -543,7 +480,7 @@ export const LandingPageView: React.FC = () => {
       {/* CH. 2 — THE FLAGSHIP VOICE LAB (EMBEDDED INTERACTIVE SIMULATOR)           */}
       {/* ========================================================================= */}
       <section
-        id="chapter-2-lab"
+        id="chapter-2-voicelab"
         className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#1A3153] text-[#FAFAFA] border-b border-[#A7C7E7]/25"
       >
         <div id="flagship-simulator-section" className="max-w-6xl mx-auto w-full space-y-10">
@@ -565,6 +502,11 @@ export const LandingPageView: React.FC = () => {
             <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
               {lp.ch2Subtitle}
             </p>
+          </div>
+
+          {/* Quick Recast Popout Card with Remotion Loop Video (Section 5.2.2 & 6.3) */}
+          <div id="recast-popout-card" className="max-w-xl mx-auto my-6">
+            <RemotionLoopVideo name="quick-recast-loop" alt="Quick Recast Micro-Loop" />
           </div>
 
           {/* Embedded Interactive Simulator Console */}
@@ -599,194 +541,35 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       {/* CH. 3 — THE PLANS & FULL DISCLOSURE (EDITORIAL LAYOUT + BOB / USD)        */}
       {/* ========================================================================= */}
-      <section
-        id="chapter-3-plans"
-        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/25"
-      >
-        <div className="max-w-6xl mx-auto w-full space-y-12">
-          {/* Chapter Header + Currency Toggle */}
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
-              <ShieldCheck size={14} />
-              <span>{lp.ch3Badge}</span>
-            </div>
-
-            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
-              {lp.ch3Title}
-            </h2>
-
-            <p className="font-inter text-sm sm:text-base text-[#A7C7E7]">
-              {lp.ch3Subtitle}
-            </p>
-
-            {/* Currency Switcher */}
-            <div className="pt-2 flex items-center justify-center gap-3">
-              <span className="text-xs font-montserrat font-bold text-[#A7C7E7]">
-                {isEs ? 'Moneda de Pago:' : 'Currency:'}
-              </span>
-              <div className="p-1 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 flex items-center shadow-inner">
-                <button
-                  type="button"
-                  onClick={() => setCurrency('BOB')}
-                  className={`px-4 py-1 rounded-full text-xs font-montserrat font-bold transition-all cursor-pointer ${
-                    currency === 'BOB'
-                      ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                      : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-                  }`}
-                >
-                  BOB (Bs.)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrency('USD')}
-                  className={`px-4 py-1 rounded-full text-xs font-montserrat font-bold transition-all cursor-pointer ${
-                    currency === 'USD'
-                      ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                      : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-                  }`}
-                >
-                  USD ($)
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* 3 Transparent Plan Columns with Architectural Hairline Borders */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            {plans.map((p) => (
-              <div
-                key={p.id}
-                className={`p-7 rounded-3xl flex flex-col justify-between transition-all duration-200 ${
-                  p.isPopular
-                    ? 'slab-3d-dark border-2 border-[#E09B30] shadow-2xl transform md:-translate-y-2'
-                    : 'slab-3d-dark shadow-xl'
-                }`}
-              >
-                <div>
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-[10px] font-montserrat font-extrabold uppercase tracking-wider mb-3 ${
-                      p.isPopular
-                        ? 'bg-[#E09B30] text-[#1A3153]'
-                        : 'bg-[#1A3153] text-[#A7C7E7] border border-[#A7C7E7]/25'
-                    }`}
-                  >
-                    {p.badge}
-                  </span>
-
-                  <h3 className="font-montserrat font-bold text-xl text-[#FAFAFA] mb-1">
-                    {p.name}
-                  </h3>
-                  <span className="text-xs text-[#A7C7E7] font-medium block mb-4">
-                    {p.target}
-                  </span>
-
-                  <div className="pb-4 mb-4 border-b border-[#A7C7E7]/20">
-                    <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#FAFAFA]">
-                      {p.price}
-                    </span>
-                  </div>
-
-                  <ul className="space-y-3 text-xs sm:text-sm text-[#FAFAFA]/90 mb-8">
-                    {p.features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <CheckCircle2
-                          size={15}
-                          className={`${p.isPopular ? 'text-[#E09B30]' : 'text-[#10b981]'} shrink-0 mt-0.5`}
-                        />
-                        <span className="leading-relaxed">{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <a
-                  href={getWhatsAppUrl(`Hola Teacher Ivan! Me gustaría consultar disponibilidad e inscribirme al ${p.name} (${p.price}).`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full py-3.5 px-4 rounded-full font-montserrat font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
-                    p.isPopular
-                      ? 'btn-3d-amber'
-                      : 'bg-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 text-[#FAFAFA]'
-                  }`}
-                >
-                  <MessageCircle size={15} />
-                  <span>{isEs ? 'Elegir Plan por WhatsApp' : 'Select Plan on WhatsApp'}</span>
-                </a>
-              </div>
-            ))}
-          </div>
-
-          {/* Full Disclosure Comparative Table (Hairline Grid) */}
-          <div className="rounded-3xl bg-[#1A3153]/60 border border-[#A7C7E7]/25 p-6 overflow-x-auto">
-            <span className="text-xs font-mono font-bold text-[#E09B30] uppercase tracking-wider block mb-4">
-              [FULL DISCLOSURE // COMPARATIVE MATRIX]
-            </span>
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-[#A7C7E7]/20 text-[#A7C7E7] font-montserrat font-bold">
-                  <th className="pb-3 pr-4">Feature / Metric</th>
-                  <th className="pb-3 px-4 text-[#E09B30]">Teacher Ivan</th>
-                  <th className="pb-3 px-4">Traditional Franchises</th>
-                  <th className="pb-3 pl-4">Mass Apps (Duolingo/Elsa)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#A7C7E7]/15 text-[#FAFAFA]">
-                <tr>
-                  <td className="py-3 pr-4 font-semibold text-[#A7C7E7]">Speaking Time / Class</td>
-                  <td className="py-3 px-4 font-bold text-[#10b981]">&gt;75% (45+ min/hr)</td>
-                  <td className="py-3 px-4 text-[#f87171]">2–5 min in group of 25</td>
-                  <td className="py-3 pl-4 text-[#A7C7E7]">Only isolated words</td>
-                </tr>
-                <tr>
-                  <td className="py-3 pr-4 font-semibold text-[#A7C7E7]">{isEs ? 'Inmersión Oral Continua' : 'Spoken Immersion Engine'}</td>
-                  <td className="py-3 px-4 font-bold text-[#10b981]">{isEs ? 'Laboratorio de Voz 24/7' : '24/7 Voice Lab'}</td>
-                  <td className="py-3 px-4 text-[#f87171]">None</td>
-                  <td className="py-3 pl-4 text-[#A7C7E7]">Robotic TTS (high lag)</td>
-                </tr>
-                <tr>
-                  <td className="py-3 pr-4 font-semibold text-[#A7C7E7]">Pedagogical Mentor</td>
-                  <td className="py-3 px-4 font-bold text-[#10b981]">Teacher Ivan 1-on-1</td>
-                  <td className="py-3 px-4 text-[#f87171]">Rotating student tutors</td>
-                  <td className="py-3 pl-4 text-[#f87171]">None (automated bot)</td>
-                </tr>
-                <tr>
-                  <td className="py-3 pr-4 font-semibold text-[#A7C7E7]">Contract & Hidden Fees</td>
-                  <td className="py-3 px-4 font-bold text-[#10b981]">Zero lock-in, cancel anytime</td>
-                  <td className="py-3 px-4 text-[#f87171]">12-month forced billing</td>
-                  <td className="py-3 pl-4 text-[#A7C7E7]">Auto-renew subscriptions</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* ========================================================================= */}
       {/* CH. 4 — ASKED BEFORE (EDITORIAL ACCORDION) & MOBILE APP DOWNLOAD STRIP    */}
       {/* ========================================================================= */}
       <section
         id="chapter-4-faq"
-        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#FAFAFA] text-[#1A3153] border-b border-[#1A3153]/15"
+        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#091326] text-[#FAFAFA] border-b border-[#223C63]"
       >
         <div className="max-w-4xl mx-auto w-full space-y-12">
           {/* Header */}
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1A3153] text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1A3153] border border-[#223C63] text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
               <Sparkles size={13} className="text-[#E09B30]" />
               <span>{lp.ch4Badge}</span>
             </div>
 
-            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#1A3153] tracking-tight">
-              {lp.ch4Title}
+            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight">
+              <span className="text-[#FAFAFA]">{isEs ? 'Preguntas frecuentes.' : 'Frequently asked.'}</span>{' '}
+              <span className="text-[#A7C7E7] font-bold">{isEs ? 'Respuestas directas.' : 'Straight answers.'}</span>
             </h2>
 
-            <p className="font-inter text-sm sm:text-base text-[#4A5568]">
+            <p className="font-inter text-sm sm:text-base text-[#A7C7E7]">
               {lp.ch4Subtitle}
             </p>
           </div>
 
           {/* Clean Hairline-Divided Q&A Rows */}
-          <div className="border-t border-b border-[#1A3153]/15 divide-y divide-[#1A3153]/15">
+          <div className="border-t border-b border-[#223C63] divide-y divide-[#223C63]">
             {faqs.map((faq, idx) => {
               const isOpen = openFaq === idx;
               return (
@@ -794,17 +577,17 @@ export const LandingPageView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full py-5 text-left font-montserrat font-bold text-sm sm:text-base text-[#1A3153] flex items-center justify-between gap-4 cursor-pointer hover:text-[#E09B30] transition-colors"
+                    className="w-full py-5 text-left font-montserrat font-bold text-sm sm:text-base text-[#FAFAFA] flex items-center justify-between gap-4 cursor-pointer hover:text-[#E09B30] transition-colors"
                   >
                     <span>{faq.q}</span>
                     {isOpen ? (
                       <ChevronUp size={18} className="text-[#E09B30] shrink-0" />
                     ) : (
-                      <ChevronDown size={18} className="text-[#1A3153]/60 shrink-0" />
+                      <ChevronDown size={18} className="text-[#A7C7E7] shrink-0" />
                     )}
                   </button>
                   {isOpen && (
-                    <div className="pb-5 text-xs sm:text-sm font-inter text-[#4A5568] leading-relaxed pr-8">
+                    <div className="pb-5 text-xs sm:text-sm font-inter text-[#A7C7E7] leading-relaxed pr-8">
                       {faq.a}
                     </div>
                   )}
@@ -814,7 +597,7 @@ export const LandingPageView: React.FC = () => {
           </div>
 
           {/* Direct WhatsApp Callout */}
-          <div className="p-6 rounded-3xl bg-[#1A3153] text-[#FAFAFA] flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left shadow-xl">
+          <div className="p-6 rounded-3xl bg-[#12223a] border border-[#223C63] text-[#FAFAFA] flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left shadow-xl">
             <div className="space-y-1">
               <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA]">
                 {isEs ? '¿Tienes una pregunta específica sobre tu caso?' : 'Have a specific question about your situation?'}

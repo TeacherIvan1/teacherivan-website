@@ -33,6 +33,7 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { TEACHER_PHONE, getWhatsAppUrl } from '../config/contact';
+import { RemotionLoopVideo } from './RemotionLoopVideo';
 import { getStudentBookingsCache } from '../modules/auth/vaultSync';
 import { MandatoryGoalsModal } from './MandatoryGoalsModal';
 import { RiggedCharacter } from './RiggedCharacter';
@@ -992,6 +993,15 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 <Award size={16} className="text-[#E09B30]" />
                 <span>{t.microLearning.d5ClosureTitle}</span>
               </h4>
+
+              {/* Telemetry Embedded Remotion CEFR Loop */}
+              <div className="rounded-2xl overflow-hidden border border-[var(--rule-light)] bg-navy-surface p-2 shadow-inner">
+                <RemotionLoopVideo
+                  name="cefr-diagnostic-loop"
+                  alt="CEFR 90s Diagnostic Telemetry Loop"
+                  className="w-full max-w-lg mx-auto"
+                />
+              </div>
 
               {/* Weekly Scorecard Summary */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

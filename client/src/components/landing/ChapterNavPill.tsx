@@ -22,7 +22,7 @@ export const ChapterNavPill: React.FC<ChapterNavPillProps> = ({ onStartVoiceTest
     handleScroll();
 
     // IntersectionObserver to accurately track the active chapter
-    const chapterIds = ['chapter-1-model', 'chapter-2-lab', 'chapter-3-plans', 'chapter-4-faq'];
+    const chapterIds = ['chapter-1-bicronic', 'chapter-2-voicelab', 'chapter-3-plans', 'chapter-4-faq'];
     const observers: IntersectionObserver[] = [];
 
     chapterIds.forEach((id) => {
@@ -33,8 +33,8 @@ export const ChapterNavPill: React.FC<ChapterNavPillProps> = ({ onStartVoiceTest
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              if (id === 'chapter-1-model') setActiveChapter('model');
-              if (id === 'chapter-2-lab') setActiveChapter('lab');
+              if (id === 'chapter-1-bicronic') setActiveChapter('model');
+              if (id === 'chapter-2-voicelab') setActiveChapter('lab');
               if (id === 'chapter-3-plans') setActiveChapter('plans');
               if (id === 'chapter-4-faq') setActiveChapter('faq');
             }
@@ -63,13 +63,13 @@ export const ChapterNavPill: React.FC<ChapterNavPillProps> = ({ onStartVoiceTest
   const chapters = [
     {
       id: 'model',
-      targetId: 'chapter-1-model',
+      targetId: 'chapter-1-bicronic',
       labelEn: 'Ch. 1 — The Model',
       labelEs: 'Ch. 1 — El Modelo',
     },
     {
       id: 'lab',
-      targetId: 'chapter-2-lab',
+      targetId: 'chapter-2-voicelab',
       labelEn: 'Ch. 2 — Voice Lab',
       labelEs: 'Ch. 2 — Laboratorio de Voz',
     },
