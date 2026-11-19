@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { NovemberPromoBanner } from './components/NovemberPromoBanner';
 import { LandingPageView } from './components/LandingPageView';
@@ -34,6 +34,7 @@ export const App: React.FC = () => {
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
   const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, openAuthModal, syncWithServer } = useAuthStore();
+  const [resourcesTab, setResourcesTab] = useState<'generator' | 'games'>('generator');
 
   const isAdmin = user?.role === 'admin';
   const showDevMode = isAdmin && isDeveloperMode;
@@ -106,8 +107,41 @@ export const App: React.FC = () => {
             ) : activeView === 'resources' ? (
               /* VIEW 2: RECURSOS & JUEGOS */
               <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
-                <EducationalResourcesView />
-                <InteractiveGamesView />
+                {/* Mobile Sub-Tab Switcher (< 768px): Cut cognitive load in half */}
+                <div className="md:hidden px-4 pt-4 pb-2">
+                  <div className="flex p-1 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] max-w-md mx-auto w-full gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setResourcesTab('generator')}
+                      className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer text-center ${
+                        resourcesTab === 'generator'
+                          ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-extrabold'
+                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      {isEs ? 'Generador IA' : 'AI Generator'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setResourcesTab('games')}
+                      className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer text-center ${
+                        resourcesTab === 'games'
+                          ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-extrabold'
+                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      {isEs ? 'Micro-Juegos' : 'Micro-Games'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Desktop: Stacks both views. Mobile: Shows selected sub-tab */}
+                <div className={resourcesTab === 'generator' ? 'block' : 'hidden md:block'}>
+                  <EducationalResourcesView />
+                </div>
+                <div className={resourcesTab === 'games' ? 'block' : 'hidden md:block'}>
+                  <InteractiveGamesView />
+                </div>
               </div>
             ) : activeView === 'schedule' ? (
               /* VIEW 3: AGENDAR CLASE (14:00 - 20:00 Bolivia Time) */
@@ -183,10 +217,10 @@ export const App: React.FC = () => {
       <WeeklyReportModal />
 
       {/* Clean Institutional Footer */}
-      <footer className="bg-[#12223a] border-t border-[#A7C7E7]/25 text-[#FAFAFA] py-10 px-6">
+      <footer id="app-footer" className="bg-[#12223a] border-t border-[#A7C7E7]/25 text-[#FAFAFA] py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start text-center md:text-left gap-2.5">
-            <BrandLockup size="lg" altText="Teacher Ivan Official Platform" />
+            <BrandLockup size="lg" variant="dark" forceDarkSurface={true} altText="Teacher Ivan Official Platform" />
             <p className="font-inter text-xs text-[#A7C7E7] max-w-sm">
               {t.footer.desc}
             </p>

@@ -8,6 +8,7 @@ export const PricingSection: React.FC = () => {
   const { isEs } = useTranslation();
   const { openAuthModal } = useAuthStore();
   const [currency, setCurrency] = useState<'BOB' | 'USD'>('BOB');
+  const [selectedTier, setSelectedTier] = useState<'essential' | 'pro' | 'executive'>('pro');
 
   const getWhatsAppPlanLink = (tier: string, priceStr: string) => {
     const text = isEs
@@ -66,12 +67,51 @@ export const PricingSection: React.FC = () => {
           </div>
         </div>
 
+        {/* Mobile Tier Quick-Jump Segmented Control (< 1024px) */}
+        <div className="lg:hidden flex p-1 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] gap-1 mb-6">
+          <button
+            type="button"
+            onClick={() => setSelectedTier('essential')}
+            className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-montserrat font-bold transition-all text-center cursor-pointer min-h-[44px] ${
+              selectedTier === 'essential'
+                ? 'bg-[#1A3153] dark:bg-[#E09B30] text-[#FAFAFA] dark:text-[#1A3153] shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            {currency === 'BOB' ? 'Essential 300' : 'Essential $45'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedTier('pro')}
+            className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-montserrat font-bold transition-all text-center cursor-pointer min-h-[44px] ${
+              selectedTier === 'pro'
+                ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-extrabold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            {currency === 'BOB' ? 'Pro 580' : 'Pro $85'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedTier('executive')}
+            className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-montserrat font-bold transition-all text-center cursor-pointer min-h-[44px] ${
+              selectedTier === 'executive'
+                ? 'bg-[#1A3153] dark:bg-[#E09B30] text-[#FAFAFA] dark:text-[#1A3153] shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            {currency === 'BOB' ? 'Executive 850' : 'Executive $125'}
+          </button>
+        </div>
+
         {/* 3-Column Architectural Hairline Matrix */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {/* 1. Essential (Autonomous) */}
           <div
             id="plan-card-essential"
-            className="slab-3d-light p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] shadow-sm"
+            className={`slab-3d-light p-6 sm:p-8 rounded-[24px] flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] shadow-sm ${
+              selectedTier === 'essential' ? 'flex' : 'hidden lg:flex'
+            }`}
           >
             <div className="space-y-4">
               {/* Badge */}
@@ -143,7 +183,9 @@ export const PricingSection: React.FC = () => {
           {/* 2. Pro (Flagship — Elevated 3D Dark Slab) */}
           <div
             id="plan-card-pro"
-            className="slab-3d-dark p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative text-[#FAFAFA] bg-[#132642] border-2 border-[#E09B30] lg:-translate-y-3 z-10"
+            className={`slab-3d-dark p-6 sm:p-8 rounded-[24px] flex-col justify-between space-y-6 relative text-[#FAFAFA] bg-[#132642] border-2 border-[#E09B30] lg:-translate-y-3 z-10 ${
+              selectedTier === 'pro' ? 'flex' : 'hidden lg:flex'
+            }`}
             style={{
               boxShadow: 'var(--shadow-slab-3d)',
             }}
@@ -156,7 +198,7 @@ export const PricingSection: React.FC = () => {
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono tracking-wider text-[#A7C7E7] uppercase">
-                  [FLAGSHIP // 3X EN VIVO]
+                  {isEs ? '[MÁS ELEGIDO • 3X EN VIVO]' : '[MOST POPULAR • 3X LIVE]'}
                 </span>
                 <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
               </div>
@@ -226,7 +268,9 @@ export const PricingSection: React.FC = () => {
           {/* 3. Executive (Maximum Immersion) */}
           <div
             id="plan-card-executive"
-            className="slab-3d-light p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] shadow-sm"
+            className={`slab-3d-light p-6 sm:p-8 rounded-[24px] flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] shadow-sm ${
+              selectedTier === 'executive' ? 'flex' : 'hidden lg:flex'
+            }`}
           >
             {/* Top Accent bar */}
             <div className="absolute top-0 inset-x-8 h-1 bg-[#1A3153] dark:bg-[#E09B30] rounded-t-full" />

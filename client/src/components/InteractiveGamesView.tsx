@@ -410,7 +410,7 @@ export const InteractiveGamesView: React.FC = () => {
         <button
           id="game-tab-recast"
           onClick={() => setActiveTab('recast')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'recast'
+          className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'recast'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
             }`}
@@ -422,7 +422,7 @@ export const InteractiveGamesView: React.FC = () => {
         <button
           id="game-tab-matcher"
           onClick={() => setActiveTab('matcher')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'matcher'
+          className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'matcher'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
             }`}
@@ -434,7 +434,7 @@ export const InteractiveGamesView: React.FC = () => {
         <button
           id="game-tab-shadowing"
           onClick={() => setActiveTab('shadowing')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'shadowing'
+          className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'shadowing'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
             }`}
@@ -446,7 +446,7 @@ export const InteractiveGamesView: React.FC = () => {
         <button
           id="game-tab-builder"
           onClick={() => setActiveTab('builder')}
-          className={`flex-1 py-2 px-3 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'builder'
+          className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'builder'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
               : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
             }`}

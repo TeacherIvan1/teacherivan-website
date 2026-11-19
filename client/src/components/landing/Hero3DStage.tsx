@@ -14,44 +14,43 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // 1. GSAP quickTo 3D cursor tilt (±6deg) on Desktop (>= 1024px)
+  // 1. GSAP quickTo 3D cursor tilt (±6deg) strictly guarded on Desktop (>= 1024px)
   useEffect(() => {
     const slab = slabRef.current;
     const container = containerRef.current;
     if (!slab || !container) return;
 
-    const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mm = gsap.matchMedia();
 
-    if (window.innerWidth < 1024 || prefersReducedMotion) {
-      return;
-    }
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      const setRotateX = gsap.quickTo(slab, 'rotationX', { duration: 0.5, ease: 'power2.out' });
+      const setRotateY = gsap.quickTo(slab, 'rotationY', { duration: 0.5, ease: 'power2.out' });
 
-    const setRotateX = gsap.quickTo(slab, 'rotationX', { duration: 0.5, ease: 'power2.out' });
-    const setRotateY = gsap.quickTo(slab, 'rotationY', { duration: 0.5, ease: 'power2.out' });
+      const handleMouseMove = (e: MouseEvent) => {
+        const rect = container.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+        const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
-      const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
+        setRotateX(-y * 12); // ±6 deg
+        setRotateY(x * 12);  // ±6 deg
+      };
 
-      setRotateX(-y * 12); // ±6 deg
-      setRotateY(x * 12);  // ±6 deg
-    };
+      const handleMouseLeave = () => {
+        setRotateX(0);
+        setRotateY(0);
+      };
 
-    const handleMouseLeave = () => {
-      setRotateX(0);
-      setRotateY(0);
-    };
+      container.addEventListener('mousemove', handleMouseMove);
+      container.addEventListener('mouseleave', handleMouseLeave);
 
-    container.addEventListener('mousemove', handleMouseMove);
-    container.addEventListener('mouseleave', handleMouseLeave);
+      return () => {
+        container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    });
 
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove);
-      container.removeEventListener('mouseleave', handleMouseLeave);
+      mm.revert();
     };
   }, []);
 
@@ -201,7 +200,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
                 <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_8px_#10B981]" />
                 <span className="text-[#FAFAFA]">VOICE LAB 24/7 • EN VIVO</span>
               </div>
-              <span className="px-2.5 py-0.5 rounded-md bg-[#A7C7E7]/15 text-[#A7C7E7] border border-[#A7C7E7]/30 text-[10px]">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#A7C7E7]/15 text-[#A7C7E7] border border-[#A7C7E7]/30 text-[10px] whitespace-nowrap">
                 CEFR A1 → C1
               </span>
             </div>
@@ -214,7 +213,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
                   <ChibiAvatar character="ivan" state="speaking" className="w-24 h-24" />
                 </div>
                 <span className="text-[11px] font-montserrat font-bold text-[#FAFAFA]">Teacher Ivan</span>
-                <span className="text-[9px] text-amber-brand font-mono uppercase">Voz Puck</span>
+                <span className="text-[9px] text-amber-brand font-mono uppercase">{isEs ? 'Coach 1-a-1' : '1-on-1 Coach'}</span>
               </div>
 
               {/* 24-Bar Canvas Waveform */}
@@ -225,8 +224,8 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
                   height={80}
                   className="w-full max-w-[220px] h-[80px]"
                 />
-                <span className="text-[10px] font-mono text-[#A7C7E7]/70 tracking-widest uppercase mt-1">
-                  16kHz Capture • 24kHz Native
+                <span className="text-xs text-[#A7C7E7] font-mono tracking-widest uppercase mt-1">
+                  {isEs ? 'AUDIO EN VIVO' : 'LIVE VOICE'}
                 </span>
               </div>
 
@@ -236,7 +235,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
                   <ChibiAvatar character="emma" state="listening" className="w-24 h-24" />
                 </div>
                 <span className="text-[11px] font-montserrat font-bold text-[#FAFAFA]">Emma IA</span>
-                <span className="text-[9px] text-[#A7C7E7] font-mono uppercase">Voz Aoede</span>
+                <span className="text-[9px] text-[#A7C7E7] font-mono uppercase">{isEs ? 'Tutora IA 24/7' : '24/7 AI Tutor'}</span>
               </div>
             </div>
 
@@ -248,9 +247,9 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
               }}
             >
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-red-300 line-through">&ldquo;I have 25 years&rdquo;</span>
+                <span className="text-xs sm:text-sm font-bold text-red-300 line-through">&ldquo;I have 25 years&rdquo;</span>
                 <ArrowRight size={12} className="text-amber-brand" />
-                <span className="text-xs font-bold text-amber-brand inline-flex items-center gap-1">
+                <span className="text-xs sm:text-sm font-bold text-amber-brand inline-flex items-center gap-1">
                   <span>&ldquo;I am 25 years old&rdquo;</span>
                   <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
                 </span>

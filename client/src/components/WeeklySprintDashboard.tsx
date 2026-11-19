@@ -617,8 +617,40 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
           </span>
         </div>
 
-        {/* 5 Day Stepper Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* Mobile Horizontal Stepper (< 768px): min-h-[44px] touch pills */}
+        <div className="md:hidden flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-1">
+          {dayTabs.map((day) => {
+            const Icon = day.icon;
+            const isSelected = selectedDay === day.id;
+            const isCompleted = completedStages.includes(day.id);
+
+            return (
+              <button
+                key={day.id}
+                type="button"
+                onClick={() => setSelectedDay(day.id)}
+                className={`min-h-[44px] px-3.5 py-2 rounded-xl border flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] font-black shadow-md'
+                    : isCompleted
+                    ? 'bg-[#12223a]/90 text-[#10b981] border-[#10b981]/50'
+                    : 'bg-[#12223a]/70 text-[#A7C7E7] border-[#A7C7E7]/25 hover:border-[#A7C7E7]/50'
+                }`}
+              >
+                <Icon size={15} />
+                <span className="font-montserrat font-bold text-xs uppercase tracking-wider">{day.label}</span>
+                {isCompleted ? (
+                  <CheckCircle2 size={13} className="text-[#10b981]" />
+                ) : (
+                  <span className="text-[10px] opacity-70">10m</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Desktop 5-Day Stepper Cards (>= 768px) */}
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3">
           {dayTabs.map((day) => {
             const Icon = day.icon;
             const isSelected = selectedDay === day.id;

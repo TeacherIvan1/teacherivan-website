@@ -239,8 +239,8 @@ export const CompactVoiceSimulator: React.FC = () => {
 
       {/* 2. Compact Control Bar (Tutor Persona + Level Selector + Scenario Strip) */}
       <div className="bg-[#12223a]/90 backdrop-blur-md rounded-2xl border border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-3 shadow-md">
-        {/* Row A: Tutor Persona Pill & Level Pill Selector */}
-        <div className="flex flex-wrap items-center justify-between gap-3 w-full max-w-full overflow-hidden">
+        {/* Row A1: Tutor Persona Pill & Session Quota Badge */}
+        <div className="flex items-center justify-between gap-2 w-full">
           {/* Tutor Persona Toggle: [Ivan | Emma] */}
           <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
             <button
@@ -248,7 +248,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               id="tutor-persona-ivan-btn"
               disabled={isLocked}
               onClick={() => setPersona('teacher-ivan')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 persona === 'teacher-ivan'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
@@ -261,7 +261,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               id="tutor-persona-emma-btn"
               disabled={isLocked}
               onClick={() => setPersona('emma')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 persona === 'emma'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
                   : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
@@ -271,38 +271,47 @@ export const CompactVoiceSimulator: React.FC = () => {
             </button>
           </div>
 
-          {/* Level Pill Selector: [Diagnostic | A1 | A2 | B1 | B2 | IELTS] */}
-          <div className="flex items-center gap-1 w-full sm:w-auto max-w-full overflow-x-auto no-scrollbar py-0.5">
-            {levelPills.map((pill) => {
-              const active = isPillActive(pill.id);
-              const isPillLocked = !isAuthenticated && pill.id !== 'diag';
-              return (
-                <button
-                  key={pill.id}
-                  type="button"
-                  id={`level-pill-${pill.id}`}
-                  disabled={isLocked}
-                  onClick={() => handleLevelPillClick(pill.id)}
-                  title={isPillLocked ? t.authModal.tierLockBanner : undefined}
-                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-montserrat font-bold uppercase tracking-[0.15em] transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
-                    active
-                      ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black scale-105'
-                      : 'bg-[#1A3153]/70 text-[#A7C7E7] hover:bg-[#1A3153] hover:text-[#FAFAFA] border border-[#A7C7E7]/20'
-                  }`}
-                >
-                  <span>{pill.label}</span>
-                  {isPillLocked && <Lock size={10} className="text-[#E09B30]" />}
-                </button>
-              );
-            })}
+          {/* Daily Quota Pill (Compact on mobile) */}
+          <div
+            id="simulator-daily-quota-badge-inline"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] shadow-sm shrink-0"
+          >
+            <Sparkles size={12} className="text-[#E09B30]" />
+            <span className="truncate">{getDailySessionBadge()}</span>
           </div>
         </div>
 
-        {/* Row B: Scenario Selector + Correction Mode + Vocab & Tips Toggle */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#A7C7E7]/15">
-          {/* Scenario Dropdown */}
-          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] shrink-0 hidden xs:inline">
+        {/* Row A2: Level Pill Selector (Horizontal Swipe Row with >=44px touch height) */}
+        <div className="flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-0.5">
+          {levelPills.map((pill) => {
+            const active = isPillActive(pill.id);
+            const isPillLocked = !isAuthenticated && pill.id !== 'diag';
+            return (
+              <button
+                key={pill.id}
+                type="button"
+                id={`level-pill-${pill.id}`}
+                disabled={isLocked}
+                onClick={() => handleLevelPillClick(pill.id)}
+                title={isPillLocked ? t.authModal.tierLockBanner : undefined}
+                className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-[0.15em] transition-all cursor-pointer shrink-0 flex items-center justify-center gap-1.5 ${
+                  active
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black scale-105'
+                    : 'bg-[#1A3153]/70 text-[#A7C7E7] hover:bg-[#1A3153] hover:text-[#FAFAFA] border border-[#A7C7E7]/20'
+                }`}
+              >
+                <span>{pill.label}</span>
+                {isPillLocked && <Lock size={10} className="text-[#E09B30]" />}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Row B: Scenario Selector + Inline Info Button + Correction Mode */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-[#A7C7E7]/15">
+          {/* Scenario Dropdown with Inline 44x44px Info Icon */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] shrink-0 hidden md:inline">
               {t.compactSimulator.scenarioLabel}:
             </span>
             <select
@@ -316,7 +325,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                 }
                 selectScenario(e.target.value);
               }}
-              className="bg-[#1A3153] text-[#FAFAFA] text-xs font-inter font-medium rounded-xl border border-[#A7C7E7]/30 px-3 py-1.5 w-full max-w-sm truncate focus:outline-none focus:border-[#E09B30] cursor-pointer"
+              className="bg-[#1A3153] text-[#FAFAFA] text-xs font-inter font-medium rounded-xl border border-[#A7C7E7]/30 px-3 py-2 flex-1 min-w-0 truncate focus:outline-none focus:border-[#E09B30] cursor-pointer min-h-[44px]"
             >
               {availableScenarios.map((scenario) => {
                 const isScenarioLocked = !isAuthenticated && scenario.id !== 'diagnostic-placement';
@@ -331,60 +340,65 @@ export const CompactVoiceSimulator: React.FC = () => {
                 );
               })}
             </select>
+
+            {/* Compact 44x44px Info Icon strictly inline beside scenario dropdown */}
+            <button
+              type="button"
+              id="toggle-vocab-tips-btn"
+              onClick={() => setShowVocabTips((prev) => !prev)}
+              className={`min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer ${
+                showVocabTips
+                  ? 'bg-[#E09B30] text-[#1A3153]'
+                  : 'bg-[#1A3153] text-[#E09B30] border border-[#E09B30]/30 hover:border-[#E09B30]'
+              }`}
+              title={t.compactSimulator.vocabTipsBtn}
+              aria-label={t.compactSimulator.vocabTipsBtn}
+            >
+              <Info size={16} />
+            </button>
           </div>
 
           {/* Correction Mode Selector: [Fluency | Coaching] */}
-          <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
-            <button
-              type="button"
-              id="correction-mode-conversation-btn"
-              onClick={() => setCorrectionMode('conversation')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-montserrat font-bold transition-all cursor-pointer ${
-                correctionMode === 'conversation'
-                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-              }`}
-              title="Fluency Mode: Natural conversation flow"
-            >
-              {isEs ? 'Fluidez' : 'Fluency'}
-            </button>
-            <button
-              type="button"
-              id="correction-mode-coaching-btn"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  promptTierLock();
-                  return;
-                }
-                setCorrectionMode('coaching');
-              }}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                correctionMode === 'coaching'
-                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-              }`}
-              title="Coaching Mode: Systematic recast error modeling"
-            >
-              <span>{isEs ? 'Corrección Activa' : 'Coaching'}</span>
-              {!isAuthenticated && <Lock size={11} className="text-[#E09B30]" />}
-            </button>
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+            <span className="sm:hidden text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7]">
+              {isEs ? 'Corrección:' : 'Mode:'}
+            </span>
+            <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
+              <button
+                type="button"
+                id="correction-mode-conversation-btn"
+                onClick={() => setCorrectionMode('conversation')}
+                className={`min-h-[36px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer ${
+                  correctionMode === 'conversation'
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                    : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                }`}
+                title="Fluency Mode: Natural conversation flow"
+              >
+                {isEs ? 'Fluidez' : 'Fluency'}
+              </button>
+              <button
+                type="button"
+                id="correction-mode-coaching-btn"
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    promptTierLock();
+                    return;
+                  }
+                  setCorrectionMode('coaching');
+                }}
+                className={`min-h-[36px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  correctionMode === 'coaching'
+                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                    : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                }`}
+                title="Coaching Mode: Systematic recast error modeling"
+              >
+                <span>{isEs ? 'Corrección Activa' : 'Coaching'}</span>
+                {!isAuthenticated && <Lock size={11} className="text-[#E09B30]" />}
+              </button>
+            </div>
           </div>
-
-          {/* Collapsible "ℹ️ Vocab & Tips" Button */}
-          <button
-            type="button"
-            id="toggle-vocab-tips-btn"
-            onClick={() => setShowVocabTips((prev) => !prev)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-montserrat font-semibold transition-all shrink-0 cursor-pointer ${
-              showVocabTips
-                ? 'bg-[#E09B30] text-[#1A3153]'
-                : 'bg-[#1A3153] text-[#E09B30] border border-[#E09B30]/30 hover:border-[#E09B30]'
-            }`}
-          >
-            <Info size={13} />
-            <span className="hidden sm:inline">{t.compactSimulator.vocabTipsBtn}</span>
-            {showVocabTips ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
         </div>
 
         {/* Collapsible Popover: Vocab & Tips */}
@@ -440,9 +454,9 @@ export const CompactVoiceSimulator: React.FC = () => {
         )}
       </div>
 
-      {/* 3. Centered 2D Avatar Stage (Compact: h-48 mobile / h-64 desktop) */}
+      {/* 3. Centered 2D Avatar Stage (Compact: h-36 mobile / h-64 desktop) */}
       <div className="relative w-full overflow-hidden rounded-2xl">
-        <TutorAvatarStage className="min-h-[220px] sm:min-h-[260px] md:min-h-[290px] py-2 sm:py-4" />
+        <TutorAvatarStage className="min-h-[144px] sm:min-h-[220px] md:min-h-[280px] py-1 sm:py-3" />
       </div>
 
       {/* 4. Live Docked Caption Overlay (Latest Tutor & User Utterance) */}
@@ -548,7 +562,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                 </>
               )}
             </button>
-            <p className="text-xs text-[#A7C7E7]/80 text-center font-medium">
+            <p className="text-xs text-[#A7C7E7]/80 text-center font-medium hidden sm:block">
               {t.compactSimulator.idleHint}
             </p>
           </div>

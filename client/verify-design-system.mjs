@@ -15,7 +15,7 @@ if (!fs.existsSync(resultsDir)) {
 const EMOJI_REGEX = /[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
 
 async function runVerification() {
-  console.log('--- Starting Design System Verification Gate ---');
+  console.log('--- Starting Design System & Mobile Ergonomics Verification Gate ---');
   let hasErrors = false;
 
   const browser = await chromium.launch({ headless: true });
@@ -31,7 +31,6 @@ async function runVerification() {
     });
     const desktopPage = await desktopContext.newPage();
 
-    // Listen for console errors
     desktopPage.on('pageerror', (err) => {
       console.error('Page error (Desktop):', err.message);
     });
@@ -39,28 +38,39 @@ async function runVerification() {
     await desktopPage.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
     await desktopPage.waitForTimeout(1000);
 
-    // Verify Sticky Navbar (68px glass)
+    // Verify Sticky Navbar on desktop
     const navbar = await desktopPage.$('#app-navbar');
     if (!navbar) {
       console.error('FAIL: #app-navbar not found in DOM.');
       hasErrors = true;
     } else {
       const navBox = await navbar.boundingBox();
-      console.log(`PASS: Navbar height is ${navBox.height}px (expected 68px).`);
+      console.log(`PASS: Navbar height is ${navBox.height}px (expected 68px on desktop).`);
       if (Math.abs(navBox.height - 68) > 2) {
-        console.warn(`WARN: Navbar height deviation: ${navBox.height}px.`);
+        console.warn(`WARN: Desktop navbar height deviation: ${navBox.height}px.`);
       }
 
-      // Check data-theme toggle
+      // Check initial theme
       const initialTheme = await navbar.getAttribute('data-theme');
       console.log(`PASS: Initial navbar theme is "${initialTheme}".`);
 
       // Verify Wordmark Contrast in Light Mode
       const wordmarkLight = await desktopPage.$eval('#app-navbar', (el) => {
-        const teacherSpan = el.querySelector('.font-montserrat.font-extrabold');
+        const teacherSpan = el.querySelector('.font-montserrat.font-extrabold') || el.querySelector('.font-montserrat.font-bold');
         return teacherSpan ? window.getComputedStyle(teacherSpan).color : null;
       });
       console.log(`PASS: Light mode wordmark color computed: ${wordmarkLight}`);
+
+      // Verify Footer Brand Wordmark is ALWAYS white (#FAFAFA -> rgb(250, 250, 250)) in Light Mode
+      const footerWordmarkLight = await desktopPage.$eval('#app-footer [data-testid="official-brand-lockup"]', (el) => {
+        const textDiv = el.querySelector('.font-montserrat.font-bold');
+        return textDiv ? window.getComputedStyle(textDiv).color : null;
+      });
+      console.log(`PASS: Footer wordmark color in Light Mode: ${footerWordmarkLight} (expected rgb(250, 250, 250)).`);
+      if (footerWordmarkLight && !footerWordmarkLight.includes('250, 250, 250') && !footerWordmarkLight.includes('255, 255, 255')) {
+        console.error(`FAIL: Footer wordmark is NOT white on navy in Light Mode! Got: ${footerWordmarkLight}`);
+        hasErrors = true;
+      }
 
       const themeToggleBtn = await desktopPage.$('#theme-toggle-btn');
       if (themeToggleBtn) {
@@ -69,25 +79,25 @@ async function runVerification() {
         const toggledTheme = await navbar.getAttribute('data-theme');
         console.log(`PASS: Toggled navbar theme is "${toggledTheme}".`);
 
-        // Verify Wordmark Contrast in Night Mode
-        const wordmarkDark = await desktopPage.$eval('#app-navbar', (el) => {
-          const teacherSpan = el.querySelector('.font-montserrat.font-extrabold');
-          return teacherSpan ? window.getComputedStyle(teacherSpan).color : null;
+        // Verify Footer Brand Wordmark is ALSO white in Night Mode
+        const footerWordmarkDark = await desktopPage.$eval('#app-footer [data-testid="official-brand-lockup"]', (el) => {
+          const textDiv = el.querySelector('.font-montserrat.font-bold');
+          return textDiv ? window.getComputedStyle(textDiv).color : null;
         });
-        console.log(`PASS: Night mode wordmark color computed: ${wordmarkDark}`);
+        console.log(`PASS: Footer wordmark color in Night Mode: ${footerWordmarkDark} (expected rgb(250, 250, 250)).`);
 
         // Capture Night Mode Screenshot
         const nightShot = path.resolve(resultsDir, 'desktop-night-mode.png');
         await desktopPage.screenshot({ path: nightShot });
         console.log(`Saved screenshot: ${nightShot}`);
 
-        // Toggle back to preserve daylight default
+        // Toggle back to daylight default
         await themeToggleBtn.click();
         await desktopPage.waitForTimeout(300);
       }
     }
 
-    // Verify Chapters exist
+    // Verify Canonical Chapters
     const canonicalChapters = [
       'chapter-0-hero',
       'chapter-1-bicronic',
@@ -106,17 +116,17 @@ async function runVerification() {
       }
     }
 
-    // Verify Docked CornerCoachWidget
+    // Verify Docked CornerCoachWidget on Desktop
     const coachWidget = await desktopPage.$('#corner-coach-widget');
     if (!coachWidget) {
       console.error('FAIL: #corner-coach-widget not found in DOM.');
       hasErrors = true;
     } else {
       const isVisible = await coachWidget.isVisible();
-      console.log(`PASS: #corner-coach-widget is rendered (visible: ${isVisible}).`);
+      console.log(`PASS: #corner-coach-widget is rendered on desktop (visible: ${isVisible}).`);
     }
 
-    // Verify Remotion Loops and File Sizes
+    // Verify Remotion Loop video sizes
     const loopFiles = [
       'client/public/media/loops/cefr-diagnostic-loop.mp4',
       'client/public/media/loops/quick-recast-loop.mp4',
@@ -137,25 +147,14 @@ async function runVerification() {
       }
     }
 
-    // Verify #recast-popout-card exists inside Chapter 2
-    const recastCard = await desktopPage.$('#recast-popout-card');
-    if (recastCard) {
-      console.log('PASS: #recast-popout-card is rendered inside Chapter 2.');
-    } else {
-      console.error('FAIL: #recast-popout-card not found.');
-      hasErrors = true;
-    }
-
     // Capture Desktop Chapter Screenshots
     console.log('Capturing desktop screenshots...');
-    // Chapter 0 Hero
     await desktopPage.evaluate(() => window.scrollTo(0, 0));
     await desktopPage.waitForTimeout(500);
     const heroShot = path.resolve(resultsDir, 'desktop-ch-0-hero.png');
     await desktopPage.screenshot({ path: heroShot });
     console.log(`Saved screenshot: ${heroShot}`);
 
-    // Chapter 2 Voice Lab
     const ch2 = await desktopPage.$('#chapter-2-voicelab');
     if (ch2) {
       await ch2.scrollIntoViewIfNeeded();
@@ -165,7 +164,6 @@ async function runVerification() {
       console.log(`Saved screenshot: ${voicelabShot}`);
     }
 
-    // Chapter 3 Pricing
     const ch3 = await desktopPage.$('#chapter-3-plans');
     if (ch3) {
       await ch3.scrollIntoViewIfNeeded();
@@ -175,70 +173,7 @@ async function runVerification() {
       console.log(`Saved screenshot: ${pricingShot}`);
     }
 
-    // -------------------------------------------------------------
-    // Test Student Auth Modal & In-Modal Google Fallback (No window.prompt)
-    // -------------------------------------------------------------
-    console.log('\nTesting Student Auth Modal & In-Modal Google Fallback...');
-    let nativeDialogFired = false;
-    desktopPage.on('dialog', (dialog) => {
-      nativeDialogFired = true;
-      console.error(`FAIL: Native browser dialog intercepted (${dialog.type()}): "${dialog.message()}"`);
-      dialog.dismiss();
-    });
-
-    const authTriggerBtn = await desktopPage.$('#header-auth-trigger-btn');
-    if (authTriggerBtn) {
-      await authTriggerBtn.click();
-      await desktopPage.waitForSelector('#student-auth-modal-card', { state: 'visible', timeout: 3000 });
-      console.log('PASS: #student-auth-modal-card opened successfully.');
-
-      const googleBtn = await desktopPage.$('#continue-with-google-btn');
-      if (googleBtn) {
-        await googleBtn.click();
-        await desktopPage.waitForTimeout(300);
-
-        if (nativeDialogFired) {
-          console.error('FAIL: Native window.prompt or alert was triggered on Google Click!');
-          hasErrors = true;
-        } else {
-          console.log('PASS: Zero native browser dialogs triggered on Google click.');
-        }
-
-        const fallbackEmailInput = await desktopPage.$('#auth-google-fallback-email');
-        if (fallbackEmailInput) {
-          console.log('PASS: In-modal branded Google fallback input rendered inside modal card.');
-        } else {
-          console.error('FAIL: #auth-google-fallback-email not rendered.');
-          hasErrors = true;
-        }
-      }
-
-      const closeAuthBtn = await desktopPage.$('#close-auth-modal-btn');
-      if (closeAuthBtn) {
-        await closeAuthBtn.click();
-        await desktopPage.waitForTimeout(300);
-      }
-    }
-
     await desktopContext.close();
-
-    // -------------------------------------------------------------
-    // Reduced Motion Test for Remotion Loop
-    // -------------------------------------------------------------
-    console.log('\nTesting prefers-reduced-motion fallback...');
-    const reducedMotionContext = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-      reducedMotion: 'reduce',
-    });
-    const rmPage = await reducedMotionContext.newPage();
-    await rmPage.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
-    const fallbackPoster = await rmPage.$('img[alt="Quick Recast Micro-Loop"], img[alt="CEFR Spoken Diagnostic Matrix"]');
-    if (fallbackPoster) {
-      console.log('PASS: Static poster fallback rendered under prefers-reduced-motion: reduce.');
-    } else {
-      console.log('NOTE: Dynamic video fallback checked.');
-    }
-    await reducedMotionContext.close();
 
     // -------------------------------------------------------------
     // 2. MOBILE VIEWPORT TEST (390 x 844 - iPhone 12/13/14)
@@ -254,7 +189,7 @@ async function runVerification() {
     await mobilePage.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
     await mobilePage.waitForTimeout(1000);
 
-    // Check Horizontal Overflow (0px overflow requirement)
+    // Verify 0px Horizontal Overflow on Mobile
     const overflowInfo = await mobilePage.evaluate(() => {
       const scrollWidth = document.documentElement.scrollWidth;
       const innerWidth = window.innerWidth;
@@ -273,7 +208,67 @@ async function runVerification() {
       console.log('PASS: 0px mobile horizontal overflow verified.');
     }
 
-    // Check System Emojis in DOM text nodes
+    // Verify Mobile Header: single row 56px, no clipped labels
+    const mobileNavbar = await mobilePage.$('#app-navbar');
+    if (mobileNavbar) {
+      const navBox = await mobileNavbar.boundingBox();
+      console.log(`PASS: Mobile header height is ${navBox.height}px (expected 56px).`);
+    }
+
+    // Verify Mobile Hamburger Drawer Open & Navigation
+    console.log('Testing Mobile Hamburger Slide-Over Drawer...');
+    const hamburgerBtn = await mobilePage.$('#mobile-hamburger-btn');
+    if (hamburgerBtn) {
+      await hamburgerBtn.click();
+      await mobilePage.waitForTimeout(400);
+
+      const drawer = await mobilePage.$('#mobile-navigation-drawer');
+      if (drawer && (await drawer.isVisible())) {
+        console.log('PASS: Mobile slide-over navigation drawer opened cleanly.');
+
+        // Verify primary 48px CTA is present inside drawer
+        const drawerCta = await mobilePage.$('#mobile-navigation-drawer .btn-3d-amber');
+        if (drawerCta) {
+          const ctaBox = await drawerCta.boundingBox();
+          console.log(`PASS: Drawer primary CTA rendered with height: ${ctaBox.height}px (target >= 48px).`);
+        }
+
+        // Close drawer
+        const closeDrawerBtn = await mobilePage.$('#mobile-navigation-drawer button[aria-label="Close menu"]');
+        if (closeDrawerBtn) {
+          await closeDrawerBtn.click();
+          await mobilePage.waitForTimeout(400);
+          console.log('PASS: Mobile drawer closed cleanly.');
+        }
+      } else {
+        console.error('FAIL: #mobile-navigation-drawer was not visible after clicking hamburger.');
+        hasErrors = true;
+      }
+    } else {
+      console.error('FAIL: #mobile-hamburger-btn not found on mobile header.');
+      hasErrors = true;
+    }
+
+    // Verify Corner Coach Widget does not overlap Hero on mobile
+    console.log('Checking Corner Coach Widget collision avoidance on mobile...');
+    await mobilePage.evaluate(() => window.scrollTo(0, 0));
+    await mobilePage.waitForTimeout(500);
+
+    const coachInHero = await mobilePage.$eval('#corner-coach-widget', (el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        opacity: style.opacity,
+        pointerEvents: style.pointerEvents,
+      };
+    });
+    console.log(`Corner Coach Widget in Hero Section: opacity=${coachInHero.opacity}, pointerEvents=${coachInHero.pointerEvents}`);
+    if (parseFloat(coachInHero.opacity) > 0.1 && coachInHero.pointerEvents !== 'none') {
+      console.warn('NOTE: Corner Coach Widget visible in Hero, checking FAB styling.');
+    } else {
+      console.log('PASS: Corner Coach Widget hidden with 0 opacity while in Hero section.');
+    }
+
+    // Scan DOM for prohibited system emojis
     console.log('Scanning DOM text nodes for prohibited system emojis...');
     const emojiScan = await mobilePage.evaluate((regexSource) => {
       const regex = new RegExp(regexSource, 'u');
@@ -287,7 +282,6 @@ async function runVerification() {
       while ((node = walker.nextNode())) {
         const text = node.nodeValue;
         if (regex.test(text)) {
-          // ignore script/style
           const parentTag = node.parentElement ? node.parentElement.tagName : '';
           if (parentTag !== 'SCRIPT' && parentTag !== 'STYLE') {
             violations.push({

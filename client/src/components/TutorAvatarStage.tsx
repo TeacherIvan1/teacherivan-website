@@ -51,7 +51,7 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
       id="tutor-avatar-stage"
       data-testid="tutor-avatar-stage"
       aria-label={t.avatarStage.avatarAria}
-      className={`relative w-full rounded-2xl bg-gradient-to-b from-[#12223a] to-[#0d1829] border border-[#A7C7E7]/30 p-4 sm:p-6 overflow-hidden flex flex-col items-center justify-center min-h-[300px] sm:min-h-[340px] shadow-2xl transition-all duration-300 ${className}`}
+      className={`relative w-full rounded-2xl bg-gradient-to-b from-[#12223a] to-[#0d1829] border border-[#A7C7E7]/30 p-3 sm:p-6 overflow-hidden flex flex-col items-center justify-center min-h-[144px] sm:min-h-[260px] md:min-h-[300px] shadow-2xl transition-all duration-300 ${className}`}
     >
       {/* Background Ambient Spotlight Effects */}
       <div

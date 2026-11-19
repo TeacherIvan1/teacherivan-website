@@ -3,6 +3,8 @@ import React from 'react';
 export interface BrandLockupProps {
   /** Optional theme variation for light background sections */
   variant?: 'dark' | 'light';
+  /** Force dark surface styling (white text + amber I + soft denim subtitle) regardless of page theme */
+  forceDarkSurface?: boolean;
   /** Size scaling for header vs footer vs hero */
   size?: 'sm' | 'md' | 'lg';
   /** Additional CSS class names */
@@ -13,12 +15,11 @@ export interface BrandLockupProps {
 
 export const BrandLockup: React.FC<BrandLockupProps> = ({
   variant = 'dark',
+  forceDarkSurface = false,
   size = 'md',
   className = '',
   altText = 'Teacher Ivan Official Logo',
 }) => {
-  const isLight = variant === 'light';
-
   // Mascot dimensions (w-7 h-7 on mobile for compact header)
   const mascotDimensions = {
     sm: 'w-7 h-7 shrink-0',
@@ -40,6 +41,19 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
     lg: 'text-xs md:text-sm',
   }[size];
 
+  // Color classes: strictly guaranteed white-on-dark when forceDarkSurface is active
+  const primaryTextColor = forceDarkSurface
+    ? 'text-[#FAFAFA]'
+    : 'text-[#1A3153] dark:text-[#FAFAFA]';
+
+  const accentIColor = forceDarkSurface
+    ? 'text-[#E09B30]'
+    : 'text-[#9A6515] dark:text-[#E09B30]';
+
+  const sublineTextColor = forceDarkSurface
+    ? 'text-[#A7C7E7]'
+    : 'text-[#4A5568] dark:text-[#A7C7E7]';
+
   return (
     <div
       className={`inline-flex items-center gap-1.5 sm:gap-3 select-none group cursor-pointer ${className}`}
@@ -59,16 +73,16 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
       <div className="flex flex-col justify-center leading-none text-left">
         {/* Line 1: Teacher Ivan on a single line (never wraps) */}
         <div
-          className={`font-montserrat font-bold tracking-tight whitespace-nowrap transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 ${primaryTextSize} text-[#1A3153] dark:text-[#FAFAFA]`}
+          className={`font-montserrat font-bold tracking-tight whitespace-nowrap transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 ${primaryTextSize} ${primaryTextColor}`}
         >
-          Teacher <span className="text-[#9A6515] dark:text-[#E09B30]">I</span>van
+          Teacher <span className={accentIColor}>I</span>van
         </div>
 
         {/* Line 2: ENGLISH CLASSES in uppercase, geometric sans-serif (Montserrat), tracking-[0.25em] (hidden on <640px for sm) */}
         <div
           className={`font-montserrat uppercase font-semibold tracking-[0.22em] sm:tracking-[0.25em] whitespace-nowrap transition-colors duration-200 ${sublineTextSize} mt-0.5 md:mt-1 ${
             size === 'sm' ? 'hidden sm:block' : ''
-          } text-[#4A5568] dark:text-[#A7C7E7]`}
+          } ${sublineTextColor}`}
         >
           ENGLISH CLASSES
         </div>
