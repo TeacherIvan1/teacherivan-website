@@ -327,35 +327,35 @@ export const ClassSchedulerView: React.FC = () => {
       className="py-4 sm:py-6 px-3 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-5 sm:gap-6 animate-in fade-in duration-200 overflow-hidden"
     >
       {/* Header Banner */}
-      <div className="p-4 sm:p-7 rounded-3xl bg-gradient-to-r from-[#12223a] to-[#1A3153] border-2 border-[#E09B30]/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
+      <div className="p-4 sm:p-7 rounded-3xl bg-[var(--bg-surface)] dark:bg-gradient-to-r dark:from-[#12223a] dark:to-[#1A3153] border-2 border-[#E09B30]/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 text-[var(--text-primary)] dark:text-[#FAFAFA]">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/20 border border-[#E09B30] text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/20 border border-[#E09B30] text-[#9A6515] dark:text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
             <Sparkles size={13} />
             <span>1-on-1 Bichronous Coaching</span>
           </div>
-          <h1 className="font-montserrat font-extrabold text-xl sm:text-3xl text-[#FAFAFA] tracking-tight">
+          <h1 className="font-montserrat font-extrabold text-xl sm:text-3xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
             {t.scheduling.title}
           </h1>
-          <p className="font-inter text-xs sm:text-sm text-[#A7C7E7] max-w-2xl leading-relaxed">
+          <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)] dark:text-[#A7C7E7] max-w-2xl leading-relaxed">
             {t.scheduling.subtitle}
           </p>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-[#FAFAFA] pt-1">
-            <span className="flex items-center gap-1.5 text-[#E09B30] font-semibold">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-primary)] dark:text-[#FAFAFA] pt-1">
+            <span className="flex items-center gap-1.5 text-[#9A6515] dark:text-[#E09B30] font-semibold">
               <Clock size={14} />
               <span>{t.scheduling.boliviaTimeNotice}</span>
             </span>
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 text-[#A7C7E7]">
+            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               <ShieldCheck size={13} className="text-[#E09B30]" />
-              <span className="font-bold text-[#FAFAFA]">{getPlanBadgeLabel()}</span>
+              <span className="font-bold text-[var(--text-primary)] dark:text-[#FAFAFA]">{getPlanBadgeLabel()}</span>
             </span>
-            <span className="text-[11px] text-[#A7C7E7]">
+            <span className="text-[11px] text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               {myBookings.length} / {maxWeeklyClasses} {isEs ? 'clases agendadas' : 'classes booked'}
             </span>
           </div>
         </div>
 
         {/* Week Switcher Navigation */}
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#1A3153] p-1.5 rounded-2xl border border-[#A7C7E7]/30 shadow-inner self-stretch md:self-auto justify-between">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[var(--bg-sunken)] dark:bg-[#1A3153] p-1.5 rounded-2xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 shadow-inner self-stretch md:self-auto justify-between">
           <button
             type="button"
             id="scheduler-prev-week-btn"
@@ -364,7 +364,7 @@ export const ClassSchedulerView: React.FC = () => {
             className={`px-3 py-2 rounded-xl text-xs font-montserrat font-bold flex items-center gap-1 transition-all cursor-pointer ${
               weekOffset === 0
                 ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                : 'text-[#A7C7E7] hover:text-[#FAFAFA] disabled:opacity-40 disabled:cursor-not-allowed'
+                : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] disabled:opacity-40 disabled:cursor-not-allowed'
             }`}
           >
             <ChevronLeft size={14} />
@@ -379,7 +379,7 @@ export const ClassSchedulerView: React.FC = () => {
             className={`px-3 py-2 rounded-xl text-xs font-montserrat font-bold flex items-center gap-1 transition-all cursor-pointer ${
               weekOffset === 1
                 ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                : 'text-[#A7C7E7] hover:text-[#FAFAFA] disabled:opacity-40 disabled:cursor-not-allowed'
+                : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] disabled:opacity-40 disabled:cursor-not-allowed'
             }`}
           >
             <span>{t.scheduling.nextWeek}</span>
@@ -390,7 +390,7 @@ export const ClassSchedulerView: React.FC = () => {
             type="button"
             onClick={fetchBookings}
             disabled={isLoading}
-            className="p-2 rounded-xl text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/10 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] hover:bg-black/5 dark:hover:bg-[#FAFAFA]/10 transition-colors cursor-pointer"
             title="Refresh schedule"
           >
             <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
@@ -648,7 +648,7 @@ export const ClassSchedulerView: React.FC = () => {
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleBookSlot(selectedMobileDay.dateStr, hour.start)}
-                className="w-full p-3.5 rounded-2xl bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-[0.99]"
+                className="w-full p-3.5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-2">
                   <CalendarIcon size={14} className="text-[#E09B30]" />
@@ -666,16 +666,16 @@ export const ClassSchedulerView: React.FC = () => {
       {/* ========================================================================= */}
       {/* DESKTOP 5-COLUMN SCHEDULE GRID (>=768px): FULL WEEK VIEW                   */}
       {/* ========================================================================= */}
-      <div className="hidden md:block rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-2xl p-6 overflow-hidden">
+      <div className="hidden md:block rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 shadow-2xl p-6 overflow-hidden">
         <div>
           {/* Day Columns Header */}
-          <div className="grid grid-cols-5 gap-3 pb-4 border-b border-[#A7C7E7]/20 text-center">
+          <div className="grid grid-cols-5 gap-3 pb-4 border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 text-center">
             {weekDays.map((d) => (
-              <div key={d.dateStr} className="p-3 rounded-2xl bg-[#1A3153]/80 border border-[#A7C7E7]/25">
-                <div className="font-montserrat font-extrabold text-sm text-[#FAFAFA]">
+              <div key={d.dateStr} className="p-3 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25">
+                <div className="font-montserrat font-extrabold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
                   {d.dayName}
                 </div>
-                <div className="font-inter text-xs text-[#E09B30] font-semibold mt-0.5">
+                <div className="font-inter text-xs text-[#9A6515] dark:text-[#E09B30] font-semibold mt-0.5">
                   {d.displayDate}
                 </div>
               </div>
@@ -720,7 +720,7 @@ export const ClassSchedulerView: React.FC = () => {
                       <div
                         key={`${day.dateStr}-${hour.start}`}
                         id={`slot-${day.dateStr}-${hour.start.replace(':', '')}`}
-                        className="p-3.5 rounded-2xl bg-[#1A3153]/40 border border-[#A7C7E7]/15 text-[#A7C7E7]/40 flex flex-col justify-between cursor-not-allowed select-none"
+                        className="p-3.5 rounded-2xl bg-[var(--bg-sunken)]/60 dark:bg-[#1A3153]/40 border border-[var(--border-hairline)]/40 dark:border-[#A7C7E7]/15 text-[var(--text-secondary)]/50 dark:text-[#A7C7E7]/40 flex flex-col justify-between cursor-not-allowed select-none"
                         title={t.scheduling.bookedSlot}
                       >
                         <div className="text-xs font-montserrat font-semibold">
@@ -740,7 +740,7 @@ export const ClassSchedulerView: React.FC = () => {
                       type="button"
                       disabled={isLoading}
                       onClick={() => handleBookSlot(day.dateStr, hour.start)}
-                      className="p-3.5 rounded-2xl bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all duration-150 flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow-md hover:scale-[1.02]"
+                      className="p-3.5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all duration-150 flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow-md hover:scale-[1.02]"
                       title={`Book ${day.dayName} at ${hour.label}`}
                     >
                       <div className="text-xs font-montserrat font-bold flex items-center justify-between w-full">

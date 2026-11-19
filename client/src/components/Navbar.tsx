@@ -286,20 +286,28 @@ export const Navbar: React.FC<NavbarProps> = ({ theme: propTheme }) => {
 
             <LanguageToggle id="navbar-lang-toggle" showIcon={false} />
 
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <span
-                  id="header-plan-status-badge"
-                  className={`text-xs font-montserrat font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${
-                    user?.plan === 'executive'
-                      ? 'bg-amber-brand/20 text-amber-brand border-amber-brand/50'
-                      : user?.plan === 'pro'
-                      ? 'bg-blue-500/20 text-blue-300 border-blue-400/40'
-                      : 'bg-slate-500/20 text-slate-300 border-slate-400/30'
-                  }`}
+            {isAuthenticated && user ? (
+              <div className="flex items-center gap-2 shrink-0">
+                <div
+                  id="navbar-student-profile-badge"
+                  className="flex items-center gap-1.5 text-xs px-2.5 py-1 bg-[#1A3153] border border-[#A7C7E7]/40 rounded-lg text-[#FAFAFA] font-montserrat font-bold whitespace-nowrap shrink-0 shadow-sm"
+                  title={user.email || user.username}
                 >
-                  {planBadgeText}
-                </span>
+                  <span className="text-[#E09B30]">●</span>
+                  <span>
+                    {user.role === 'admin'
+                      ? 'Admin • VIP'
+                      : `${(user.fullName ? user.fullName.split(' ')[0] : user.username || 'Student')} • ${
+                          user.plan === 'executive'
+                            ? '5 CLASES/SEM'
+                            : user.plan === 'pro'
+                            ? '3 CLASES/SEM'
+                            : user.plan === 'essential'
+                            ? 'AUTÓNOMO'
+                            : 'FREE'
+                        }`}
+                  </span>
+                </div>
 
                 <button
                   onClick={signOut}
@@ -363,6 +371,36 @@ export const Navbar: React.FC<NavbarProps> = ({ theme: propTheme }) => {
                 <X size={22} />
               </button>
             </div>
+
+            {/* Authenticated Student Profile in Drawer */}
+            {isAuthenticated && user && (
+              <div className="mt-4 p-3 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#132642] border border-[var(--border-hairline)] flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 truncate">
+                  <div className="w-8 h-8 rounded-full bg-[#E09B30] text-[#1A3153] font-montserrat font-black text-xs flex items-center justify-center shrink-0">
+                    {(user.fullName || user.username || 'S')[0].toUpperCase()}
+                  </div>
+                  <div className="flex flex-col truncate">
+                    <span className="font-montserrat font-bold text-xs text-[var(--text-primary)] truncate">
+                      {user.fullName || user.username}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-secondary)] truncate">
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-montserrat font-black uppercase tracking-wider bg-[#E09B30] text-[#1A3153] shrink-0">
+                  {user.role === 'admin'
+                    ? 'ADMIN'
+                    : user.plan === 'executive'
+                    ? 'EXECUTIVE'
+                    : user.plan === 'pro'
+                    ? 'PRO'
+                    : user.plan === 'essential'
+                    ? 'ESSENTIAL'
+                    : 'FREE'}
+                </span>
+              </div>
+            )}
 
             <div className="py-6 flex flex-col gap-2 flex-1">
               {!isAuthenticated ? (
@@ -446,6 +484,20 @@ export const Navbar: React.FC<NavbarProps> = ({ theme: propTheme }) => {
                     <Calendar size={18} />
                     <span>{isEs ? 'Agendar Clase' : 'Book Class'}</span>
                   </button>
+
+                  {user?.role === 'admin' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        toggleDeveloperMode();
+                        setIsMobileDrawerOpen(false);
+                      }}
+                      className="w-full min-h-[44px] px-4 py-3 rounded-xl text-left font-mono text-xs text-[#1A3153] dark:text-[#FAFAFA] bg-[#EEF3F8] dark:bg-[#132642] border border-[#E09B30]/60 hover:bg-[#E09B30]/10 transition-colors flex items-center justify-between cursor-pointer mt-2"
+                    >
+                      <span>ADMIN DEV MODE</span>
+                      <span className={`w-2 h-2 rounded-full ${isDeveloperMode ? 'bg-[#10b981]' : 'bg-red-400'}`} />
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -453,11 +505,26 @@ export const Navbar: React.FC<NavbarProps> = ({ theme: propTheme }) => {
             <div className="pt-4 border-t border-[var(--border-hairline)] space-y-3">
               <button
                 type="button"
-                onClick={handleTakeAssessment}
+                onClick={() => {
+                  setIsMobileDrawerOpen(false);
+                  if (isAuthenticated) {
+                    setActiveView('simulator');
+                  } else {
+                    handleTakeAssessment();
+                  }
+                }}
                 className="btn-3d-amber w-full min-h-[48px] py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider cursor-pointer shadow-lg flex items-center justify-center gap-2"
               >
                 <Sparkles size={16} />
-                <span>{isEs ? 'Probar Nivel en 90s Gratis →' : 'Test Level in 90s Free →'}</span>
+                <span>
+                  {isAuthenticated
+                    ? isEs
+                      ? 'Ir al Simulador de Voz →'
+                      : 'Open Voice Simulator →'
+                    : isEs
+                    ? 'Probar Nivel en 90s Gratis →'
+                    : 'Test Level in 90s Free →'}
+                </span>
               </button>
 
               {!isAuthenticated ? (

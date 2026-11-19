@@ -17,12 +17,17 @@ export const CornerCoachWidget: React.FC<CornerCoachWidgetProps> = ({
   const [isCollidingSection, setIsCollidingSection] = useState(false);
 
   useEffect(() => {
-    // Prevent persistent bottom collisions on mobile (<1024px) in Hero, Voice Lab, App CTA, or Footer
+    // Prevent persistent collisions on desktop and mobile in Hero, Voice Lab, FAQ, App CTA, or Footer
     const targetSelectors = [
       '#chapter-0-hero',
+      '#hero-3d-stage',
+      '#hero',
       '#chapter-2-voicelab',
       '#flagship-simulator-section',
+      '#chapter-4-faq',
+      '#final-cta-section',
       '#download-mobile-app-section',
+      '#app-footer',
       'footer',
     ];
 
@@ -34,7 +39,7 @@ export const CornerCoachWidget: React.FC<CornerCoachWidgetProps> = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // If any conflicting section is in view, hide the floating widget on mobile
+        // If any conflicting section is in view, hide the floating widget
         const hasVisibleConflict = entries.some((entry) => entry.isIntersecting);
         setIsCollidingSection(hasVisibleConflict);
       },
@@ -66,14 +71,14 @@ export const CornerCoachWidget: React.FC<CornerCoachWidgetProps> = ({
     }
   };
 
-  const hiddenMobileClasses = isCollidingSection
-    ? 'max-lg:opacity-0 max-lg:pointer-events-none max-lg:translate-y-4'
-    : 'max-lg:opacity-100 max-lg:translate-y-0';
+  const hiddenClasses = isCollidingSection
+    ? 'opacity-0 pointer-events-none translate-y-4'
+    : 'opacity-100 translate-y-0';
 
   return (
     <div
       id="corner-coach-widget"
-      className={`fixed right-4 bottom-4 md:right-6 md:bottom-6 z-40 transition-all duration-300 ${hiddenMobileClasses} ${className}`}
+      className={`fixed right-4 bottom-4 md:right-6 md:bottom-6 z-40 transition-all duration-300 ${hiddenClasses} ${className}`}
     >
       {/* ===================================================================== */}
       {/* MOBILE COMPACT CIRCULAR FAB (< 1024px): 56x56px touch target          */}

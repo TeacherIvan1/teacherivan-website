@@ -300,7 +300,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
       {/* ========================================================================= */}
       <div
         id="personalized-goal-header-card"
-        className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#091326] via-[#12223a] to-[#1A3153] text-[#FAFAFA] border-2 border-[#E09B30]/40 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden"
+        className="p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-gradient-to-r dark:from-[#091326] dark:via-[#12223a] dark:to-[#1A3153] text-[var(--text-primary)] dark:text-[#FAFAFA] border border-[var(--border-hairline)] dark:border-[#E09B30]/40 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden transition-colors"
       >
         {/* Subtle Ambient Glow */}
         <div
@@ -311,7 +311,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* Left: Chibi Mascot with Ambient Frame & Dynamic Reactive Status Pill */}
         <div className="flex items-center gap-4 sm:gap-5 w-full lg:w-auto relative z-10">
           <div className="relative shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30] p-1 flex items-center justify-center shadow-lg shadow-[#E09B30]/20 overflow-hidden">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[var(--bg-sunken)] dark:bg-[#1A3153] border-2 border-[#E09B30] p-1 flex items-center justify-center shadow-lg shadow-[#E09B30]/20 overflow-hidden">
               <RiggedCharacter
                 persona="teacher-ivan"
                 state="idle"
@@ -326,10 +326,10 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
 
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA] tracking-tight">
+              <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
                 {studentName}
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#A7C7E7] inline-flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] inline-flex items-center gap-1">
                 <Globe size={11} className="text-[#E09B30]" />
                 <span>{getCountryFlag(userCountry)}</span>
               </span>
@@ -363,8 +363,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>{isEs ? 'Inmersión Asincrónica 24/7 Activa' : '24/7 Async Immersion Active'}</span>
               </span>
-              <span className="text-xs text-[#A7C7E7] font-medium">
-                <strong className="text-[#FAFAFA]">{primaryGoal}</strong> • "{personalObjective}"
+              <span className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] font-medium">
+                <strong className="text-[var(--text-primary)] dark:text-[#FAFAFA]">{primaryGoal}</strong> • "{personalObjective}"
               </span>
             </div>
           </div>
@@ -373,17 +373,17 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* Right: Weekly Progress Bar + Edit Goals Button */}
         <div className="flex flex-col sm:flex-row lg:flex-col items-center lg:items-end justify-between gap-3 w-full lg:w-auto shrink-0 relative z-10">
           <div className="w-full sm:w-64 lg:w-64 space-y-1.5 text-center lg:text-right">
-            <div className="flex justify-between text-xs font-montserrat font-bold text-[#FAFAFA]">
+            <div className="flex justify-between text-xs font-montserrat font-bold text-[var(--text-primary)] dark:text-[#FAFAFA]">
               <span>{t.microLearning.progressLabel}</span>
-              <span className="text-[#E09B30] font-black">{completedStages.length}/5 ({progressPercentage}%)</span>
+              <span className="text-[#9A6515] dark:text-[#E09B30] font-black">{completedStages.length}/5 ({progressPercentage}%)</span>
             </div>
-            <div className="w-full h-3 rounded-full bg-[#1A3153] border border-[#A7C7E7]/25 overflow-hidden p-0.5">
+            <div className="w-full h-3 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 overflow-hidden p-0.5">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-[#E09B30] to-[#10b981] transition-all duration-700 shadow-sm"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
-            <div className="flex justify-between items-center text-[11px] text-[#A7C7E7]">
+            <div className="flex justify-between items-center text-[11px] text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               <span className="font-semibold">+{totalXp} XP {isEs ? 'ganados' : 'earned'}</span>
               <span className="font-bold text-[#10b981] inline-flex items-center gap-1">
                 <Flame size={12} className="text-[#E09B30]" />
@@ -397,7 +397,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               type="button"
               id="edit-student-goals-btn"
               onClick={() => setIsEditGoalsOpen(true)}
-              className="px-4 py-2 rounded-xl border border-[#A7C7E7]/30 bg-[#1A3153] hover:bg-[#1A3153]/80 text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 bg-[var(--bg-sunken)] dark:bg-[#1A3153] hover:opacity-80 text-[var(--text-primary)] dark:text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
               <Edit3 size={13} className="text-[#E09B30]" />
               <span>{t.microLearning.editGoals}</span>
@@ -418,7 +418,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
 
       {/* Mode Switcher for Pro & Executive Students */}
       {isHybrid && (
-        <div className="flex items-center gap-2 p-1 rounded-2xl bg-[#12223a] border border-[#A7C7E7]/25 w-fit">
+        <div className="flex items-center gap-2 p-1 rounded-2xl bg-[var(--bg-surface)] dark:bg-[#12223a] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 w-fit">
           <button
             type="button"
             id="tab-hybrid-schedule-btn"
@@ -426,7 +426,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               roadmapMode === 'hybrid'
                 ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
-                : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
             }`}
           >
             <Video size={14} />
@@ -439,7 +439,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               roadmapMode === 'sprint'
                 ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
-                : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
             }`}
           >
             <Target size={14} />
@@ -453,21 +453,21 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
       {/* ========================================================================= */}
       {roadmapMode === 'hybrid' && isHybrid && (
         <div id="hybrid-schedule-section" className="space-y-4 animate-in fade-in duration-200">
-          <div className="p-6 sm:p-7 rounded-3xl bg-[#12223a] border border-[#A7C7E7]/30 shadow-xl space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#A7C7E7]/20 pb-4">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 pb-4">
               <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#9A6515] dark:text-[#E09B30] text-xs font-montserrat font-bold">
                   <Sparkles size={14} />
                   <span>{isEs ? 'Método Bicrónico: Motor 1 + Motor 2' : 'Bicronic Method: Engine 1 + Engine 2'}</span>
                 </div>
-                <h3 className="font-montserrat font-extrabold text-lg sm:text-xl text-[#FAFAFA]">
+                <h3 className="font-montserrat font-extrabold text-lg sm:text-xl text-[var(--text-primary)] dark:text-[#FAFAFA]">
                   {isEs ? `Tu Ruta Híbrida Semanal (${studentBookings.length}/${targetClassesCount} Clases Agendadas)` : `Your Weekly Hybrid Roadmap (${studentBookings.length}/${targetClassesCount} Classes Booked)`}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveView('schedule')}
-                className="px-4 py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Calendar size={13} />
                 <span>{isEs ? 'Agendar / Gestionar Clases' : 'Book / Manage Classes'}</span>
@@ -477,18 +477,18 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             {/* 4 Dynamic Hybrid Roadmap Nodes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* NODE 1: Pre-Class Preparation */}
-              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
+              <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 border-2 border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/20 text-[#A7C7E7] text-[10px] font-montserrat font-bold uppercase">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/20 text-[#1A3153] dark:text-[#A7C7E7] text-[10px] font-montserrat font-bold uppercase">
                       Paso 1 • Pre-Clase
                     </span>
-                    <Clock size={14} className="text-[#A7C7E7]" />
+                    <Clock size={14} className="text-[#E09B30]" />
                   </div>
-                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                  <h4 className="font-montserrat font-bold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
                     {isEs ? 'Inmersión Pre-Clase (Colocaciones)' : 'Pre-Class Target Collocations'}
                   </h4>
-                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
                     {isEs
                       ? 'Revisa el vocabulario clave y los temas que discutirás con Teacher Ivan en tu sesión en vivo.'
                       : 'Review target vocabulary and topics to debate with Teacher Ivan in your live session.'}
@@ -500,14 +500,14 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                     setSelectedDay(0);
                     setRoadmapMode('sprint');
                   }}
-                  className="w-full py-2 rounded-xl bg-[#12223a] hover:bg-[#12223a]/80 text-[#E09B30] border border-[#E09B30]/40 text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-[var(--bg-surface)] dark:bg-[#12223a] hover:bg-[#E09B30] hover:text-[#1A3153] text-[#9A6515] dark:text-[#E09B30] border border-[#E09B30]/40 text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer transition-colors"
                 >
                   <span>{isEs ? 'Ver Colocaciones →' : 'View Collocations →'}</span>
                 </button>
               </div>
 
               {/* NODE 2: Live 1-on-1 Coaching (3x or 5x/wk) */}
-              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#E09B30] flex flex-col justify-between gap-4 shadow-lg shadow-[#E09B30]/10">
+              <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 border-2 border-[#E09B30] flex flex-col justify-between gap-4 shadow-lg shadow-[#E09B30]/10">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] text-[10px] font-montserrat font-black uppercase">
@@ -515,10 +515,10 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                     </span>
                     <Video size={14} className="text-[#E09B30]" />
                   </div>
-                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                  <h4 className="font-montserrat font-bold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
                     {isEs ? 'Mentoría 1 a 1 en Vivo (Zoom/Meet)' : '1-on-1 Live Coaching Session'}
                   </h4>
-                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
                     {studentBookings.length > 0 ? (
                       isEs
                         ? `Tienes ${studentBookings.length} clase(s) programada(s): ${studentBookings.map((b) => `${b.dayOfWeek} ${b.startTime}`).join(', ')} (Hora Bolivia).`
@@ -533,7 +533,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveView('schedule')}
-                  className="w-full py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer shadow-sm"
                 >
                   <Calendar size={13} />
                   <span>{isEs ? 'Ir al Calendario →' : 'Go to Calendar →'}</span>
@@ -541,18 +541,18 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               </div>
 
               {/* NODE 3: Post-Class Recast Fixation (24/7 Voice Lab) */}
-              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
+              <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 border-2 border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-montserrat font-bold uppercase">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-[#047857] dark:text-emerald-300 text-[10px] font-montserrat font-bold uppercase">
                       Paso 3 • Post-Clase
                     </span>
-                    <Headphones size={14} className="text-emerald-400" />
+                    <Headphones size={14} className="text-emerald-500 dark:text-emerald-400" />
                   </div>
-                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                  <h4 className="font-montserrat font-bold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
                     {isEs ? 'Fijación de Recasts en Voz 24/7' : 'Post-Class Recast Fixation'}
                   </h4>
-                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
                     {isEs
                       ? 'Reformula en el Laboratorio de Voz los errores detectados durante tu clase en vivo para automatizar reflejos.'
                       : 'Rehearse and recast errors flagged during your live session inside the 24/7 Voice Lab.'}
@@ -561,7 +561,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveView('simulator')}
-                  className="w-full py-2 rounded-xl bg-[#12223a] hover:bg-[#12223a]/80 text-emerald-400 border border-emerald-400/40 text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-[var(--bg-surface)] dark:bg-[#12223a] hover:bg-emerald-500 hover:text-white text-[#047857] dark:text-emerald-400 border border-emerald-500/40 text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer transition-colors"
                 >
                   <Mic size={13} />
                   <span>{isEs ? 'Practicar en Voz 24/7 →' : 'Practice in 24/7 Voice →'}</span>
@@ -569,18 +569,18 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               </div>
 
               {/* NODE 4: Weekly Milestone & WhatsApp Sync */}
-              <div className="p-5 rounded-2xl bg-[#1A3153]/80 border-2 border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
+              <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 border-2 border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 flex flex-col justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-[10px] font-montserrat font-bold uppercase">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/20 text-[#9A6515] dark:text-[#E09B30] text-[10px] font-montserrat font-bold uppercase">
                       Paso 4 • Cierre Semanal
                     </span>
                     <Award size={14} className="text-[#E09B30]" />
                   </div>
-                  <h4 className="font-montserrat font-bold text-sm text-[#FAFAFA]">
+                  <h4 className="font-montserrat font-bold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
                     {isEs ? 'Reporte Pedagógico y Sync' : 'Pedagogical Report & Sync'}
                   </h4>
-                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
                     {isEs
                       ? 'Revisa tus métricas de tiempo de habla (>75% STT) y sincroniza tu avance con Teacher Ivan vía WhatsApp.'
                       : 'Review your Student Talking Time (>75% STT) and sync your weekly report with Teacher Ivan on WhatsApp.'}
@@ -590,7 +590,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                   href={generateWhatsAppReportMessage()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer shadow-sm"
                 >
                   <MessageCircle size={13} />
                   <span>{isEs ? 'Sync WhatsApp →' : 'WhatsApp Sync →'}</span>
@@ -663,10 +663,10 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 onClick={() => setSelectedDay(day.id)}
                 className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-[#1A3153] border-[#E09B30] shadow-xl ring-2 ring-[#E09B30]/30 scale-[1.02]'
+                    ? 'bg-[var(--bg-surface)] dark:bg-[#1A3153] border-[#E09B30] shadow-xl ring-2 ring-[#E09B30]/30 scale-[1.02]'
                     : isCompleted
-                    ? 'bg-[#12223a]/90 border-[#10b981]/50 opacity-90'
-                    : 'bg-[#12223a]/70 border-[#A7C7E7]/25 hover:border-[#A7C7E7]/50'
+                    ? 'bg-[var(--bg-sunken)] dark:bg-[#12223a]/90 border-[#10b981]/50 opacity-90'
+                    : 'bg-[var(--bg-sunken)]/60 dark:bg-[#12223a]/70 border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 hover:border-[#E09B30]/50'
                 }`}
               >
                 <div>
@@ -677,7 +677,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                           ? 'bg-[#E09B30] text-[#1A3153]'
                           : isCompleted
                           ? 'bg-[#10b981] text-[#1A3153]'
-                          : 'bg-[#FAFAFA]/10 text-[#A7C7E7]'
+                          : 'bg-[var(--bg-sunken)] dark:bg-[#FAFAFA]/10 text-[var(--text-secondary)] dark:text-[#A7C7E7]'
                       }`}
                     >
                       {day.label}
@@ -689,24 +689,24 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                         <span>{isEs ? 'Listo' : 'Done'}</span>
                       </span>
                     ) : (
-                      <span className="text-[10px] text-[#A7C7E7] font-medium">10–15m</span>
+                      <span className="text-[10px] text-[var(--text-secondary)] dark:text-[#A7C7E7] font-medium">10–15m</span>
                     )}
                   </div>
 
-                  <div className="w-8 h-8 rounded-xl bg-[#FAFAFA]/10 flex items-center justify-center text-[#E09B30] mb-2">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--bg-sunken)] dark:bg-[#FAFAFA]/10 flex items-center justify-center text-[#E09B30] mb-2">
                     <Icon size={16} />
                   </div>
 
-                  <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#E09B30] block mb-1">
+                  <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#9A6515] dark:text-[#E09B30] block mb-1">
                     {day.type}
                   </span>
 
-                  <h4 className="font-montserrat font-bold text-xs text-[#FAFAFA] leading-snug line-clamp-2">
+                  <h4 className="font-montserrat font-bold text-xs text-[var(--text-primary)] dark:text-[#FAFAFA] leading-snug line-clamp-2">
                     {content.title}
                   </h4>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-[#A7C7E7]/15 flex items-center justify-between text-[10px] font-montserrat font-semibold text-[#A7C7E7]">
+                <div className="mt-3 pt-2 border-t border-[var(--border-hairline)] dark:border-[#A7C7E7]/15 flex items-center justify-between text-[10px] font-montserrat font-semibold text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                   <span>{isSelected ? (isEs ? 'Activo ↓' : 'Active ↓') : (isEs ? 'Ver Tarea' : 'View Task')}</span>
                   <ArrowRight size={12} className={isSelected ? 'text-[#E09B30]' : ''} />
                 </div>

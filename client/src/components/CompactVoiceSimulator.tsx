@@ -239,8 +239,8 @@ export const CompactVoiceSimulator: React.FC = () => {
 
       {/* 2. Compact Control Bar (Tutor Persona + Level Selector + Scenario Strip) */}
       <div className="bg-[#12223a]/90 backdrop-blur-md rounded-2xl border border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-3 shadow-md">
-        {/* Row A1: Tutor Persona Pill & Session Quota Badge */}
-        <div className="flex items-center justify-between gap-2 w-full">
+        {/* Row A1: Tutor Persona Pill */}
+        <div className="flex items-center gap-2 w-full">
           {/* Tutor Persona Toggle: [Ivan | Emma] */}
           <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
             <button
@@ -270,134 +270,122 @@ export const CompactVoiceSimulator: React.FC = () => {
               <span>{t.persona.emma.name}</span>
             </button>
           </div>
-
-          {/* Daily Quota Pill (Compact on mobile) */}
-          <div
-            id="simulator-daily-quota-badge-inline"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] shadow-sm shrink-0"
-          >
-            <Sparkles size={12} className="text-[#E09B30]" />
-            <span className="truncate">{getDailySessionBadge()}</span>
-          </div>
         </div>
 
         {/* Row A2: Level Pill Selector (Horizontal Swipe Row with >=44px touch height) */}
-        <div className="flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-0.5">
-          {levelPills.map((pill) => {
-            const active = isPillActive(pill.id);
-            const isPillLocked = !isAuthenticated && pill.id !== 'diag';
-            return (
-              <button
-                key={pill.id}
-                type="button"
-                id={`level-pill-${pill.id}`}
-                disabled={isLocked}
-                onClick={() => handleLevelPillClick(pill.id)}
-                title={isPillLocked ? t.authModal.tierLockBanner : undefined}
-                className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-[0.15em] transition-all cursor-pointer shrink-0 flex items-center justify-center gap-1.5 ${
-                  active
-                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black scale-105'
-                    : 'bg-[#1A3153]/70 text-[#A7C7E7] hover:bg-[#1A3153] hover:text-[#FAFAFA] border border-[#A7C7E7]/20'
-                }`}
-              >
-                <span>{pill.label}</span>
-                {isPillLocked && <Lock size={10} className="text-[#E09B30]" />}
-              </button>
-            );
-          })}
+        <div className="relative w-full">
+          <div className="flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-0.5 pr-8">
+            {levelPills.map((pill) => {
+              const active = isPillActive(pill.id);
+              const isPillLocked = !isAuthenticated && pill.id !== 'diag';
+              return (
+                <button
+                  key={pill.id}
+                  type="button"
+                  id={`level-pill-${pill.id}`}
+                  disabled={isLocked}
+                  onClick={() => handleLevelPillClick(pill.id)}
+                  title={isPillLocked ? t.authModal.tierLockBanner : undefined}
+                  className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-[0.15em] transition-all cursor-pointer shrink-0 flex items-center justify-center gap-1.5 ${
+                    active
+                      ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black scale-105'
+                      : 'bg-[#1A3153]/70 text-[#A7C7E7] hover:bg-[#1A3153] hover:text-[#FAFAFA] border border-[#A7C7E7]/20'
+                  }`}
+                >
+                  <span>{pill.label}</span>
+                  {isPillLocked && <Lock size={10} className="text-[#E09B30]" />}
+                </button>
+              );
+            })}
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#12223a] to-transparent" />
         </div>
 
-        {/* Row B: Scenario Selector + Inline Info Button + Correction Mode */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-[#A7C7E7]/15">
-          {/* Scenario Dropdown with Inline 44x44px Info Icon */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] shrink-0 hidden md:inline">
-              {t.compactSimulator.scenarioLabel}:
-            </span>
-            <select
-              id="compact-scenario-select"
-              disabled={isLocked}
-              value={selectedScenarioId}
-              onChange={(e) => {
-                if (!isAuthenticated && e.target.value !== 'diagnostic-placement') {
+        {/* Row B: Scenario Selector + Inline Info Button */}
+        <div className="flex items-center gap-2 w-full pt-2 border-t border-[#A7C7E7]/15">
+          <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] shrink-0 hidden md:inline">
+            {t.compactSimulator.scenarioLabel}:
+          </span>
+          <select
+            id="compact-scenario-select"
+            disabled={isLocked}
+            value={selectedScenarioId}
+            onChange={(e) => {
+              if (!isAuthenticated && e.target.value !== 'diagnostic-placement') {
+                promptTierLock();
+                return;
+              }
+              selectScenario(e.target.value);
+            }}
+            className="bg-[#1A3153] text-[#FAFAFA] text-xs font-inter font-medium rounded-xl border border-[#A7C7E7]/30 px-3 py-2 flex-1 min-w-0 truncate focus:outline-none focus:border-[#E09B30] cursor-pointer min-h-[44px]"
+          >
+            {availableScenarios.map((scenario) => {
+              const isScenarioLocked = !isAuthenticated && scenario.id !== 'diagnostic-placement';
+              const scenarioLabel =
+                scenario.id === 'diagnostic-placement' && isEs
+                  ? 'Diagnóstico Hablado (Evaluación 90s)'
+                  : `${scenario.title} (${scenario.category})`;
+              return (
+                <option key={scenario.id} value={scenario.id} className="bg-[#12223a] text-[#FAFAFA]">
+                  {isScenarioLocked ? `[Pro] ${scenario.title}` : scenarioLabel}
+                </option>
+              );
+            })}
+          </select>
+
+          {/* Compact 44x44px Info Icon strictly inline beside scenario dropdown */}
+          <button
+            type="button"
+            id="toggle-vocab-tips-btn"
+            onClick={() => setShowVocabTips((prev) => !prev)}
+            className={`min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer ${
+              showVocabTips
+                ? 'bg-[#E09B30] text-[#1A3153]'
+                : 'bg-[#1A3153] text-[#E09B30] border border-[#E09B30]/30 hover:border-[#E09B30]'
+            }`}
+            title={t.compactSimulator.vocabTipsBtn}
+            aria-label={t.compactSimulator.vocabTipsBtn}
+          >
+            <Info size={16} />
+          </button>
+        </div>
+
+        {/* Row C: Correction Mode Selector [Fluency | Coaching] Full-Width */}
+        <div className="w-full">
+          <div className="grid grid-cols-2 gap-2 w-full p-1 bg-[#1A3153] rounded-xl border border-[#A7C7E7]/30 min-h-[44px]">
+            <button
+              type="button"
+              id="correction-mode-conversation-btn"
+              onClick={() => setCorrectionMode('conversation')}
+              className={`min-h-[38px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center justify-center ${
+                correctionMode === 'conversation'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              }`}
+              title="Fluency Mode: Natural conversation flow"
+            >
+              <span>{isEs ? 'Fluidez' : 'Fluency'}</span>
+            </button>
+            <button
+              type="button"
+              id="correction-mode-coaching-btn"
+              onClick={() => {
+                if (!isAuthenticated) {
                   promptTierLock();
                   return;
                 }
-                selectScenario(e.target.value);
+                setCorrectionMode('coaching');
               }}
-              className="bg-[#1A3153] text-[#FAFAFA] text-xs font-inter font-medium rounded-xl border border-[#A7C7E7]/30 px-3 py-2 flex-1 min-w-0 truncate focus:outline-none focus:border-[#E09B30] cursor-pointer min-h-[44px]"
-            >
-              {availableScenarios.map((scenario) => {
-                const isScenarioLocked = !isAuthenticated && scenario.id !== 'diagnostic-placement';
-                const scenarioLabel =
-                  scenario.id === 'diagnostic-placement' && isEs
-                    ? 'Diagnóstico Hablado (Evaluación 90s)'
-                    : `${scenario.title} (${scenario.category})`;
-                return (
-                  <option key={scenario.id} value={scenario.id} className="bg-[#12223a] text-[#FAFAFA]">
-                    {isScenarioLocked ? `[Pro] ${scenario.title}` : scenarioLabel}
-                  </option>
-                );
-              })}
-            </select>
-
-            {/* Compact 44x44px Info Icon strictly inline beside scenario dropdown */}
-            <button
-              type="button"
-              id="toggle-vocab-tips-btn"
-              onClick={() => setShowVocabTips((prev) => !prev)}
-              className={`min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer ${
-                showVocabTips
-                  ? 'bg-[#E09B30] text-[#1A3153]'
-                  : 'bg-[#1A3153] text-[#E09B30] border border-[#E09B30]/30 hover:border-[#E09B30]'
+              className={`min-h-[38px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                correctionMode === 'coaching'
+                  ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
+                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
               }`}
-              title={t.compactSimulator.vocabTipsBtn}
-              aria-label={t.compactSimulator.vocabTipsBtn}
+              title="Coaching Mode: Systematic recast error modeling"
             >
-              <Info size={16} />
+              <span>{isEs ? 'Corrección Activa' : 'Coaching'}</span>
+              {!isAuthenticated && <Lock size={11} className="text-[#E09B30]" />}
             </button>
-          </div>
-
-          {/* Correction Mode Selector: [Fluency | Coaching] */}
-          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-            <span className="sm:hidden text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7]">
-              {isEs ? 'Corrección:' : 'Mode:'}
-            </span>
-            <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
-              <button
-                type="button"
-                id="correction-mode-conversation-btn"
-                onClick={() => setCorrectionMode('conversation')}
-                className={`min-h-[36px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer ${
-                  correctionMode === 'conversation'
-                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                    : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-                }`}
-                title="Fluency Mode: Natural conversation flow"
-              >
-                {isEs ? 'Fluidez' : 'Fluency'}
-              </button>
-              <button
-                type="button"
-                id="correction-mode-coaching-btn"
-                onClick={() => {
-                  if (!isAuthenticated) {
-                    promptTierLock();
-                    return;
-                  }
-                  setCorrectionMode('coaching');
-                }}
-                className={`min-h-[36px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                  correctionMode === 'coaching'
-                    ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                    : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
-                }`}
-                title="Coaching Mode: Systematic recast error modeling"
-              >
-                <span>{isEs ? 'Corrección Activa' : 'Coaching'}</span>
-                {!isAuthenticated && <Lock size={11} className="text-[#E09B30]" />}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -562,9 +550,6 @@ export const CompactVoiceSimulator: React.FC = () => {
                 </>
               )}
             </button>
-            <p className="text-xs text-[#A7C7E7]/80 text-center font-medium hidden sm:block">
-              {t.compactSimulator.idleHint}
-            </p>
           </div>
         ) : (
           /* ACTIVE STATE: Large Green/Amber "Done Speaking" + Compact Red "End & Score" */

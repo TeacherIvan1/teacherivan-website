@@ -103,6 +103,22 @@ export const EducationalResourcesView: React.FC = () => {
   const [levelFilter, setLevelFilter] = useState<'ALL' | 'A1–A2' | 'B1–B2' | 'IELTS / C1'>('ALL');
   const [scenarioFilter, setScenarioFilter] = useState<string>('ALL');
 
+  const getScenarioLabel = (sc: string) => {
+    if (!isEs) return sc;
+    switch (sc) {
+      case 'Tech Job Interview':
+        return 'Entrevista Tech';
+      case 'Scholarship Interview':
+        return 'Entrevista de Beca';
+      case 'Daily Routine':
+        return 'Rutina Diaria';
+      case 'IELTS Academic':
+        return 'IELTS Académico';
+      default:
+        return sc;
+    }
+  };
+
   // Reader Modal State
   const [activeReading, setActiveReading] = useState<ReadingItem | null>(null);
   const [selectedCollocation, setSelectedCollocation] = useState<Collocation | null>(null);
@@ -699,7 +715,10 @@ export const EducationalResourcesView: React.FC = () => {
           {/* Quick Preset Topic Pills */}
           <div className="flex items-center gap-2 flex-wrap text-xs text-[#A7C7E7]">
             <span className="font-semibold text-xs text-[#FAFAFA]">{isEs ? 'Ideas Rápidas:' : 'Quick Ideas:'}</span>
-            {['Salary Negotiation', 'Incident Post-Mortem', 'M&A Due Diligence', 'Cross-Border Team Sync'].map((idea) => (
+            {(isEs
+              ? ['Negociación Salarial', 'Post-Mortem de Incidente', 'Due Diligence MBA', 'Sincronización Internacional']
+              : ['Salary Negotiation', 'Incident Post-Mortem', 'MBA Due Diligence', 'Cross-Border Team Sync']
+            ).map((idea) => (
               <button
                 key={idea}
                 type="button"
@@ -994,10 +1013,10 @@ export const EducationalResourcesView: React.FC = () => {
             className="px-3 py-1.5 rounded-full text-xs bg-[#1A3153] border border-[#A7C7E7]/30 text-[#FAFAFA] font-medium focus:outline-none focus:border-[#E09B30]"
           >
             <option value="ALL">{t.resourcesView.filterAllScenarios}</option>
-            <option value="Daily Routine">Daily Routine</option>
-            <option value="Scholarship Interview">Scholarship Interview</option>
-            <option value="Tech Job Interview">Tech Job Interview</option>
-            <option value="IELTS Academic">IELTS Academic</option>
+            <option value="Daily Routine">{getScenarioLabel('Daily Routine')}</option>
+            <option value="Scholarship Interview">{getScenarioLabel('Scholarship Interview')}</option>
+            <option value="Tech Job Interview">{getScenarioLabel('Tech Job Interview')}</option>
+            <option value="IELTS Academic">{getScenarioLabel('IELTS Academic')}</option>
           </select>
         </div>
       </div>
@@ -1036,7 +1055,7 @@ export const EducationalResourcesView: React.FC = () => {
                         {reading.level}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/15 text-[#A7C7E7] text-[11px] font-semibold">
-                        {reading.scenario}
+                        {getScenarioLabel(reading.scenario)}
                       </span>
                     </div>
 
@@ -1128,7 +1147,7 @@ export const EducationalResourcesView: React.FC = () => {
                         {item.level}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/15 text-[#A7C7E7] text-[11px] font-semibold">
-                        {item.scenario}
+                        {getScenarioLabel(item.scenario)}
                       </span>
                     </div>
 
@@ -1205,7 +1224,7 @@ export const EducationalResourcesView: React.FC = () => {
                   <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/15 text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
                     {activeReading.level}
                   </span>
-                  <span className="text-xs text-[#A7C7E7]">{activeReading.scenario}</span>
+                  <span className="text-xs text-[#A7C7E7]">{getScenarioLabel(activeReading.scenario)}</span>
                 </div>
                 <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA]">
                   {activeReading.title}

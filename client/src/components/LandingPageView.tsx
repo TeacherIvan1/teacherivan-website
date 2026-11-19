@@ -55,6 +55,7 @@ export const LandingPageView: React.FC = () => {
   const { status, startSession } = useConversationStore();
   const { openAuthModal } = useAuthStore();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [isCh1Expanded, setIsCh1Expanded] = useState<boolean>(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showIosModal, setShowIosModal] = useState<boolean>(false);
   const [showAndroidModal, setShowAndroidModal] = useState<boolean>(false);
@@ -242,9 +243,16 @@ export const LandingPageView: React.FC = () => {
                 {lp.ch1Thesis}
               </h2>
 
-              <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed line-clamp-2 md:line-clamp-none">
+              <p className={`font-inter text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed ${isCh1Expanded ? '' : 'line-clamp-2 md:line-clamp-none'}`}>
                 {lp.ch1Description}
               </p>
+              <button
+                type="button"
+                onClick={() => setIsCh1Expanded((prev) => !prev)}
+                className="md:hidden text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] min-h-[44px] -mt-2 inline-flex items-center cursor-pointer hover:underline"
+              >
+                {isCh1Expanded ? (isEs ? 'Mostrar menos ↑' : 'Show less ↑') : (isEs ? 'Leer más ↓' : 'Read more ↓')}
+              </button>
 
               {/* Architectural Metrics Grid */}
               <div className="grid grid-cols-2 gap-2.5 sm:gap-3 pt-2">
@@ -326,7 +334,7 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Card 1: Traditional Academies (30% STT) */}
-              <div className={`slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] ${
+              <div className={`slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4 bg-[var(--bg-surface)] dark:bg-[#132642] border border-[var(--border-hairline)] text-[var(--text-primary)] ${
                 activeCh1Card === 0 ? 'block' : 'hidden md:block'
               }`}>
                 <div className="flex items-center justify-between">
@@ -338,7 +346,7 @@ export const LandingPageView: React.FC = () => {
                   </span>
                 </div>
 
-                <h3 className="font-montserrat font-bold text-xl text-[var(--text-primary)]">
+                <h3 className="font-montserrat font-bold text-xl text-[#1A3153] dark:text-[#FAFAFA]">
                   {isEs
                     ? 'Academias Tradicionales y Clases Masivas'
                     : 'Traditional Academies & 30-Student Lectures'}
@@ -346,7 +354,7 @@ export const LandingPageView: React.FC = () => {
 
                 {/* Progress bar scrub */}
                 <div>
-                  <div className="flex justify-between text-xs font-inter text-[var(--text-secondary)] mb-1.5">
+                  <div className="flex justify-between text-xs font-inter text-[#4A5568] dark:text-[#A7C7E7] mb-1.5">
                     <span>{isEs ? 'Tiempo de producción oral del alumno:' : 'Student speaking participation:'}</span>
                     <span className="font-mono font-bold text-red-600">30%</span>
                   </div>
@@ -355,7 +363,7 @@ export const LandingPageView: React.FC = () => {
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs sm:text-sm text-[var(--text-secondary)] pt-2">
+                <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] pt-2">
                   <li className="flex items-start gap-2">
                     <XCircle size={15} className="text-red-500 shrink-0 mt-0.5" />
                     <span>
@@ -442,7 +450,7 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Card 3: 24/7 AI Voice Immersion & Daily Micro-Learning (95% Reflex Retention) */}
-              <div className={`slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] ${
+              <div className={`slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4 bg-[var(--bg-surface)] dark:bg-[#132642] border border-[var(--border-hairline)] text-[var(--text-primary)] ${
                 activeCh1Card === 2 ? 'block' : 'hidden md:block'
               }`}>
                 <div className="flex items-center justify-between">
@@ -454,7 +462,7 @@ export const LandingPageView: React.FC = () => {
                   </span>
                 </div>
 
-                <h3 className="font-montserrat font-bold text-xl text-[var(--text-primary)]">
+                <h3 className="font-montserrat font-bold text-xl text-[#1A3153] dark:text-[#FAFAFA]">
                   {isEs
                     ? 'Laboratorio de Voz 24/7 y Micro-Sprints Diarios'
                     : '24/7 Voice Lab & Daily Micro-Learning Sprints'}
@@ -462,7 +470,7 @@ export const LandingPageView: React.FC = () => {
 
                 {/* Progress bar scrub */}
                 <div>
-                  <div className="flex justify-between text-xs font-inter text-[var(--text-secondary)] mb-1.5">
+                  <div className="flex justify-between text-xs font-inter text-[#4A5568] dark:text-[#A7C7E7] mb-1.5">
                     <span>{isEs ? 'Retención de reflejos automáticos:' : 'Automated speaking reflex retention:'}</span>
                     <span className="font-mono font-bold text-[#047857] dark:text-[#34D399]">95%</span>
                   </div>
@@ -471,7 +479,7 @@ export const LandingPageView: React.FC = () => {
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs sm:text-sm text-[var(--text-secondary)] pt-2">
+                <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] pt-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-[#047857] dark:text-[#34D399] shrink-0 mt-0.5" />
                     <span>
@@ -532,7 +540,7 @@ export const LandingPageView: React.FC = () => {
           </div>
 
           {/* Quick Recast Popout Card with Remotion Loop Video (Section 5.2.2 & 6.3) */}
-          <div id="recast-popout-card" className="max-w-xl mx-auto my-3 md:my-6 aspect-[16/9] sm:aspect-auto max-h-[210px] sm:max-h-none overflow-hidden rounded-2xl">
+          <div id="recast-popout-card" className="max-w-xl mx-auto my-2 md:my-6 py-0 min-h-0 aspect-[16/9] sm:aspect-auto max-h-[210px] sm:max-h-none overflow-hidden rounded-2xl">
             <RemotionLoopVideo name="quick-recast-loop" alt="Quick Recast Micro-Loop" />
           </div>
 

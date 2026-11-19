@@ -113,9 +113,9 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
         {/* Left Column (col-span-5): Narrative & Action */}
         <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
           {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] dark:text-[#E09B30] uppercase">
+          <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] dark:text-[#E09B30] uppercase whitespace-nowrap">
             <span className="w-8 h-[1px] bg-[#9A6515]/50 dark:bg-[#E09B30]/50 inline-block" />
-            <span>{isEs ? 'MÉTODO BICRÓNICO • COACHING 1-A-1 + IA 24/7' : 'BICHRONOUS METHOD • 1-ON-1 COACHING + 24/7 AI'}</span>
+            <span className="whitespace-nowrap">{isEs ? 'MÉTODO BICRÓNICO • COACHING 1-A-1 + IA 24/7' : 'BICHRONOUS METHOD • 1-ON-1 COACHING + 24/7 AI'}</span>
           </div>
 
           {/* Two-Tone H1 */}
@@ -197,8 +197,8 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
             {/* Top Status Bar */}
             <div className="flex items-center justify-between pb-4 border-b border-[var(--rule-dark)] text-xs text-[#A7C7E7] font-montserrat font-bold uppercase tracking-wider">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_8px_#10B981]" />
-                <span className="text-[#FAFAFA]">VOICE LAB 24/7 • EN VIVO</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_8px_#10B981] shrink-0" />
+                <span className="text-[#FAFAFA] whitespace-nowrap text-[10px] sm:text-xs">VOICE LAB 24/7 • EN VIVO</span>
               </div>
               <span className="px-2.5 py-0.5 rounded-md bg-[#A7C7E7]/15 text-[#A7C7E7] border border-[#A7C7E7]/30 text-[10px] whitespace-nowrap">
                 CEFR A1 → C1
@@ -241,14 +241,14 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
 
             {/* Floating Pop-Out Proof Pill (translateZ: 36px) */}
             <div
-              className="mt-4 p-3.5 rounded-2xl bg-[#091326]/90 border border-[#E09B30]/40 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-[var(--shadow-float-dark)]"
+              className="mt-4 p-3.5 rounded-2xl bg-[#091326]/90 border border-[#E09B30]/40 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-[var(--shadow-float-dark)]"
               style={{
                 transform: 'translateZ(36px)',
               }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 text-center sm:text-left">
                 <span className="text-xs sm:text-sm font-bold text-red-300 line-through">&ldquo;I have 25 years&rdquo;</span>
-                <ArrowRight size={12} className="text-amber-brand" />
+                <ArrowRight size={12} className="text-amber-brand hidden sm:inline" />
                 <span className="text-xs sm:text-sm font-bold text-amber-brand inline-flex items-center gap-1">
                   <span>&ldquo;I am 25 years old&rdquo;</span>
                   <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />

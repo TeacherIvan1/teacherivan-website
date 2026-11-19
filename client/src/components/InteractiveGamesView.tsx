@@ -416,7 +416,7 @@ export const InteractiveGamesView: React.FC = () => {
             }`}
         >
           <Zap size={14} />
-          <span>{t.gamesView.tabRecast}</span>
+          <span>{isEs ? 'Reto de Recast' : 'Quick Recast Challenge'}</span>
         </button>
 
         <button
@@ -428,7 +428,7 @@ export const InteractiveGamesView: React.FC = () => {
             }`}
         >
           <Sparkles size={14} />
-          <span>{isEs ? 'Collocation Blitz (30s)' : 'Collocation Blitz (30s)'}</span>
+          <span>{isEs ? 'Colocaciones (30s)' : 'Collocation Blitz (30s)'}</span>
         </button>
 
         <button
@@ -440,7 +440,7 @@ export const InteractiveGamesView: React.FC = () => {
             }`}
         >
           <Mic size={14} />
-          <span>{isEs ? 'Audio Shadowing' : 'Audio Shadowing'}</span>
+          <span>{isEs ? 'Imitación de Audio' : 'Audio Shadowing'}</span>
         </button>
 
         <button

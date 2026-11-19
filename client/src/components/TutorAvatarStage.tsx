@@ -67,12 +67,12 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
       {/* Top Status Bar Inside Stage */}
       <div className="w-full flex items-center justify-between z-20 mb-2 px-1 text-xs">
         {/* Tutor Identity Tag */}
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-          <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#FAFAFA] text-[11px] sm:text-xs">
+        <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
+          <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shrink-0" />
+          <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#FAFAFA] text-[11px] sm:text-xs whitespace-nowrap">
             {tutorName}
           </span>
-          <span className="text-[10px] font-mono font-medium text-[#E09B30] px-2 py-0.5 rounded bg-[#1A3153] border border-[#E09B30]/30 hidden sm:inline-block">
+          <span className="text-[10px] font-mono font-medium text-[#E09B30] px-2 py-0.5 rounded bg-[#1A3153] border border-[#E09B30]/30 hidden sm:inline-block shrink-0">
             {voiceBadge}
           </span>
         </div>

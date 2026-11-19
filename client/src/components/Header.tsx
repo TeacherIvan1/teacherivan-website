@@ -207,11 +207,11 @@ export const Header: React.FC = () => {
 
           {/* Center: Desktop Navigation Tabs (Authenticated) or Chapter Links (Guests) */}
           {isAuthenticated ? (
-            <nav className="flex items-center gap-1.5 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
+            <nav className="flex items-center gap-1 bg-[#1A3153]/80 p-1 rounded-full border border-[#A7C7E7]/30 shadow-inner">
               <button
                 id="nav-tab-path"
                 onClick={() => setActiveView('path')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   activeView === 'path'
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
                     : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
@@ -224,20 +224,20 @@ export const Header: React.FC = () => {
               <button
                 id="nav-tab-simulator"
                 onClick={() => setActiveView('simulator')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   activeView === 'simulator'
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
                     : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
                 }`}
               >
                 <Headphones size={14} />
-                <span>{isEs ? 'Tutor de Conversación' : 'Voice Tutor'}</span>
+                <span>{isEs ? 'Simulador' : 'Simulator'}</span>
               </button>
 
               <button
                 id="nav-tab-resources"
                 onClick={() => setActiveView('resources')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   activeView === 'resources'
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
                     : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
@@ -250,14 +250,14 @@ export const Header: React.FC = () => {
               <button
                 id="nav-tab-schedule"
                 onClick={() => setActiveView('schedule')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   activeView === 'schedule'
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/30 font-black'
                     : 'text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#FAFAFA]/5'
                 }`}
               >
                 <Calendar size={14} />
-                <span>{isEs ? 'Agendar Clase (14:00–20:00)' : 'Book Class (14:00–20:00)'}</span>
+                <span>{isEs ? 'Agendar' : 'Schedule'}</span>
               </button>
             </nav>
           ) : (
@@ -394,39 +394,22 @@ export const Header: React.FC = () => {
               <div className="flex items-center gap-1.5 shrink-0">
                 <div
                   id="student-profile-badge"
-                  className="flex items-center gap-1 text-xs px-2.5 py-1 bg-[#1A3153] border border-[#A7C7E7]/40 rounded-lg text-[#FAFAFA] font-montserrat font-bold truncate max-w-[120px] shrink-0 shadow-sm"
-                  title={`@${user.username || user.fullName.split(' ')[0]}`}
+                  className="flex items-center gap-1.5 text-xs px-2.5 py-1 bg-[#1A3153] border border-[#A7C7E7]/40 rounded-lg text-[#FAFAFA] font-montserrat font-bold whitespace-nowrap shrink-0 shadow-sm"
+                  title={user.email || user.username}
                 >
-                  <span className="text-[#E09B30]">@</span>
-                  <span className="truncate">{user.username || user.fullName.split(' ')[0].toLowerCase()}</span>
-                  {user.cefrLevel && (
-                    <span className="px-1 py-0.2 rounded bg-[#E09B30] text-[#1A3153] text-[9px] font-black ml-0.5">
-                      {user.cefrLevel}
-                    </span>
-                  )}
-                </div>
-
-                <div
-                  id="header-plan-status-badge"
-                  className={`text-[10px] font-montserrat font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-0.5 transition-all shadow-sm ${
-                    user.plan === 'executive'
-                      ? 'bg-gradient-to-r from-emerald-500 to-[#E09B30] text-[#1A3153] border border-[#E09B30]/50 font-black'
-                      : user.plan === 'pro'
-                      ? 'bg-[#E09B30] text-[#1A3153] shadow-md shadow-[#E09B30]/20 font-black'
-                      : user.plan === 'essential'
-                      ? 'bg-[#A7C7E7]/25 text-[#A7C7E7] border border-[#A7C7E7]/50'
-                      : 'bg-[#E09B30]/20 text-[#E09B30] border border-[#E09B30]/50 font-black shadow-sm'
-                  }`}
-                  title={user.plan === 'free' || !user.plan ? (isEs ? 'Campaña Noviembre Gratis (5 sesiones/día)' : 'Free November Campaign (5 sessions/day)') : `Plan: ${(user.plan || 'free').toUpperCase()}`}
-                >
-                  <span className="whitespace-nowrap">
-                    {user.plan === 'executive'
-                      ? (isEs ? 'EXECUTIVE • 5 CLASES/SEM VIP' : 'EXECUTIVE • 5 CLASSES/WK VIP')
-                      : user.plan === 'pro'
-                      ? (isEs ? 'PRO • 3 CLASES/SEM + 24/7' : 'PRO • 3 CLASSES/WK + 24/7')
-                      : user.plan === 'essential'
-                      ? (isEs ? 'ESSENTIAL • AUTÓNOMO 24/7' : 'ESSENTIAL • AUTONOMOUS 24/7')
-                      : (isEs ? 'FREE • 5 SESIONES/DÍA' : 'FREE • 5 SESSIONS/DAY')}
+                  <span className="text-[#E09B30]">●</span>
+                  <span>
+                    {user.role === 'admin'
+                      ? 'Admin • VIP'
+                      : `${(user.fullName ? user.fullName.split(' ')[0] : user.username || 'Student')} • ${
+                          user.plan === 'executive'
+                            ? '5 CLASES/SEM'
+                            : user.plan === 'pro'
+                            ? '3 CLASES/SEM'
+                            : user.plan === 'essential'
+                            ? 'AUTÓNOMO'
+                            : 'FREE'
+                        }`}
                   </span>
                 </div>
 
@@ -512,6 +495,36 @@ export const Header: React.FC = () => {
                 <X size={22} />
               </button>
             </div>
+
+            {/* Authenticated Student Profile in Drawer */}
+            {isAuthenticated && user && (
+              <div className="mt-4 p-3 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#132642] border border-[var(--border-hairline)] flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 truncate">
+                  <div className="w-8 h-8 rounded-full bg-[#E09B30] text-[#1A3153] font-montserrat font-black text-xs flex items-center justify-center shrink-0">
+                    {(user.fullName || user.username || 'S')[0].toUpperCase()}
+                  </div>
+                  <div className="flex flex-col truncate">
+                    <span className="font-montserrat font-bold text-xs text-[var(--text-primary)] truncate">
+                      {user.fullName || user.username}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-secondary)] truncate">
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-montserrat font-black uppercase tracking-wider bg-[#E09B30] text-[#1A3153] shrink-0">
+                  {user.role === 'admin'
+                    ? 'ADMIN'
+                    : user.plan === 'executive'
+                    ? 'EXECUTIVE'
+                    : user.plan === 'pro'
+                    ? 'PRO'
+                    : user.plan === 'essential'
+                    ? 'ESSENTIAL'
+                    : 'FREE'}
+                </span>
+              </div>
+            )}
 
             {/* Center: Navigation Links */}
             <div className="py-6 flex flex-col gap-2 flex-1">
@@ -626,7 +639,7 @@ export const Header: React.FC = () => {
                         toggleDeveloperMode();
                         setIsMobileDrawerOpen(false);
                       }}
-                      className="w-full min-h-[44px] px-4 py-3 rounded-xl text-left font-mono text-xs border border-purple-500/40 text-purple-400 hover:bg-purple-950/20 transition-colors flex items-center justify-between cursor-pointer mt-2"
+                      className="w-full min-h-[44px] px-4 py-3 rounded-xl text-left font-mono text-xs text-[#1A3153] dark:text-[#FAFAFA] bg-[#EEF3F8] dark:bg-[#132642] border border-[#E09B30]/60 hover:bg-[#E09B30]/10 transition-colors flex items-center justify-between cursor-pointer mt-2"
                     >
                       <span>ADMIN DEV MODE</span>
                       <span className={`w-2 h-2 rounded-full ${isDeveloperMode ? 'bg-[#10b981]' : 'bg-red-400'}`} />
@@ -641,11 +654,26 @@ export const Header: React.FC = () => {
               {/* Primary 48px .btn-3d-amber CTA */}
               <button
                 type="button"
-                onClick={handleTakeAssessment}
+                onClick={() => {
+                  setIsMobileDrawerOpen(false);
+                  if (isAuthenticated) {
+                    setActiveView('simulator');
+                  } else {
+                    handleTakeAssessment();
+                  }
+                }}
                 className="btn-3d-amber w-full min-h-[48px] py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider cursor-pointer shadow-lg flex items-center justify-center gap-2"
               >
                 <Sparkles size={16} />
-                <span>{isEs ? 'Probar Nivel en 90s Gratis →' : 'Test Level in 90s Free →'}</span>
+                <span>
+                  {isAuthenticated
+                    ? isEs
+                      ? 'Ir al Simulador de Voz →'
+                      : 'Open Voice Simulator →'
+                    : isEs
+                    ? 'Probar Nivel en 90s Gratis →'
+                    : 'Test Level in 90s Free →'}
+                </span>
               </button>
 
               {/* Secondary Action */}

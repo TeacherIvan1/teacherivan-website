@@ -107,11 +107,11 @@ export const PlanApprovedModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       id="plan-approved-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B1526]/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#091326]/80 backdrop-blur-md animate-in fade-in duration-200"
     >
       <div
         id="plan-approved-modal-card"
-        className="relative w-full max-w-lg bg-[#1A3153] border border-[#A7C7E7]/40 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center gap-5 overflow-hidden animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto bg-[#1A3153] border border-[#A7C7E7]/40 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center gap-5 my-auto animate-in zoom-in-95 duration-200"
         style={{
           boxShadow: '0 25px 50px -12px rgba(224, 155, 48, 0.25)',
         }}

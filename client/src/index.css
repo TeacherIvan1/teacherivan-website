@@ -185,7 +185,7 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* App Container */
@@ -1422,10 +1422,17 @@ body {
 }
 
 .slab-3d-light {
-  background: var(--paper-elevated);
-  border: 1px solid var(--rule-light);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
   box-shadow: var(--shadow-float-light);
-  transition: transform 0.4s var(--ease-soft-land), box-shadow 0.4s var(--ease-soft-land), border-color 0.3s ease;
+  transition: transform 0.4s var(--ease-soft-land), box-shadow 0.4s var(--ease-soft-land), border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark .slab-3d-light,
+[data-theme="dark"] .slab-3d-light {
+  background: #132642;
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-float-dark);
 }
 
 .slab-3d-light:hover {

@@ -670,3 +670,14 @@ export const useConversationStore = create<ConversationState>((set, get) => {
     },
   };
 });
+
+// Synchronize global voice session watchdog flag for cache-busting auto-update guards
+if (typeof window !== 'undefined') {
+  useConversationStore.subscribe((state) => {
+    window.__TI_VOICE_SESSION_ACTIVE__ =
+      state.status === 'connected' ||
+      state.status === 'connecting' ||
+      state.status === 'requesting_token';
+  });
+}
+
