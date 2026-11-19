@@ -648,13 +648,13 @@ export const ClassSchedulerView: React.FC = () => {
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleBookSlot(selectedMobileDay.dateStr, hour.start)}
-                className="w-full p-3.5 rounded-2xl bg-[#FAFAFA] text-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-[0.99]"
+                className="w-full p-3.5 rounded-2xl bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all flex items-center justify-between cursor-pointer shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-2">
                   <CalendarIcon size={14} className="text-[#E09B30]" />
                   <span className="text-xs font-montserrat font-bold">{hour.label}</span>
                 </div>
-                <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#4A5568]">
+                <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[var(--text-secondary)]">
                   {t.scheduling.availableSlot}
                 </span>
               </button>
@@ -740,14 +740,14 @@ export const ClassSchedulerView: React.FC = () => {
                       type="button"
                       disabled={isLoading}
                       onClick={() => handleBookSlot(day.dateStr, hour.start)}
-                      className="p-3.5 rounded-2xl bg-[#FAFAFA] text-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 transition-all duration-150 flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow-md hover:scale-[1.02]"
+                      className="p-3.5 rounded-2xl bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all duration-150 flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow-md hover:scale-[1.02]"
                       title={`Book ${day.dayName} at ${hour.label}`}
                     >
                       <div className="text-xs font-montserrat font-bold flex items-center justify-between w-full">
                         <span>{hour.label}</span>
                         <CalendarIcon size={12} className="opacity-40 group-hover:opacity-100" />
                       </div>
-                      <div className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#4A5568] group-hover:text-[#1A3153] mt-2">
+                      <div className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[#1A3153] mt-2">
                         {t.scheduling.availableSlot}
                       </div>
                     </button>

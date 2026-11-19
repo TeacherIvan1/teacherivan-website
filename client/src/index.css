@@ -11,6 +11,17 @@
    ============================================================================== */
 
 :root {
+  /* === Semantic Theme System (Workstream 1) — Light Mode Default === */
+  --bg-canvas:         #FAFAFA;
+  --bg-surface:        #FFFFFF;
+  --bg-sunken:         #EEF3F8;
+  --bg-elevated:       #FFFFFF;
+  --text-primary:      #1A3153;
+  --text-secondary:    #4A5568;
+  --accent-text:       #9A6515; /* WCAG AA 4.74:1 — NEVER use #E09B30 for text on light backgrounds */
+  --border-hairline:   rgba(26, 49, 83, 0.14);
+  --glass-bg:          rgba(250, 250, 250, 0.86);
+
   /* === Core Brand Anchors (Design.md v3.0) === */
   --navy-primary:      #1A3153; /* RGB: 26, 49, 83   | Primary dark canvas, light-mode display ink */
   --navy-elevated:     #1E3A5F; /* RGB: 30, 58, 95   | Elevated dark glass card surface */
@@ -129,6 +140,19 @@
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html.dark,
+[data-theme="dark"] {
+  --bg-canvas:         #091326;
+  --bg-surface:        #132642;
+  --bg-sunken:         #0d1829;
+  --bg-elevated:       #1A3153;
+  --text-primary:      #FAFAFA;
+  --text-secondary:    #A7C7E7;
+  --accent-text:       #E09B30; /* WCAG AA 5.54:1 on #1A3153 */
+  --border-hairline:   rgba(167, 199, 231, 0.18);
+  --glass-bg:          rgba(9, 19, 38, 0.86);
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -157,10 +181,11 @@ html, body, #root {
 
 body {
   font-family: var(--font-body);
-  background-color: var(--brand-navy);
-  color: var(--text-main);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* App Container */

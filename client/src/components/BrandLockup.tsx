@@ -59,18 +59,16 @@ export const BrandLockup: React.FC<BrandLockupProps> = ({
       <div className="flex flex-col justify-center leading-none text-left">
         {/* Line 1: Teacher Ivan on a single line (never wraps) */}
         <div
-          className={`font-montserrat font-bold tracking-tight whitespace-nowrap transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 ${primaryTextSize} ${
-            isLight ? 'text-[#1A3153]' : 'text-[#FAFAFA]'
-          }`}
+          className={`font-montserrat font-bold tracking-tight whitespace-nowrap transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 ${primaryTextSize} text-[#1A3153] dark:text-[#FAFAFA]`}
         >
-          Teacher <span className="text-[#E09B30]">I</span>van
+          Teacher <span className="text-[#9A6515] dark:text-[#E09B30]">I</span>van
         </div>
 
         {/* Line 2: ENGLISH CLASSES in uppercase, geometric sans-serif (Montserrat), tracking-[0.25em] (hidden on <640px for sm) */}
         <div
           className={`font-montserrat uppercase font-semibold tracking-[0.22em] sm:tracking-[0.25em] whitespace-nowrap transition-colors duration-200 ${sublineTextSize} mt-0.5 md:mt-1 ${
             size === 'sm' ? 'hidden sm:block' : ''
-          } ${isLight ? 'text-[#4A5568]' : 'text-[#A7C7E7]'}`}
+          } text-[#4A5568] dark:text-[#A7C7E7]`}
         >
           ENGLISH CLASSES
         </div>

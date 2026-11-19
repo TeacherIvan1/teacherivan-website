@@ -55,12 +55,32 @@ async function runVerification() {
       const initialTheme = await navbar.getAttribute('data-theme');
       console.log(`PASS: Initial navbar theme is "${initialTheme}".`);
 
+      // Verify Wordmark Contrast in Light Mode
+      const wordmarkLight = await desktopPage.$eval('#app-navbar', (el) => {
+        const teacherSpan = el.querySelector('.font-montserrat.font-extrabold');
+        return teacherSpan ? window.getComputedStyle(teacherSpan).color : null;
+      });
+      console.log(`PASS: Light mode wordmark color computed: ${wordmarkLight}`);
+
       const themeToggleBtn = await desktopPage.$('#theme-toggle-btn');
       if (themeToggleBtn) {
         await themeToggleBtn.click();
         await desktopPage.waitForTimeout(300);
         const toggledTheme = await navbar.getAttribute('data-theme');
         console.log(`PASS: Toggled navbar theme is "${toggledTheme}".`);
+
+        // Verify Wordmark Contrast in Night Mode
+        const wordmarkDark = await desktopPage.$eval('#app-navbar', (el) => {
+          const teacherSpan = el.querySelector('.font-montserrat.font-extrabold');
+          return teacherSpan ? window.getComputedStyle(teacherSpan).color : null;
+        });
+        console.log(`PASS: Night mode wordmark color computed: ${wordmarkDark}`);
+
+        // Capture Night Mode Screenshot
+        const nightShot = path.resolve(resultsDir, 'desktop-night-mode.png');
+        await desktopPage.screenshot({ path: nightShot });
+        console.log(`Saved screenshot: ${nightShot}`);
+
         // Toggle back to preserve daylight default
         await themeToggleBtn.click();
         await desktopPage.waitForTimeout(300);
@@ -153,6 +173,51 @@ async function runVerification() {
       const pricingShot = path.resolve(resultsDir, 'desktop-ch-3-pricing.png');
       await desktopPage.screenshot({ path: pricingShot });
       console.log(`Saved screenshot: ${pricingShot}`);
+    }
+
+    // -------------------------------------------------------------
+    // Test Student Auth Modal & In-Modal Google Fallback (No window.prompt)
+    // -------------------------------------------------------------
+    console.log('\nTesting Student Auth Modal & In-Modal Google Fallback...');
+    let nativeDialogFired = false;
+    desktopPage.on('dialog', (dialog) => {
+      nativeDialogFired = true;
+      console.error(`FAIL: Native browser dialog intercepted (${dialog.type()}): "${dialog.message()}"`);
+      dialog.dismiss();
+    });
+
+    const authTriggerBtn = await desktopPage.$('#header-auth-trigger-btn');
+    if (authTriggerBtn) {
+      await authTriggerBtn.click();
+      await desktopPage.waitForSelector('#student-auth-modal-card', { state: 'visible', timeout: 3000 });
+      console.log('PASS: #student-auth-modal-card opened successfully.');
+
+      const googleBtn = await desktopPage.$('#continue-with-google-btn');
+      if (googleBtn) {
+        await googleBtn.click();
+        await desktopPage.waitForTimeout(300);
+
+        if (nativeDialogFired) {
+          console.error('FAIL: Native window.prompt or alert was triggered on Google Click!');
+          hasErrors = true;
+        } else {
+          console.log('PASS: Zero native browser dialogs triggered on Google click.');
+        }
+
+        const fallbackEmailInput = await desktopPage.$('#auth-google-fallback-email');
+        if (fallbackEmailInput) {
+          console.log('PASS: In-modal branded Google fallback input rendered inside modal card.');
+        } else {
+          console.error('FAIL: #auth-google-fallback-email not rendered.');
+          hasErrors = true;
+        }
+      }
+
+      const closeAuthBtn = await desktopPage.$('#close-auth-modal-btn');
+      if (closeAuthBtn) {
+        await closeAuthBtn.click();
+        await desktopPage.waitForTimeout(300);
+      }
     }
 
     await desktopContext.close();

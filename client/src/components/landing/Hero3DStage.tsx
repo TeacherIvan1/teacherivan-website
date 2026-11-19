@@ -108,32 +108,29 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
   return (
     <section
       id="chapter-0-hero"
-      className="relative w-full pt-24 pb-16 md:pt-32 md:pb-24 px-4 sm:px-6 lg:px-12 border-b border-[var(--rule-light)] select-none overflow-hidden"
-      style={{
-        background: 'var(--bg-daylight)',
-      }}
+      className="relative w-full pt-24 pb-16 md:pt-32 md:pb-24 px-4 sm:px-6 lg:px-12 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)] text-[var(--text-primary)] select-none overflow-hidden"
     >
       <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
         {/* Left Column (col-span-5): Narrative & Action */}
         <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
           {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] uppercase">
-            <span className="w-8 h-[1px] bg-[#9A6515]/50 inline-block" />
+          <div className="inline-flex items-center gap-2 text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] dark:text-[#E09B30] uppercase">
+            <span className="w-8 h-[1px] bg-[#9A6515]/50 dark:bg-[#E09B30]/50 inline-block" />
             <span>{isEs ? 'MÉTODO BICRÓNICO • COACHING 1-A-1 + IA 24/7' : 'BICHRONOUS METHOD • 1-ON-1 COACHING + 24/7 AI'}</span>
           </div>
 
           {/* Two-Tone H1 */}
           <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight">
-            <span className="text-[#1A3153] block">
+            <span className="text-[var(--text-primary)] block">
               {isEs ? 'Hablá inglés con fluidez' : 'Speak English fluently'}
             </span>
-            <span className="text-[#4A5568] block font-bold">
+            <span className="text-[var(--text-secondary)] block font-bold">
               {isEs ? 'y sin bloqueos al conversar.' : 'without freezing in conversations.'}
             </span>
           </h1>
 
           {/* Concise Subcopy */}
-          <p className="font-sans text-base sm:text-lg text-[#4A5568] max-w-[44ch] leading-relaxed">
+          <p className="font-sans text-base sm:text-lg text-[var(--text-secondary)] max-w-[44ch] leading-relaxed">
             {isEs
               ? 'Mentoría 1-a-1 en vivo (>75% habla activa) + Laboratorio de Voz 24/7 con Teacher Ivan y Emma.'
               : 'Live 1-on-1 human coaching (>75% student talking time) + 24/7 Voice Lab with Teacher Ivan & Emma.'}
@@ -145,8 +142,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
               id="hero-primary-cta-btn"
               type="button"
               onClick={onStartVoiceTest}
-              className="btn-3d-amber w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-xs sm:text-sm font-montserrat font-bold uppercase tracking-wider cursor-pointer shadow-lg"
-              style={{ minHeight: 52 }}
+              className="btn-3d-amber w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full text-xs sm:text-sm font-montserrat font-bold uppercase tracking-wider cursor-pointer shadow-lg whitespace-nowrap h-12"
             >
               <Mic size={18} />
               <span>{isEs ? 'PROBAR MI NIVEL EN 90S GRATIS →' : 'TEST MY LEVEL IN 90S FREE →'}</span>
@@ -157,8 +153,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
               href="https://wa.me/59172878330"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-xs sm:text-sm font-montserrat font-bold text-[#1A3153] bg-white hover:bg-slate-50 border border-[var(--rule-light)] transition-all cursor-pointer shadow-sm"
-              style={{ minHeight: 52 }}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-montserrat font-bold text-[#1A3153] dark:text-[#FAFAFA] bg-white dark:bg-[#132642] hover:bg-slate-50 dark:hover:bg-[#1E3A5F] border border-[var(--border-hairline)] transition-all cursor-pointer shadow-sm whitespace-nowrap h-12"
             >
               <MessageCircle size={17} className="text-[#10B981]" />
               <span>WhatsApp +591 72878330</span>
@@ -166,7 +161,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
           </div>
 
           {/* Trust Microcopy */}
-          <p className="text-[13px] text-[#64748B] font-medium flex items-center gap-2 pt-1">
+          <p className="text-[13px] text-[var(--text-secondary)] font-medium flex items-center gap-2 pt-1">
             <CheckCircle2 size={15} className="text-[#10B981] shrink-0" />
             <span>
               {isEs

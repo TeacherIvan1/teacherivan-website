@@ -12,7 +12,7 @@ export interface TutorAvatarStageProps {
 export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = '' }) => {
   const { status, isTutorSpeaking, micLevel, messages } = useConversationStore();
   const { persona } = useTeachingStore();
-  const { t } = useTranslation();
+  const { t, isEs } = useTranslation();
 
   const isConnected = status === 'connected';
 
@@ -31,7 +31,13 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
   const isIvan = persona === 'teacher-ivan';
   const avatarSrc = isIvan ? '/assets/teacher-ivan.svg' : '/assets/emma.svg';
   const tutorName = isIvan ? t.persona.teacherIvan.name : t.persona.emma.name;
-  const voiceBadge = isIvan ? 'Puck (Male)' : 'Aoede (Female)';
+  const voiceBadge = isIvan
+    ? isEs
+      ? 'Voz Masculina'
+      : 'Puck (Male)'
+    : isEs
+    ? 'Voz Femenina'
+    : 'Aoede (Female)';
 
   // 3. Extract the current phrase preview for the speech bubble
   const lastAssistantMessage = [...messages]
@@ -179,12 +185,22 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
         <p className="text-[11px] sm:text-xs text-[#A7C7E7] font-inter">
           {isConnected
             ? isSpeaking
-              ? `${tutorName} is responding naturally...`
+              ? isEs
+                ? `${tutorName} está respondiendo con audio natural...`
+                : `${tutorName} is responding naturally...`
               : isListening
-              ? 'Speak naturally—you can interrupt anytime'
+              ? isEs
+                ? 'Habla con tranquilidad — puedes interrumpir cuando quieras'
+                : 'Speak naturally—you can interrupt anytime'
+              : isEs
+              ? 'Esperando tu voz...'
               : 'Listening for your voice...'
             : isIvan
-            ? 'Teacher Ivan • Empathetic & Structured Pedagogical Mentor'
+            ? isEs
+              ? 'Teacher Ivan • Mentor Pedagógico Empático y Estructurado'
+              : 'Teacher Ivan • Empathetic & Structured Pedagogical Mentor'
+            : isEs
+            ? 'Emma • Coach Conversacional de Inglés Cercana y Dinámica'
             : 'Emma • Friendly Conversational English Coach'}
         </p>
       </div>

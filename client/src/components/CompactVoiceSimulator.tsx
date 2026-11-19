@@ -320,9 +320,13 @@ export const CompactVoiceSimulator: React.FC = () => {
             >
               {availableScenarios.map((scenario) => {
                 const isScenarioLocked = !isAuthenticated && scenario.id !== 'diagnostic-placement';
+                const scenarioLabel =
+                  scenario.id === 'diagnostic-placement' && isEs
+                    ? 'Diagnóstico Hablado (Evaluación 90s)'
+                    : `${scenario.title} (${scenario.category})`;
                 return (
                   <option key={scenario.id} value={scenario.id} className="bg-[#12223a] text-[#FAFAFA]">
-                    {isScenarioLocked ? `[Pro] ${scenario.title}` : `${scenario.title} (${scenario.category})`}
+                    {isScenarioLocked ? `[Pro] ${scenario.title}` : scenarioLabel}
                   </option>
                 );
               })}
@@ -361,7 +365,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               }`}
               title="Coaching Mode: Systematic recast error modeling"
             >
-              <span>{isEs ? 'Coaching' : 'Coaching'}</span>
+              <span>{isEs ? 'Corrección Activa' : 'Coaching'}</span>
               {!isAuthenticated && <Lock size={11} className="text-[#E09B30]" />}
             </button>
           </div>

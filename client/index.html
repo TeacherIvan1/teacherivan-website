@@ -21,6 +21,22 @@
     <meta name="twitter:image" content="https://teacherivan.com/og-preview-1200x630.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>Teacher Ivan | English Classes & 24/7 AI Voice Tutor</title>
+    <!-- Prevent FOUC by reading ti_theme immediately -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('ti_theme');
+          var root = document.documentElement;
+          if (saved === 'dark') {
+            root.classList.add('dark');
+            root.setAttribute('data-theme', 'dark');
+          } else {
+            root.classList.remove('dark');
+            root.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <!-- Google Fonts: Montserrat & Inter for brand typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

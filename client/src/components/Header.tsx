@@ -24,11 +24,12 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useAuthStore } from '../modules/auth/authStore';
 import { LanguageToggle } from './LanguageToggle';
 import { BrandLockup } from './BrandLockup';
+import { useTheme } from '../modules/theme/ThemeContext';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
-  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
+  const { theme, isDark, toggleTheme } = useTheme();
   const status = useConversationStore((s) => s.status);
   const { t, isEs } = useTranslation();
   const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
@@ -36,40 +37,6 @@ export const Header: React.FC = () => {
   const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, openAuthModal, signOut } = useAuthStore();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // Find whether we are currently over a dark chapter
-      const darkSections = ['chapter-1-bicronic', 'chapter-2-voicelab', 'chapter-4-faq', 'flagship-simulator-section'];
-      let isDark = false;
-      const scrollY = window.scrollY + 75;
-
-      for (const id of darkSections) {
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollY >= top && scrollY < top + height) {
-            isDark = true;
-            break;
-          }
-        }
-      }
-
-      if (isAuthenticated && activeView !== 'path') {
-        isDark = true;
-      }
-
-      setCurrentTheme(isDark ? 'dark' : 'light');
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [isAuthenticated, activeView]);
 
   useEffect(() => {
     let mounted = true;
@@ -116,11 +83,11 @@ export const Header: React.FC = () => {
   return (
     <header
       id="app-navbar"
-      data-theme={currentTheme}
-      className={`sticky top-0 z-50 w-full h-[68px] select-none transition-colors duration-300 flex items-center ${
-        currentTheme === 'light'
-          ? 'bg-[#FAFAFA]/85 text-[#1A3153] border-b border-[rgba(26,49,83,0.12)]'
-          : 'bg-[#1A3153]/85 text-[#FAFAFA] border-b border-[rgba(167,199,231,0.22)]'
+      data-theme={theme}
+      className={`sticky top-0 z-50 w-full h-[68px] select-none transition-colors duration-250 flex items-center backdrop-blur-md border-b border-[var(--border-hairline)] ${
+        isDark
+          ? 'bg-[#091326]/90 text-[#FAFAFA]'
+          : 'bg-[#FAFAFA]/90 text-[#1A3153]'
       }`}
       style={{
         backdropFilter: 'saturate(1.4) blur(14px)',
@@ -256,16 +223,12 @@ export const Header: React.FC = () => {
           <button
             id="theme-toggle-btn"
             type="button"
-            onClick={() => setCurrentTheme(currentTheme === 'light' ? 'dark' : 'light')}
+            onClick={toggleTheme}
             className="p-1 sm:p-1.5 rounded-full hover:bg-current/10 transition-colors text-current opacity-80 hover:opacity-100 cursor-pointer"
-            title={currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             aria-label="Toggle theme"
           >
-            {currentTheme === 'light' ? (
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            ) : (
+            {isDark ? (
               <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="5" />
                 <line x1="12" y1="1" x2="12" y2="3" />
@@ -276,6 +239,10 @@ export const Header: React.FC = () => {
                 <line x1="21" y1="12" x2="23" y2="12" />
                 <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             )}
           </button>

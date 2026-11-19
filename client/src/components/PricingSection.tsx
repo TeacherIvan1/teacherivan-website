@@ -19,26 +19,22 @@ export const PricingSection: React.FC = () => {
   return (
     <section
       id="chapter-3-plans"
-      className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 border-b border-[var(--rule-light)] select-none"
-      style={{
-        background: 'var(--paper-white)',
-        color: 'var(--navy-primary)',
-      }}
+      className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[var(--bg-canvas)] text-[var(--text-primary)] border-b border-[var(--border-hairline)] select-none transition-colors duration-200"
     >
       <div className="max-w-[1280px] mx-auto space-y-12">
         {/* Header Controls: Two-tone H2 + Currency Toggle */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-[var(--rule-light)]">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-[var(--border-hairline)]">
           <div>
-            <div className="text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] uppercase mb-1">
+            <div className="text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] dark:text-[#E09B30] uppercase mb-1">
               —— CH. 03 • {isEs ? 'INVERSIÓN TRANSPARENTE' : 'TRANSPARENT TUITION'}
             </div>
-            <h2 className="font-montserrat font-black text-2xl sm:text-3xl md:text-4xl tracking-tight text-[#1A3153]">
+            <h2 className="font-montserrat font-black text-2xl sm:text-3xl md:text-4xl tracking-tight text-[var(--text-primary)]">
               {isEs ? 'Planes claros.' : 'Clear plans.'}{' '}
-              <span className="text-[#4A5568] font-bold">
+              <span className="text-[var(--text-secondary)] font-bold">
                 {isEs ? 'Sin contratos ocultos.' : 'No hidden contracts.'}
               </span>
             </h2>
-            <p className="text-sm sm:text-base text-[#4A5568] font-sans mt-1">
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] font-sans mt-1">
               {isEs
                 ? 'Cancelá o cambiá de plan en cualquier momento. Cupos limitados a 10 alumnos por franja horaria.'
                 : 'Cancel or switch tiers anytime. Strictly capped at 10 students per time window.'}
@@ -46,13 +42,13 @@ export const PricingSection: React.FC = () => {
           </div>
 
           {/* BOB | USD Currency Toggle */}
-          <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 border border-[var(--rule-light)] shadow-inner shrink-0">
+          <div className="flex items-center gap-1.5 p-1 rounded-full bg-[var(--bg-sunken)] border border-[var(--border-hairline)] shadow-inner shrink-0">
             <button
               onClick={() => setCurrency('BOB')}
               className={`px-4 py-1.5 rounded-full text-xs font-montserrat font-bold tracking-wider transition-all cursor-pointer ${
                 currency === 'BOB'
-                  ? 'bg-[#1A3153] text-[#FAFAFA] shadow-sm'
-                  : 'text-[#4A5568] hover:text-[#1A3153]'
+                  ? 'bg-[#1A3153] dark:bg-[#E09B30] text-[#FAFAFA] dark:text-[#1A3153] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               BOB (Bs)
@@ -61,8 +57,8 @@ export const PricingSection: React.FC = () => {
               onClick={() => setCurrency('USD')}
               className={`px-4 py-1.5 rounded-full text-xs font-montserrat font-bold tracking-wider transition-all cursor-pointer ${
                 currency === 'USD'
-                  ? 'bg-[#1A3153] text-[#FAFAFA] shadow-sm'
-                  : 'text-[#4A5568] hover:text-[#1A3153]'
+                  ? 'bg-[#1A3153] dark:bg-[#E09B30] text-[#FAFAFA] dark:text-[#1A3153] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               USD ($)
@@ -75,19 +71,19 @@ export const PricingSection: React.FC = () => {
           {/* 1. Essential (Autonomous) */}
           <div
             id="plan-card-essential"
-            className="slab-3d-light p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative border border-[#A7C7E7]/40"
+            className="slab-3d-light p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] shadow-sm"
           >
             <div className="space-y-4">
               {/* Badge */}
-              <div className="inline-block px-3 py-1 rounded-full bg-[#EEF3F8] text-[#1A3153] text-[10px] font-montserrat font-extrabold uppercase tracking-[0.15em] border border-[#1A3153]/10">
+              <div className="inline-block px-3 py-1 rounded-full bg-[var(--bg-sunken)] text-[var(--text-primary)] text-[10px] font-montserrat font-extrabold uppercase tracking-[0.15em] border border-[var(--border-hairline)]">
                 {isEs ? 'AUTÓNOMO 24/7' : '24/7 AUTONOMOUS'}
               </div>
 
               <div>
-                <h3 className="font-montserrat font-bold text-2xl text-[#1A3153]">
+                <h3 className="font-montserrat font-bold text-2xl text-[var(--text-primary)]">
                   Essential
                 </h3>
-                <p className="text-xs text-[#4A5568] mt-1 font-sans">
+                <p className="text-xs text-[var(--text-secondary)] mt-1 font-sans">
                   {isEs
                     ? 'Inmersión autónoma con IA para profesionales que avanzan a su propio ritmo.'
                     : 'Autonomous AI immersion for self-paced professionals.'}
@@ -96,16 +92,16 @@ export const PricingSection: React.FC = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-1 pt-2">
-                <span className="font-montserrat font-black text-3xl sm:text-4xl text-[#1A3153] tabular-nums">
+                <span className="font-montserrat font-black text-3xl sm:text-4xl text-[var(--text-primary)] tabular-nums">
                   {currency === 'BOB' ? '300 BOB' : '$45 USD'}
                 </span>
-                <span className="text-xs text-[#64748B] font-sans">
+                <span className="text-xs text-[var(--text-secondary)] font-sans">
                   {isEs ? '/ mes' : '/ mo'}
                 </span>
               </div>
 
               {/* Features List */}
-              <ul className="space-y-3 pt-4 border-t border-[var(--rule-light)] text-xs sm:text-sm text-[#4A5568] font-sans">
+              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[var(--text-secondary)] font-sans">
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
                   <span>
@@ -137,7 +133,7 @@ export const PricingSection: React.FC = () => {
               href={getWhatsAppPlanLink('Essential', currency === 'BOB' ? '300 BOB/mes' : '$45 USD/mo')}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] bg-transparent hover:bg-[#1A3153] hover:text-[#FAFAFA] border border-[#1A3153] transition-all cursor-pointer min-h-[48px]"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] bg-transparent hover:bg-[#1A3153] hover:text-[#FAFAFA] dark:hover:bg-[#E09B30] dark:hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all cursor-pointer min-h-[48px]"
             >
               <span>{isEs ? 'Elegir Essential' : 'Select Essential'}</span>
               <ArrowRight size={14} />
@@ -147,7 +143,7 @@ export const PricingSection: React.FC = () => {
           {/* 2. Pro (Flagship — Elevated 3D Dark Slab) */}
           <div
             id="plan-card-pro"
-            className="slab-3d-dark p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative text-[#FAFAFA] border-2 border-[#E09B30] lg:-translate-y-3 z-10"
+            className="slab-3d-dark p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative text-[#FAFAFA] bg-[#132642] border-2 border-[#E09B30] lg:-translate-y-3 z-10"
             style={{
               boxShadow: 'var(--shadow-slab-3d)',
             }}
@@ -187,7 +183,7 @@ export const PricingSection: React.FC = () => {
               </div>
 
               {/* Features List */}
-              <ul className="space-y-3 pt-4 border-t border-[var(--rule-dark)] text-xs sm:text-sm text-[#FAFAFA] font-sans">
+              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[#FAFAFA] font-sans">
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
@@ -230,22 +226,22 @@ export const PricingSection: React.FC = () => {
           {/* 3. Executive (Maximum Immersion) */}
           <div
             id="plan-card-executive"
-            className="slab-3d-light p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative border border-[#1A3153]/25"
+            className="slab-3d-light p-6 sm:p-8 rounded-[24px] flex flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] shadow-sm"
           >
             {/* Top Accent bar */}
-            <div className="absolute top-0 inset-x-8 h-1 bg-[#1A3153] rounded-t-full" />
+            <div className="absolute top-0 inset-x-8 h-1 bg-[#1A3153] dark:bg-[#E09B30] rounded-t-full" />
 
             <div className="space-y-4">
               {/* Badge */}
-              <div className="inline-block px-3 py-1 rounded-full bg-[#1A3153] text-[#FAFAFA] text-[10px] font-montserrat font-extrabold uppercase tracking-[0.15em]">
+              <div className="inline-block px-3 py-1 rounded-full bg-[#1A3153] dark:bg-[#1E3A5F] text-[#FAFAFA] text-[10px] font-montserrat font-extrabold uppercase tracking-[0.15em]">
                 {isEs ? 'INMERSIÓN TOTAL VIP' : 'VIP MAXIMUM IMMERSION'}
               </div>
 
               <div>
-                <h3 className="font-montserrat font-bold text-2xl text-[#1A3153]">
+                <h3 className="font-montserrat font-bold text-2xl text-[var(--text-primary)]">
                   Executive VIP
                 </h3>
-                <p className="text-xs text-[#4A5568] mt-1 font-sans">
+                <p className="text-xs text-[var(--text-secondary)] mt-1 font-sans">
                   {isEs
                     ? 'Inmersión diaria de lunes a viernes para entrevistas internacionales o roles remotos clave.'
                     : 'Daily Mon–Fri immersion for international interviews and remote executive roles.'}
@@ -254,16 +250,16 @@ export const PricingSection: React.FC = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-1 pt-2">
-                <span className="font-montserrat font-black text-3xl sm:text-4xl text-[#1A3153] tabular-nums">
+                <span className="font-montserrat font-black text-3xl sm:text-4xl text-[var(--text-primary)] tabular-nums">
                   {currency === 'BOB' ? '850 BOB' : '$125 USD'}
                 </span>
-                <span className="text-xs text-[#64748B] font-sans">
+                <span className="text-xs text-[var(--text-secondary)] font-sans">
                   {isEs ? '/ mes' : '/ mo'}
                 </span>
               </div>
 
               {/* Features List */}
-              <ul className="space-y-3 pt-4 border-t border-[var(--rule-light)] text-xs sm:text-sm text-[#4A5568] font-sans">
+              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[var(--text-secondary)] font-sans">
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
                   <span>
@@ -295,7 +291,7 @@ export const PricingSection: React.FC = () => {
               href={getWhatsAppPlanLink('Executive VIP', currency === 'BOB' ? '850 BOB/mes' : '$125 USD/mo')}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#FAFAFA] bg-[#1A3153] hover:bg-[#091326] transition-all cursor-pointer min-h-[48px]"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#FAFAFA] bg-[#1A3153] dark:bg-[#E09B30] dark:text-[#1A3153] hover:bg-[#091326] dark:hover:bg-[#c88624] transition-all cursor-pointer min-h-[48px]"
             >
               <span>{isEs ? 'Aplicar a Executive' : 'Apply to Executive'}</span>
               <ArrowRight size={14} />
@@ -304,7 +300,7 @@ export const PricingSection: React.FC = () => {
         </div>
 
         {/* Quota & Trust Note */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-[var(--rule-light)] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-xs text-[#4A5568]">
+        <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-xs text-[var(--text-secondary)] shadow-sm">
           <div className="flex items-center gap-2">
             <ShieldCheck size={16} className="text-[#10B981] shrink-0" />
             <span>
@@ -315,7 +311,7 @@ export const PricingSection: React.FC = () => {
           </div>
           <button
             onClick={() => openAuthModal('signup')}
-            className="text-amber-bevel font-bold hover:underline whitespace-nowrap cursor-pointer"
+            className="text-[#9A6515] dark:text-[#E09B30] font-bold hover:underline whitespace-nowrap cursor-pointer"
           >
             {isEs ? 'Crear Cuenta Gratis →' : 'Create Free Account →'}
           </button>

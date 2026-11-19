@@ -791,14 +791,14 @@ export const EducationalResourcesView: React.FC = () => {
             </div>
 
             {/* Content Passage */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-[#A7C7E7]/40 font-inter text-sm text-[#1A3153] leading-relaxed whitespace-pre-wrap">
+            <div className="p-4 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] font-inter text-sm text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap">
               {activeCustomResource.content}
             </div>
 
             {/* Key Collocations with Audio TTS Pronunciation */}
             {activeCustomResource.collocations && activeCustomResource.collocations.length > 0 && (
               <div className="space-y-3">
-                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                   <Volume2 size={15} className="text-[#E09B30]" />
                   <span>{isEs ? 'Colocaciones Clave (Escucha y Repite):' : 'Key Collocations (Listen & Repeat):'}</span>
                 </h4>
@@ -806,29 +806,29 @@ export const EducationalResourcesView: React.FC = () => {
                   {activeCustomResource.collocations.map((c, cIdx) => (
                     <div
                       key={cIdx}
-                      className="p-3.5 rounded-2xl bg-white border border-[#A7C7E7]/50 shadow-sm flex flex-col justify-between gap-2"
+                      className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm flex flex-col justify-between gap-2"
                     >
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-montserrat font-bold text-sm text-[#1A3153]">{c.term}</span>
+                          <span className="font-montserrat font-bold text-sm text-[var(--text-primary)]">{c.term}</span>
                           <button
                             type="button"
                             onClick={() => handlePlayCustomAudio(c.term)}
-                            className="p-1 rounded-lg bg-[#E09B30]/15 hover:bg-[#E09B30] text-[#1A3153] transition-colors cursor-pointer"
+                            className="p-1 rounded-lg bg-[#E09B30]/15 hover:bg-[#E09B30] text-[#1A3153] dark:text-[#FAFAFA] transition-colors cursor-pointer"
                             title="Listen pronunciation"
                           >
                             <Volume2 size={14} />
                           </button>
                         </div>
-                        {c.phonetic && <span className="text-[11px] font-mono text-[#4A5568] block mb-1">{c.phonetic}</span>}
-                        <p className="text-xs text-[#4A5568]">
+                        {c.phonetic && <span className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">{c.phonetic}</span>}
+                        <p className="text-xs text-[var(--text-secondary)]">
                           <strong>EN:</strong> {c.definitionEn}
                         </p>
-                        <p className="text-xs text-[#4A5568]">
+                        <p className="text-xs text-[var(--text-secondary)]">
                           <strong>ES:</strong> {c.definitionEs}
                         </p>
                       </div>
-                      <p className="text-xs italic text-[#1A3153] border-t border-slate-100 pt-1.5">
+                      <p className="text-xs italic text-[var(--text-primary)] border-t border-[var(--border-hairline)] pt-1.5">
                         "{c.example}"
                       </p>
                     </div>
@@ -839,8 +839,8 @@ export const EducationalResourcesView: React.FC = () => {
 
             {/* 3 Interactive Comprehension / Recast Checks */}
             {activeCustomResource.comprehensionChecks && activeCustomResource.comprehensionChecks.length > 0 && (
-              <div className="space-y-4 pt-2 border-t border-[#A7C7E7]/30">
-                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+              <div className="space-y-4 pt-2 border-t border-[var(--border-hairline)]">
+                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                   <CheckCircle2 size={15} className="text-[#10b981]" />
                   <span>{isEs ? 'Verificación de Comprensión y Errores:' : 'Comprehension & Error Correction Checks:'}</span>
                 </h4>
@@ -852,11 +852,11 @@ export const EducationalResourcesView: React.FC = () => {
                     const isCorrect = selected === q.correctIndex;
 
                     return (
-                      <div key={qIdx} className="p-4 rounded-2xl bg-white border border-[#A7C7E7]/40 space-y-2">
-                        <div className="font-montserrat font-bold text-xs text-[#1A3153]">
+                      <div key={qIdx} className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-2">
+                        <div className="font-montserrat font-bold text-xs text-[var(--text-primary)]">
                           {qIdx + 1}. {q.question}
                         </div>
-                        {q.questionEs && <div className="text-[11px] text-[#4A5568]">{q.questionEs}</div>}
+                        {q.questionEs && <div className="text-[11px] text-[var(--text-secondary)]">{q.questionEs}</div>}
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                           {q.options.map((opt, oIdx) => {
@@ -871,13 +871,13 @@ export const EducationalResourcesView: React.FC = () => {
                                 className={`p-2.5 rounded-xl border text-left text-xs font-medium transition-all cursor-pointer ${
                                   answered
                                     ? oIdx === q.correctIndex
-                                      ? 'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold'
+                                      ? 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-400 text-emerald-900 dark:text-emerald-200 font-bold'
                                       : isThisSelected
-                                      ? 'bg-red-100 border-red-300 text-red-900'
-                                      : 'bg-slate-50 border-slate-200 text-slate-500'
+                                      ? 'bg-red-100 dark:bg-red-950/60 border-red-300 text-red-900 dark:text-red-200'
+                                      : 'bg-[var(--bg-sunken)] border-[var(--border-hairline)] text-[var(--text-secondary)]'
                                     : isThisSelected
                                     ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] font-bold'
-                                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-[#1A3153]'
+                                    : 'bg-[var(--bg-surface)] hover:bg-[var(--bg-sunken)] border-[var(--border-hairline)] text-[var(--text-primary)]'
                                 }`}
                               >
                                 {opt}

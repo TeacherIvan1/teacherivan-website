@@ -30,7 +30,6 @@ import { PricingSection } from './PricingSection';
 import { RemotionLoopVideo } from './RemotionLoopVideo';
 import { ChapterRail } from './ChapterRail';
 import { CornerCoachWidget } from './CornerCoachWidget';
-import { ChapterNavPill } from './landing/ChapterNavPill';
 import { RiggedCharacter } from './RiggedCharacter';
 import { getWhatsAppUrl } from '../config/contact';
 import Lenis from 'lenis';
@@ -100,19 +99,6 @@ export const LandingPageView: React.FC = () => {
       };
       gsap.ticker.add(tickerCallback);
       gsap.ticker.lagSmoothing(0);
-
-      // Hero -> Ch 01 -> Ch 02 background crossfade
-      gsap.to('#chapter-1-bicronic', {
-        scrollTrigger: {
-          trigger: '#chapter-1-bicronic',
-          start: 'top 65%',
-          endTrigger: '#chapter-2-voicelab',
-          end: 'top 25%',
-          scrub: 0.6,
-        },
-        backgroundColor: '#1A3153',
-        color: '#FAFAFA',
-      });
 
       // Quick Recast popout card animation in Ch 02
       gsap.fromTo(
@@ -194,9 +180,6 @@ export const LandingPageView: React.FC = () => {
       id="landing-page-view"
       className="flex flex-col w-full max-w-[100vw] overflow-x-hidden animate-in fade-in duration-200"
     >
-      {/* Floating Pear.no-Style Sticky Chapter Navigation Bar (Desktop & Mobile) */}
-      <ChapterNavPill onStartVoiceTest={handleStartVoiceTest} />
-
       {/* Global Scroll-Scrub Progress Hairline Indicator on Top */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-[#1A3153] z-50 pointer-events-none">
         <div
@@ -219,16 +202,16 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       <section
         id="problem-solution-strip"
-        className="py-10 px-4 sm:px-6 bg-[#12223a] border-b border-[#A7C7E7]/25 text-center"
+        className="py-10 px-4 sm:px-6 bg-[var(--bg-sunken)] border-b border-[var(--border-hairline)] text-center transition-colors duration-200"
       >
         <div className="max-w-4xl mx-auto space-y-4">
           <p className="font-montserrat font-semibold text-sm sm:text-base md:text-lg text-[#f87171] leading-relaxed flex items-center justify-center gap-2">
             <XCircle size={18} className="text-[#f87171] shrink-0" />
             <span>{lp.problemLine}</span>
           </p>
-          <p className="font-montserrat font-extrabold text-base sm:text-xl md:text-2xl text-[#FAFAFA] leading-relaxed flex items-center justify-center gap-2">
+          <p className="font-montserrat font-extrabold text-base sm:text-xl md:text-2xl text-[var(--text-primary)] leading-relaxed flex items-center justify-center gap-2">
             <Sparkles size={18} className="text-[#E09B30] shrink-0" />
-            <span className="text-[#E09B30]">{lp.solutionLine}</span>
+            <span className="text-[#9A6515] dark:text-[#E09B30]">{lp.solutionLine}</span>
           </p>
         </div>
       </section>
@@ -238,64 +221,64 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       <section
         id="chapter-1-bicronic"
-        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#FAFAFA] text-[#1A3153] border-b border-[#1A3153]/15 transition-colors duration-300"
+        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[var(--bg-canvas)] text-[var(--text-primary)] border-b border-[var(--border-hairline)] transition-colors duration-300"
       >
         <div className="max-w-7xl mx-auto">
           {/* Split-Screen Layout (Sticky pinned left column on lg: >=1024px) */}
           <div className="lg:grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
             {/* Left Column: Sticky Thesis & Institutional Metrics */}
             <div className="lg:col-span-5 lg:sticky lg:top-28 lg:self-start space-y-6 mb-10 lg:mb-0">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A3153] text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A3153] dark:bg-[#1E3A5F] text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
                 <Clock size={13} className="text-[#E09B30]" />
                 <span>{lp.ch1Badge}</span>
               </div>
 
-              <div className="font-mono text-xs text-[#4A5568] uppercase tracking-wider">
+              <div className="font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider">
                 // ARCHITECTURE: BICHRONOUS PEDAGOGY
               </div>
 
-              <h2 className="font-montserrat font-black text-2xl sm:text-3xl md:text-4xl leading-tight text-[#1A3153] tracking-tight">
+              <h2 className="font-montserrat font-black text-2xl sm:text-3xl md:text-4xl leading-tight text-[var(--text-primary)] tracking-tight">
                 {lp.ch1Thesis}
               </h2>
 
-              <p className="font-inter text-sm sm:text-base text-[#4A5568] leading-relaxed">
+              <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
                 {lp.ch1Description}
               </p>
 
               {/* Architectural Metrics Grid */}
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-4 rounded-2xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-sm">
-                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#E09B30] block">
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm">
+                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#9A6515] dark:text-[#E09B30] tabular-nums block">
                     &gt;75%
                   </span>
-                  <span className="text-xs font-montserrat font-bold text-[#1A3153] uppercase tracking-wider">
+                  <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                     {isEs ? 'Habla del Alumno' : 'Student Talking Time'}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-sm">
-                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#1A3153] block">
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm">
+                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[var(--text-primary)] tabular-nums block">
                     0.0s
                   </span>
-                  <span className="text-xs font-montserrat font-bold text-[#4A5568] uppercase tracking-wider">
+                  <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                     {isEs ? 'Respuesta Inmediata' : 'Zero Speaking Delay'}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-sm">
-                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#10b981] block">
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm">
+                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#10b981] tabular-nums block">
                     3x
                   </span>
-                  <span className="text-xs font-montserrat font-bold text-[#1A3153] uppercase tracking-wider">
+                  <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                     {isEs ? 'Reflejos Más Rápidos' : 'Faster Fluency Reflex'}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAFAFA] border border-[#1A3153]/15 shadow-sm">
-                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#E09B30] block">
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm">
+                  <span className="font-montserrat font-black text-2xl sm:text-3xl text-[#9A6515] dark:text-[#E09B30] tabular-nums block">
                     10m
                   </span>
-                  <span className="text-xs font-montserrat font-bold text-[#4A5568] uppercase tracking-wider">
+                  <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                     {isEs ? 'Micro-Hábito Diario' : 'Daily Micro-Habit'}
                   </span>
                 </div>
@@ -305,17 +288,17 @@ export const LandingPageView: React.FC = () => {
             {/* Right Column: Architectural Cards with Scroll-Scrubbed Progress Bars */}
             <div className="lg:col-span-7 space-y-6">
               {/* Card 1: Traditional Academies (30% STT) */}
-              <div className="slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4">
+              <div className="slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)]">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#f87171] uppercase tracking-wider">
                     [01 // TRADITIONAL ACADEMIES]
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-red-100 text-red-800 text-[11px] font-montserrat font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300 text-[11px] font-montserrat font-bold">
                     30% STT
                   </span>
                 </div>
 
-                <h3 className="font-montserrat font-bold text-xl text-[#1A3153]">
+                <h3 className="font-montserrat font-bold text-xl text-[var(--text-primary)]">
                   {isEs
                     ? 'Academias Tradicionales y Clases Masivas'
                     : 'Traditional Academies & 30-Student Lectures'}
@@ -323,16 +306,16 @@ export const LandingPageView: React.FC = () => {
 
                 {/* Progress bar scrub */}
                 <div>
-                  <div className="flex justify-between text-xs font-inter text-[#4A5568] mb-1.5">
+                  <div className="flex justify-between text-xs font-inter text-[var(--text-secondary)] mb-1.5">
                     <span>{isEs ? 'Tiempo de producción oral del alumno:' : 'Student speaking participation:'}</span>
                     <span className="font-mono font-bold text-red-600">30%</span>
                   </div>
-                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-[var(--bg-sunken)] rounded-full overflow-hidden">
                     <div className="h-full bg-red-500 rounded-full w-[30%]" />
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A5568] pt-2">
+                <ul className="space-y-2.5 text-xs sm:text-sm text-[var(--text-secondary)] pt-2">
                   <li className="flex items-start gap-2">
                     <XCircle size={15} className="text-red-500 shrink-0 mt-0.5" />
                     <span>
@@ -361,7 +344,7 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Card 2: Teacher Ivan 1-on-1 Bichronous Coaching (78% STT) */}
-              <div className="slab-3d-dark p-6 sm:p-8 rounded-3xl text-[#FAFAFA] border-2 border-[#E09B30] space-y-4 relative overflow-hidden">
+              <div className="slab-3d-dark p-6 sm:p-8 rounded-3xl text-[#FAFAFA] bg-[#132642] border-2 border-[#E09B30] space-y-4 relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#E09B30] uppercase tracking-wider">
                     [02 // TEACHER IVAN BICHRONOUS COACHING]
@@ -383,7 +366,7 @@ export const LandingPageView: React.FC = () => {
                     <span>{isEs ? 'Tiempo de producción oral del alumno:' : 'Student speaking participation:'}</span>
                     <span className="font-mono font-bold text-[#E09B30]">78%</span>
                   </div>
-                  <div className="h-2 w-full bg-[#12223a] rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-[#091326] rounded-full overflow-hidden">
                     <div className="h-full bg-[#E09B30] rounded-full w-[78%]" />
                   </div>
                 </div>
@@ -417,17 +400,17 @@ export const LandingPageView: React.FC = () => {
               </div>
 
               {/* Card 3: 24/7 AI Voice Immersion & Daily Micro-Learning (95% Reflex Retention) */}
-              <div className="slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4">
+              <div className="slab-3d-light p-6 sm:p-8 rounded-3xl space-y-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)]">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#10b981] uppercase tracking-wider">
                     [03 // 24/7 VOICE IMMERSION & MICRO-SPRINTS]
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-montserrat font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[11px] font-montserrat font-bold">
                     95% RETENTION
                   </span>
                 </div>
 
-                <h3 className="font-montserrat font-bold text-xl text-[#1A3153]">
+                <h3 className="font-montserrat font-bold text-xl text-[var(--text-primary)]">
                   {isEs
                     ? 'Laboratorio de Voz 24/7 y Micro-Sprints Diarios'
                     : '24/7 Voice Lab & Daily Micro-Learning Sprints'}
@@ -435,16 +418,16 @@ export const LandingPageView: React.FC = () => {
 
                 {/* Progress bar scrub */}
                 <div>
-                  <div className="flex justify-between text-xs font-inter text-[#4A5568] mb-1.5">
+                  <div className="flex justify-between text-xs font-inter text-[var(--text-secondary)] mb-1.5">
                     <span>{isEs ? 'Retención de reflejos automáticos:' : 'Automated speaking reflex retention:'}</span>
                     <span className="font-mono font-bold text-[#10b981]">95%</span>
                   </div>
-                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-[var(--bg-sunken)] rounded-full overflow-hidden">
                     <div className="h-full bg-[#10b981] rounded-full w-[95%]" />
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs sm:text-sm text-[#4A5568] pt-2">
+                <ul className="space-y-2.5 text-xs sm:text-sm text-[var(--text-secondary)] pt-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-[#10b981] shrink-0 mt-0.5" />
                     <span>
@@ -548,28 +531,28 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       <section
         id="chapter-4-faq"
-        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#091326] text-[#FAFAFA] border-b border-[#223C63]"
+        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[var(--bg-canvas)] text-[var(--text-primary)] border-b border-[var(--border-hairline)] transition-colors duration-200"
       >
         <div className="max-w-4xl mx-auto w-full space-y-12">
           {/* Header */}
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1A3153] border border-[#223C63] text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-[var(--text-primary)] text-xs font-montserrat font-bold uppercase tracking-[0.15em]">
               <Sparkles size={13} className="text-[#E09B30]" />
               <span>{lp.ch4Badge}</span>
             </div>
 
             <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight">
-              <span className="text-[#FAFAFA]">{isEs ? 'Preguntas frecuentes.' : 'Frequently asked.'}</span>{' '}
-              <span className="text-[#A7C7E7] font-bold">{isEs ? 'Respuestas directas.' : 'Straight answers.'}</span>
+              <span className="text-[var(--text-primary)]">{isEs ? 'Preguntas frecuentes.' : 'Frequently asked.'}</span>{' '}
+              <span className="text-[var(--text-secondary)] font-bold">{isEs ? 'Respuestas directas.' : 'Straight answers.'}</span>
             </h2>
 
-            <p className="font-inter text-sm sm:text-base text-[#A7C7E7]">
+            <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)]">
               {lp.ch4Subtitle}
             </p>
           </div>
 
           {/* Clean Hairline-Divided Q&A Rows */}
-          <div className="border-t border-b border-[#223C63] divide-y divide-[#223C63]">
+          <div className="border-t border-b border-[var(--border-hairline)] divide-y divide-[var(--border-hairline)]">
             {faqs.map((faq, idx) => {
               const isOpen = openFaq === idx;
               return (
@@ -577,17 +560,17 @@ export const LandingPageView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full py-5 text-left font-montserrat font-bold text-sm sm:text-base text-[#FAFAFA] flex items-center justify-between gap-4 cursor-pointer hover:text-[#E09B30] transition-colors"
+                    className="w-full py-5 text-left font-montserrat font-bold text-sm sm:text-base text-[var(--text-primary)] flex items-center justify-between gap-4 cursor-pointer hover:text-[#E09B30] transition-colors"
                   >
                     <span>{faq.q}</span>
                     {isOpen ? (
                       <ChevronUp size={18} className="text-[#E09B30] shrink-0" />
                     ) : (
-                      <ChevronDown size={18} className="text-[#A7C7E7] shrink-0" />
+                      <ChevronDown size={18} className="text-[var(--text-secondary)] shrink-0" />
                     )}
                   </button>
                   {isOpen && (
-                    <div className="pb-5 text-xs sm:text-sm font-inter text-[#A7C7E7] leading-relaxed pr-8">
+                    <div className="pb-5 text-xs sm:text-sm font-inter text-[var(--text-secondary)] leading-relaxed pr-8">
                       {faq.a}
                     </div>
                   )}
@@ -597,12 +580,12 @@ export const LandingPageView: React.FC = () => {
           </div>
 
           {/* Direct WhatsApp Callout */}
-          <div className="p-6 rounded-3xl bg-[#12223a] border border-[#223C63] text-[#FAFAFA] flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left shadow-xl">
+          <div className="p-6 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[var(--text-primary)] flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left shadow-md">
             <div className="space-y-1">
-              <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA]">
+              <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[var(--text-primary)]">
                 {isEs ? '¿Tienes una pregunta específica sobre tu caso?' : 'Have a specific question about your situation?'}
               </h3>
-              <p className="text-xs sm:text-sm text-[#A7C7E7]">
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
                 {isEs
                   ? 'Escríbele directamente a Teacher Ivan por WhatsApp y recibe respuesta en minutos.'
                   : 'Chat directly with Teacher Ivan on WhatsApp and get answers in minutes.'}
@@ -627,49 +610,49 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       <section
         id="download-mobile-app-section"
-        className="py-16 md:py-20 px-4 sm:px-6 lg:px-12 bg-gradient-to-b from-[#12223a] to-[#1A3153] border-b border-[#A7C7E7]/25 text-[#FAFAFA]"
+        className="py-16 md:py-20 px-4 sm:px-6 lg:px-12 bg-[var(--bg-sunken)] border-b border-[var(--border-hairline)] text-[var(--text-primary)] transition-colors duration-200"
       >
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left Column: Headline, Features, Download Buttons */}
           <div className="flex-1 space-y-6 max-w-2xl text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1A3153] border border-[#E09B30]/40 text-xs font-montserrat font-bold text-[#E09B30] uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] uppercase tracking-wider">
               <Smartphone size={14} />
               <span>{t.mobileApp.sectionBadge}</span>
             </div>
 
-            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
+            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[var(--text-primary)] tracking-tight">
               {t.mobileApp.title}
             </h2>
 
-            <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
+            <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
               {t.mobileApp.subtitle}
             </p>
 
             {/* Feature Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-              <div className="p-3.5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/20 space-y-1">
-                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] block">
                   {t.mobileApp.feature1Title}
                 </span>
-                <p className="text-[11px] font-inter text-[#A7C7E7] leading-snug">
+                <p className="text-[11px] font-inter text-[var(--text-secondary)] leading-snug">
                   {t.mobileApp.feature1Desc}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/20 space-y-1">
-                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] block">
                   {t.mobileApp.feature2Title}
                 </span>
-                <p className="text-[11px] font-inter text-[#A7C7E7] leading-snug">
+                <p className="text-[11px] font-inter text-[var(--text-secondary)] leading-snug">
                   {t.mobileApp.feature2Desc}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/20 space-y-1">
-                <span className="text-xs font-montserrat font-bold text-[#E09B30] block">
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-1">
+                <span className="text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] block">
                   {t.mobileApp.feature3Title}
                 </span>
-                <p className="text-[11px] font-inter text-[#A7C7E7] leading-snug">
+                <p className="text-[11px] font-inter text-[var(--text-secondary)] leading-snug">
                   {t.mobileApp.feature3Desc}
                 </p>
               </div>
@@ -681,7 +664,7 @@ export const LandingPageView: React.FC = () => {
                 id="app-download-android-btn"
                 type="button"
                 onClick={handleDownloadAndroid}
-                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#1A3153] hover:bg-[#12223a] border-2 border-[#3ddc84]/50 hover:border-[#3ddc84] text-[#FAFAFA] font-montserrat font-bold transition-all transform hover:-translate-y-0.5 shadow-xl cursor-pointer"
+                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#1A3153] hover:bg-[#12223a] dark:bg-[#132642] dark:hover:bg-[#1A3153] border-2 border-[#3ddc84]/50 hover:border-[#3ddc84] text-[#FAFAFA] font-montserrat font-bold transition-all transform hover:-translate-y-0.5 shadow-xl cursor-pointer"
               >
                 <AndroidIcon className="w-6 h-6 text-[#3ddc84] shrink-0" />
                 <div className="text-left">
@@ -698,7 +681,7 @@ export const LandingPageView: React.FC = () => {
                 id="app-download-ios-btn"
                 type="button"
                 onClick={handleDownloadIos}
-                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#1A3153] hover:bg-[#12223a] border-2 border-[#A7C7E7]/50 hover:border-[#E09B30] text-[#FAFAFA] font-montserrat font-bold transition-all transform hover:-translate-y-0.5 shadow-xl cursor-pointer"
+                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-[#1A3153] hover:bg-[#12223a] dark:bg-[#132642] dark:hover:bg-[#1A3153] border-2 border-[#A7C7E7]/50 hover:border-[#E09B30] text-[#FAFAFA] font-montserrat font-bold transition-all transform hover:-translate-y-0.5 shadow-xl cursor-pointer"
               >
                 <AppleIcon className="w-6 h-6 text-[#FAFAFA] shrink-0" />
                 <div className="text-left">
@@ -719,18 +702,18 @@ export const LandingPageView: React.FC = () => {
               <div className="w-20 h-4 bg-[#1A3153] rounded-full mx-auto mb-3" />
               <div className="rounded-3xl bg-[#1A3153] p-4 text-center border border-[#A7C7E7]/20 flex flex-col items-center">
                 <span className="text-[10px] font-montserrat font-extrabold text-[#E09B30] uppercase tracking-wider mb-2">
-                  Live Voice Assistant
+                  {isEs ? 'TUTOR DE VOZ EN VIVO' : 'LIVE VOICE ASSISTANT'}
                 </span>
                 <div className="w-36 h-36 mx-auto mb-2">
                   <RiggedCharacter persona="teacher-ivan" state="listening" className="w-full h-full" />
                 </div>
                 <div className="w-full py-2 px-3 rounded-xl bg-[#12223a] border border-[#A7C7E7]/25 text-left mb-2">
                   <span className="text-[9px] font-mono font-bold text-[#10b981] block">● {isEs ? 'Conectado (Laboratorio de Voz)' : 'Connected (Voice Lab)'}</span>
-                  <span className="text-[11px] font-inter text-[#FAFAFA]">"Tell me about your project..."</span>
+                  <span className="text-[11px] font-inter text-[#FAFAFA]">{isEs ? '“Cuéntame sobre tu proyecto...”' : '“Tell me about your project...”'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-[#A7C7E7] font-montserrat font-bold">
                   <Mic size={12} className="text-[#E09B30]" />
-                  <span>Tap to Speak</span>
+                  <span>{isEs ? 'Toca para hablar' : 'Tap to Speak'}</span>
                 </div>
               </div>
             </div>
@@ -743,13 +726,13 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       <section
         id="final-cta-section"
-        className="py-16 md:py-24 px-4 sm:px-6 bg-[#12223a] text-center"
+        className="py-16 md:py-24 px-4 sm:px-6 bg-[var(--bg-canvas)] text-[var(--text-primary)] text-center transition-colors duration-200"
       >
         <div className="max-w-2xl mx-auto space-y-5">
-          <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
+          <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[var(--text-primary)] tracking-tight">
             {lp.finalCtaHeadline}
           </h2>
-          <p className="font-inter text-xs sm:text-sm text-[#A7C7E7] max-w-lg mx-auto">
+          <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)] max-w-lg mx-auto">
             {lp.finalCtaSubhead}
           </p>
 
@@ -778,7 +761,7 @@ export const LandingPageView: React.FC = () => {
               </a>
             </div>
 
-            <p className="text-xs text-[#A7C7E7] font-medium flex items-center gap-1.5">
+            <p className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-[#10b981]" />
               <span>{lp.heroFrictionReducer}</span>
             </p>

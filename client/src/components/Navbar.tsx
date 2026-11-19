@@ -7,68 +7,28 @@ import { useDevModeStore } from '../modules/dev/devModeStore';
 import { useAssessmentStore } from '../modules/assessment/assessmentStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { LanguageToggle } from './LanguageToggle';
+import { useTheme } from '../modules/theme/ThemeContext';
 
 export interface NavbarProps {
   theme?: 'light' | 'dark';
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ theme }) => {
+export const Navbar: React.FC<NavbarProps> = ({ theme: propTheme }) => {
   const { t, isEs } = useTranslation();
   const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, openAuthModal, signOut } = useAuthStore();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
   const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
   const selectScenario = useTeachingStore((s) => s.selectScenario);
+  const { theme: contextTheme, isDark, toggleTheme } = useTheme();
 
-  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(theme || 'light');
-
-  // Automatic scroll-tied theme detection if theme prop is not explicitly forced
-  useEffect(() => {
-    if (theme) {
-      setCurrentTheme(theme);
-      return;
-    }
-
-    const handleScroll = () => {
-      // Find whether we are in a dark chapter
-      const darkSections = ['chapter-1-bicronic', 'chapter-2-voicelab', 'chapter-4-faq', 'flagship-simulator-section'];
-      let isDark = false;
-      const scrollY = window.scrollY + 70;
-
-      for (const id of darkSections) {
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollY >= top && scrollY < top + height) {
-            isDark = true;
-            break;
-          }
-        }
-      }
-
-      // If in student authenticated portal view, keep dark slate theme
-      if (isAuthenticated && activeView !== 'path') {
-        isDark = true;
-      }
-
-      setCurrentTheme(isDark ? 'dark' : 'light');
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [theme, isAuthenticated, activeView]);
+  const currentTheme = propTheme || contextTheme;
+  const isLight = currentTheme === 'light';
 
   const handleTakeAssessment = () => {
     selectScenario('diagnostic-placement');
     openAssessmentModal();
   };
-
-  const isLight = currentTheme === 'light';
 
   // Plan badge styling based on user plan
   const planBadgeText = (user?.plan || 'free').toUpperCase();
@@ -115,18 +75,14 @@ export const Navbar: React.FC<NavbarProps> = ({ theme }) => {
             <div className="flex flex-col text-left leading-none">
               <div className="flex items-center gap-1">
                 <span
-                  className={`font-montserrat font-extrabold tracking-tight text-base sm:text-lg whitespace-nowrap ${
-                    isLight ? 'text-[#1A3153]' : 'text-[#FAFAFA]'
-                  }`}
+                  className="font-montserrat font-extrabold tracking-tight text-base sm:text-lg whitespace-nowrap text-[#1A3153] dark:text-[#FAFAFA]"
                 >
-                  Teacher Ivan
+                  Teacher <span className="text-[#9A6515] dark:text-[#E09B30]">I</span>van
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E09B30]" />
               </div>
               <span
-                className={`text-[9px] sm:text-[10px] font-mono tracking-wider uppercase font-semibold ${
-                  isLight ? 'text-[#4A5568]' : 'text-[#A7C7E7]'
-                }`}
+                className="text-[9px] sm:text-[10px] font-mono tracking-wider uppercase font-semibold text-[#4A5568] dark:text-[#A7C7E7]"
               >
                 {isEs ? 'Método Bicrónico' : 'Bichronous Method'}
               </span>

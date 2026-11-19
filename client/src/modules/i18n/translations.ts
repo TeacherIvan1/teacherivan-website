@@ -1790,7 +1790,7 @@ export const translations = {
       selectLevel: 'Nivel',
       selectTutor: 'Tutor',
       scenarioLabel: 'Escenario',
-      vocabTipsBtn: 'Vocabulario y Tips',
+      vocabTipsBtn: 'Vocabulario y Consejos',
       chatTranscriptBtn: 'Transcripción Completa',
       startSpeaking: 'Iniciar Práctica',
       doneSpeaking: 'Listo',
@@ -2122,10 +2122,10 @@ export const translations = {
 
 type DeepString<T> = {
   readonly [K in keyof T]: T[K] extends readonly (infer _U)[]
-    ? readonly string[]
-    : T[K] extends object
-    ? DeepString<T[K]>
-    : string;
+  ? readonly string[]
+  : T[K] extends object
+  ? DeepString<T[K]>
+  : string;
 };
 
 export type Translations = DeepString<typeof translations.en>;

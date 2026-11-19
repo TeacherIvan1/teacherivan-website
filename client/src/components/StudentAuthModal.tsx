@@ -66,6 +66,7 @@ export const StudentAuthModal: React.FC = () => {
 
   // Wizard Step (1: Account Credentials, 2: Learning Goals)
   const [step, setStep] = useState<1 | 2>(1);
+  const [showGoogleFallback, setShowGoogleFallback] = useState(false);
 
   // Step 1 Form fields
   const [username, setUsername] = useState('');
@@ -94,6 +95,7 @@ export const StudentAuthModal: React.FC = () => {
   useEffect(() => {
     if (isAuthModalOpen) {
       setStep(1);
+      setShowGoogleFallback(false);
       setValidationError(null);
       setRecoverSuccess(null);
     }
@@ -356,6 +358,7 @@ export const StudentAuthModal: React.FC = () => {
 
                 setFullName(gName);
                 setEmail(gEmail);
+                setShowGoogleFallback(false);
                 setStep(2);
               } catch (decErr) {
                 console.error('[Google JWT decode error]:', decErr);
@@ -370,21 +373,25 @@ export const StudentAuthModal: React.FC = () => {
       }
     }
 
-    // Direct Google prompt fallback
-    const promptEmail = window.prompt(
-      isEs ? 'Ingresa tu correo de Google (Gmail):' : 'Enter your Google (Gmail) email address:',
-      email || 'student@gmail.com'
-    );
+    // Direct in-modal Google fallback (no window.prompt!)
+    setShowGoogleFallback(true);
+  };
 
-    if (promptEmail && promptEmail.includes('@')) {
-      const promptName = window.prompt(
-        isEs ? 'Confirma tu nombre completo:' : 'Confirm your full name:',
-        fullName || 'Student'
-      );
-      setFullName((promptName || 'Student').trim());
-      setEmail(promptEmail.trim());
-      setStep(2);
+  const handleGoogleFallbackSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+    const trimmedEmail = email.trim();
+    const trimmedName = fullName.trim();
+    if (!trimmedEmail || !trimmedEmail.includes('@') || !trimmedEmail.includes('.')) {
+      setValidationError(isEs ? 'Ingresa un correo de Gmail válido.' : 'Enter a valid Gmail address.');
+      return;
     }
+    if (!trimmedName) {
+      setValidationError(isEs ? 'Ingresa tu nombre completo.' : 'Enter your full name.');
+      return;
+    }
+    setShowGoogleFallback(false);
+    setStep(2);
   };
 
   return (
@@ -402,10 +409,10 @@ export const StudentAuthModal: React.FC = () => {
     >
       <div
         id="student-auth-modal-card"
-        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[var(--radius-container)] p-4 sm:p-6 pb-6 sm:pb-8 box-border bg-[#FAFAFA] text-[#1A3153] border border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[var(--radius-container)] p-4 sm:p-6 pb-6 sm:pb-8 box-border bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-hairline)] shadow-2xl flex flex-col my-auto transition-colors duration-200"
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#A7C7E7]/30 text-[#1A3153]">
+        <div className="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)] text-[var(--text-primary)]">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl bg-[#E09B30]/20 border border-[#E09B30] flex items-center justify-center text-[#E09B30]">
               <Sparkles size={18} />
@@ -413,7 +420,7 @@ export const StudentAuthModal: React.FC = () => {
             <div>
               <h2
                 id="auth-modal-title"
-                className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug text-[#1A3153]"
+                className="font-montserrat font-extrabold text-base sm:text-lg tracking-tight leading-snug text-[var(--text-primary)]"
               >
                 {isRecoverMode
                   ? t.authModal.titleRecover
@@ -423,7 +430,7 @@ export const StudentAuthModal: React.FC = () => {
                   ? t.authModal.step1Title
                   : t.authModal.step2Title}
               </h2>
-              <p className="text-[11px] text-[#4A5568]">Teacher Ivan • English Classes</p>
+              <p className="text-[11px] text-[var(--text-secondary)]">Teacher Ivan • English Classes</p>
             </div>
           </div>
 
@@ -431,7 +438,7 @@ export const StudentAuthModal: React.FC = () => {
             id="close-auth-modal-btn"
             type="button"
             onClick={closeAuthModal}
-            className="w-8 h-8 rounded-full bg-[#1A3153]/10 hover:bg-[#1A3153]/20 text-[#1A3153] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-[var(--bg-sunken)] hover:bg-[#E09B30]/20 text-[var(--text-primary)] flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X size={16} />
@@ -444,7 +451,7 @@ export const StudentAuthModal: React.FC = () => {
           {authModalBanner && (
             <div
               id="auth-modal-tier-banner"
-              className="p-3.5 rounded-2xl bg-[#E09B30]/15 border border-[#E09B30] text-xs font-montserrat font-bold text-[#1A3153] flex items-center gap-2.5 shadow-sm"
+              className="p-3.5 rounded-2xl bg-[#E09B30]/15 border border-[#E09B30] text-xs font-montserrat font-bold text-[var(--text-primary)] flex items-center gap-2.5 shadow-sm"
             >
               <Sparkles size={16} className="text-[#E09B30] shrink-0" />
               <span>{authModalBanner}</span>
@@ -453,19 +460,20 @@ export const StudentAuthModal: React.FC = () => {
 
           {/* Mode Switcher Tabs (Sign Up vs Sign In) - Hidden in Recover & Google Complete Profile */}
           {!isCompletingProfile && !isRecoverMode && (
-            <div className="flex rounded-2xl bg-[#1A3153]/10 p-1 border border-[#A7C7E7]/30">
+            <div className="flex rounded-2xl bg-[var(--bg-sunken)] p-1 border border-[var(--border-hairline)]">
               <button
                 type="button"
                 id="auth-tab-signup"
                 onClick={() => {
                   setValidationError(null);
                   setStep(1);
+                  setShowGoogleFallback(false);
                   openAuthModal('signup');
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   !isSignInMode
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                    : 'text-[#4A5568] hover:text-[#1A3153]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {t.authModal.tabSignUp}
@@ -475,12 +483,13 @@ export const StudentAuthModal: React.FC = () => {
                 id="auth-tab-signin"
                 onClick={() => {
                   setValidationError(null);
+                  setShowGoogleFallback(false);
                   openAuthModal('signin');
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   isSignInMode
                     ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                    : 'text-[#4A5568] hover:text-[#1A3153]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {t.authModal.tabSignIn}
@@ -493,15 +502,15 @@ export const StudentAuthModal: React.FC = () => {
             <div className="flex items-center justify-between gap-2 px-1">
               <div
                 className={`flex-1 h-1.5 rounded-full transition-all ${
-                  step >= 1 ? 'bg-[#E09B30]' : 'bg-[#A7C7E7]/40'
+                  step >= 1 ? 'bg-[#E09B30]' : 'bg-[var(--border-hairline)]'
                 }`}
               />
-              <span className="text-[11px] font-montserrat font-bold text-[#4A5568]">
+              <span className="text-[11px] font-montserrat font-bold text-[var(--text-secondary)]">
                 {step === 1 ? '1 / 2' : '2 / 2'}
               </span>
               <div
                 className={`flex-1 h-1.5 rounded-full transition-all ${
-                  step === 2 ? 'bg-[#E09B30]' : 'bg-[#A7C7E7]/40'
+                  step === 2 ? 'bg-[#E09B30]' : 'bg-[var(--border-hairline)]'
                 }`}
               />
             </div>
@@ -539,16 +548,16 @@ export const StudentAuthModal: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <p className="text-xs text-[#4A5568] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                     {t.authModal.subtitleRecover}
                   </p>
 
                   <div>
-                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                       {t.authModal.usernameLabel} <span className="text-[#E09B30]">*</span>
                     </label>
                     <div className="relative">
-                      <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                      <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                       <input
                         type="text"
                         id="auth-recover-username-input"
@@ -558,17 +567,17 @@ export const StudentAuthModal: React.FC = () => {
                         value={recoverUsername}
                         onChange={(e) => setRecoverUsername(e.target.value)}
                         placeholder={t.authModal.usernamePlaceholder}
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                       {t.authModal.verificationContactLabel} <span className="text-[#E09B30]">*</span>
                     </label>
                     <div className="relative">
-                      <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                      <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                       <input
                         type="text"
                         id="auth-recover-contact-input"
@@ -576,17 +585,17 @@ export const StudentAuthModal: React.FC = () => {
                         value={recoverContact}
                         onChange={(e) => setRecoverContact(e.target.value)}
                         placeholder={t.authModal.verificationContactPlaceholder}
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                       {t.authModal.newPasswordLabel} <span className="text-[#E09B30]">*</span>
                     </label>
                     <div className="relative">
-                      <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                      <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                       <input
                         type="password"
                         id="auth-recover-newpassword-input"
@@ -595,7 +604,7 @@ export const StudentAuthModal: React.FC = () => {
                         value={recoverNewPassword}
                         onChange={(e) => setRecoverNewPassword(e.target.value)}
                         placeholder={t.authModal.newPasswordPlaceholder}
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                       />
                     </div>
                   </div>
@@ -639,7 +648,7 @@ export const StudentAuthModal: React.FC = () => {
                         setValidationError(null);
                         openAuthModal('signin');
                       }}
-                      className="text-xs text-[#4A5568] hover:text-[#1A3153] hover:underline font-semibold cursor-pointer"
+                      className="text-xs text-[var(--text-secondary)] hover:text-[#9A6515] dark:hover:text-[#E09B30] hover:underline font-semibold cursor-pointer"
                     >
                       {t.authModal.backToSignIn}
                     </button>
@@ -653,11 +662,11 @@ export const StudentAuthModal: React.FC = () => {
             /* ========================================================================= */
             <form onSubmit={handleSignInSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                   {t.authModal.usernameLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
-                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                   <input
                     type="text"
                     id="auth-signin-username-input"
@@ -667,17 +676,17 @@ export const StudentAuthModal: React.FC = () => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder={t.authModal.usernamePlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                   {t.authModal.passwordLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
-                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                   <input
                     type="password"
                     id="auth-signin-password-input"
@@ -685,7 +694,7 @@ export const StudentAuthModal: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t.authModal.passwordPlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
               </div>
@@ -720,7 +729,7 @@ export const StudentAuthModal: React.FC = () => {
                     setRecoverUsername(username || '');
                     openAuthModal('recover_password');
                   }}
-                  className="text-xs text-[#4A5568] hover:text-[#E09B30] hover:underline font-semibold cursor-pointer"
+                  className="text-xs text-[var(--text-secondary)] hover:text-[#9A6515] dark:hover:text-[#E09B30] hover:underline font-semibold cursor-pointer"
                 >
                   {t.authModal.forgotPassword}
                 </button>
@@ -730,7 +739,7 @@ export const StudentAuthModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => openAuthModal('signup')}
-                  className="text-xs text-[#E09B30] hover:underline font-semibold cursor-pointer"
+                  className="text-xs text-[#9A6515] dark:text-[#E09B30] hover:underline font-semibold cursor-pointer"
                 >
                   {t.authModal.needAccount}
                 </button>
@@ -738,8 +747,83 @@ export const StudentAuthModal: React.FC = () => {
             </form>
           ) : step === 1 ? (
             /* ========================================================================= */
-            /* STEP 1: ACCOUNT CREDENTIALS (Username, Password, Name, Email, Phone, etc) */
+            /* STEP 1: ACCOUNT CREDENTIALS OR IN-MODAL GOOGLE FALLBACK                   */
             /* ========================================================================= */
+            showGoogleFallback ? (
+              <form onSubmit={handleGoogleFallbackSubmit} className="space-y-4 animate-in fade-in">
+                <div className="p-4 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <svg width="20" height="20" viewBox="0 0 48 48" className="shrink-0">
+                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <span className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)]">
+                      {isEs ? 'Acceso con Google' : 'Google Sign-In'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                    {isEs
+                      ? 'Ingresa tu correo de Gmail y tu nombre completo para vincular tu cuenta de estudiante:'
+                      : 'Enter your Gmail address and full name to connect your student profile:'}
+                  </p>
+
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
+                      {t.authModal.emailLabel} (Gmail) <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      <input
+                        type="email"
+                        id="auth-google-fallback-email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="student@gmail.com"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
+                      {t.authModal.fullNameLabel} <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <div className="relative">
+                      <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      <input
+                        type="text"
+                        id="auth-google-fallback-name"
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder={isEs ? 'Tu Nombre Completo' : 'Your Full Name'}
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowGoogleFallback(false)}
+                      className="flex-1 py-3 px-4 rounded-full border border-[var(--border-hairline)] text-xs font-montserrat font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] uppercase tracking-wider transition-all cursor-pointer"
+                    >
+                      {isEs ? 'Cancelar' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      id="auth-google-fallback-submit-btn"
+                      className="flex-1 py-3 px-4 rounded-full bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+                    >
+                      {isEs ? 'Continuar →' : 'Continue →'}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            ) : (
             <form onSubmit={handleProceedToStep2} className="space-y-3.5">
               {/* Google One-Tap Action */}
               <div className="space-y-3 mb-2">
@@ -748,7 +832,7 @@ export const StudentAuthModal: React.FC = () => {
                   id="continue-with-google-btn"
                   disabled={isLoading}
                   onClick={handleGoogleClick}
-                  className="w-full py-3 px-4 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] hover:bg-slate-50 text-[#1A3153] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all duration-150 cursor-pointer"
+                  className="w-full py-3 px-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-sunken)] text-[var(--text-primary)] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all duration-150 cursor-pointer"
                 >
                   <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
                     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -760,22 +844,22 @@ export const StudentAuthModal: React.FC = () => {
                 </button>
 
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-[#A7C7E7]/40" />
-                  <span className="text-[11px] font-medium text-[#4A5568] uppercase tracking-wider">
+                  <div className="flex-1 h-px bg-[var(--border-hairline)]" />
+                  <span className="text-[11px] font-medium text-[var(--text-secondary)] uppercase tracking-wider">
                     {t.authModal.orDivider}
                   </span>
-                  <div className="flex-1 h-px bg-[#A7C7E7]/40" />
+                  <div className="flex-1 h-px bg-[var(--border-hairline)]" />
                 </div>
               </div>
 
               {/* Username & Password (2-column on sm) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                     {t.authModal.usernameLabel} <span className="text-[#E09B30]">*</span>
                   </label>
                   <div className="relative">
-                    <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                     <input
                       type="text"
                       id="auth-username-input"
@@ -785,17 +869,17 @@ export const StudentAuthModal: React.FC = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder={t.authModal.usernamePlaceholder}
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                     {t.authModal.passwordLabel} <span className="text-[#E09B30]">*</span>
                   </label>
                   <div className="relative">
-                    <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                     <input
                       type="password"
                       id="auth-password-input"
@@ -804,7 +888,7 @@ export const StudentAuthModal: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t.authModal.passwordPlaceholder}
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                     />
                   </div>
                 </div>
@@ -812,11 +896,11 @@ export const StudentAuthModal: React.FC = () => {
 
               {/* Full Name */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                   {t.authModal.fullNameLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
-                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                   <input
                     type="text"
                     id="auth-full-name-input"
@@ -824,18 +908,18 @@ export const StudentAuthModal: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder={t.authModal.fullNamePlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                   {t.authModal.emailLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
-                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                   <input
                     type="email"
                     id="auth-email-input"
@@ -843,18 +927,18 @@ export const StudentAuthModal: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t.authModal.emailPlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
               </div>
 
               {/* Phone Number */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                   {t.authModal.phoneLabel} <span className="text-[#E09B30]">*</span>
                 </label>
                 <div className="relative">
-                  <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                  <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                   <input
                     type="tel"
                     id="auth-phone-input"
@@ -862,7 +946,7 @@ export const StudentAuthModal: React.FC = () => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder={t.authModal.phonePlaceholder}
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                   />
                 </div>
               </div>
@@ -870,11 +954,11 @@ export const StudentAuthModal: React.FC = () => {
               {/* Date of Birth & Country (2-column on sm) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                     {t.authModal.dobLabel} <span className="text-[#E09B30]">*</span>
                   </label>
                   <div className="relative">
-                    <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                     <input
                       type="date"
                       id="auth-dob-input"
@@ -882,23 +966,23 @@ export const StudentAuthModal: React.FC = () => {
                       max={new Date().toISOString().split('T')[0]}
                       value={dateOfBirth}
                       onChange={(e) => setDateOfBirth(e.target.value)}
-                      className="w-full pl-10 pr-2.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
+                      className="w-full pl-10 pr-2.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1">
+                  <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
                     {t.authModal.countryLabel} <span className="text-[#E09B30]">*</span>
                   </label>
                   <div className="relative">
-                    <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5568]" />
+                    <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                     <select
                       id="auth-country-select"
                       required
                       value={country}
                       onChange={(e) => setCountry(e.target.value as SupportedCountry)}
-                      className="w-full pl-10 pr-2.5 py-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] cursor-pointer"
+                      className="w-full pl-10 pr-2.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] cursor-pointer"
                     >
                       {SUPPORTED_COUNTRIES.map((c) => (
                         <option key={c} value={c}>
@@ -932,12 +1016,13 @@ export const StudentAuthModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => openAuthModal('signin')}
-                  className="text-xs text-[#E09B30] hover:underline font-semibold cursor-pointer"
+                  className="text-xs text-[#9A6515] dark:text-[#E09B30] hover:underline font-semibold cursor-pointer"
                 >
                   {t.authModal.alreadyRegistered}
                 </button>
               </div>
             </form>
+            )
           ) : (
             /* ========================================================================= */
             /* STEP 2: LEARNING GOALS & CEFR TARGET WIZARD                               */
@@ -948,7 +1033,7 @@ export const StudentAuthModal: React.FC = () => {
                 type="button"
                 id="auth-back-step1-btn"
                 onClick={() => setStep(1)}
-                className="text-xs text-[#4A5568] hover:text-[#1A3153] font-montserrat font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-montserrat font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <ArrowLeft size={14} />
                 <span>{t.authModal.backBtn}</span>
@@ -956,7 +1041,7 @@ export const StudentAuthModal: React.FC = () => {
 
               {/* 1. Current / Target CEFR Level */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1.5 flex items-center gap-1.5">
                   <Award size={14} className="text-[#E09B30]" />
                   <span>{t.mandatoryGoalsModal.levelLabel}</span>
                 </label>
@@ -970,8 +1055,8 @@ export const StudentAuthModal: React.FC = () => {
                         onClick={() => setTargetLevel(lvl)}
                         className={`py-2 px-2 rounded-xl border text-xs font-montserrat font-bold transition-all text-center cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1A3153] text-[#E09B30] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
-                            : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7]/60 hover:bg-slate-100'
+                            ? 'bg-[#1A3153] dark:bg-[#1E3A5F] text-[#E09B30] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border-hairline)] hover:bg-[var(--bg-sunken)]'
                         }`}
                       >
                         {lvl}
@@ -983,7 +1068,7 @@ export const StudentAuthModal: React.FC = () => {
 
               {/* 2. Primary Learning Goal */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1.5 flex items-center gap-1.5">
                   <Compass size={14} className="text-[#E09B30]" />
                   <span>{t.mandatoryGoalsModal.primaryGoalLabel}</span>
                 </label>
@@ -997,8 +1082,8 @@ export const StudentAuthModal: React.FC = () => {
                         onClick={() => setPrimaryGoal(goal)}
                         className={`p-2.5 rounded-xl border text-left text-xs font-montserrat font-bold transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1A3153] text-[#FAFAFA] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
-                            : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7]/60 hover:bg-slate-100'
+                            ? 'bg-[#1A3153] dark:bg-[#1E3A5F] text-[#FAFAFA] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border-hairline)] hover:bg-[var(--bg-sunken)]'
                         }`}
                       >
                         <span className="truncate">{goal}</span>
@@ -1011,7 +1096,7 @@ export const StudentAuthModal: React.FC = () => {
 
               {/* 3. Priority Skill Focus */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1.5 flex items-center gap-1.5">
                   <BookOpen size={14} className="text-[#E09B30]" />
                   <span>{t.mandatoryGoalsModal.focusSkillLabel}</span>
                 </label>
@@ -1025,8 +1110,8 @@ export const StudentAuthModal: React.FC = () => {
                         onClick={() => setFocusSkill(skill)}
                         className={`p-2.5 rounded-xl border text-left text-xs font-montserrat font-bold transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1A3153] text-[#FAFAFA] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
-                            : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7]/60 hover:bg-slate-100'
+                            ? 'bg-[#1A3153] dark:bg-[#1E3A5F] text-[#FAFAFA] border-[#E09B30] shadow-sm ring-1 ring-[#E09B30]'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border-hairline)] hover:bg-[var(--bg-sunken)]'
                         }`}
                       >
                         <span className="truncate">{skill}</span>
@@ -1039,7 +1124,7 @@ export const StudentAuthModal: React.FC = () => {
 
               {/* 4. Specific Personal Goal (Required Input) */}
               <div>
-                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[#1A3153] mb-1 flex items-center gap-1.5">
+                <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1 flex items-center gap-1.5">
                   <Target size={14} className="text-[#E09B30]" />
                   <span>{t.mandatoryGoalsModal.personalObjectiveLabel}</span>
                   <span className="text-[#E09B30]">*</span>
@@ -1055,7 +1140,7 @@ export const StudentAuthModal: React.FC = () => {
                       ? 'ej., Preparar mi entrevista de beca internacional / Pasar entrevistas técnicas'
                       : 'e.g., Prepare for my international scholarship interview / Pass tech interviews'
                   }
-                  className="w-full p-2.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] leading-relaxed"
+                  className="w-full p-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] leading-relaxed"
                 />
               </div>
 
@@ -1081,7 +1166,7 @@ export const StudentAuthModal: React.FC = () => {
             </form>
           )}
 
-          <p className="text-[11px] text-center text-[#4A5568]/80 pt-1">
+          <p className="text-[11px] text-center text-[var(--text-secondary)]/80 pt-1">
             {t.authModal.termsNote}
           </p>
         </div>

@@ -689,10 +689,10 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
       {/* ========================================================================= */}
       <div
         id="interactive-active-day-stage"
-        className="p-6 sm:p-8 rounded-3xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#A7C7E7] shadow-2xl space-y-6 animate-in fade-in duration-200"
+        className="p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] text-[var(--text-primary)] border-2 border-[var(--border-hairline)] shadow-2xl space-y-6 animate-in fade-in duration-200 transition-colors"
       >
         {/* Stage Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#A7C7E7]/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[var(--border-hairline)]">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A3153] text-[#E09B30] text-xs font-montserrat font-bold uppercase tracking-wider">
               <span>{dayTabs[selectedDay].label}: {dayTabs[selectedDay].type}</span>
@@ -703,16 +703,16 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 </span>
               )}
             </div>
-            <h3 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#1A3153] tracking-tight">
+            <h3 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] tracking-tight">
               {activeDayData.title}
             </h3>
-            <p className="font-inter text-xs sm:text-sm text-[#4A5568] leading-relaxed">
+            <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {activeDayData.description}
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#1A3153] text-xs font-montserrat font-bold">
+            <span className="px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#9A6515] dark:text-[#E09B30] text-xs font-montserrat font-bold">
               +25 XP
             </span>
           </div>
@@ -723,12 +723,12 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* ======================================================================= */}
         {selectedDay === 0 && (
           <div className="space-y-5">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-[#A7C7E7]/50 space-y-3">
-              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+            <div className="p-4 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-3">
+              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                 <BookOpen size={15} className="text-[#E09B30]" />
                 <span>{t.microLearning.d1ReadingTitle}</span>
               </h4>
-              <p className="font-inter text-xs sm:text-sm text-[#4A5568] leading-relaxed">
+              <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                 {isEs
                   ? `Para avanzar hacia tu objetivo "${personalObjective}", los hablantes de nivel ${targetLevel} estructuran sus respuestas utilizando colocaciones de alta frecuencia. Escucha y repite en voz alta las siguientes colocaciones clave:`
                   : `To achieve your milestone "${personalObjective}", high-level speakers articulate their thoughts using natural collocations. Listen and repeat aloud these target collocations:`}
@@ -739,15 +739,15 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 {activeDayData.collocations.map((colloc, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl bg-[#FAFAFA] border border-[#A7C7E7] shadow-sm flex items-center justify-between gap-2 hover:border-[#E09B30] transition-colors"
+                    className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm flex items-center justify-between gap-2 hover:border-[#E09B30] transition-colors"
                   >
-                    <span className="font-mono text-xs font-bold text-[#1A3153] truncate">
+                    <span className="font-mono text-xs font-bold text-[var(--text-primary)] truncate">
                       "{colloc}"
                     </span>
                     <button
                       type="button"
                       onClick={() => handlePlayCollocation(colloc)}
-                      className="p-1.5 rounded-lg bg-[#1A3153] text-[#E09B30] hover:bg-[#E09B30] hover:text-[#1A3153] transition-colors cursor-pointer shrink-0"
+                      className="p-1.5 rounded-lg bg-[#1A3153]/10 dark:bg-[#A7C7E7]/15 text-[#1A3153] dark:text-[#E09B30] hover:bg-[#E09B30] hover:text-[#1A3153] transition-colors cursor-pointer shrink-0"
                       title="Pronounce with native audio"
                     >
                       <Volume2 size={14} className={playingCollocation === colloc ? 'animate-bounce' : ''} />
@@ -758,7 +758,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             </div>
 
             {/* Key Highlight */}
-            <div className="p-3.5 rounded-2xl bg-[#E09B30]/15 border border-[#E09B30]/40 text-xs text-[#1A3153] flex items-center gap-2.5">
+            <div className="p-3.5 rounded-2xl bg-[#E09B30]/10 border border-[#E09B30]/30 text-xs text-[#9A6515] dark:text-[#E09B30] flex items-center gap-2.5">
               <Sparkles size={16} className="text-[#E09B30] shrink-0" />
               <span><strong>{isEs ? 'Consejo de Teacher Ivan:' : 'Teacher Ivan’s Tip:'}</strong> {activeDayData.highlight}</span>
             </div>
@@ -780,20 +780,20 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* ======================================================================= */}
         {selectedDay === 1 && (
           <div className="space-y-5">
-            <div className="p-5 rounded-2xl bg-slate-50 border border-[#A7C7E7]/50 space-y-4">
-              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+            <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-4">
+              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                 <Gamepad2 size={16} className="text-[#E09B30]" />
                 <span>{t.microLearning.d2GrammarTitle}</span>
               </h4>
 
-              <p className="font-inter text-xs sm:text-sm text-[#4A5568]">
+              <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)]">
                 {isEs
                   ? 'Selecciona el conector formal adecuado para estructurar una respuesta persuasiva:'
                   : 'Select the proper formal connector to articulate a persuasive executive narrative:'}
               </p>
 
               {/* Challenge Box */}
-              <div className="p-4 rounded-xl bg-[#FAFAFA] border border-[#A7C7E7] font-inter text-sm text-[#1A3153] leading-relaxed">
+              <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-inter text-sm text-[var(--text-primary)] leading-relaxed">
                 "Our team encountered severe scalability bottlenecks; <strong>[ _____ ]</strong>, we spearheaded a modular migration that subsequently reduced latency by 40%."
               </div>
 
@@ -816,7 +816,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                         ? opt === 'subsequently'
                           ? 'bg-[#10b981] text-[#FAFAFA] border-[#10b981]'
                           : 'bg-red-500 text-[#FAFAFA] border-red-500'
-                        : 'bg-[#FAFAFA] text-[#1A3153] border-[#A7C7E7] hover:bg-slate-100'
+                        : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-hairline)] hover:bg-[var(--bg-sunken)]'
                     }`}
                   >
                     {opt}
@@ -858,8 +858,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* ======================================================================= */}
         {selectedDay === 2 && (
           <div className="space-y-5">
-            <div className="p-5 rounded-2xl bg-slate-50 border border-[#A7C7E7]/50 space-y-4">
-              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+            <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-4">
+              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                 <Mic size={16} className="text-[#E09B30]" />
                 <span>{t.microLearning.d3OralTitle}</span>
               </h4>
@@ -894,7 +894,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                   type="button"
                   id="d3-mark-complete-btn"
                   onClick={() => completeStage(2)}
-                  className="w-full sm:w-auto py-3.5 px-5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-slate-200 hover:bg-slate-300 text-[#1A3153] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto py-3.5 px-5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[var(--bg-surface)] hover:bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-[var(--text-primary)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <CheckCircle2 size={15} />
                   <span>{isEs ? 'Marcar Completado (+25 XP)' : 'Mark Complete (+25 XP)'}</span>
@@ -909,9 +909,9 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* ======================================================================= */}
         {selectedDay === 3 && (
           <div className="space-y-5">
-            <div className="p-5 rounded-2xl bg-slate-50 border border-[#A7C7E7]/50 space-y-4">
+            <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-4">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+                <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                   <PenTool size={16} className="text-[#E09B30]" />
                   <span>{t.microLearning.d4WritingTitle}</span>
                 </h4>
@@ -921,7 +921,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                       ? 'text-[#10b981]'
                       : wordCount > 0
                       ? 'text-[#E09B30]'
-                      : 'text-[#4A5568]'
+                      : 'text-[var(--text-secondary)]'
                   }`}
                 >
                   {wordCount} {t.microLearning.wordCount} ({t.microLearning.minWords})
@@ -929,12 +929,12 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               </div>
 
               {/* Tailored Prompt Box */}
-              <div className="p-4 rounded-xl bg-[#E09B30]/15 border border-[#E09B30]/40 text-xs text-[#1A3153] space-y-1">
-                <span className="font-montserrat font-bold text-[#1A3153] flex items-center gap-1.5 uppercase text-[11px] tracking-wider">
+              <div className="p-4 rounded-xl bg-[#E09B30]/10 border border-[#E09B30]/30 text-xs text-[#9A6515] dark:text-[#E09B30] space-y-1">
+                <span className="font-montserrat font-bold text-[var(--text-primary)] flex items-center gap-1.5 uppercase text-[11px] tracking-wider">
                   <Sparkles size={13} className="text-[#E09B30]" />
                   <span>{isEs ? 'Consigna Personalizada de Teacher Ivan:' : 'Teacher Ivan’s Custom Prompt:'}</span>
                 </span>
-                <p className="font-inter text-xs leading-relaxed text-[#1A3153]">
+                <p className="font-inter text-xs leading-relaxed text-[var(--text-primary)]">
                   {activeDayData.writingPrompt}
                 </p>
               </div>
@@ -945,14 +945,14 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 value={localWriting}
                 onChange={(e) => setLocalWriting(e.target.value)}
                 placeholder={t.microLearning.writingPlaceholder}
-                className="w-full p-3.5 rounded-xl border border-[#A7C7E7] bg-[#FAFAFA] text-[#1A3153] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] resize-y leading-relaxed"
+                className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30] resize-y leading-relaxed"
               />
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
                 {writingStatus ? (
                   <span className="text-xs font-bold text-[#10b981]">{writingStatus}</span>
                 ) : (
-                  <p className="text-[11px] text-[#4A5568]">
+                  <p className="text-[11px] text-[var(--text-secondary)]">
                     {isEs
                       ? 'Tu redacción se incluirá en tu reporte semanal para Teacher Ivan.'
                       : 'Your writing sample will be sent in your weekly report to Teacher Ivan.'}
@@ -972,7 +972,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               </div>
 
               {day4Feedback && (
-                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
+                <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
                   <span className="font-montserrat font-bold block">
                     {isEs ? 'Evaluación de Redacción:' : 'Writing Critique:'}
                   </span>
@@ -988,14 +988,14 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         {/* ======================================================================= */}
         {selectedDay === 4 && (
           <div className="space-y-5">
-            <div className="p-5 rounded-2xl bg-slate-50 border border-[#A7C7E7]/50 space-y-4">
-              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] flex items-center gap-1.5">
+            <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-4">
+              <h4 className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                 <Award size={16} className="text-[#E09B30]" />
                 <span>{t.microLearning.d5ClosureTitle}</span>
               </h4>
 
               {/* Telemetry Embedded Remotion CEFR Loop */}
-              <div className="rounded-2xl overflow-hidden border border-[var(--rule-light)] bg-navy-surface p-2 shadow-inner">
+              <div className="rounded-2xl overflow-hidden border border-[var(--border-hairline)] bg-navy-surface p-2 shadow-inner">
                 <RemotionLoopVideo
                   name="cefr-diagnostic-loop"
                   alt="CEFR 90s Diagnostic Telemetry Loop"
@@ -1005,8 +1005,8 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
 
               {/* Weekly Scorecard Summary */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-xl bg-[#FAFAFA] border border-[#A7C7E7] text-center">
-                  <span className="text-[10px] font-montserrat font-bold uppercase text-[#4A5568] block mb-1">
+                <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center">
+                  <span className="text-[10px] font-montserrat font-bold uppercase text-[var(--text-secondary)] block mb-1">
                     {isEs ? 'Hábito' : 'Habit'}
                   </span>
                   <span className="font-montserrat font-black text-xl text-[#10b981]">
@@ -1014,26 +1014,26 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                   </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#FAFAFA] border border-[#A7C7E7] text-center">
-                  <span className="text-[10px] font-montserrat font-bold uppercase text-[#4A5568] block mb-1">
+                <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center">
+                  <span className="text-[10px] font-montserrat font-bold uppercase text-[var(--text-secondary)] block mb-1">
                     XP Total
                   </span>
-                  <span className="font-montserrat font-black text-xl text-[#E09B30]">
+                  <span className="font-montserrat font-black text-xl text-[#9A6515] dark:text-[#E09B30]">
                     +{totalXp} XP
                   </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#FAFAFA] border border-[#A7C7E7] text-center">
-                  <span className="text-[10px] font-montserrat font-bold uppercase text-[#4A5568] block mb-1">
+                <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center">
+                  <span className="text-[10px] font-montserrat font-bold uppercase text-[var(--text-secondary)] block mb-1">
                     {isEs ? 'Nivel MCER' : 'CEFR Band'}
                   </span>
-                  <span className="font-montserrat font-black text-xl text-[#1A3153]">
+                  <span className="font-montserrat font-black text-xl text-[var(--text-primary)]">
                     {targetLevel}
                   </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#FAFAFA] border border-[#A7C7E7] text-center">
-                  <span className="text-[10px] font-montserrat font-bold uppercase text-[#4A5568] block mb-1">
+                <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center">
+                  <span className="text-[10px] font-montserrat font-bold uppercase text-[var(--text-secondary)] block mb-1">
                     {isEs ? 'Redacción' : 'Writing'}
                   </span>
                   <span className="font-montserrat font-black text-xl text-[#10b981]">
@@ -1062,7 +1062,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               <button
                 type="button"
                 onClick={openReportModal}
-                className="text-xs text-[#E09B30] hover:underline font-montserrat font-bold flex items-center gap-1 cursor-pointer"
+                className="text-xs text-[#9A6515] dark:text-[#E09B30] hover:underline font-montserrat font-bold flex items-center gap-1 cursor-pointer"
               >
                 <BarChart3 size={14} />
                 <span>{t.sprintDashboard.viewWeeklyReport}</span>
