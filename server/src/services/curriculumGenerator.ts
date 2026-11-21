@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import type { LearningGoals } from './userStore.js';
+import { sanitizeInput, wrapStudentInput, SYSTEM_GUARDRAILS } from '../utils/promptGuard.js';
 export type { LearningGoals };
 
 export interface SprintDay {
@@ -446,15 +447,24 @@ export async function generateWeeklySprint(goals: LearningGoals): Promise<Genera
   const CANDIDATE_MODELS = ['gemini-3.1-flash-lite', 'gemini-2.5-flash'];
   const ai = new GoogleGenAI({ apiKey });
 
+  const safeTargetLevel = sanitizeInput(goals.targetLevel, 20) || 'B1';
+  const safePrimaryGoal = sanitizeInput(goals.primaryGoal, 80) || 'Daily Conversational Fluency';
+  const safeFocusSkill = sanitizeInput(goals.focusSkill, 80) || 'Speaking Fluency & Pronunciation';
+  const safePersonalObjective = sanitizeInput(goals.personalObjective, 400);
+
+  const studentContext = wrapStudentInput(
+    `- Target CEFR Level: ${safeTargetLevel}\n- Primary Learning Goal: ${safePrimaryGoal}\n- Priority Focus Skill: ${safeFocusSkill}\n- Specific Personal Objective: "${safePersonalObjective}"`,
+    'student_input'
+  );
+
   const prompt = `You are Teacher Ivan, a world-class bilingual English tutor.
 A student has completed their onboarding profile and requires a personalized 5-Day Micro-Learning Sprint (D1 to D5).
 Generate both English and Spanish translations for titles, descriptions, writing prompts, and highlights so bilingual UI switches flawlessly.
 
-STUDENT PROFILE:
-- Target CEFR Level: ${goals.targetLevel}
-- Primary Learning Goal: ${goals.primaryGoal}
-- Priority Focus Skill: ${goals.focusSkill}
-- Specific Personal Objective: "${goals.personalObjective}"
+${SYSTEM_GUARDRAILS}
+
+STUDENT PROFILE DATA:
+${studentContext}
 
 Generate a 5-day sprint strictly in JSON format conforming to this exact structure:
 {
@@ -508,8 +518,8 @@ Generate a 5-day sprint strictly in JSON format conforming to this exact structu
       "descriptionEs": "string in Spanish",
       "targetCollocations": ["collocation 1", "collocation 2", "collocation 3"],
       "simulatorScenarioPreset": "string",
-      "functionalWritingPrompt": "A detailed 80-120 word writing prompt in English explicitly mentioning and targeting: '${goals.personalObjective}'",
-      "functionalWritingPromptEs": "Consigna detallada de escritura de 80-120 palabras en español mencionando explícitamente y enfocada en: '${goals.personalObjective}'",
+      "functionalWritingPrompt": "A detailed 80-120 word writing prompt in English explicitly mentioning and targeting: '${safePersonalObjective}'",
+      "functionalWritingPromptEs": "Consigna detallada de escritura de 80-120 palabras en español mencionando explícitamente y enfocada en: '${safePersonalObjective}'",
       "highlight": "string in English",
       "highlightEs": "string in Spanish"
     },
@@ -531,8 +541,8 @@ Generate a 5-day sprint strictly in JSON format conforming to this exact structu
 
 CRITICAL RULES:
 1. Return ONLY valid JSON, with NO surrounding markdown or commentary.
-2. Ensure Day 4 functionalWritingPrompt and functionalWritingPromptEs are deeply tailored to: "${goals.personalObjective}".
-3. Keep collocations high-frequency, natural, and directly applicable to "${goals.primaryGoal}".`;
+2. Ensure Day 4 functionalWritingPrompt and functionalWritingPromptEs are deeply tailored to: "${safePersonalObjective}".
+3. Keep collocations high-frequency, natural, and directly applicable to "${safePrimaryGoal}".`;
 
   for (const model of CANDIDATE_MODELS) {
     try {
@@ -542,6 +552,7 @@ CRITICAL RULES:
         config: {
           temperature: 0.4,
           responseMimeType: 'application/json',
+          maxOutputTokens: 2048,
         },
       });
 
@@ -917,14 +928,23 @@ export async function generateCustomResource(req: CustomResourceRequest): Promis
   const CANDIDATE_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
   const ai = new GoogleGenAI({ apiKey });
 
+  const safeTopic = sanitizeInput(req.topic, 300);
+  const safeTargetLevel = sanitizeInput(req.targetLevel, 20) || 'B2';
+  const safeResourceType = sanitizeInput(req.resourceType, 50) || 'article_collocations';
+  const safeStudentGoal = sanitizeInput(req.studentGoal, 300) || 'Spoken English Mastery';
+
+  const requestContext = wrapStudentInput(
+    `- Topic / Situation: "${safeTopic}"\n- Target CEFR Level: ${safeTargetLevel}\n- Resource Type: ${safeResourceType}\n- Student Learning Objective: "${safeStudentGoal}"`,
+    'student_input'
+  );
+
   const prompt = `You are Teacher Ivan, an elite bilingual English tutor and curriculum designer.
 Generate an on-demand, highly engaging custom learning resource tailored to the student's request.
 
-REQUEST PARAMETERS:
-- Topic / Situation: "${req.topic}"
-- Target CEFR Level: ${req.targetLevel || 'B2'}
-- Resource Type: ${req.resourceType || 'article_collocations'}
-- Student Learning Objective: "${req.studentGoal || 'Spoken English Mastery'}"
+${SYSTEM_GUARDRAILS}
+
+STUDENT REQUEST PARAMETERS:
+${requestContext}
 
 OUTPUT SCHEMA (Return strictly JSON):
 {
@@ -966,6 +986,7 @@ CRITICAL CONSTRAINTS:
         config: {
           temperature: 0.4,
           responseMimeType: 'application/json',
+          maxOutputTokens: 2048,
         },
       });
 

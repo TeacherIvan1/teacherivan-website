@@ -1,9 +1,12 @@
 import { Router, Request, Response } from 'express';
-import { userStore } from '../services/userStore.js';
+import { OAuth2Client } from 'google-auth-library';
+import { userStore, ADMIN_EMAIL } from '../services/userStore.js';
 import { bookingStore } from '../services/bookingStore.js';
 import { sheetsService } from '../services/sheetsService.js';
+import { requireAuth, requireAdmin, optionalAuth, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
+const googleOAuthClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 
 /**
  * POST /api/auth/register
@@ -103,7 +106,7 @@ router.post('/register', (req: Request, res: Response) => {
       cefrLevel: learningGoals?.targetLevel,
     });
 
-    const token = userStore.createSessionToken(user.id);
+    const token = userStore.createSessionToken(user.id, user.role || 'student');
 
     // Asynchronously append student to Google Sheet
     sheetsService.appendStudentRegistration(user).catch((sheetErr) => {
@@ -233,20 +236,28 @@ router.post('/recover-password', (req: Request, res: Response) => {
  * Body: { id?: string, email?: string, learningGoals: LearningGoals, cefrLevel?: string, fullName?: string, country?: string, dateOfBirth?: string }
  * Completes mandatory onboarding profile and goals.
  */
-router.put('/profile', (req: Request, res: Response) => {
+router.put('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id, email, learningGoals, cefrLevel, fullName, phoneNumber, country, dateOfBirth } = req.body || {};
 
-    if (!id && !email) {
-      return res.status(400).json({ error: 'Student ID or email is required to update profile' });
+    const targetId = id || (email ? userStore.findByEmail(email)?.id : undefined);
+    // Student can only update their own profile unless they are an admin
+    if (req.user && req.user.role !== 'admin' && targetId && targetId !== req.user.id) {
+      return res.status(403).json({
+        error: 'Forbidden: You cannot modify another student profile.',
+        errorEs: 'Acceso denegado: No puedes modificar el perfil de otro estudiante.',
+        errorEn: 'Forbidden: You cannot modify another student profile.',
+      });
     }
+
+    const identifier = req.user ? { id: req.user.id } : { id, email };
 
     if (!learningGoals || typeof learningGoals !== 'object') {
       return res.status(400).json({ error: 'Learning goals are required' });
     }
 
     const updated = userStore.updateUserProfile(
-      { id, email },
+      identifier,
       {
         learningGoals,
         cefrLevel: cefrLevel || learningGoals.targetLevel,
@@ -275,11 +286,30 @@ router.put('/profile', (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/google
- * Body: { email: string, fullName: string, phoneNumber?: string, googleId?: string, dateOfBirth?: string, country?: string }
+ * Body: { email: string, fullName: string, phoneNumber?: string, googleId?: string, dateOfBirth?: string, country?: string, credential?: string, idToken?: string }
  */
-router.post('/google', (req: Request, res: Response) => {
+router.post('/google', async (req: Request, res: Response) => {
   try {
-    const { email, fullName, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted } = req.body || {};
+    let { email, fullName, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted, credential, idToken } = req.body || {};
+
+    // 1. Verify Google ID token cryptographically if client library provided a token
+    const tokenToVerify = credential || idToken;
+    if (tokenToVerify && googleOAuthClient && process.env.GOOGLE_CLIENT_ID) {
+      try {
+        const ticket = await googleOAuthClient.verifyIdToken({
+          idToken: tokenToVerify,
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const gPayload = ticket.getPayload();
+        if (gPayload && gPayload.email) {
+          email = gPayload.email;
+          fullName = fullName || gPayload.name || 'Google Student';
+        }
+      } catch (tokenErr) {
+        console.warn('[Google Auth] Token verification rejected:', tokenErr);
+        return res.status(401).json({ error: 'Invalid Google authentication token' });
+      }
+    }
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return res.status(400).json({ error: 'Valid Google email is required' });
@@ -292,7 +322,7 @@ router.post('/google', (req: Request, res: Response) => {
       if (phoneNumber && phoneNumber.trim()) {
         userStore.updateUserProfile({ email }, { phoneNumber: phoneNumber.trim() });
       }
-      const token = userStore.createSessionToken(existing.id);
+      const token = userStore.createSessionToken(existing.id, existing.role || 'student');
       return res.status(200).json({
         status: 'ok',
         user: userStore.findByEmail(email) || existing,
@@ -314,7 +344,7 @@ router.post('/google', (req: Request, res: Response) => {
         learningGoals: learningGoals || existing?.learningGoals,
         cefrLevel: learningGoals?.targetLevel || existing?.cefrLevel,
       });
-      const token = userStore.createSessionToken(user.id);
+      const token = userStore.createSessionToken(user.id, user.role || 'student');
       return res.status(200).json({
         status: 'ok',
         user,
@@ -330,7 +360,7 @@ router.post('/google', (req: Request, res: Response) => {
       phoneNumber: phoneNumber || existing?.phoneNumber,
       authProvider: 'google',
     });
-    const token = userStore.createSessionToken(tempUser.id);
+    const token = userStore.createSessionToken(tempUser.id, tempUser.role || 'student');
 
     return res.status(200).json({
       status: 'ok',
@@ -350,21 +380,15 @@ router.post('/google', (req: Request, res: Response) => {
  * Headers: Authorization: Bearer <token>
  * Query: ?userId=...
  */
-router.get('/me', (req: Request, res: Response) => {
+router.get('/me', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
-    const queryId = (req.query.userId || req.query.id || req.query.email) as string | undefined;
-    let user = queryId ? (userStore.findById(queryId) || userStore.findByEmail(queryId)) : undefined;
+    let user = req.user;
 
-    if (!user && authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '').trim();
-      try {
-        const decoded = Buffer.from(token, 'base64').toString('utf8');
-        const parts = decoded.split(':');
-        if (parts.length >= 1) {
-          user = userStore.findById(parts[0]) || userStore.findByEmail(parts[0]);
-        }
-      } catch {}
+    if (!user) {
+      const queryId = (req.query.userId || req.query.id || req.query.email) as string | undefined;
+      if (queryId) {
+        user = userStore.findById(queryId) || userStore.findByEmail(queryId);
+      }
     }
 
     if (!user) {
@@ -386,33 +410,23 @@ router.get('/me', (req: Request, res: Response) => {
  * POST /api/auth/ack-plan-notification
  * Body: { userId?: string, email?: string }
  */
-router.post('/ack-plan-notification', (req: Request, res: Response) => {
+router.post('/ack-plan-notification', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { userId, email } = req.body || {};
-    const authHeader = req.headers.authorization;
-    const identifier = userId || email;
+    const targetId = req.user ? req.user.id : (userId || email);
 
-    let user = identifier ? (userStore.findById(identifier) || userStore.findByEmail(identifier)) : undefined;
-
-    if (!user && authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '').trim();
-      try {
-        const decoded = Buffer.from(token, 'base64').toString('utf8');
-        const parts = decoded.split(':');
-        if (parts.length >= 1) {
-          user = userStore.findById(parts[0]) || userStore.findByEmail(parts[0]);
-        }
-      } catch {}
+    if (!targetId) {
+      return res.status(400).json({ error: 'User identifier required' });
     }
 
-    if (!user) {
+    const updated = userStore.ackPlanNotification(targetId);
+    if (!updated) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const updated = userStore.ackPlanNotification(user.id);
     return res.status(200).json({
       status: 'ok',
-      user: updated || user,
+      user: updated,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -423,9 +437,9 @@ router.post('/ack-plan-notification', (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/sync
- * Body: { user: User } or user fields
+ * Body: { user: User, bookings?: Booking[] }
  */
-router.post('/sync', (req: Request, res: Response) => {
+router.post('/sync', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const userPayload = req.body?.user || req.body;
     const incomingBookings = req.body?.bookings || req.body?.myBookings || [];
@@ -434,7 +448,14 @@ router.post('/sync', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Valid user profile required for sync' });
     }
 
-    const user = userStore.syncClientUser(userPayload);
+    // Defensive Object Property Level Authorization:
+    // Strip client role spoofing: role can only be 'admin' if email strictly matches ADMIN_EMAIL
+    const safePayload = { ...userPayload };
+    if (safePayload.role === 'admin' && userStore.normalizeEmail(safePayload.email) !== userStore.normalizeEmail(ADMIN_EMAIL)) {
+      safePayload.role = 'student';
+    }
+
+    const user = userStore.syncClientUser(safePayload);
     const token = userStore.createSessionToken(user.id, user.role || 'student');
 
     // Self-healing student bookings from client cache
@@ -463,10 +484,10 @@ router.post('/sync', (req: Request, res: Response) => {
 });
 
 /**
- * PUT /api/auth/plan or /api/auth/:id/plan
+ * PUT /api/auth/:id/plan
  * Manual Plan Assignment by Admin
  */
-router.put('/:id/plan', (req: Request, res: Response) => {
+router.put('/:id/plan', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
   try {
     const rawId = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;
@@ -493,9 +514,10 @@ router.put('/:id/plan', (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/users/export (or /api/auth/export)
+ * GET /api/auth/export
+ * Admin Student Roster Export
  */
-router.get('/export', (_req: Request, res: Response) => {
+router.get('/export', requireAdmin, (_req: AuthenticatedRequest, res: Response) => {
   try {
     const users = userStore.getAllUsers();
     return res.status(200).json({
@@ -505,7 +527,7 @@ router.get('/export', (_req: Request, res: Response) => {
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[GET /api/users/export Error]:', msg);
+    console.error('[GET /api/auth/export Error]:', msg);
     return res.status(500).json({ error: 'Internal server error during export' });
   }
 });

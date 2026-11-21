@@ -99,9 +99,12 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(completedGoogleUser.country, 'Mexico');
   assert.equal(completedGoogleUser.dateOfBirth, '1995-10-20');
 
-  // 8. Verify session token creation
+  // 8. Verify session token creation and verification
   const token = store.createSessionToken(user1.id);
   assert.ok(typeof token === 'string' && token.length > 20);
+  const tokenPayload = store.verifySessionToken(token);
+  assert.equal(tokenPayload?.userId, user1.id);
+  assert.equal(tokenPayload?.role, 'student');
 
   // 9. Verify total users (Admin + Maria + Carlos = 3)
   assert.equal(store.getAllUsers().length, 3);
@@ -111,11 +114,11 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(user1.maxDailySessions, 5);
   assert.equal(user1.maxWeeklyClasses, 0);
 
-  // 11. Admin updates student plan to 'essential' (1 class/wk, 10 sessions/day)
+  // 11. Admin updates student plan to 'essential' (0 class/wk, 10 sessions/day)
   const updatedToEssential = store.updateUserPlan(user1.id, 'essential');
   assert.ok(updatedToEssential);
   assert.equal(updatedToEssential?.plan, 'essential');
-  assert.equal(updatedToEssential?.maxWeeklyClasses, 1);
+  assert.equal(updatedToEssential?.maxWeeklyClasses, 0);
   assert.equal(updatedToEssential?.maxDailySessions, 10);
 
   // 12. Quota check & increment
@@ -124,11 +127,11 @@ test('UserStore - registration, upsert and retrieval', (t) => {
   assert.equal(q1.quota.used, 1);
   assert.equal(q1.quota.max, 10);
 
-  // 13. Update to 'pro' (unlimited simulator: max -1, 2 classes/wk)
+  // 13. Update to 'pro' (unlimited simulator: max -1, 3 classes/wk)
   const updatedToPro = store.updateUserPlan(user1.id, 'pro');
   assert.equal(updatedToPro?.plan, 'pro');
   assert.equal(updatedToPro?.maxDailySessions, -1);
-  assert.equal(updatedToPro?.maxWeeklyClasses, 2);
+  assert.equal(updatedToPro?.maxWeeklyClasses, 3);
 
   // 14. Username and Password Authentication Tests
   assert.equal(admin.username, 'ivan');

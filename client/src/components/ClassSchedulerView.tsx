@@ -71,7 +71,7 @@ export function formatIsoDate(d: Date): string {
 }
 
 export const ClassSchedulerView: React.FC = () => {
-  const { user, isAuthenticated, openAuthModal } = useAuthStore();
+  const { user, token, isAuthenticated, openAuthModal } = useAuthStore();
   const { t, isEs } = useTranslation();
 
   const [weekOffset, setWeekOffset] = useState<number>(0); // 0 = current, 1 = next
@@ -129,7 +129,10 @@ export const ClassSchedulerView: React.FC = () => {
         console.log(`[ClassSchedulerView] Rehydrating ${missingOnServer.length} student bookings to server...`);
         fetch(getApiUrl('/api/users/rehydrate-roster'), {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify({ bookings: missingOnServer }),
         }).catch(() => {});
       }
@@ -240,7 +243,10 @@ export const ClassSchedulerView: React.FC = () => {
       setIsLoading(true);
       const res = await fetch(getApiUrl('/api/bookings'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           studentId: user.id,
           studentName: user.fullName,
@@ -286,7 +292,10 @@ export const ClassSchedulerView: React.FC = () => {
       setIsLoading(true);
       const res = await fetch(getApiUrl(`/api/bookings/${bookingId}`), {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           studentId: user.id,
           studentEmail: user.email,

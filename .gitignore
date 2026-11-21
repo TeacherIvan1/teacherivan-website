@@ -72,6 +72,9 @@ look/
 
 # Non-website media, video pipeline & reference repositories
 media-pipeline/
+media-pipeline/tools/
+tools/
+**/tools/
 reference-repos/
 remotion-reel/
 llajta-crossfit-reel/

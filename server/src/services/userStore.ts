@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,11 +24,11 @@ export interface PlanDefaults {
 export function getPlanDefaults(plan: StudentPlan = 'free'): PlanDefaults {
   switch (plan) {
     case 'essential':
-      return { maxWeeklyClasses: 1, maxDailySessions: 10 };
+      return { maxWeeklyClasses: 0, maxDailySessions: 10 };
     case 'pro':
-      return { maxWeeklyClasses: 2, maxDailySessions: -1 };
-    case 'executive':
       return { maxWeeklyClasses: 3, maxDailySessions: -1 };
+    case 'executive':
+      return { maxWeeklyClasses: 5, maxDailySessions: -1 };
     case 'free':
     default:
       return { maxWeeklyClasses: 0, maxDailySessions: 5 };
@@ -60,7 +61,55 @@ export interface User {
 }
 
 export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'ivan@teacherivan.com').trim().toLowerCase();
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'IvanAdmin2026!';
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === 'production' ? '' : 'IvanAdmin2026!');
+export const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
+export const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'ti-jwt-dev-secret-key-32chars-min-ok!');
+
+/**
+ * Hashes a plaintext password using crypto.scryptSync with a cryptographically secure 16-byte salt.
+ * Stored format: scrypt$<salt>$<derivedHash>
+ */
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const derived = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `scrypt$${salt}$${derived}`;
+}
+
+/**
+ * Verifies a password against a stored hash or legacy plaintext string.
+ * Uses crypto.timingSafeEqual to prevent timing attacks.
+ */
+export function verifyPassword(
+  password: string,
+  storedHashOrPlain?: string
+): { valid: boolean; needsUpgrade: boolean } {
+  if (!password || !storedHashOrPlain) {
+    return { valid: false, needsUpgrade: false };
+  }
+
+  // Modern scrypt salted hash
+  if (storedHashOrPlain.startsWith('scrypt$')) {
+    const parts = storedHashOrPlain.split('$');
+    if (parts.length === 3) {
+      const salt = parts[1];
+      const originalHash = parts[2];
+      const derived = crypto.scryptSync(password, salt, 64).toString('hex');
+      const bufA = Buffer.from(derived, 'hex');
+      const bufB = Buffer.from(originalHash, 'hex');
+      if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+        return { valid: true, needsUpgrade: false };
+      }
+    }
+    return { valid: false, needsUpgrade: false };
+  }
+
+  // Legacy plaintext fallback for backwards compatibility; flags for auto-upgrade on login
+  if (password === storedHashOrPlain) {
+    return { valid: true, needsUpgrade: true };
+  }
+
+  return { valid: false, needsUpgrade: false };
+}
 
 export class UserStore {
   private dataFilePath: string;
@@ -97,11 +146,13 @@ export class UserStore {
     const normAdminEmail = this.normalizeEmail(ADMIN_EMAIL);
     const existingAdmin = this.users.get(normAdminEmail);
 
+    const initialAdminPasswordHash = ADMIN_PASSWORD_HASH || (ADMIN_PASSWORD ? hashPassword(ADMIN_PASSWORD) : '');
+
     if (!existingAdmin) {
       const adminUser: User = {
         id: 'usr_admin_ivan',
         username: 'ivan',
-        password: ADMIN_PASSWORD,
+        password: initialAdminPasswordHash,
         fullName: 'Teacher Ivan (Admin)',
         email: normAdminEmail,
         phoneNumber: '+591 72878330',
@@ -135,8 +186,8 @@ export class UserStore {
         existingAdmin.username = 'ivan';
         changed = true;
       }
-      if (existingAdmin.password !== ADMIN_PASSWORD) {
-        existingAdmin.password = ADMIN_PASSWORD;
+      if (initialAdminPasswordHash && (!existingAdmin.password || !existingAdmin.password.startsWith('scrypt$'))) {
+        existingAdmin.password = initialAdminPasswordHash;
         changed = true;
       }
       if (changed) {
@@ -150,7 +201,7 @@ export class UserStore {
         {
           id: 'usr_seed_sofia',
           username: 'sofia',
-          password: 'Sofia2026!',
+          password: hashPassword('Sofia2026!'),
           fullName: 'Sofia Rodriguez',
           email: 'sofia@example.com',
           phoneNumber: '+591 72878330',
@@ -172,7 +223,7 @@ export class UserStore {
         {
           id: 'usr_seed_ana',
           username: 'ana',
-          password: 'Student2026!',
+          password: hashPassword('Student2026!'),
           fullName: 'Ana Morales',
           email: 'ana@example.com',
           phoneNumber: '+591 70000000',
@@ -238,16 +289,23 @@ export class UserStore {
               }
               usedUsernames.add(assignedUsername);
 
+              // Auto-hash plaintext password if loading legacy format
+              let userPassword = u.password;
+              if (userPassword && !userPassword.startsWith('scrypt$')) {
+                userPassword = hashPassword(userPassword);
+              } else if (!userPassword) {
+                userPassword = isAdmin ? (ADMIN_PASSWORD ? hashPassword(ADMIN_PASSWORD) : '') : hashPassword('Student2026!');
+              }
+
               const migratedUser: User = {
                 ...u,
                 username: assignedUsername,
-                password: u.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
+                password: userPassword,
               };
               this.users.set(normEmail, migratedUser);
             }
           }
         }
-      } else {
         this.saveToDisk();
       }
       this.isLoaded = true;
@@ -317,8 +375,26 @@ export class UserStore {
 
     // 1. Check admin account
     if (normUser === 'ivan' || normUser === 'teacherivan' || normEmail === this.normalizeEmail(ADMIN_EMAIL)) {
-      if (password === ADMIN_PASSWORD) {
-        const admin = this.findByEmail(ADMIN_EMAIL) || this.findByUsername('ivan');
+      const admin = this.findByEmail(ADMIN_EMAIL) || this.findByUsername('ivan');
+      if (admin && admin.password) {
+        const check = verifyPassword(password, admin.password);
+        if (check.valid) {
+          if (check.needsUpgrade) {
+            admin.password = hashPassword(password);
+            this.saveToDisk();
+          }
+          return { success: true, user: admin };
+        }
+      }
+      if (ADMIN_PASSWORD_HASH) {
+        const checkHash = verifyPassword(password, ADMIN_PASSWORD_HASH);
+        if (checkHash.valid && admin) {
+          return { success: true, user: admin };
+        }
+      }
+      if (ADMIN_PASSWORD && password === ADMIN_PASSWORD && admin) {
+        admin.password = hashPassword(password);
+        this.saveToDisk();
         return { success: true, user: admin };
       }
       return { success: false, error: 'Invalid admin credentials' };
@@ -334,8 +410,15 @@ export class UserStore {
       return { success: false, error: 'User not found' };
     }
 
-    if (user.password && user.password !== password) {
-      return { success: false, error: 'Incorrect password' };
+    if (user.password) {
+      const check = verifyPassword(password, user.password);
+      if (!check.valid) {
+        return { success: false, error: 'Incorrect password' };
+      }
+      if (check.needsUpgrade) {
+        user.password = hashPassword(password);
+        this.saveToDisk();
+      }
     }
 
     return { success: true, user };
@@ -382,7 +465,7 @@ export class UserStore {
       return { success: false, error: 'The email or phone number does not match our records for this user' };
     }
 
-    user.password = newPassword.trim();
+    user.password = hashPassword(newPassword.trim());
     this.saveToDisk();
 
     return { success: true, user };
@@ -423,13 +506,17 @@ export class UserStore {
       throw new Error(`Username "${chosenUsername}" is already taken.`);
     }
 
+    const securePassword = data.password
+      ? (data.password.startsWith('scrypt$') ? data.password : hashPassword(data.password))
+      : undefined;
+
     if (existing) {
       const plan = data.plan || existing.plan || (isAdmin ? 'executive' : 'free');
       const planDefaults = getPlanDefaults(plan);
       const updated: User = {
         ...existing,
         username: chosenUsername || existing.username,
-        password: data.password || existing.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
+        password: securePassword || existing.password || (isAdmin ? (ADMIN_PASSWORD ? hashPassword(ADMIN_PASSWORD) : '') : hashPassword('Student2026!')),
         fullName: data.fullName ? data.fullName.trim() : existing.fullName,
         phoneNumber: data.phoneNumber ? data.phoneNumber.trim() : (existing.phoneNumber || ''),
         dateOfBirth: data.dateOfBirth ? data.dateOfBirth.trim() : existing.dateOfBirth,
@@ -457,7 +544,7 @@ export class UserStore {
     const newUser: User = {
       id: isAdmin ? 'usr_admin_ivan' : `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
       username: chosenUsername,
-      password: data.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
+      password: securePassword || (isAdmin ? (ADMIN_PASSWORD ? hashPassword(ADMIN_PASSWORD) : '') : hashPassword('Student2026!')),
       fullName: data.fullName ? data.fullName.trim() : (isAdmin ? 'Teacher Ivan (Admin)' : 'Student'),
       email: normEmail,
       phoneNumber: data.phoneNumber ? data.phoneNumber.trim() : '',
@@ -584,14 +671,16 @@ export class UserStore {
     const newUser: User = {
       id: clientUser.id || (isAdmin ? 'usr_admin_ivan' : `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`),
       username: chosenUsername,
-      password: clientUser.password || (isAdmin ? ADMIN_PASSWORD : 'Student2026!'),
+      password: clientUser.password
+        ? (clientUser.password.startsWith('scrypt$') ? clientUser.password : hashPassword(clientUser.password))
+        : (isAdmin ? (ADMIN_PASSWORD ? hashPassword(ADMIN_PASSWORD) : '') : hashPassword('Student2026!')),
       fullName: clientUser.fullName ? clientUser.fullName.trim() : (isAdmin ? 'Teacher Ivan (Admin)' : 'Student'),
       email: normEmail,
       phoneNumber: clientUser.phoneNumber ? clientUser.phoneNumber.trim() : '',
       dateOfBirth: clientUser.dateOfBirth ? clientUser.dateOfBirth.trim() : '',
       country: clientUser.country ? clientUser.country.trim() : '',
       authProvider: clientUser.authProvider || 'email',
-      role: isAdmin ? 'admin' : (clientUser.role || 'student'),
+      role: isAdmin ? 'admin' : 'student',
       plan: userPlan,
       planUpdatedAt: clientUser.planUpdatedAt || new Date().toISOString(),
       planNotificationPending: clientUser.planNotificationPending ?? false,
@@ -621,10 +710,16 @@ export class UserStore {
       const normEmail = this.normalizeEmail(incoming.email);
       const existing = this.users.get(normEmail);
 
+      let securePassword = incoming.password;
+      if (securePassword && !securePassword.startsWith('scrypt$')) {
+        securePassword = hashPassword(securePassword);
+      }
+
       if (!existing) {
         // Missing student restored from Admin Roster Vault
         this.users.set(normEmail, {
           ...incoming,
+          password: securePassword || hashPassword('Student2026!'),
           email: normEmail,
           username: incoming.username ? this.normalizeUsername(incoming.username) : this.normalizeUsername(normEmail.split('@')[0]),
         });
@@ -787,10 +882,44 @@ export class UserStore {
     return updated;
   }
 
+  /**
+   * Generates a signed JWT session token.
+   */
   public createSessionToken(userId: string, role: 'student' | 'admin' = 'student'): string {
-    const timestamp = Date.now();
-    const nonce = crypto.randomBytes(16).toString('hex');
-    return Buffer.from(`${userId}:${role}:${timestamp}:${nonce}`).toString('base64');
+    const secret = JWT_SECRET || 'ti-jwt-fallback-secret-key-32chars!';
+    return jwt.sign({ userId, role }, secret, { expiresIn: '7d' });
+  }
+
+  /**
+   * Cryptographically verifies a JWT session token with legacy base64 fallback.
+   */
+  public verifySessionToken(token: string): { userId: string; role: 'student' | 'admin' } | null {
+    if (!token) return null;
+    const secret = JWT_SECRET || 'ti-jwt-fallback-secret-key-32chars!';
+
+    try {
+      const decoded = jwt.verify(token, secret) as { userId: string; role?: 'student' | 'admin' };
+      if (decoded && decoded.userId) {
+        return {
+          userId: decoded.userId,
+          role: decoded.role === 'admin' ? 'admin' : 'student',
+        };
+      }
+    } catch {
+      // Legacy base64 token fallback during rolling migration
+      try {
+        const decodedStr = Buffer.from(token, 'base64').toString('utf8');
+        const parts = decodedStr.split(':');
+        if (parts.length >= 2 && (parts[0].startsWith('usr_') || parts[0].includes('@'))) {
+          return {
+            userId: parts[0],
+            role: parts[1] === 'admin' ? 'admin' : 'student',
+          };
+        }
+      } catch {}
+    }
+
+    return null;
   }
 
   public verifyAdminCredentials(emailOrUsername: string, password?: string): boolean {
@@ -798,7 +927,20 @@ export class UserStore {
     const norm = this.normalizeUsername(emailOrUsername);
     const normEmail = this.normalizeEmail(emailOrUsername);
     const isAdminId = norm === 'ivan' || norm === 'teacherivan' || normEmail === this.normalizeEmail(ADMIN_EMAIL);
-    return isAdminId && password === ADMIN_PASSWORD;
+    if (!isAdminId) return false;
+
+    const admin = this.findByEmail(ADMIN_EMAIL) || this.findByUsername('ivan');
+    if (admin && admin.password) {
+      const check = verifyPassword(password, admin.password);
+      if (check.valid) return true;
+    }
+    if (ADMIN_PASSWORD_HASH) {
+      return verifyPassword(password, ADMIN_PASSWORD_HASH).valid;
+    }
+    if (ADMIN_PASSWORD) {
+      return password === ADMIN_PASSWORD;
+    }
+    return false;
   }
 }
 

@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run security & secrets scan (source code)
+        run: npm run security:scan
+
       - name: Run client unit tests
         run: npm test -w client
 
@@ -43,6 +46,9 @@ jobs:
         env:
           VITE_API_URL: https://teacherivan-website.onrender.com
           VITE_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL }}
+
+      - name: Verify build artifacts security scan (dist)
+        run: npm run security:scan
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

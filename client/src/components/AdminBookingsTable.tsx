@@ -3,6 +3,7 @@ import { CalendarDays, RefreshCw, Download, MessageCircle, Clock, Trash2, CheckC
 import { getApiUrl } from '../config/api';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { TEACHER_PHONE } from '../config/contact';
+import { useAuthStore } from '../modules/auth/authStore';
 import { syncAndHealAdminData, saveAdminBookingsVault, BookingRecord } from '../modules/auth/vaultSync';
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHeaderCell, Button } from '../design-system/astryx';
 
@@ -59,8 +60,12 @@ export const AdminBookingsTable: React.FC = () => {
   const handleCancel = async (id: string) => {
     if (!window.confirm('Cancel this class booking from database?')) return;
     try {
+      const token = useAuthStore.getState().token;
       const res = await fetch(getApiUrl(`/api/bookings/${id}`), {
         method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       });
       if (res.ok) {
         const updated = bookings.filter((b) => b.id !== id);

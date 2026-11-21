@@ -2,7 +2,7 @@
   {
     "id": "usr_admin_ivan",
     "username": "ivan",
-    "password": "IvanAdmin2026!",
+    "password": "scrypt$0be263c327a064464650c19533b4d90c$53ade3f30043b465db822f8cb5797b912f7a21af61a25fa7f2f95851bc9b1d97a71ff715662042decf9e1b04c9cfd5f20214fd05fc29b0a3af6df94aa34ebc85",
     "fullName": "Teacher Ivan (Admin)",
     "email": "ivan@teacherivan.com",
     "phoneNumber": "+591 72878330",
@@ -25,7 +25,7 @@
   {
     "id": "usr_1792637508386_4a39b1e0",
     "username": "sofia",
-    "password": "Sofia2026!",
+    "password": "scrypt$7af964aa88d9723cc662df2267574026$b3288fb38d097bcbad6789b410d85fa922c10fcc6872db07dfea31bdbbbb70ae75eb64731c1e436fcb475788ce253a0f4f1538ed3ccc40e933568ab2335266dc",
     "fullName": "Sofia Rodriguez",
     "email": "sofia@example.com",
     "phoneNumber": "+591 72878330",
@@ -46,7 +46,7 @@
   {
     "id": "usr_1792682382837_49d49b62",
     "username": "ana",
-    "password": "Student2026!",
+    "password": "scrypt$5a07fb0e31f2859bf8210948af124a50$9132f18f06aa5dcac709c1d9d11bee69d07962e589f543ad4d04916b4334878f6a505fdf28b4b0b29590850608598dec0dedc9cda888fc2d9ebd0c908a3ca03c",
     "fullName": "Ana Morales",
     "email": "ana@example.com",
     "phoneNumber": "",

@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
+import { sanitizeInput, wrapStudentInput, SYSTEM_GUARDRAILS } from '../utils/promptGuard.js';
 
 export interface TurnData {
   role: 'user' | 'assistant';
@@ -312,14 +313,22 @@ export async function generateSessionReport(params: ReportGenerationParams): Pro
 
   const ai = new GoogleGenAI({ apiKey });
 
-  // Compress transcript into compact dialogue (U: / T:) to cut input tokens by ~50%
+  // Compress transcript into compact dialogue (U: / T:) to cut input tokens by ~50%, sanitizing each turn
   const compactTranscript = turns
     .filter((t) => t.content && t.content.trim().length > 0)
-    .map((t) => (t.role === 'user' ? `U: ${t.content.trim()}` : `T: ${t.content.trim()}`))
+    .map((t) => {
+      const rolePrefix = t.role === 'user' ? 'U: ' : 'T: ';
+      const cleanContent = sanitizeInput(t.content, 500);
+      return `${rolePrefix}${cleanContent}`;
+    })
     .join('\n');
+
+  const wrappedTranscript = wrapStudentInput(compactTranscript, 'student_transcript');
 
   const systemPrompt = `You are an expert spoken English pedagogical analyst.
 Your task is to analyze the learner's conversational English performance during a real-time practice session and provide an encouraging, honest, high-value session report.
+
+${SYSTEM_GUARDRAILS}
 
 TRANSCRIPT FORMAT:
 U = User (Learner)
@@ -343,7 +352,7 @@ Target Vocabulary: ${(scenario.targetVocabulary || []).join(', ')}
 Grammar Focus: ${(scenario.targetGrammar || []).join(', ')}
 
 TRANSCRIPT:
-${compactTranscript}
+${wrappedTranscript}
 
 Please provide the structured session report matching the required schema.`;
 

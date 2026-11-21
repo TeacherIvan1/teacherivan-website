@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,9 +11,10 @@ import authRouter from './routes/auth.js';
 import bookingRouter from './routes/bookings.js';
 import curriculumRouter from './routes/curriculum.js';
 import sheetsRouter from './routes/sheets.js';
-import { userStore } from './services/userStore.js';
+import { userStore, ADMIN_EMAIL } from './services/userStore.js';
 import { bookingStore } from './services/bookingStore.js';
 import { initRemoteBackup } from './services/remoteBackup.js';
+import { requireAdmin, requireAuth, optionalAuth, AuthenticatedRequest } from './middleware/auth.js';
 
 // Resolve directory paths for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -21,50 +24,71 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
+// Fail closed in production if required security secrets are absent
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
+    console.error('FATAL ERROR: JWT_SECRET environment variable must be set in production (min 16 chars).');
+    process.exit(1);
+  }
+}
+
 const app = express();
 const port = parseInt(process.env.PORT || '3001', 10);
+const isProd = process.env.NODE_ENV === 'production';
 
-// Allowed CORS origins
+// Apply Helmet for defense-in-depth HTTP headers
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  })
+);
+
+// Strict CORS Origins
 const allowedOrigins = [
   'https://teacherivan.com',
-  'http://teacherivan.com',
   'https://www.teacherivan.com',
-  'http://www.teacherivan.com',
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:3000',
-  'http://localhost:3001',
+  ...(isProd
+    ? []
+    : [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:3000',
+        'http://localhost:3001',
+      ]),
 ];
 
-// Middleware
+// Add extra origins if specified in environment
+if (process.env.ALLOWED_ORIGINS) {
+  process.env.ALLOWED_ORIGINS.split(',').forEach((o) => {
+    const trimmed = o.trim();
+    if (trimmed && !allowedOrigins.includes(trimmed)) {
+      allowedOrigins.push(trimmed);
+    }
+  });
+}
+
+// CORS Middleware with strict validation (no blanket reflection)
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, server-to-server, Render health checks)
+      // Allow requests with no origin (mobile native apps, curl, server-to-server, Render health checks)
       if (!origin) {
         return callback(null, true);
       }
 
-      // Check explicitly permitted origins
+      // Check strictly allowed origins
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // Allow any custom domain or environment override if configured
-      if (
-        process.env.ALLOWED_ORIGINS &&
-        process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).includes(origin)
-      ) {
+      // Allow github preview origins if in dev
+      if (!isProd && (origin.endsWith('.github.io') || origin.endsWith('.onrender.com'))) {
         return callback(null, true);
       }
 
-      // Also allow github.io preview domains or internal onrender domains
-      if (origin.endsWith('.github.io') || origin.endsWith('.onrender.com')) {
-        return callback(null, true);
-      }
-
-      // Allow origin reflection for development and non-listed clients
-      return callback(null, true);
+      // Deny untrusted origins
+      return callback(new Error(`CORS Error: Origin ${origin} not permitted.`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -72,7 +96,48 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+
+// Rate Limiters (API Security & Throttling)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // 20 attempts per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Too many authentication attempts. Please try again after 15 minutes.',
+    errorEs: 'Demasiados intentos de acceso. Por favor intenta de nuevo en 15 minutos.',
+    errorEn: 'Too many authentication attempts. Please try again after 15 minutes.',
+  },
+});
+
+const bookingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Too many booking requests. Please wait a few minutes.',
+  },
+});
+
+const aiGenLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 30, // 30 AI requests per 10 min
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'AI generation rate limit reached. Please wait before generating more resources.',
+  },
+});
+
+// Apply Rate Limiters
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/recover-password', authLimiter);
+app.use('/api/bookings', bookingLimiter);
+app.use('/api/curriculum', aiGenLimiter);
+app.use('/api/report', aiGenLimiter);
 
 // Routes
 app.use('/api/token', tokenRouter);
@@ -82,8 +147,8 @@ app.use('/api/bookings', bookingRouter);
 app.use('/api/curriculum', curriculumRouter);
 app.use('/api/sheets', sheetsRouter);
 
-// GET /api/users/export
-app.get('/api/users/export', (_req, res) => {
+// GET /api/users/export (Protected by requireAdmin)
+app.get('/api/users/export', requireAdmin, (_req: AuthenticatedRequest, res) => {
   const users = userStore.getAllUsers();
   res.status(200).json({
     status: 'ok',
@@ -92,12 +157,42 @@ app.get('/api/users/export', (_req, res) => {
   });
 });
 
-// POST /api/users/rehydrate-roster (Admin Roster Vault auto-recovery)
-app.post('/api/users/rehydrate-roster', (req, res) => {
+// POST /api/users/rehydrate-roster
+// Protected: Only Admin can rehydrate full roster; logged in students can only rehydrate their own bookings
+app.post('/api/users/rehydrate-roster', optionalAuth, (req: AuthenticatedRequest, res) => {
   try {
     const { users, bookings } = req.body || {};
-    const mergedUsers = userStore.rehydrateRoster(users || []);
-    const mergedBookings = bookingStore.rehydrateBookings(bookings || []);
+    const callingUser = req.user;
+
+    // If attempting to restore users array, require admin
+    if (Array.isArray(users) && users.length > 0) {
+      if (!callingUser || callingUser.role !== 'admin') {
+        return res.status(403).json({
+          error: 'Forbidden: Admin access required to rehydrate user accounts.',
+        });
+      }
+    }
+
+    // If student is rehydrating bookings, verify ownership of all items
+    let safeBookings = bookings || [];
+    if (callingUser && callingUser.role !== 'admin') {
+      safeBookings = safeBookings.filter(
+        (b: any) =>
+          b &&
+          (b.studentId === callingUser.id ||
+            userStore.normalizeEmail(b.studentEmail) === userStore.normalizeEmail(callingUser.email))
+      );
+    } else if (!callingUser) {
+      // Unauthenticated request cannot inject arbitrary bookings
+      safeBookings = [];
+    }
+
+    const mergedUsers = (callingUser && callingUser.role === 'admin' && users)
+      ? userStore.rehydrateRoster(users)
+      : userStore.getAllUsers();
+    const mergedBookings = safeBookings.length > 0
+      ? bookingStore.rehydrateBookings(safeBookings)
+      : bookingStore.getAllBookings();
 
     return res.status(200).json({
       status: 'ok',
@@ -113,8 +208,8 @@ app.post('/api/users/rehydrate-roster', (req, res) => {
   }
 });
 
-// PUT /api/users/:id/plan (Admin manual plan update)
-app.put('/api/users/:id/plan', (req, res) => {
+// PUT /api/users/:id/plan (Admin manual plan update - Protected by requireAdmin)
+app.put('/api/users/:id/plan', requireAdmin, (req: AuthenticatedRequest, res) => {
   try {
     const rawId = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;

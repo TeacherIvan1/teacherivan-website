@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { bookingStore, BookingStartTime } from '../services/bookingStore.js';
+import { requireAuth, requireAdmin, optionalAuth, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -7,7 +8,7 @@ const router = Router();
  * GET /api/bookings?weekStart=YYYY-MM-DD
  * Returns bookings for the specified week (or all if not specified)
  */
-router.get('/', (req: Request, res: Response) => {
+router.get('/', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const weekStart = req.query.weekStart as string | undefined;
     const bookings = weekStart
@@ -28,30 +29,63 @@ router.get('/', (req: Request, res: Response) => {
 
 /**
  * POST /api/bookings
- * Body: { studentId, studentName, studentEmail, studentCountry, date, startTime, learningGoal }
+ * Body: { date, startTime, learningGoal }
+ * Strictly authenticated; authoritatively binds to the logged-in student.
  */
-router.post('/', (req: Request, res: Response) => {
+router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { studentId, studentName, studentEmail, studentCountry, date, startTime, learningGoal } = req.body || {};
+    const user = req.user!;
+    const { date, startTime, learningGoal } = req.body || {};
 
-    if (!studentId || !studentName || !studentEmail) {
-      return res.status(400).json({ error: 'Student information (ID, name, email) is required.' });
-    }
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return res.status(400).json({ error: 'Valid date (YYYY-MM-DD) is required.' });
+      return res.status(400).json({
+        error: 'Valid date (YYYY-MM-DD) is required.',
+        errorEs: 'Se requiere una fecha válida (AAAA-MM-DD).',
+        errorEn: 'Valid date (YYYY-MM-DD) is required.',
+      });
     }
     if (!startTime) {
-      return res.status(400).json({ error: 'Class start time is required.' });
+      return res.status(400).json({
+        error: 'Class start time is required.',
+        errorEs: 'La hora de inicio de la clase es requerida.',
+        errorEn: 'Class start time is required.',
+      });
+    }
+
+    // Determine weekly quota authoritatively from user record (ignore untrusted client body parameters)
+    const plan = user.plan || (user.role === 'admin' ? 'executive' : 'free');
+    let maxWeeklyClasses = 0;
+    if (user.role === 'admin') {
+      maxWeeklyClasses = 99;
+    } else if (plan === 'pro') {
+      maxWeeklyClasses = 3;
+    } else if (plan === 'executive') {
+      maxWeeklyClasses = 5;
+    } else {
+      maxWeeklyClasses = 0;
+    }
+
+    if (maxWeeklyClasses === 0) {
+      const quotaMessage =
+        plan === 'essential'
+          ? 'El Plan Essential (300 BOB) es 100% autónomo (Laboratorio de Voz 24/7 y Recursos Ilimitados). Para agendar clases en vivo 1 a 1, actualiza al Plan Pro (580 BOB — 3 clases/sem) o Executive (850 BOB — 5 clases/sem).'
+          : 'El plan Gratuito no incluye clases en vivo 1 a 1. Por favor activa el Plan Pro (580 BOB — 3 clases/sem) o Executive (850 BOB — 5 clases/sem) por WhatsApp para agendar.';
+      return res.status(403).json({
+        error: quotaMessage,
+        errorEs: quotaMessage,
+        errorEn: 'Live 1-on-1 classes require an active Pro or Executive plan.',
+      });
     }
 
     const booking = bookingStore.createBooking({
-      studentId,
-      studentName,
-      studentEmail,
-      studentCountry: studentCountry || 'Bolivia',
+      studentId: user.id,
+      studentName: user.fullName,
+      studentEmail: user.email,
+      studentCountry: user.country || 'Bolivia',
       date,
       startTime: startTime as BookingStartTime,
-      learningGoal,
+      learningGoal: learningGoal || user.learningGoals?.primaryGoal || 'Daily Conversational Fluency',
+      maxWeeklyClasses,
     });
 
     return res.status(201).json({
@@ -61,21 +95,49 @@ router.post('/', (req: Request, res: Response) => {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[POST /api/bookings Error]:', msg);
+
+    // Conflict if double booked
+    if (msg.includes('already booked')) {
+      return res.status(409).json({ error: msg });
+    }
+    // Limit reached
+    if (msg.includes('límite') || msg.includes('limit') || msg.includes('already have a class')) {
+      return res.status(403).json({ error: msg });
+    }
+
     return res.status(400).json({ error: msg });
   }
 });
 
 /**
  * DELETE /api/bookings/:id
- * Optional body/query: studentIdOrEmail for ownership verification
+ * Enforces ownership: only the student who owns the booking or an admin can delete.
  */
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
+    const user = req.user!;
     const rawId = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;
-    const studentIdOrEmail = (req.body?.studentId || req.query.studentId || req.body?.studentEmail || req.query.studentEmail) as string | undefined;
 
-    const success = bookingStore.deleteBooking(id, studentIdOrEmail);
+    const booking = bookingStore.getBookingById(id);
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found.' });
+    }
+
+    const isOwner =
+      booking.studentId === user.id ||
+      booking.studentEmail.toLowerCase() === user.email.toLowerCase();
+    const isAdmin = user.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        error: 'Forbidden: You cannot cancel another student booking.',
+        errorEs: 'Acceso denegado: No puedes cancelar la clase de otro estudiante.',
+        errorEn: 'Forbidden: You cannot cancel another student booking.',
+      });
+    }
+
+    const success = bookingStore.deleteBooking(id, booking.studentId);
     if (!success) {
       return res.status(404).json({ error: 'Booking not found.' });
     }
@@ -95,7 +157,7 @@ router.delete('/:id', (req: Request, res: Response) => {
  * GET /api/bookings/export
  * Admin overview of all booked classes
  */
-router.get('/export', (_req: Request, res: Response) => {
+router.get('/export', requireAdmin, (_req: AuthenticatedRequest, res: Response) => {
   try {
     const all = bookingStore.getAllBookings();
     return res.status(200).json({
