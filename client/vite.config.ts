@@ -33,6 +33,7 @@ function versionEmitterPlugin(): Plugin {
 }
 
 export default defineConfig({
+  base: '/',
   define: {
     __APP_VERSION__: JSON.stringify(BUILD_VERSION),
   },

@@ -134,12 +134,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
             isLoading: false,
             authModalMode: 'complete_google_profile',
             pendingGoogleProfile: {
-              email: data.email,
-              fullName: data.fullName,
+              email: json.user?.email || data.email || '',
+              fullName: json.user?.fullName || data.fullName || '',
             },
             error: null,
           });
-          return { needsProfileCompletion: true };
+          return { needsProfileCompletion: true, user: json.user, token: json.token };
         }
 
         const { user, token } = json;
@@ -155,7 +155,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
           pendingGoogleProfile: null,
           error: null,
         });
-        return { needsProfileCompletion: false };
+        return { needsProfileCompletion: false, user, token };
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         set({ isLoading: false, error: msg });

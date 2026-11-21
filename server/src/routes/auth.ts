@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { userStore, ADMIN_EMAIL } from '../services/userStore.js';
 import { bookingStore } from '../services/bookingStore.js';
 import { sheetsService } from '../services/sheetsService.js';
+import { googleDbService } from '../services/googleDbService.js';
 import { requireAuth, requireAdmin, optionalAuth, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
@@ -108,7 +109,12 @@ router.post('/register', (req: Request, res: Response) => {
 
     const token = userStore.createSessionToken(user.id, user.role || 'student');
 
-    // Asynchronously append student to Google Sheet
+    // Asynchronously upsert student to Google Database (Google Sheets API v4)
+    googleDbService.upsertUserInGoogleDb(user).catch((dbErr) => {
+      console.warn('[Google DB] Async upsert registration notice:', dbErr);
+    });
+
+    // Asynchronously append student to Google Sheet (Legacy Webhook fallback)
     sheetsService.appendStudentRegistration(user).catch((sheetErr) => {
       console.warn('[Google Sheets] Async append registration notice:', sheetErr);
     });
@@ -273,6 +279,10 @@ router.put('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) =
       return res.status(404).json({ error: 'Student profile not found' });
     }
 
+    googleDbService.upsertUserInGoogleDb(updated).catch((dbErr) => {
+      console.warn('[Google DB] Async upsert profile notice:', dbErr);
+    });
+
     return res.status(200).json({
       status: 'ok',
       user: updated,
@@ -294,17 +304,24 @@ router.post('/google', async (req: Request, res: Response) => {
 
     // 1. Verify Google ID token cryptographically if client library provided a token
     const tokenToVerify = credential || idToken;
-    if (tokenToVerify && googleOAuthClient && process.env.GOOGLE_CLIENT_ID) {
+    const clientId = process.env.GOOGLE_CLIENT_ID || '116786083172-q1m93t06euvdsa4tdd6gs9klddhc86i9.apps.googleusercontent.com';
+
+    if (tokenToVerify) {
       try {
-        const ticket = await googleOAuthClient.verifyIdToken({
+        const client = googleOAuthClient || new OAuth2Client(clientId);
+        const ticket = await client.verifyIdToken({
           idToken: tokenToVerify,
-          audience: process.env.GOOGLE_CLIENT_ID,
+          audience: clientId,
         });
         const gPayload = ticket.getPayload();
-        if (gPayload && gPayload.email) {
-          email = gPayload.email;
-          fullName = fullName || gPayload.name || 'Google Student';
+        if (!gPayload || !gPayload.email) {
+          return res.status(401).json({ error: 'Invalid Google token payload' });
         }
+        if (gPayload.email_verified === false) {
+          return res.status(401).json({ error: 'Google email is not verified' });
+        }
+        email = gPayload.email;
+        fullName = fullName || gPayload.name || 'Google Student';
       } catch (tokenErr) {
         console.warn('[Google Auth] Token verification rejected:', tokenErr);
         return res.status(401).json({ error: 'Invalid Google authentication token' });
@@ -322,10 +339,14 @@ router.post('/google', async (req: Request, res: Response) => {
       if (phoneNumber && phoneNumber.trim()) {
         userStore.updateUserProfile({ email }, { phoneNumber: phoneNumber.trim() });
       }
-      const token = userStore.createSessionToken(existing.id, existing.role || 'student');
+      const updatedUser = userStore.findByEmail(email) || existing;
+      googleDbService.upsertUserInGoogleDb(updatedUser).catch((dbErr) => {
+        console.warn('[Google DB] Async user upsert notice:', dbErr);
+      });
+      const token = userStore.createSessionToken(updatedUser.id, updatedUser.role || 'student');
       return res.status(200).json({
         status: 'ok',
-        user: userStore.findByEmail(email) || existing,
+        user: updatedUser,
         token,
         needsProfileCompletion: false,
       });
@@ -344,6 +365,9 @@ router.post('/google', async (req: Request, res: Response) => {
         learningGoals: learningGoals || existing?.learningGoals,
         cefrLevel: learningGoals?.targetLevel || existing?.cefrLevel,
       });
+      googleDbService.upsertUserInGoogleDb(user).catch((dbErr) => {
+        console.warn('[Google DB] Async user upsert notice:', dbErr);
+      });
       const token = userStore.createSessionToken(user.id, user.role || 'student');
       return res.status(200).json({
         status: 'ok',
@@ -359,6 +383,9 @@ router.post('/google', async (req: Request, res: Response) => {
       email,
       phoneNumber: phoneNumber || existing?.phoneNumber,
       authProvider: 'google',
+    });
+    googleDbService.upsertUserInGoogleDb(tempUser).catch((dbErr) => {
+      console.warn('[Google DB] Async user upsert notice:', dbErr);
     });
     const token = userStore.createSessionToken(tempUser.id, tempUser.role || 'student');
 

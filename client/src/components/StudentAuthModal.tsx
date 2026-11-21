@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Sparkles,
@@ -25,6 +25,8 @@ import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { getEnvVar, getApiUrl } from '../config/api';
+import { GOOGLE_CLIENT_ID } from '../config/auth';
+import { useTheme } from '../modules/theme/ThemeContext';
 import { Button, Badge, Card, TextInput, Field, FormWizard } from '../design-system/astryx';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1 / IELTS'] as const;
@@ -59,14 +61,16 @@ export const StudentAuthModal: React.FC = () => {
     loginWithCredentials,
     recoverPassword,
   } = useAuthStore();
+  const syncWithServer = useAuthStore((s) => s.syncWithServer);
 
   const { t, isEs } = useTranslation();
+  const { isDark } = useTheme();
   const setPersonalizedSprint = useSprintStore((s) => s.setPersonalizedSprint);
   const setActiveView = useNavigationStore((s) => s.setActiveView);
 
   // Wizard Step (1: Account Credentials, 2: Learning Goals)
   const [step, setStep] = useState<1 | 2>(1);
-  const [showGoogleFallback, setShowGoogleFallback] = useState(false);
+  const googleBtnContainerRef = useRef<HTMLDivElement>(null);
 
   // Step 1 Form fields
   const [username, setUsername] = useState('');
@@ -95,7 +99,6 @@ export const StudentAuthModal: React.FC = () => {
   useEffect(() => {
     if (isAuthModalOpen) {
       setStep(1);
-      setShowGoogleFallback(false);
       setValidationError(null);
       setRecoverSuccess(null);
     }
@@ -333,66 +336,94 @@ export const StudentAuthModal: React.FC = () => {
     }
   };
 
-  const handleGoogleClick = async () => {
+  const handleGoogleCredentialResponse = async (response: { credential: string }) => {
+    if (!response || !response.credential) return;
     setValidationError(null);
-    const googleClientId = getEnvVar('VITE_GOOGLE_CLIENT_ID');
 
-    if (googleClientId && typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
-      try {
-        (window as any).google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: async (response: any) => {
-            if (response.credential) {
-              try {
-                const base64Url = response.credential.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(
-                  atob(base64)
-                    .split('')
-                    .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                    .join('')
-                );
-                const gData = JSON.parse(jsonPayload);
-                const gEmail = gData.email;
-                const gName = gData.name || gData.given_name || 'Student';
+    let decodedEmail = '';
+    let decodedName = '';
+    try {
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const gData = JSON.parse(jsonPayload);
+      decodedEmail = gData.email || '';
+      decodedName = gData.name || gData.given_name || 'Google Student';
+    } catch (e) {
+      console.warn('[StudentAuthModal] Pre-decode notice:', e);
+    }
 
-                setFullName(gName);
-                setEmail(gEmail);
-                setShowGoogleFallback(false);
-                setStep(2);
-              } catch (decErr) {
-                console.error('[Google JWT decode error]:', decErr);
-              }
-            }
-          },
-        });
-        (window as any).google.accounts.id.prompt();
-        return;
-      } catch (gErr) {
-        console.warn('[Google Identity Services warning]:', gErr);
+    try {
+      const result = await authenticateWithGoogle({
+        credential: response.credential,
+        email: decodedEmail,
+        fullName: decodedName,
+      });
+
+      if (result.needsProfileCompletion) {
+        if (decodedEmail) setEmail(decodedEmail);
+        if (decodedName) setFullName(decodedName);
+        setStep(2);
+      } else {
+        await syncWithServer();
+        closeAuthModal();
       }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setValidationError(msg);
     }
-
-    // Direct in-modal Google fallback (no window.prompt!)
-    setShowGoogleFallback(true);
   };
 
-  const handleGoogleFallbackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationError(null);
-    const trimmedEmail = email.trim();
-    const trimmedName = fullName.trim();
-    if (!trimmedEmail || !trimmedEmail.includes('@') || !trimmedEmail.includes('.')) {
-      setValidationError(isEs ? 'Ingresa un correo de Gmail válido.' : 'Enter a valid Gmail address.');
-      return;
+  // Initialize Google Identity Services (GIS) button with retry
+  useEffect(() => {
+    if (!isAuthModalOpen || step !== 1 || isRecoverMode) return;
+
+    let retryCount = 0;
+    const maxRetries = 20; // 20 * 250ms = 5s
+    let intervalId: any = null;
+
+    const renderGis = () => {
+      if (typeof window !== 'undefined' && (window as any).google?.accounts?.id && googleBtnContainerRef.current) {
+        try {
+          (window as any).google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredentialResponse,
+          });
+          googleBtnContainerRef.current.innerHTML = '';
+          (window as any).google.accounts.id.renderButton(googleBtnContainerRef.current, {
+            theme: isDark ? 'filled_black' : 'outline',
+            size: 'large',
+            width: '100%',
+            text: 'continue_with',
+            locale: isEs ? 'es' : 'en',
+          });
+          if (intervalId) clearInterval(intervalId);
+          return true;
+        } catch (e) {
+          console.warn('[StudentAuthModal] GIS render notice:', e);
+        }
+      }
+      return false;
+    };
+
+    if (!renderGis()) {
+      intervalId = setInterval(() => {
+        retryCount++;
+        if (renderGis() || retryCount >= maxRetries) {
+          clearInterval(intervalId);
+        }
+      }, 250);
     }
-    if (!trimmedName) {
-      setValidationError(isEs ? 'Ingresa tu nombre completo.' : 'Enter your full name.');
-      return;
-    }
-    setShowGoogleFallback(false);
-    setStep(2);
-  };
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isAuthModalOpen, step, isSignInMode, isRecoverMode, isDark, isEs]);
 
   return (
     <div
@@ -467,7 +498,6 @@ export const StudentAuthModal: React.FC = () => {
                 onClick={() => {
                   setValidationError(null);
                   setStep(1);
-                  setShowGoogleFallback(false);
                   openAuthModal('signup');
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
@@ -483,7 +513,6 @@ export const StudentAuthModal: React.FC = () => {
                 id="auth-tab-signin"
                 onClick={() => {
                   setValidationError(null);
-                  setShowGoogleFallback(false);
                   openAuthModal('signin');
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
@@ -747,102 +776,16 @@ export const StudentAuthModal: React.FC = () => {
             </form>
           ) : step === 1 ? (
             /* ========================================================================= */
-            /* STEP 1: ACCOUNT CREDENTIALS OR IN-MODAL GOOGLE FALLBACK                   */
+            /* STEP 1: ACCOUNT CREDENTIALS WITH OFFICIAL GOOGLE IDENTITY SERVICES        */
             /* ========================================================================= */
-            showGoogleFallback ? (
-              <form onSubmit={handleGoogleFallbackSubmit} className="space-y-4 animate-in fade-in">
-                <div className="p-4 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] space-y-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <svg width="20" height="20" viewBox="0 0 48 48" className="shrink-0">
-                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    </svg>
-                    <span className="font-montserrat font-bold text-xs uppercase tracking-wider text-[var(--text-primary)]">
-                      {isEs ? 'Acceso con Google' : 'Google Sign-In'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    {isEs
-                      ? 'Ingresa tu correo de Gmail y tu nombre completo para vincular tu cuenta de estudiante:'
-                      : 'Enter your Gmail address and full name to connect your student profile:'}
-                  </p>
-
-                  <div>
-                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
-                      {t.authModal.emailLabel} (Gmail) <span className="text-[#E09B30]">*</span>
-                    </label>
-                    <div className="relative">
-                      <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
-                      <input
-                        type="email"
-                        id="auth-google-fallback-email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="student@gmail.com"
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
-                      {t.authModal.fullNameLabel} <span className="text-[#E09B30]">*</span>
-                    </label>
-                    <div className="relative">
-                      <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
-                      <input
-                        type="text"
-                        id="auth-google-fallback-name"
-                        required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder={isEs ? 'Tu Nombre Completo' : 'Your Full Name'}
-                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30] focus:ring-1 focus:ring-[#E09B30]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowGoogleFallback(false)}
-                      className="flex-1 py-3 px-4 rounded-full border border-[var(--border-hairline)] text-xs font-montserrat font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] uppercase tracking-wider transition-all cursor-pointer"
-                    >
-                      {isEs ? 'Cancelar' : 'Cancel'}
-                    </button>
-                    <button
-                      type="submit"
-                      id="auth-google-fallback-submit-btn"
-                      className="flex-1 py-3 px-4 rounded-full bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
-                    >
-                      {isEs ? 'Continuar →' : 'Continue →'}
-                    </button>
-                  </div>
-                </div>
-              </form>
-            ) : (
             <form onSubmit={handleProceedToStep2} className="space-y-3.5">
-              {/* Google One-Tap Action */}
+              {/* Google Identity Services Real GIS Button */}
               <div className="space-y-3 mb-2">
-                <button
-                  type="button"
-                  id="continue-with-google-btn"
-                  disabled={isLoading}
-                  onClick={handleGoogleClick}
-                  className="w-full py-3 px-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-sunken)] text-[var(--text-primary)] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all duration-150 cursor-pointer"
-                >
-                  <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                  </svg>
-                  <span>{t.authModal.googleBtn}</span>
-                </button>
-
+                <div
+                  ref={googleBtnContainerRef}
+                  id="google-signin-btn-container"
+                  className="w-full flex justify-center min-h-[44px]"
+                />
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-[var(--border-hairline)]" />
                   <span className="text-[11px] font-medium text-[var(--text-secondary)] uppercase tracking-wider">
@@ -1022,7 +965,6 @@ export const StudentAuthModal: React.FC = () => {
                 </button>
               </div>
             </form>
-            )
           ) : (
             /* ========================================================================= */
             /* STEP 2: LEARNING GOALS & CEFR TARGET WIZARD                               */

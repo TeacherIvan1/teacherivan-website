@@ -1,15 +1,19 @@
 import { Router, Request, Response } from 'express';
 import { bookingStore, BookingStartTime } from '../services/bookingStore.js';
+import { googleDbService } from '../services/googleDbService.js';
 import { requireAuth, requireAdmin, optionalAuth, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
 /**
- * GET /api/bookings?weekStart=YYYY-MM-DD
+ * GET /api/bookings?weekStart=YYYY-MM-DD&force=true
  * Returns bookings for the specified week (or all if not specified)
  */
-router.get('/', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
+router.get('/', optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
+    if (req.query.force === 'true') {
+      await googleDbService.syncFromGoogleDb(true);
+    }
     const weekStart = req.query.weekStart as string | undefined;
     const bookings = weekStart
       ? bookingStore.getBookingsForWeek(weekStart)
@@ -19,6 +23,7 @@ router.get('/', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
       status: 'ok',
       total: bookings.length,
       bookings,
+      googleDbStatus: googleDbService.getStatus(),
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -88,6 +93,10 @@ router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
       maxWeeklyClasses,
     });
 
+    googleDbService.upsertBookingInGoogleDb(booking).catch((dbErr) => {
+      console.warn('[Google DB] Async upsert booking notice:', dbErr);
+    });
+
     return res.status(201).json({
       status: 'ok',
       booking,
@@ -141,6 +150,10 @@ router.delete('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) =>
     if (!success) {
       return res.status(404).json({ error: 'Booking not found.' });
     }
+
+    googleDbService.deleteBookingInGoogleDb(id).catch((dbErr) => {
+      console.warn('[Google DB] Async cancel booking notice:', dbErr);
+    });
 
     return res.status(200).json({
       status: 'ok',

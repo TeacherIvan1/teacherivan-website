@@ -75,14 +75,16 @@ export interface AuthState {
     profileCompleted?: boolean;
   }) => Promise<void>;
   authenticateWithGoogle: (data: {
-    email: string;
-    fullName: string;
+    email?: string;
+    fullName?: string;
     phoneNumber?: string;
     dateOfBirth?: string;
     country?: string;
     learningGoals?: LearningGoals;
     profileCompleted?: boolean;
-  }) => Promise<{ needsProfileCompletion: boolean }>;
+    credential?: string;
+    idToken?: string;
+  }) => Promise<{ needsProfileCompletion: boolean; user?: UserProfile; token?: string }>;
   loginWithCredentials: (data: {
     username?: string;
     email?: string;

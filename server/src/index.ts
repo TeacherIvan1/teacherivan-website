@@ -13,6 +13,7 @@ import curriculumRouter from './routes/curriculum.js';
 import sheetsRouter from './routes/sheets.js';
 import { userStore, ADMIN_EMAIL } from './services/userStore.js';
 import { bookingStore } from './services/bookingStore.js';
+import { googleDbService } from './services/googleDbService.js';
 import { initRemoteBackup } from './services/remoteBackup.js';
 import { requireAdmin, requireAuth, optionalAuth, AuthenticatedRequest } from './middleware/auth.js';
 
@@ -148,12 +149,16 @@ app.use('/api/curriculum', curriculumRouter);
 app.use('/api/sheets', sheetsRouter);
 
 // GET /api/users/export (Protected by requireAdmin)
-app.get('/api/users/export', requireAdmin, (_req: AuthenticatedRequest, res) => {
+app.get('/api/users/export', requireAdmin, async (req: AuthenticatedRequest, res) => {
+  if (req.query.force === 'true') {
+    await googleDbService.syncFromGoogleDb(true);
+  }
   const users = userStore.getAllUsers();
   res.status(200).json({
     status: 'ok',
     total: users.length,
     users,
+    googleDbStatus: googleDbService.getStatus(),
   });
 });
 
@@ -224,6 +229,10 @@ app.put('/api/users/:id/plan', requireAdmin, (req: AuthenticatedRequest, res) =>
       return res.status(404).json({ error: 'User not found' });
     }
 
+    googleDbService.upsertUserInGoogleDb(updated).catch((dbErr) => {
+      console.warn('[Google DB] Async upsert plan update notice:', dbErr);
+    });
+
     return res.status(200).json({
       status: 'ok',
       user: updated,
@@ -248,6 +257,10 @@ app.get('/api/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     apiKeyConfigured: hasKey,
     defaultModel: process.env.GEMINI_LIVE_MODEL || 'gemini-2.5-flash-native-audio-latest',
+    googleAuthConfigured: Boolean(process.env.GOOGLE_CLIENT_ID),
+    googleDbStatus: googleDbService.getStatus(),
+    userCount: userStore.getAllUsers().length,
+    bookingCount: bookingStore.getAllBookings().length,
   });
 });
 
@@ -272,5 +285,10 @@ app.listen(port, () => {
   // Initialize Cloud Backup persistence (Gist / KV / Self-Healing)
   initRemoteBackup().catch((err) => {
     console.warn('[Remote Backup] Initialization notice:', err);
+  });
+
+  // Automatically sync authoritative Google Database on startup
+  googleDbService.syncFromGoogleDb().catch((err) => {
+    console.warn('[Google Database] Startup sync notice:', err);
   });
 });

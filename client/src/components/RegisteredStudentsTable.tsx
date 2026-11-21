@@ -64,10 +64,16 @@ export const RegisteredStudentsTable: React.FC = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (force = false) => {
     setIsLoading(true);
     setError(null);
     try {
+      if (force) {
+        const token = useAuthStore.getState().token;
+        await fetch(getApiUrl('/api/users/export?force=true'), {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }).catch(() => {});
+      }
       // Additive Union Sync: reads local vault, merges with server, self-heals server if needed
       const { users: merged } = await syncAndHealAdminData();
       setUsers(merged);
@@ -193,16 +199,40 @@ export const RegisteredStudentsTable: React.FC = () => {
               <span className="px-2 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] font-mono text-[11px] font-bold">
                 {users.length}
               </span>
+              {sheetsStatus?.configured ? (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Google DB</span>
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  <span>Local Buffer</span>
+                </span>
+              )}
             </h3>
             <p className="text-[11px] text-[#A7C7E7]">
               {isEs
-                ? 'Asignación manual de planes luego de pago por WhatsApp'
-                : 'Manual plan assignment after manual WhatsApp payment'}
+                ? 'Sincronizado en tiempo real con Google Sheets (2-way sync)'
+                : 'Real-time 2-way sync with Google Sheets database'}
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+          {/* Ver Google Sheet Link */}
+          {sheetsStatus?.sheetId && sheetsStatus.sheetId !== 'AppsScriptWebhook' && (
+            <a
+              href={`https://docs.google.com/spreadsheets/d/${sheetsStatus.sheetId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-xl border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/20 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <FileSpreadsheet size={13} className="text-emerald-400" />
+              <span>{isEs ? 'Ver Google Sheet ↗' : 'View Google Sheet ↗'}</span>
+            </a>
+          )}
+
           {/* Google Sheets Sync Button */}
           <button
             type="button"
@@ -223,15 +253,13 @@ export const RegisteredStudentsTable: React.FC = () => {
             <span>
               {isSyncingSheets
                 ? (isEs ? 'Sincronizando...' : 'Syncing...')
-                : sheetsStatus?.configured
-                ? (isEs ? 'Sincronizar Sheets' : 'Sync Sheets')
-                : (isEs ? 'Google Sheets' : 'Google Sheets')}
+                : (isEs ? 'Sincronizar Sheets' : 'Sync Sheets')}
             </span>
           </button>
 
           <button
             type="button"
-            onClick={fetchUsers}
+            onClick={() => fetchUsers(true)}
             disabled={isLoading}
             className="px-3 py-1.5 rounded-xl border border-[#A7C7E7]/30 text-xs text-[#A7C7E7] hover:text-[#FAFAFA] hover:bg-[#1A3153] flex items-center gap-1.5 transition-colors cursor-pointer"
           >
