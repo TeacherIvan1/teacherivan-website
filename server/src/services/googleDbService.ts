@@ -65,7 +65,7 @@ export interface GoogleDbStatus {
   lastSyncTime?: string;
   userCount: number;
   bookingCount: number;
-  status: 'connected' | 'unconfigured' | 'error';
+  status: 'connected' | 'not_configured' | 'error';
   errorMessage?: string;
 }
 
@@ -90,6 +90,7 @@ export class GoogleDbService {
     if (!sheetId || !clientEmail || !privateKey) {
       this.sheetsClient = null;
       this.spreadsheetId = null;
+      console.warn('[GoogleDB] Running in local-disk fallback until GOOGLE_SHEET_ID / Service Account vars are set');
       return false;
     }
 
@@ -131,7 +132,7 @@ export class GoogleDbService {
       lastSyncTime: this.lastSyncTimestamp ? new Date(this.lastSyncTimestamp).toISOString() : undefined,
       userCount: userStore.getAllUsers().length,
       bookingCount: bookingStore.getAllBookings().length,
-      status: configured ? (this.lastError ? 'error' : 'connected') : 'unconfigured',
+      status: configured ? (this.lastError ? 'error' : 'connected') : 'not_configured',
       errorMessage: this.lastError || undefined,
     };
   }

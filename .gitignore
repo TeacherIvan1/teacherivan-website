@@ -78,6 +78,9 @@ tools/
 reference-repos/
 remotion-reel/
 llajta-crossfit-reel/
+# Temporary & scratch files
+*.tmp
+**/*.tmp
 temp_audio/
 scratch/
 Reels/

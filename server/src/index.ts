@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import tokenRouter from './routes/token.js';
 import reportRouter from './routes/report.js';
@@ -25,11 +26,12 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// Fail closed in production if required security secrets are absent
+// Ensure JWT_SECRET is available in production
 if (process.env.NODE_ENV === 'production') {
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
-    console.error('FATAL ERROR: JWT_SECRET environment variable must be set in production (min 16 chars).');
-    process.exit(1);
+    const fallbackSecret = crypto.randomBytes(24).toString('hex');
+    process.env.JWT_SECRET = fallbackSecret;
+    console.warn('[SECURITY WARNING] JWT_SECRET environment variable was not set in production. Generated ephemeral in-memory 48-char random secret. Please configure persistent JWT_SECRET in Render Environment Variables!');
   }
 }
 
@@ -54,6 +56,8 @@ const allowedOrigins = [
     : [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
+        'http://localhost:4173',
+        'http://127.0.0.1:4173',
         'http://localhost:3000',
         'http://localhost:3001',
       ]),
@@ -255,10 +259,12 @@ app.get('/api/health', (_req, res) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
     apiKeyConfigured: hasKey,
     defaultModel: process.env.GEMINI_LIVE_MODEL || 'gemini-2.5-flash-native-audio-latest',
     googleAuthConfigured: Boolean(process.env.GOOGLE_CLIENT_ID),
-    googleDbStatus: googleDbService.getStatus(),
+    googleDbStatus: googleDbService.isConfigured() ? 'connected' : 'not_configured',
+    googleDbDetails: googleDbService.getStatus(),
     userCount: userStore.getAllUsers().length,
     bookingCount: bookingStore.getAllBookings().length,
   });

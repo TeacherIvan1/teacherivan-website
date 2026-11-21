@@ -81,7 +81,16 @@ export class BookingStore {
       const list = Array.from(this.bookings.values());
       const tmpPath = `${this.dataFilePath}.${Date.now()}.${Math.random().toString(36).substring(2, 8)}.tmp`;
       fs.writeFileSync(tmpPath, JSON.stringify(list, null, 2), 'utf8');
-      fs.renameSync(tmpPath, this.dataFilePath);
+      try {
+        fs.renameSync(tmpPath, this.dataFilePath);
+      } catch (renameErr: any) {
+        if (renameErr.code === 'EPERM' || renameErr.code === 'EBUSY') {
+          fs.copyFileSync(tmpPath, this.dataFilePath);
+          try { fs.unlinkSync(tmpPath); } catch {}
+        } else {
+          throw renameErr;
+        }
+      }
     } catch (err) {
       console.error('[BookingStore] Error writing bookings to disk:', err);
     }

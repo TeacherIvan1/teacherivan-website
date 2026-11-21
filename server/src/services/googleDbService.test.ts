@@ -121,4 +121,7 @@ test('GoogleDbService - Status and unconfigured safety', () => {
   assert.ok(typeof status.configured === 'boolean');
   assert.ok(typeof status.userCount === 'number');
   assert.ok(typeof status.bookingCount === 'number');
+  if (!status.configured) {
+    assert.equal(status.status, 'not_configured');
+  }
 });
