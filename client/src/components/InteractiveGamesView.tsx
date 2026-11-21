@@ -397,22 +397,22 @@ export const InteractiveGamesView: React.FC = () => {
           <Gamepad2 size={14} />
           <span>{t.gamesView.badge}</span>
         </div>
-        <h1 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
+        <h1 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
           {t.gamesView.title}
         </h1>
-        <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
+        <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
           {t.gamesView.subtitle}
         </p>
       </div>
 
       {/* Tabs Selector */}
-      <div className="flex items-center justify-center gap-2 p-1.5 rounded-full bg-[#12223a] border border-[#A7C7E7]/30 max-w-2xl mx-auto w-full shadow-inner flex-wrap sm:flex-nowrap">
+      <div className="flex items-center justify-center gap-2 p-1.5 rounded-full bg-[var(--bg-sunken)] dark:bg-[#12223a] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 max-w-2xl mx-auto w-full shadow-inner flex-wrap sm:flex-nowrap">
         <button
           id="game-tab-recast"
           onClick={() => setActiveTab('recast')}
           className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'recast'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
-              : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
             }`}
         >
           <Zap size={14} />
@@ -424,7 +424,7 @@ export const InteractiveGamesView: React.FC = () => {
           onClick={() => setActiveTab('matcher')}
           className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'matcher'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
-              : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
             }`}
         >
           <Sparkles size={14} />
@@ -436,7 +436,7 @@ export const InteractiveGamesView: React.FC = () => {
           onClick={() => setActiveTab('shadowing')}
           className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'shadowing'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
-              : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
             }`}
         >
           <Mic size={14} />
@@ -448,7 +448,7 @@ export const InteractiveGamesView: React.FC = () => {
           onClick={() => setActiveTab('builder')}
           className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl sm:rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeTab === 'builder'
               ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-black'
-              : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+              : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
             }`}
         >
           <Trophy size={14} />
@@ -458,14 +458,14 @@ export const InteractiveGamesView: React.FC = () => {
 
       {/* GAME 1: QUICK RECAST CHALLENGE */}
       {activeTab === 'recast' && (
-        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
+        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a]/90 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 shadow-2xl space-y-6">
           {/* Status Header */}
-          <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
+          <div className="flex items-center justify-between border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 pb-4">
             <div>
               <span className="text-xs font-bold text-[#E09B30] uppercase tracking-wider block">
                 {isEs ? 'Desafío' : 'Challenge'} {currentRecastIndex + 1} / {recastQuestions.length}
               </span>
-              <p className="font-inter text-xs text-[#A7C7E7]">
+              <p className="font-inter text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                 {t.gamesView.recastDesc}
               </p>
             </div>
@@ -483,7 +483,7 @@ export const InteractiveGamesView: React.FC = () => {
           {!isRecastFinished ? (
             <div className="space-y-6">
               {/* Bad Sentence Banner with Chibi Teacher Ivan Recast Mascot */}
-              <div className="p-5 rounded-2xl bg-[#1A3153] border-2 border-[#f59e0b]/40 flex items-start gap-4">
+              <div className="p-5 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153] border-2 border-[#f59e0b]/40 flex items-start gap-4">
                 <img
                   src={tutorAvatarSrc}
                   alt={tutorAvatarAlt}
@@ -494,7 +494,7 @@ export const InteractiveGamesView: React.FC = () => {
                     <AlertTriangle size={13} className="text-[#f59e0b] shrink-0" />
                     <span>{isEs ? 'Frase con Error Común:' : 'Common Spanish Interference:'}</span>
                   </span>
-                  <p className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA] italic">
+                  <p className="font-montserrat font-extrabold text-base sm:text-lg text-[var(--text-primary)] dark:text-[#FAFAFA] italic">
                     "{recastQuestions[currentRecastIndex].badSentence}"
                   </p>
                 </div>
@@ -502,7 +502,7 @@ export const InteractiveGamesView: React.FC = () => {
 
               {/* Options */}
               <div className="space-y-3">
-                <span className="text-xs font-montserrat font-bold text-[#A7C7E7] uppercase tracking-wider block">
+                <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] uppercase tracking-wider block">
                   {isEs ? 'Elige la reformulación nativa correcta:' : 'Select the natural native recast:'}
                 </span>
 
@@ -510,14 +510,14 @@ export const InteractiveGamesView: React.FC = () => {
                   const isSelected = selectedRecastOption === optIdx;
                   const isCorrect = optIdx === recastQuestions[currentRecastIndex].correctIndex;
 
-                  let btnStyle = 'bg-[#1A3153]/80 hover:bg-[#1A3153] border-[#A7C7E7]/20 text-[#FAFAFA]';
+                  let btnStyle = 'bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 hover:bg-[var(--bg-surface)] dark:hover:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 text-[var(--text-primary)] dark:text-[#FAFAFA]';
                   if (selectedRecastOption !== null) {
                     if (isCorrect) {
-                      btnStyle = 'bg-[#10b981]/25 border-[#10b981] text-[#FAFAFA] shadow-md';
+                      btnStyle = 'bg-[#10b981]/25 border-[#10b981] text-[var(--text-primary)] dark:text-[#FAFAFA] shadow-md';
                     } else if (isSelected) {
-                      btnStyle = 'bg-[#ef4444]/25 border-[#ef4444] text-[#FAFAFA]';
+                      btnStyle = 'bg-[#ef4444]/25 border-[#ef4444] text-[var(--text-primary)] dark:text-[#FAFAFA]';
                     } else {
-                      btnStyle = 'opacity-40 border-[#A7C7E7]/10 text-[#A7C7E7]';
+                      btnStyle = 'opacity-40 border-[var(--border-hairline)] dark:border-[#A7C7E7]/10 text-[var(--text-secondary)] dark:text-[#A7C7E7]';
                     }
                   }
 
@@ -597,8 +597,8 @@ export const InteractiveGamesView: React.FC = () => {
 
       {/* GAME 2: COLLOCATION & PHRASAL VERB MATCHER */}
       {activeTab === 'matcher' && (
-        <div className="max-w-4xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
-          <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
+        <div className="max-w-4xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a]/90 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 shadow-2xl space-y-6">
+          <div className="flex items-center justify-between border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 pb-4">
             <div className="flex items-center gap-3">
               <img
                 src={tutorAvatarSrc}
@@ -716,8 +716,8 @@ export const InteractiveGamesView: React.FC = () => {
 
       {/* GAME 3: AUDIO SHADOWING SPRINT */}
       {activeTab === 'shadowing' && (
-        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
-          <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
+        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a]/90 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 shadow-2xl space-y-6">
+          <div className="flex items-center justify-between border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 pb-4">
             <div className="flex items-center gap-3">
               <img
                 src={tutorAvatarSrc}
@@ -728,7 +728,7 @@ export const InteractiveGamesView: React.FC = () => {
                 <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
                   {isEs ? 'Audio Shadowing Sprint • Sombra Fonética' : 'Audio Shadowing Sprint'} • {shadowIndex + 1} / {shadowChallenges.length}
                 </span>
-                <p className="font-inter text-xs text-[#A7C7E7]">
+                <p className="font-inter text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                   {shadowChallenges[shadowIndex].context}
                 </p>
               </div>
@@ -740,11 +740,11 @@ export const InteractiveGamesView: React.FC = () => {
           </div>
 
           {/* Target Phrase Slab */}
-          <div className="p-6 rounded-3xl bg-[#1A3153] border-2 border-[#E09B30]/40 space-y-3 text-center">
-            <p className="font-montserrat font-extrabold text-lg sm:text-xl text-[#FAFAFA] leading-snug">
+          <div className="p-6 rounded-3xl bg-[var(--bg-sunken)] dark:bg-[#1A3153] border-2 border-[#E09B30]/40 space-y-3 text-center">
+            <p className="font-montserrat font-extrabold text-lg sm:text-xl text-[var(--text-primary)] dark:text-[#FAFAFA] leading-snug">
               "{shadowChallenges[shadowIndex].phrase}"
             </p>
-            <p className="font-mono text-xs text-[#A7C7E7]">
+            <p className="font-mono text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               {shadowChallenges[shadowIndex].phonetic}
             </p>
             <p className="text-xs text-[#E09B30] italic flex items-center justify-center gap-1.5">
@@ -814,8 +814,8 @@ export const InteractiveGamesView: React.FC = () => {
 
       {/* GAME 4: SENTENCE STRUCTURE BUILDER */}
       {activeTab === 'builder' && (
-        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 shadow-2xl space-y-6">
-          <div className="flex items-center justify-between border-b border-[#A7C7E7]/20 pb-4">
+        <div className="max-w-3xl mx-auto w-full p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a]/90 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 shadow-2xl space-y-6">
+          <div className="flex items-center justify-between border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 pb-4">
             <div className="flex items-center gap-3">
               <img
                 src={tutorAvatarSrc}
@@ -826,7 +826,7 @@ export const InteractiveGamesView: React.FC = () => {
                 <span className="font-montserrat font-bold text-xs text-[#E09B30] uppercase tracking-wider block">
                   {t.gamesView.tabBuilder} • {currentBuilderIndex + 1} / {builderChallenges.length}
                 </span>
-                <p className="font-inter text-xs text-[#A7C7E7]">
+                <p className="font-inter text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                   {currentChallenge.hint}
                 </p>
               </div>
@@ -835,14 +835,14 @@ export const InteractiveGamesView: React.FC = () => {
             <button
               type="button"
               onClick={handleClearBuilder}
-              className="py-1 px-3 rounded-lg bg-[#1A3153] text-[#A7C7E7] hover:text-[#FAFAFA] text-xs font-semibold cursor-pointer"
+              className="py-1 px-3 rounded-lg bg-[var(--bg-sunken)] dark:bg-[#1A3153] text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] text-xs font-semibold cursor-pointer"
             >
               {t.gamesView.resetSentence}
             </button>
           </div>
 
           {/* Target Slot Area */}
-          <div className="min-h-[90px] p-4 rounded-2xl bg-[#1A3153]/70 border-2 border-dashed border-[#A7C7E7]/30 flex flex-wrap items-center gap-2">
+          <div className="min-h-[90px] p-4 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153]/70 border-2 border-dashed border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 flex flex-wrap items-center gap-2">
             {selectedWords.length === 0 ? (
               <span className="text-xs text-[#A7C7E7]/60 italic">
                 {isEs ? 'Toca las palabras abajo en orden para construir la oración...' : 'Tap the word pills below in order to build the sentence...'}

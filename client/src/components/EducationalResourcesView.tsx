@@ -616,10 +616,10 @@ export const EducationalResourcesView: React.FC = () => {
           <BookOpen size={14} />
           <span>{t.resourcesView.badge}</span>
         </div>
-        <h1 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
+        <h1 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
           {t.resourcesView.title}
         </h1>
-        <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
+        <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
           {t.resourcesView.subtitle}
         </p>
       </div>
@@ -627,14 +627,14 @@ export const EducationalResourcesView: React.FC = () => {
       {/* Quick-Access Card: 1-on-1 Class Scheduling with Teacher Ivan */}
       <div
         id="quick-book-class-card"
-        className="p-6 rounded-3xl bg-gradient-to-r from-[#12223a] via-[#1A3153] to-[#12223a] border-2 border-[#E09B30]/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
+        className="p-6 rounded-3xl bg-[var(--bg-surface)] dark:bg-gradient-to-r dark:from-[#12223a] dark:via-[#1A3153] dark:to-[#12223a] border-2 border-[#E09B30]/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
       >
         <div className="space-y-1.5 text-center md:text-left">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
             <Calendar size={14} />
             <span>{t.scheduling.quickBookCardTitle}</span>
           </div>
-          <p className="font-inter text-xs text-[#FAFAFA] max-w-2xl leading-relaxed">
+          <p className="font-inter text-xs text-[var(--text-primary)] dark:text-[#FAFAFA] max-w-2xl leading-relaxed">
             {t.scheduling.quickBookCardDesc}
           </p>
         </div>
@@ -653,25 +653,25 @@ export const EducationalResourcesView: React.FC = () => {
       {/* ========================================================================= */}
       <div
         id="custom-resource-studio"
-        className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#091326] via-[#12223a] to-[#1A3153] border-2 border-[#E09B30]/40 shadow-2xl space-y-6"
+        className="p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-gradient-to-r dark:from-[#091326] dark:via-[#12223a] dark:to-[#1A3153] border-2 border-[#E09B30]/40 shadow-2xl space-y-6"
       >
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[#A7C7E7]/20 pb-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 pb-4">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E09B30]/20 text-[#E09B30] text-xs font-montserrat font-bold">
               <Sparkles size={14} />
               <span>{isEs ? 'Estudio de Recursos Personalizados a Demanda' : 'On-Demand Custom Resource Studio'}</span>
             </div>
-            <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA]">
+            <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA]">
               {isEs ? 'Genera Material a Medida para Cualquier Situación' : 'Generate Custom Material for Any Scenario'}
             </h2>
-            <p className="text-xs sm:text-sm text-[#A7C7E7] max-w-2xl">
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] dark:text-[#A7C7E7] max-w-2xl">
               {isEs
                 ? 'Escribe tu tema profesional o desafío (ej. "Negociación Salarial", "Incident Post-Mortem", "M&A Due Diligence") y obtén un artículo con colocaciones, un guion de diálogo o una ficha imprimible generada por IA.'
                 : 'Enter your workplace scenario (e.g. "Salary Negotiation", "Incident Post-Mortem", "M&A Due Diligence") and generate tailored articles, dialogues, or printable worksheets.'}
             </p>
           </div>
 
-          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-montserrat font-bold uppercase shrink-0">
+          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-400/40 text-xs font-montserrat font-bold uppercase shrink-0">
             {isEs ? 'Acceso Ilimitado' : 'Unlimited Access'}
           </span>
         </div>
@@ -685,7 +685,7 @@ export const EducationalResourcesView: React.FC = () => {
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
               placeholder={isEs ? 'Ej: Technical Interview for Silicon Valley, Incident Post-Mortem...' : 'E.g., Technical Interview for Silicon Valley, Incident Post-Mortem...'}
-              className="flex-1 px-4 py-3 rounded-2xl bg-[#1A3153] border border-[#A7C7E7]/30 text-white placeholder-[#A7C7E7]/60 text-sm focus:outline-none focus:border-[#E09B30]"
+              className="flex-1 px-4 py-3 rounded-2xl bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-[var(--text-primary)] dark:text-white placeholder-[var(--text-secondary)] dark:placeholder-[#A7C7E7]/60 text-sm focus:outline-none focus:border-[#E09B30]"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleGenerateCustomResource();
               }}
@@ -713,8 +713,8 @@ export const EducationalResourcesView: React.FC = () => {
           </div>
 
           {/* Quick Preset Topic Pills */}
-          <div className="flex items-center gap-2 flex-wrap text-xs text-[#A7C7E7]">
-            <span className="font-semibold text-xs text-[#FAFAFA]">{isEs ? 'Ideas Rápidas:' : 'Quick Ideas:'}</span>
+          <div className="flex items-center gap-2 flex-wrap text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
+            <span className="font-semibold text-xs text-[var(--text-primary)] dark:text-[#FAFAFA]">{isEs ? 'Ideas Rápidas:' : 'Quick Ideas:'}</span>
             {(isEs
               ? ['Negociación Salarial', 'Post-Mortem de Incidente', 'Due Diligence MBA', 'Sincronización Internacional']
               : ['Salary Negotiation', 'Incident Post-Mortem', 'MBA Due Diligence', 'Cross-Border Team Sync']
@@ -723,7 +723,7 @@ export const EducationalResourcesView: React.FC = () => {
                 key={idea}
                 type="button"
                 onClick={() => setCustomTopic(idea)}
-                className="px-2.5 py-1 rounded-lg bg-[#1A3153] hover:bg-[#A7C7E7]/20 border border-[#A7C7E7]/30 text-xs text-[#FAFAFA] cursor-pointer transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-[var(--bg-sunken)] dark:bg-[#1A3153] hover:border-[#E09B30] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-xs text-[var(--text-primary)] dark:text-[#FAFAFA] cursor-pointer transition-colors"
               >
                 {idea}
               </button>
@@ -959,11 +959,11 @@ export const EducationalResourcesView: React.FC = () => {
                   className="p-4 rounded-2xl bg-[#1A3153]/80 hover:bg-[#1A3153] border border-[#A7C7E7]/25 hover:border-[#E09B30] transition-all cursor-pointer flex flex-col justify-between gap-2 shadow-sm"
                 >
                   <div>
-                    <div className="flex items-center justify-between text-[10px] text-[#A7C7E7] font-mono mb-1">
-                      <span className="uppercase">{res.resourceType.replace('_', ' ')}</span>
+                    <div className="flex items-center justify-between text-[10px] text-[var(--text-secondary)] dark:text-[#A7C7E7] font-mono mb-1">
+                      <span className="uppercase">{isEs ? (res.resourceType === 'article_collocations' ? 'ARTÍCULO' : res.resourceType === 'dialogue_script' ? 'GUION' : res.resourceType === 'vocab_phrasal_deck' ? 'VOCABULARIO' : 'FICHA') : res.resourceType.replace('_', ' ')}</span>
                       <span className="text-[#E09B30] font-bold">CEFR {res.targetLevel}</span>
                     </div>
-                    <h5 className="font-montserrat font-bold text-xs text-[#FAFAFA] line-clamp-2">
+                    <h5 className="font-montserrat font-bold text-xs text-[var(--text-primary)] dark:text-[#FAFAFA] line-clamp-2">
                       {res.title}
                     </h5>
                   </div>
@@ -979,10 +979,10 @@ export const EducationalResourcesView: React.FC = () => {
       </div>
 
       {/* Filter Strip */}
-      <div className="p-4 rounded-3xl bg-[#12223a]/90 border border-[#A7C7E7]/25 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+      <div className="p-4 rounded-3xl bg-[var(--bg-surface)] dark:bg-[#12223a]/90 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 flex flex-wrap items-center justify-between gap-4 shadow-lg">
         {/* CEFR Level Filter */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-montserrat font-bold text-[#A7C7E7] flex items-center gap-1.5 uppercase tracking-wider">
+          <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] flex items-center gap-1.5 uppercase tracking-wider">
             <Filter size={14} className="text-[#E09B30]" />
             <span>{t.resourcesView.level}:</span>
           </span>
@@ -994,7 +994,7 @@ export const EducationalResourcesView: React.FC = () => {
               className={`px-3 py-1.5 rounded-full text-xs font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 levelFilter === lvl
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                  : 'bg-[#1A3153] text-[#A7C7E7] hover:text-[#FAFAFA] border border-[#A7C7E7]/20'
+                  : 'bg-[var(--bg-sunken)] dark:bg-[#1A3153] text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/20'
               }`}
             >
               {lvl === 'ALL' ? t.resourcesView.filterAllLevels : lvl}
@@ -1004,13 +1004,13 @@ export const EducationalResourcesView: React.FC = () => {
 
         {/* Scenario Filter */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-montserrat font-bold text-[#A7C7E7] uppercase tracking-wider">
+          <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] uppercase tracking-wider">
             {t.resourcesView.scenario}:
           </span>
           <select
             value={scenarioFilter}
             onChange={(e) => setScenarioFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-full text-xs bg-[#1A3153] border border-[#A7C7E7]/30 text-[#FAFAFA] font-medium focus:outline-none focus:border-[#E09B30]"
+            className="px-3 py-1.5 rounded-full text-xs bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-[var(--text-primary)] dark:text-[#FAFAFA] font-medium focus:outline-none focus:border-[#E09B30]"
           >
             <option value="ALL">{t.resourcesView.filterAllScenarios}</option>
             <option value="Daily Routine">{getScenarioLabel('Daily Routine')}</option>
@@ -1025,11 +1025,11 @@ export const EducationalResourcesView: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA] flex items-center gap-2.5">
+            <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA] flex items-center gap-2.5">
               <BookOpen size={22} className="text-[#E09B30]" />
               <span>{t.resourcesView.readingsTitle}</span>
             </h2>
-            <p className="font-inter text-xs sm:text-sm text-[#A7C7E7]">
+            <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               {t.resourcesView.readingsSubtitle}
             </p>
           </div>
@@ -1044,8 +1044,8 @@ export const EducationalResourcesView: React.FC = () => {
                 key={reading.id}
                 className={`p-6 rounded-3xl border transition-all duration-200 flex flex-col justify-between ${
                   isCompleted
-                    ? 'bg-gradient-to-b from-[#1A3153] to-[#12223a] border-[#10b981]/40 shadow-md'
-                    : 'bg-[#1A3153]/70 border-[#A7C7E7]/25 hover:border-[#A7C7E7]/50 shadow-lg'
+                    ? 'bg-[var(--bg-surface)] dark:bg-gradient-to-b dark:from-[#1A3153] dark:to-[#12223a] border-[#10b981]/40 shadow-md'
+                    : 'bg-[var(--bg-surface)] dark:bg-[#1A3153]/70 border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 hover:border-[#E09B30]/50 shadow-lg'
                 }`}
               >
                 <div>
@@ -1054,18 +1054,18 @@ export const EducationalResourcesView: React.FC = () => {
                       <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/15 text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
                         {reading.level}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/15 text-[#A7C7E7] text-[11px] font-semibold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/15 text-[var(--text-secondary)] dark:text-[#A7C7E7] text-[11px] font-semibold">
                         {getScenarioLabel(reading.scenario)}
                       </span>
                     </div>
 
-                    <span className="flex items-center gap-1 text-xs text-[#A7C7E7]">
+                    <span className="flex items-center gap-1 text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                       <Clock size={12} />
                       <span>{reading.readTime}</span>
                     </span>
                   </div>
 
-                  <h3 className="font-montserrat font-bold text-lg text-[#FAFAFA] mb-2 leading-snug">
+                  <h3 className="font-montserrat font-bold text-lg text-[var(--text-primary)] dark:text-[#FAFAFA] mb-2 leading-snug">
                     {reading.title}
                   </h3>
                   <p className="font-inter text-xs sm:text-sm text-[#A7C7E7] leading-relaxed mb-4">
@@ -1118,11 +1118,11 @@ export const EducationalResourcesView: React.FC = () => {
       {/* SECTION 2: MULTIMEDIA & LISTENING MICRO-LESSONS */}
       <div className="space-y-4 pt-4">
         <div>
-          <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA] flex items-center gap-2.5">
+          <h2 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA] flex items-center gap-2.5">
             <Headphones size={22} className="text-[#E09B30]" />
             <span>{t.resourcesView.listeningsTitle}</span>
           </h2>
-          <p className="font-inter text-xs sm:text-sm text-[#A7C7E7]">
+          <p className="font-inter text-xs sm:text-sm text-[var(--text-secondary)] dark:text-[#A7C7E7]">
             {t.resourcesView.listeningsSubtitle}
           </p>
         </div>
@@ -1136,8 +1136,8 @@ export const EducationalResourcesView: React.FC = () => {
                 key={item.id}
                 className={`p-6 rounded-3xl border transition-all duration-200 flex flex-col justify-between ${
                   isCompleted
-                    ? 'bg-gradient-to-b from-[#1A3153] to-[#12223a] border-[#10b981]/40 shadow-md'
-                    : 'bg-[#1A3153]/70 border-[#A7C7E7]/25 hover:border-[#A7C7E7]/50 shadow-lg'
+                    ? 'bg-[var(--bg-surface)] dark:bg-gradient-to-b dark:from-[#1A3153] dark:to-[#12223a] border-[#10b981]/40 shadow-md'
+                    : 'bg-[var(--bg-surface)] dark:bg-[#1A3153]/70 border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 hover:border-[#E09B30]/50 shadow-lg'
                 }`}
               >
                 <div>
@@ -1146,18 +1146,18 @@ export const EducationalResourcesView: React.FC = () => {
                       <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/15 text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
                         {item.level}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/15 text-[#A7C7E7] text-[11px] font-semibold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#A7C7E7]/15 text-[var(--text-secondary)] dark:text-[#A7C7E7] text-[11px] font-semibold">
                         {getScenarioLabel(item.scenario)}
                       </span>
                     </div>
 
-                    <span className="flex items-center gap-1 text-xs text-[#A7C7E7]">
+                    <span className="flex items-center gap-1 text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                       <Clock size={12} />
                       <span>{item.duration}</span>
                     </span>
                   </div>
 
-                  <h3 className="font-montserrat font-bold text-lg text-[#FAFAFA] mb-3 leading-snug">
+                  <h3 className="font-montserrat font-bold text-lg text-[var(--text-primary)] dark:text-[#FAFAFA] mb-3 leading-snug">
                     {item.title}
                   </h3>
 

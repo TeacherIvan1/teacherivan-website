@@ -340,7 +340,7 @@ export const ClassSchedulerView: React.FC = () => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E09B30]/20 border border-[#E09B30] text-[#9A6515] dark:text-[#E09B30] text-[11px] font-montserrat font-bold uppercase tracking-wider">
             <Sparkles size={13} />
-            <span>1-on-1 Bichronous Coaching</span>
+            <span>{isEs ? 'COACHING SINCRÓNICO 1-A-1' : '1-ON-1 BICHRONOUS COACHING'}</span>
           </div>
           <h1 className="font-montserrat font-extrabold text-xl sm:text-3xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
             {t.scheduling.title}

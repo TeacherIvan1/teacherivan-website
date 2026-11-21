@@ -331,8 +331,8 @@ export const Header: React.FC = () => {
             {/* Language Switcher (EN | ES) */}
             <LanguageToggle id="header-lang-toggle" showIcon={false} />
 
-            {/* Technical UI — Developer Mode */}
-            {isDeveloperMode && (
+            {/* Technical UI — Developer Mode (strictly gated for Admin) */}
+            {(user?.role === 'admin' && isDeveloperMode) && (
               <>
                 <div className="status-badge hidden xl:inline-flex" title="Backend Server Status" id="backend-status-badge">
                   <Server size={13} color="#A7C7E7" />

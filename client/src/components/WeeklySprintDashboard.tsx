@@ -573,12 +573,12 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full bg-[#E09B30]/20 text-[#9A6515] dark:text-[#E09B30] text-[10px] font-montserrat font-bold uppercase">
-                      Paso 4 • Cierre Semanal
+                      {isEs ? 'Paso 4 • Cierre Semanal' : 'Step 4 • Weekly Wrap-up'}
                     </span>
                     <Award size={14} className="text-[#E09B30]" />
                   </div>
                   <h4 className="font-montserrat font-bold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
-                    {isEs ? 'Reporte Pedagógico y Sync' : 'Pedagogical Report & Sync'}
+                    {isEs ? 'Reporte Pedagógico Semanal' : 'Weekly Pedagogical Report'}
                   </h4>
                   <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
                     {isEs
@@ -593,7 +593,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                   className="w-full py-2 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white text-xs font-montserrat font-bold flex items-center justify-center gap-1 cursor-pointer shadow-sm"
                 >
                   <MessageCircle size={13} />
-                  <span>{isEs ? 'Sync WhatsApp →' : 'WhatsApp Sync →'}</span>
+                  <span>{isEs ? 'Enviar por WhatsApp →' : 'Send via WhatsApp →'}</span>
                 </a>
               </div>
             </div>

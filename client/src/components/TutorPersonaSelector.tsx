@@ -23,8 +23,6 @@ export const TutorPersonaSelector: React.FC<TutorPersonaSelectorProps> = ({
     role: string;
     desc: string;
     avatarSrc: string;
-    voiceName: string;
-    genderLabel: string;
   }> = [
       {
         id: 'teacher-ivan',
@@ -33,8 +31,6 @@ export const TutorPersonaSelector: React.FC<TutorPersonaSelectorProps> = ({
         role: t.persona.teacherIvan.role,
         desc: t.persona.teacherIvan.desc,
         avatarSrc: '/assets/teacher-ivan.svg',
-        voiceName: 'Puck',
-        genderLabel: 'Male',
       },
       {
         id: 'emma',
@@ -43,8 +39,6 @@ export const TutorPersonaSelector: React.FC<TutorPersonaSelectorProps> = ({
         role: t.persona.emma.role,
         desc: t.persona.emma.desc,
         avatarSrc: '/assets/emma.svg',
-        voiceName: 'Aoede',
-        genderLabel: 'Female',
       },
     ];
 

@@ -197,7 +197,7 @@ export const CompactVoiceSimulator: React.FC = () => {
             <Radio size={11} className="text-[#10b981] animate-pulse" />
             <span>{isEs ? 'Laboratorio de Voz 24/7 • Audio Natural' : '24/7 Voice Lab • Natural Audio'}</span>
           </div>
-          <h1 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[#FAFAFA] tracking-tight">
+          <h1 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
             {t.compactSimulator.title}
           </h1>
         </div>
@@ -207,7 +207,7 @@ export const CompactVoiceSimulator: React.FC = () => {
           {/* Daily Sessions Quota Badge */}
           <div
             id="simulator-daily-quota-badge"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A3153] border border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[#FAFAFA] shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[var(--text-primary)] dark:text-[#FAFAFA] shadow-sm"
           >
             <Sparkles size={12} className="text-[#E09B30]" />
             <span>{getDailySessionBadge()}</span>
@@ -229,20 +229,20 @@ export const CompactVoiceSimulator: React.FC = () => {
               <span>{formatTimer(elapsedSeconds)}</span>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#A7C7E7]">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-              <span>24/7 Available</span>
+              <span>{isEs ? 'Disponible 24/7' : '24/7 Available'}</span>
             </div>
           )}
         </div>
       </div>
 
       {/* 2. Compact Control Bar (Tutor Persona + Level Selector + Scenario Strip) */}
-      <div className="bg-[#12223a]/90 backdrop-blur-md rounded-2xl border border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-3 shadow-md">
+      <div className="bg-[var(--bg-surface)] dark:bg-[#12223a]/90 backdrop-blur-md rounded-2xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-3 shadow-md">
         {/* Row A1: Tutor Persona Pill */}
         <div className="flex items-center gap-2 w-full">
           {/* Tutor Persona Toggle: [Ivan | Emma] */}
-          <div className="flex items-center gap-1 bg-[#1A3153] p-1 rounded-xl border border-[#A7C7E7]/30 shrink-0">
+          <div className="flex items-center gap-1 bg-[var(--bg-sunken)] dark:bg-[#1A3153] p-1 rounded-xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 shrink-0">
             <button
               type="button"
               id="tutor-persona-ivan-btn"
@@ -251,7 +251,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 persona === 'teacher-ivan'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                  : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
               }`}
             >
               <span>{t.persona.teacherIvan.name}</span>
@@ -264,7 +264,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 persona === 'emma'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-md'
-                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                  : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
               }`}
             >
               <span>{t.persona.emma.name}</span>
@@ -289,7 +289,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                   className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-[0.15em] transition-all cursor-pointer shrink-0 flex items-center justify-center gap-1.5 ${
                     active
                       ? 'bg-[#E09B30] text-[#1A3153] shadow-sm font-black scale-105'
-                      : 'bg-[#1A3153]/70 text-[#A7C7E7] hover:bg-[#1A3153] hover:text-[#FAFAFA] border border-[#A7C7E7]/20'
+                      : 'bg-[var(--bg-sunken)] dark:bg-[#1A3153]/70 text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:bg-[var(--bg-surface)] dark:hover:bg-[#1A3153] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/20'
                   }`}
                 >
                   <span>{pill.label}</span>
@@ -298,12 +298,12 @@ export const CompactVoiceSimulator: React.FC = () => {
               );
             })}
           </div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#12223a] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[var(--bg-surface)] dark:from-[#12223a] to-transparent" />
         </div>
 
         {/* Row B: Scenario Selector + Inline Info Button */}
-        <div className="flex items-center gap-2 w-full pt-2 border-t border-[#A7C7E7]/15">
-          <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[#A7C7E7] shrink-0 hidden md:inline">
+        <div className="flex items-center gap-2 w-full pt-2 border-t border-[var(--border-hairline)] dark:border-[#A7C7E7]/15">
+          <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[var(--text-secondary)] dark:text-[#A7C7E7] shrink-0 hidden md:inline">
             {t.compactSimulator.scenarioLabel}:
           </span>
           <select
@@ -317,7 +317,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               }
               selectScenario(e.target.value);
             }}
-            className="bg-[#1A3153] text-[#FAFAFA] text-xs font-inter font-medium rounded-xl border border-[#A7C7E7]/30 px-3 py-2 flex-1 min-w-0 truncate focus:outline-none focus:border-[#E09B30] cursor-pointer min-h-[44px]"
+            className="bg-[var(--bg-sunken)] dark:bg-[#1A3153] text-[var(--text-primary)] dark:text-[#FAFAFA] text-xs font-inter font-medium rounded-xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 px-3 py-2 flex-1 min-w-0 truncate focus:outline-none focus:border-[#E09B30] cursor-pointer min-h-[44px]"
           >
             {availableScenarios.map((scenario) => {
               const isScenarioLocked = !isAuthenticated && scenario.id !== 'diagnostic-placement';
@@ -326,7 +326,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                   ? 'Diagnóstico Hablado (Evaluación 90s)'
                   : `${scenario.title} (${scenario.category})`;
               return (
-                <option key={scenario.id} value={scenario.id} className="bg-[#12223a] text-[#FAFAFA]">
+                <option key={scenario.id} value={scenario.id} className="bg-[var(--bg-surface)] dark:bg-[#12223a] text-[var(--text-primary)] dark:text-[#FAFAFA]">
                   {isScenarioLocked ? `[Pro] ${scenario.title}` : scenarioLabel}
                 </option>
               );
@@ -341,7 +341,7 @@ export const CompactVoiceSimulator: React.FC = () => {
             className={`min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer ${
               showVocabTips
                 ? 'bg-[#E09B30] text-[#1A3153]'
-                : 'bg-[#1A3153] text-[#E09B30] border border-[#E09B30]/30 hover:border-[#E09B30]'
+                : 'bg-[var(--bg-sunken)] dark:bg-[#1A3153] text-[#9A6515] dark:text-[#E09B30] border border-[var(--border-hairline)] dark:border-[#E09B30]/30 hover:border-[#E09B30]'
             }`}
             title={t.compactSimulator.vocabTipsBtn}
             aria-label={t.compactSimulator.vocabTipsBtn}
@@ -352,7 +352,7 @@ export const CompactVoiceSimulator: React.FC = () => {
 
         {/* Row C: Correction Mode Selector [Fluency | Coaching] Full-Width */}
         <div className="w-full">
-          <div className="grid grid-cols-2 gap-2 w-full p-1 bg-[#1A3153] rounded-xl border border-[#A7C7E7]/30 min-h-[44px]">
+          <div className="grid grid-cols-2 gap-2 w-full p-1 bg-[var(--bg-sunken)] dark:bg-[#1A3153] rounded-xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 min-h-[44px]">
             <button
               type="button"
               id="correction-mode-conversation-btn"
@@ -360,7 +360,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               className={`min-h-[38px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center justify-center ${
                 correctionMode === 'conversation'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                  : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
               }`}
               title="Fluency Mode: Natural conversation flow"
             >
@@ -379,7 +379,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               className={`min-h-[38px] px-3 py-1 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 correctionMode === 'coaching'
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
-                  : 'text-[#A7C7E7] hover:text-[#FAFAFA]'
+                  : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
               }`}
               title="Coaching Mode: Systematic recast error modeling"
             >
@@ -393,7 +393,7 @@ export const CompactVoiceSimulator: React.FC = () => {
         {showVocabTips && (
           <div
             id="vocab-tips-popover"
-            className="p-3.5 rounded-xl bg-[#1A3153]/90 border border-[#E09B30]/40 text-xs animate-in fade-in duration-150"
+            className="p-3.5 rounded-xl bg-[var(--bg-surface)] dark:bg-[#1A3153]/90 border border-[#E09B30]/40 text-xs animate-in fade-in duration-150"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="font-montserrat font-bold text-[#E09B30] flex items-center gap-1.5">
@@ -403,24 +403,24 @@ export const CompactVoiceSimulator: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowVocabTips(false)}
-                className="text-[#A7C7E7] hover:text-[#FAFAFA]"
+                className="text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]"
               >
                 <X size={14} />
               </button>
             </div>
-            <p className="text-[#A7C7E7] text-[11px] mb-2 leading-relaxed">
+            <p className="text-[var(--text-secondary)] dark:text-[#A7C7E7] text-[11px] mb-2 leading-relaxed">
               {activeScenario.description}
             </p>
             {activeScenario.targetVocabulary && activeScenario.targetVocabulary.length > 0 && (
               <div className="mb-2">
-                <span className="text-[10px] font-bold text-[#FAFAFA] block mb-1">
+                <span className="text-[10px] font-bold text-[var(--text-primary)] dark:text-[#FAFAFA] block mb-1">
                   Vocabulary:
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {activeScenario.targetVocabulary.map((word, idx) => (
                     <span
                       key={idx}
-                      className="px-2 py-0.5 rounded-md bg-[#12223a] text-[#E09B30] border border-[#E09B30]/30 text-[10px] font-mono"
+                      className="px-2 py-0.5 rounded-md bg-[var(--bg-sunken)] dark:bg-[#12223a] text-[#9A6515] dark:text-[#E09B30] border border-[#E09B30]/30 text-[10px] font-mono"
                     >
                       {word}
                     </span>
@@ -430,10 +430,10 @@ export const CompactVoiceSimulator: React.FC = () => {
             )}
             {activeScenario.targetGrammar && activeScenario.targetGrammar.length > 0 && (
               <div>
-                <span className="text-[10px] font-bold text-[#FAFAFA] block mb-1">
+                <span className="text-[10px] font-bold text-[var(--text-primary)] dark:text-[#FAFAFA] block mb-1">
                   Grammar / Connectors:
                 </span>
-                <p className="text-[11px] text-[#A7C7E7]">
+                <p className="text-[11px] text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                   {activeScenario.targetGrammar.join(' • ')}
                 </p>
               </div>
@@ -450,14 +450,14 @@ export const CompactVoiceSimulator: React.FC = () => {
       {/* 4. Live Docked Caption Overlay (Latest Tutor & User Utterance) */}
       <div
         id="compact-live-captions-dock"
-        className="rounded-2xl bg-[#12223a]/80 backdrop-blur-sm border border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-2 shadow-sm"
+        className="rounded-2xl bg-[var(--bg-surface)] dark:bg-[#12223a]/80 backdrop-blur-sm border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 p-3 sm:p-4 flex flex-col gap-2 shadow-sm"
       >
         {/* Tutor Latest Bubble */}
         <div className="flex items-start gap-2.5 text-xs sm:text-sm">
           <div className="w-6 h-6 rounded-full bg-[#E09B30] text-[#1A3153] flex items-center justify-center shrink-0 font-bold text-[11px]">
             {persona === 'teacher-ivan' ? 'I' : 'E'}
           </div>
-          <div className="flex-1 bg-[#1A3153]/80 rounded-xl rounded-tl-none p-2.5 border border-[#E09B30]/30">
+          <div className="flex-1 bg-[var(--bg-sunken)] dark:bg-[#1A3153]/80 rounded-xl rounded-tl-none p-2.5 border border-[#E09B30]/30">
             <div className="flex items-center justify-between text-[10px] font-montserrat font-bold text-[#E09B30] mb-0.5">
               <span>{persona === 'teacher-ivan' ? t.persona.teacherIvan.name : t.persona.emma.name}</span>
               {isTutorSpeaking && (
@@ -467,9 +467,9 @@ export const CompactVoiceSimulator: React.FC = () => {
                 </span>
               )}
             </div>
-            <p className="text-[#FAFAFA] font-inter leading-relaxed">
+            <p className="text-[var(--text-primary)] dark:text-[#FAFAFA] font-inter leading-relaxed">
               {latestTutorMsg?.content || (
-                <span className="text-[#A7C7E7]/70 italic">
+                <span className="text-[var(--text-secondary)] dark:text-[#A7C7E7]/70 italic">
                   {isConnected
                     ? t.avatarStage.speaking
                     : t.compactSimulator.idleHint}
@@ -485,11 +485,11 @@ export const CompactVoiceSimulator: React.FC = () => {
             <div className="w-6 h-6 rounded-full bg-[#A7C7E7] text-[#1A3153] flex items-center justify-center shrink-0 font-bold text-[11px]">
               <User size={13} className="text-[#1A3153]" />
             </div>
-            <div className="flex-1 bg-[#1A3153]/50 rounded-xl rounded-tr-none p-2.5 border border-[#A7C7E7]/20 text-right">
-              <div className="text-[10px] font-montserrat font-bold text-[#A7C7E7] mb-0.5">
+            <div className="flex-1 bg-[var(--bg-sunken)] dark:bg-[#1A3153]/50 rounded-xl rounded-tr-none p-2.5 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/20 text-right">
+              <div className="text-[10px] font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] mb-0.5">
                 You
               </div>
-              <p className="text-[#FAFAFA] font-inter leading-relaxed">
+              <p className="text-[var(--text-primary)] dark:text-[#FAFAFA] font-inter leading-relaxed">
                 {latestUserMsg.content}
               </p>
             </div>
@@ -502,7 +502,7 @@ export const CompactVoiceSimulator: React.FC = () => {
             type="button"
             id="toggle-chat-transcript-btn"
             onClick={() => setShowTranscriptDrawer((prev) => !prev)}
-            className="inline-flex items-center gap-1.5 text-xs text-[#A7C7E7] hover:text-[#FAFAFA] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA] transition-colors cursor-pointer"
           >
             <MessageSquare size={13} className="text-[#E09B30]" />
             <span>{t.compactSimulator.chatTranscriptBtn}</span>
@@ -521,7 +521,7 @@ export const CompactVoiceSimulator: React.FC = () => {
       {/* 5. Simple, Intuitive 1-Tap Action Dock */}
       <div
         id="compact-action-dock"
-        className="w-full rounded-2xl bg-[#12223a] border-2 border-[#E09B30]/40 p-4 shadow-xl flex flex-col items-center gap-3"
+        className="w-full rounded-2xl bg-[var(--bg-surface)] dark:bg-[#12223a] border-2 border-[#E09B30]/40 p-4 shadow-xl flex flex-col items-center gap-3"
       >
         {!isConnected ? (
           /* IDLE STATE: 1 Large #E09B30 Pill Button */
@@ -570,7 +570,7 @@ export const CompactVoiceSimulator: React.FC = () => {
               id="stop-session-btn"
               type="button"
               onClick={() => stopSession()}
-              className="w-full sm:w-auto py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#f43f5e]/20 hover:bg-[#f43f5e] text-[#f87171] hover:text-[#FAFAFA] border border-[#f43f5e]/40 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer min-h-[50px]"
+              className="w-full sm:w-auto py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#f43f5e]/15 hover:bg-[#f43f5e] text-[#dc2626] dark:text-[#f87171] hover:text-[#FAFAFA] border border-[#f43f5e]/30 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer min-h-[50px]"
             >
               <Square size={16} fill="currentColor" />
               <span>{t.compactSimulator.endAndScore}</span>

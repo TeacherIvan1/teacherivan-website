@@ -20,7 +20,7 @@ import { ClassSchedulerView } from './components/ClassSchedulerView';
 import { RegisteredStudentsTable } from './components/RegisteredStudentsTable';
 import { AdminBookingsTable } from './components/AdminBookingsTable';
 import { PlanApprovedModal } from './components/PlanApprovedModal';
-import { VersionChecker } from './components/VersionChecker';
+import { VersionWatcher } from './components/VersionWatcher';
 import { BrandLockup } from './components/BrandLockup';
 import { Terminal, Sparkles, BookOpen, Headphones, Calendar, Target, MessageCircle } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
@@ -75,7 +75,7 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col font-inter transition-colors duration-200">
       {/* Forced Client-Side Auto-Update for Returning Devices */}
-      <VersionChecker />
+      <VersionWatcher />
 
       {/* Student Plan Approval Celebratory Pop-Up Modal */}
       <PlanApprovedModal />

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { withVersion } from '../utils/assetUrl';
 
 export type RigState = 'idle' | 'listening' | 'speaking';
 export type RigPersona = 'teacher-ivan' | 'emma';
@@ -17,7 +18,7 @@ const svgMarkupCache: Record<string, string> = {};
 // Eagerly preload both rigs in browser environments
 if (typeof window !== 'undefined') {
   ['/assets/teacher-ivan-rig.svg', '/assets/emma-rig.svg'].forEach((path) => {
-    fetch(path)
+    fetch(withVersion(path))
       .then((res) => (res.ok ? res.text() : ''))
       .then((markup) => {
         if (markup) svgMarkupCache[path] = markup;
@@ -49,7 +50,7 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
     // Immediately clear stale previous persona markup while loading
     setSvgMarkup('');
 
-    fetch(assetPath)
+    fetch(withVersion(assetPath))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.text();

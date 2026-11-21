@@ -48,19 +48,19 @@ describe('i18n Language Module', () => {
     // English persona checks
     assert.ok(translations.en.persona.heading);
     assert.ok(translations.en.persona.teacherIvan.name);
-    assert.ok(translations.en.persona.teacherIvan.voiceLabel.includes('Puck'));
+    assert.ok(translations.en.persona.teacherIvan.voiceLabel.includes('Male Voice'));
     assert.ok(translations.en.persona.teacherIvan.role);
     assert.ok(translations.en.persona.emma.name);
-    assert.ok(translations.en.persona.emma.voiceLabel.includes('Aoede'));
+    assert.ok(translations.en.persona.emma.voiceLabel.includes('Female Voice'));
     assert.ok(translations.en.persona.emma.role);
 
     // Spanish persona checks
     assert.ok(translations.es.persona.heading);
     assert.ok(translations.es.persona.teacherIvan.name);
-    assert.ok(translations.es.persona.teacherIvan.voiceLabel.includes('Puck'));
+    assert.ok(translations.es.persona.teacherIvan.voiceLabel.includes('Voz Masculina'));
     assert.ok(translations.es.persona.teacherIvan.role);
     assert.ok(translations.es.persona.emma.name);
-    assert.ok(translations.es.persona.emma.voiceLabel.includes('Aoede'));
+    assert.ok(translations.es.persona.emma.voiceLabel.includes('Voz Femenina'));
     assert.ok(translations.es.persona.emma.role);
   });
 

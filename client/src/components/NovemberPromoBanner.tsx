@@ -10,7 +10,8 @@ export const NovemberPromoBanner: React.FC = () => {
   const { setActiveView } = useNavigationStore();
   const [isDismissed, setIsDismissed] = useState<boolean>(false);
 
-  if (isDismissed) return null;
+  // Hide public promotional signup banner when student is authenticated
+  if (isAuthenticated || isDismissed) return null;
 
   const handleCtaClick = () => {
     if (!isAuthenticated) {

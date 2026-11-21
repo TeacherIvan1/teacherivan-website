@@ -92,7 +92,7 @@ export const RegisteredStudentsTable: React.FC = () => {
       const updatedList = users.map((u) => {
         if (u.id !== userId) return u;
         const maxDaily = newPlan === 'essential' ? 10 : newPlan === 'free' ? 5 : -1;
-        const maxWeekly = newPlan === 'executive' ? 3 : newPlan === 'pro' ? 2 : newPlan === 'essential' ? 1 : 0;
+        const maxWeekly = newPlan === 'executive' ? 5 : newPlan === 'pro' ? 3 : 0;
         return {
           ...u,
           plan: newPlan,
@@ -369,10 +369,10 @@ export const RegisteredStudentsTable: React.FC = () => {
                           onChange={(e) => handlePlanChange(student.id, e.target.value as StudentPlan)}
                           className="bg-[#1A3153] text-[#FAFAFA] text-xs rounded-xl border border-[#A7C7E7]/30 px-2.5 py-1.5 focus:outline-none focus:border-[#E09B30] cursor-pointer disabled:opacity-50"
                         >
-                          <option value="free">Free (5/day)</option>
-                          <option value="essential">Essential (1 class/wk)</option>
-                          <option value="pro">Pro (2 classes/wk)</option>
-                          <option value="executive">Executive (3 classes/wk)</option>
+                          <option value="free">{isEs ? 'Gratis (5/día)' : 'Free (5/day)'}</option>
+                          <option value="essential">{isEs ? 'Essential (0 clases/sem)' : 'Essential (0 classes/wk)'}</option>
+                          <option value="pro">{isEs ? 'Pro (3 clases/sem)' : 'Pro (3 classes/wk)'}</option>
+                          <option value="executive">{isEs ? 'Executive (5 clases/sem)' : 'Executive (5 classes/wk)'}</option>
                         </select>
 
                         {isUpdating && (

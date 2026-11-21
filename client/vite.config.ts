@@ -37,6 +37,15 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(BUILD_VERSION),
   },
   plugins: [react(), versionEmitterPlugin()],
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

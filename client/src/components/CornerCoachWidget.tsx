@@ -17,14 +17,18 @@ export const CornerCoachWidget: React.FC<CornerCoachWidgetProps> = ({
   const [isCollidingSection, setIsCollidingSection] = useState(false);
 
   useEffect(() => {
-    // Prevent persistent collisions on desktop and mobile in Hero, Voice Lab, FAQ, App CTA, or Footer
+    // Prevent persistent collisions on desktop and mobile in Hero, Voice Lab, Pricing, FAQ, App CTA, or Footer
     const targetSelectors = [
       '#chapter-0-hero',
       '#hero-3d-stage',
       '#hero',
       '#chapter-2-voicelab',
       '#flagship-simulator-section',
+      '#chapter-3-pricing',
+      '#pricing-section',
+      '#pricing',
       '#chapter-4-faq',
+      '#faq-pricing-section',
       '#final-cta-section',
       '#download-mobile-app-section',
       '#app-footer',
@@ -83,19 +87,32 @@ export const CornerCoachWidget: React.FC<CornerCoachWidgetProps> = ({
       {/* ===================================================================== */}
       {/* MOBILE COMPACT CIRCULAR FAB (< 1024px): 56x56px touch target          */}
       {/* ===================================================================== */}
-      <button
-        type="button"
-        onClick={handleLaunch}
-        className="lg:hidden w-14 h-14 rounded-full border-2 border-[#E09B30] bg-[#132642] shadow-[0_4px_20px_rgba(224,155,48,0.4)] flex items-center justify-center relative group cursor-pointer focus:outline-none overflow-hidden"
-        aria-label={isEs ? 'Abrir Laboratorio de Voz con Emma' : 'Open Voice Lab with Emma'}
-      >
-        <ChibiAvatar
-          character="emma"
-          state="speaking"
-          className="w-16 h-16 translate-y-1.5 group-hover:scale-110 transition-transform"
-        />
-        <span className="absolute top-1 right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#132642] animate-pulse" />
-      </button>
+      <div className="lg:hidden relative">
+        <button
+          type="button"
+          onClick={handleLaunch}
+          className="w-14 h-14 rounded-full border-2 border-[#E09B30] bg-[#132642] shadow-[0_4px_20px_rgba(224,155,48,0.4)] flex items-center justify-center relative group cursor-pointer focus:outline-none overflow-hidden"
+          aria-label={isEs ? 'Abrir Laboratorio de Voz con Emma' : 'Open Voice Lab with Emma'}
+        >
+          <ChibiAvatar
+            character="emma"
+            state="speaking"
+            className="w-16 h-16 translate-y-1.5 group-hover:scale-110 transition-transform"
+          />
+          <span className="absolute top-1 right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#132642] animate-pulse" />
+        </button>
+
+        {/* Mobile dismiss button */}
+        <button
+          type="button"
+          onClick={() => setIsDismissed(true)}
+          className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-[#132642] border border-[#A7C7E7]/50 text-[#A7C7E7] hover:text-[#FAFAFA] flex items-center justify-center text-xs shadow-md cursor-pointer z-10"
+          title={isEs ? 'Descartar' : 'Dismiss'}
+          aria-label="Dismiss coach widget"
+        >
+          <X size={10} />
+        </button>
+      </div>
 
       {/* ===================================================================== */}
       {/* DESKTOP EXPANDED PILL (>= 1024px): Full Interactive Diagnostic Banner  */}

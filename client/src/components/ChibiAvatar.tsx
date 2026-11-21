@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { withVersion } from '../utils/assetUrl';
 
 export type ChibiCharacter = 'ivan' | 'emma' | 'teacher-ivan';
 export type ChibiState = 'idle' | 'listening' | 'speaking';
@@ -37,7 +38,7 @@ export const ChibiAvatar: React.FC<ChibiAvatarProps> = ({
       return;
     }
 
-    fetch(assetPath)
+    fetch(withVersion(assetPath))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.text();

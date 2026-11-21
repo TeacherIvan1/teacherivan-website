@@ -122,14 +122,14 @@ export const translations = {
       teacherIvan: {
         id: 'teacher-ivan',
         name: 'Teacher Ivan',
-        voiceLabel: 'Male Voice (Puck)',
+        voiceLabel: 'Male Voice',
         role: 'Charismatic Pedagogical Mentor',
         desc: 'Empathetic, charismatic, and structured pedagogical guidance.',
       },
       emma: {
         id: 'emma',
         name: 'Emma',
-        voiceLabel: 'Female Voice (Aoede)',
+        voiceLabel: 'Female Voice',
         role: 'Friendly Conversational Coach',
         desc: 'Warm, encouraging practice for spontaneous daily conversation.',
       },
@@ -1181,14 +1181,14 @@ export const translations = {
       teacherIvan: {
         id: 'teacher-ivan',
         name: 'Teacher Ivan',
-        voiceLabel: 'Voz Masculina (Puck)',
+        voiceLabel: 'Voz Masculina',
         role: 'Mentor Pedagógico Carismático',
         desc: 'Orientación pedagógica empática, carismática y estructurada.',
       },
       emma: {
         id: 'emma',
         name: 'Emma',
-        voiceLabel: 'Voz Femenina (Aoede)',
+        voiceLabel: 'Voz Femenina',
         role: 'Coach Conversacional Amigable',
         desc: 'Práctica cálida y motivadora para conversación cotidiana espontánea.',
       },

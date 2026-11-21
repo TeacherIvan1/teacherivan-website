@@ -341,7 +341,7 @@ export const LandingPageView: React.FC = () => {
                   <span className="font-mono text-xs font-bold text-[#B91C1C] dark:text-[#FCA5A5] uppercase tracking-wider">
                     {isEs ? '[01 // ACADEMIAS TRADICIONALES]' : '[01 // TRADITIONAL ACADEMIES]'}
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300 text-[11px] font-montserrat font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-950/40 text-red-900 dark:text-red-300 text-[11px] font-montserrat font-bold">
                     {isEs ? '30% HABLA' : '30% STT'}
                   </span>
                 </div>
@@ -457,7 +457,7 @@ export const LandingPageView: React.FC = () => {
                   <span className="font-mono text-xs font-bold text-[#047857] dark:text-[#34D399] uppercase tracking-wider">
                     {isEs ? '[03 // INMERSIÓN 24/7 Y MICRO-SPRINTS]' : '[03 // 24/7 VOICE IMMERSION & MICRO-SPRINTS]'}
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-[#047857] dark:text-[#34D399] text-[11px] font-montserrat font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-950 dark:text-[#34D399] text-[11px] font-montserrat font-bold">
                     {isEs ? '95% RETENCIÓN' : '95% RETENTION'}
                   </span>
                 </div>
@@ -516,7 +516,7 @@ export const LandingPageView: React.FC = () => {
       {/* ========================================================================= */}
       <section
         id="chapter-2-voicelab"
-        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[#1A3153] text-[#FAFAFA] border-b border-[#A7C7E7]/25"
+        className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[var(--bg-canvas)] text-[var(--text-primary)] border-b border-[var(--border-hairline)]"
       >
         <div id="flagship-simulator-section" className="max-w-6xl mx-auto w-full space-y-10">
           {/* Architectural Chapter Header */}
@@ -526,15 +526,15 @@ export const LandingPageView: React.FC = () => {
               <span>{lp.ch2Badge}</span>
             </div>
 
-            <div className="font-mono text-xs text-[#A7C7E7] uppercase tracking-wider">
+            <div className="font-mono text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] uppercase tracking-wider">
               {isEs ? 'LABORATORIO DE VOZ 24/7' : '24/7 VOICE LAB'}
             </div>
 
-            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#FAFAFA] tracking-tight">
+            <h2 className="font-montserrat font-extrabold text-2xl sm:text-3xl md:text-4xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
               {lp.ch2Title}
             </h2>
 
-            <p className="font-inter text-sm sm:text-base text-[#A7C7E7] leading-relaxed">
+            <p className="font-inter text-sm sm:text-base text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
               {lp.ch2Subtitle}
             </p>
           </div>
@@ -545,17 +545,17 @@ export const LandingPageView: React.FC = () => {
           </div>
 
           {/* Embedded Interactive Simulator Console */}
-          <div className="slab-3d-dark rounded-3xl border-2 border-[#A7C7E7]/30 shadow-2xl overflow-hidden p-2 sm:p-5">
+          <div className="slab-3d-dark rounded-3xl border-2 border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 shadow-2xl overflow-hidden p-2 sm:p-5 bg-[var(--bg-surface)] dark:bg-[#12223a]">
             <CompactVoiceSimulator />
           </div>
 
           {/* Locked Scenarios / Sign-Up Prompt Banner */}
-          <div className="p-5 rounded-2xl bg-[#12223a]/80 border border-[#A7C7E7]/25 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="p-5 rounded-2xl bg-[var(--bg-surface)] dark:bg-[#12223a]/80 border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div className="space-y-1">
-              <span className="text-xs font-montserrat font-bold text-[#E09B30] uppercase tracking-wider block">
+              <span className="text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] uppercase tracking-wider block">
                 {isEs ? '¿Quieres desbloquear todos los escenarios y tu ruta de 5 días?' : 'Want to unlock all scenarios and your 5-day path?'}
               </span>
-              <p className="text-xs text-[#A7C7E7]">
+              <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7]">
                 {isEs
                   ? 'Crea tu cuenta de estudiante gratis en 2 pasos para guardar tu progreso y agendar con Teacher Ivan.'
                   : 'Create your free student account in 2 steps to track your progress and book with Teacher Ivan.'}
@@ -565,7 +565,7 @@ export const LandingPageView: React.FC = () => {
             <button
               type="button"
               onClick={() => openAuthModal('signup')}
-              className="px-6 py-2.5 rounded-full bg-[#1A3153] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 text-xs font-montserrat font-bold text-[#FAFAFA] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap shadow-md"
+              className="px-6 py-2.5 rounded-full bg-[#1A3153] dark:bg-[#E09B30] hover:bg-[#E09B30] hover:text-[#1A3153] border border-[#A7C7E7]/40 text-xs font-montserrat font-bold text-[#FAFAFA] dark:text-[#1A3153] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap shadow-md"
             >
               {isEs ? 'Crear Cuenta Gratis →' : 'Create Free Account →'}
             </button>
