@@ -16,8 +16,55 @@
  */
 
 import { google, sheets_v4 } from 'googleapis';
+import crypto from 'crypto';
 import { User, userStore, StudentPlan, LearningGoals } from './userStore.js';
 import { Booking, bookingStore, BookingStartTime, BookingEndTime } from './bookingStore.js';
+
+export function sanitizeSheetId(input: string | undefined): string | null {
+  if (!input) return null;
+  const trimmed = input.trim();
+  const urlMatch = trimmed.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (urlMatch && urlMatch[1]) {
+    return urlMatch[1];
+  }
+  return trimmed;
+}
+
+export function sanitizePrivateKey(rawKey: string | undefined): string | null {
+  if (!rawKey) return null;
+  let keyStr = rawKey.trim();
+  if ((keyStr.startsWith('"') && keyStr.endsWith('"')) || (keyStr.startsWith("'") && keyStr.endsWith("'"))) {
+    keyStr = keyStr.slice(1, -1);
+  }
+  keyStr = keyStr.replace(/\\n/g, '\n');
+
+  const lines = keyStr.split('\n');
+  const cleanedLines: string[] = [];
+  let inKey = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (trimmed.includes('BEGIN PRIVATE KEY') || trimmed.includes('END PRIVATE KEY')) {
+      cleanedLines.push(trimmed);
+      inKey = trimmed.includes('BEGIN PRIVATE KEY');
+    } else if (inKey) {
+      cleanedLines.push(trimmed.replace(/\s+/g, ''));
+    } else {
+      cleanedLines.push(trimmed);
+    }
+  }
+
+  const cleanedPem = cleanedLines.join('\n');
+
+  try {
+    crypto.createPrivateKey(cleanedPem);
+    return cleanedPem;
+  } catch (err) {
+    console.error('[GoogleDbService] Invalid private key PEM format:', err instanceof Error ? err.message : String(err));
+    return null;
+  }
+}
 
 export const USER_SHEET_HEADERS = [
   'ID',
@@ -83,9 +130,12 @@ export class GoogleDbService {
   }
 
   private initClient(): boolean {
-    const sheetId = process.env.GOOGLE_SHEET_ID;
-    const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-    let privateKey = process.env.GOOGLE_PRIVATE_KEY;
+    const rawSheetId = process.env.GOOGLE_SHEET_ID;
+    const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+    const rawPrivateKey = process.env.GOOGLE_PRIVATE_KEY;
+
+    const sheetId = sanitizeSheetId(rawSheetId);
+    const privateKey = sanitizePrivateKey(rawPrivateKey);
 
     if (!sheetId || !clientEmail || !privateKey) {
       this.sheetsClient = null;
@@ -95,7 +145,6 @@ export class GoogleDbService {
     }
 
     try {
-      privateKey = privateKey.replace(/\\n/g, '\n');
       const auth = new google.auth.JWT({
         email: clientEmail,
         key: privateKey,
@@ -215,9 +264,13 @@ export class GoogleDbService {
 
       this.isInitialized = true;
       return true;
-    } catch (err) {
+    } catch (err: any) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn('[GoogleDbService] Notice ensuring tabs exist:', msg);
+      if (err?.code === 403 || msg.includes('403') || msg.toLowerCase().includes('permission')) {
+        console.error(`[GoogleDbService] 403 Permission Denied: Please share the Google Sheet (${this.spreadsheetId}) with ${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'teacher-ivan-users@gemini-auto-project-515422.iam.gserviceaccount.com'} as Editor!`);
+      } else {
+        console.warn('[GoogleDbService] Notice ensuring tabs exist:', msg);
+      }
       this.lastError = msg;
       return false;
     }
@@ -450,9 +503,13 @@ export class GoogleDbService {
         bookingCount: bookingStore.getAllBookings().length,
         lastSyncTime: new Date(this.lastSyncTimestamp).toISOString(),
       };
-    } catch (err) {
+    } catch (err: any) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn('[GoogleDbService] syncFromGoogleDb notice:', msg);
+      if (err?.code === 403 || msg.includes('403') || msg.toLowerCase().includes('permission')) {
+        console.error(`[GoogleDbService] 403 Permission Denied: Please share the Google Sheet (${this.spreadsheetId}) with ${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'teacher-ivan-users@gemini-auto-project-515422.iam.gserviceaccount.com'} as Editor!`);
+      } else {
+        console.warn('[GoogleDbService] syncFromGoogleDb notice:', msg);
+      }
       this.lastError = msg;
       return {
         synced: false,

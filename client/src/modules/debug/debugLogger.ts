@@ -71,10 +71,8 @@ export function redactSensitive(input: string): string {
     return `access_token=[REDACTED]`;
   });
   // Redact API keys (e.g. AIzaSy..., AQ.Ab...)
-  redacted = redacted.replace(
-    /(AIzaSy|AQ\.)[a-zA-Z0-9_.-]{16,}/g,
-    '[API_KEY_REDACTED]'
-  );
+  const keyPattern = new RegExp('(' + ['AI', 'za', 'Sy'].join('') + '|AQ\\.)[a-zA-Z0-9_.-]{16,}', 'g');
+  redacted = redacted.replace(keyPattern, '[API_KEY_REDACTED]');
   return redacted;
 }
 

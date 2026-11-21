@@ -123,8 +123,6 @@ export const StudentAuthModal: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAuthModalOpen, closeAuthModal, isLoading]);
 
-  if (!isAuthModalOpen) return null;
-
   const isCompletingProfile = authModalMode === 'complete_google_profile';
   const isSignInMode = authModalMode === 'signin';
   const isRecoverMode = authModalMode === 'recover_password';
@@ -424,6 +422,8 @@ export const StudentAuthModal: React.FC = () => {
       if (intervalId) clearInterval(intervalId);
     };
   }, [isAuthModalOpen, step, isSignInMode, isRecoverMode, isDark, isEs]);
+
+  if (!isAuthModalOpen) return null;
 
   return (
     <div

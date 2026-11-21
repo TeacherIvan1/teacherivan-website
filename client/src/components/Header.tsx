@@ -679,6 +679,7 @@ export const Header: React.FC = () => {
               {/* Secondary Action */}
               {!isAuthenticated ? (
                 <button
+                  id="mobile-drawer-auth-btn"
                   type="button"
                   onClick={() => {
                     setIsMobileDrawerOpen(false);
