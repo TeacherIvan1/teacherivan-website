@@ -2027,7 +2027,7 @@ export const translations = {
       slotHours: '14:00 a 20:00',
     },
     landingPage: {
-      heroHeadline: 'Hablá inglés con fluidez y sin bloqueos al conversar.',
+      heroHeadline: 'Habla inglés con fluidez y sin bloqueos al conversar.',
       heroSubhead: 'Combina práctica de voz 24/7 con clases 1-a-1 en vivo junto a Teacher Ivan.',
       heroPrimaryCta: 'Probar mi nivel de voz gratis',
       heroFrictionReducer: 'Diagnóstico de voz de 90s gratis • Sin registro previo',

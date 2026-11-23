@@ -199,13 +199,13 @@ export const CompactVoiceSimulator: React.FC = () => {
       {/* 1. Header & Live Indicator */}
       <div className="flex items-center justify-between gap-3 pb-2 border-b border-[#A7C7E7]/20">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-[10px] font-montserrat font-bold uppercase tracking-wider mb-1">
-            <Radio size={11} className="text-[#10b981] animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EEF3F8] dark:bg-[#E09B30]/15 border border-[#1A3153]/15 dark:border-[#E09B30]/30 text-[#9A6515] dark:text-[#E09B30] text-[10px] font-montserrat font-bold uppercase tracking-wider mb-1">
+            <Radio size={11} className="text-[#10b981] animate-pulse" aria-hidden="true" />
             <span>{isEs ? 'Laboratorio de Voz 24/7 • Audio Natural' : '24/7 Voice Lab • Natural Audio'}</span>
           </div>
-          <h1 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
+          <h3 className="font-montserrat font-extrabold text-xl sm:text-2xl text-[var(--text-primary)] dark:text-[#FAFAFA] tracking-tight">
             {t.compactSimulator.title}
-          </h1>
+          </h3>
         </div>
 
         {/* Timer, Reconnecting Pill, Quota Badge or Status */}

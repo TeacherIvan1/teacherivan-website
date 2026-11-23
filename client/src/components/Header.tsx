@@ -33,6 +33,16 @@ export const Header: React.FC = () => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
   useScrollLock(isMobileDrawerOpen);
   const { theme, isDark, toggleTheme } = useTheme();
+
+  // Escape key dismissal for mobile navigation drawer (WCAG 2.1.1)
+  useEffect(() => {
+    if (!isMobileDrawerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMobileDrawerOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileDrawerOpen]);
   const status = useConversationStore((s) => s.status);
   const { t, isEs } = useTranslation();
   const openAssessmentModal = useAssessmentStore((s) => s.openAssessmentModal);
@@ -114,6 +124,7 @@ export const Header: React.FC = () => {
           {/* Left: BrandWordmark (Teacher in Montserrat + Ivan in Mr Dafoe) */}
           <BrandWordmark
             isMobile={true}
+            surface={isDark ? 'dark' : 'light'}
             onClick={() => {
               if (isAuthenticated) {
                 setActiveView('path');
@@ -183,6 +194,7 @@ export const Header: React.FC = () => {
           {/* Left: BrandWordmark (Teacher in Montserrat + Ivan in Mr Dafoe) */}
           <BrandWordmark
             isMobile={false}
+            surface={isDark ? 'dark' : 'light'}
             onClick={() => {
               if (isAuthenticated) {
                 setActiveView('path');

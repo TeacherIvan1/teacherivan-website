@@ -137,7 +137,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
           {/* Two-Tone H1 */}
           <h1 className="font-montserrat font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight">
             <span className="text-[var(--text-primary)] block">
-              {isEs ? 'Hablá inglés con fluidez' : 'Speak English fluently'}
+              {isEs ? 'Habla inglés con fluidez' : 'Speak English fluently'}
             </span>
             <span className="text-[var(--text-secondary)] block font-bold">
               {isEs ? 'y sin bloqueos al conversar.' : 'without freezing in conversations.'}

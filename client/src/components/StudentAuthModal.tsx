@@ -73,6 +73,16 @@ export const StudentAuthModal: React.FC = () => {
   // Lock background page scroll (DOM + Lenis) whenever AuthModal is open
   useScrollLock(isAuthModalOpen);
 
+  // Escape key dismissal for StudentAuthModal (WCAG 2.1.1)
+  useEffect(() => {
+    if (!isAuthModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeAuthModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAuthModalOpen, closeAuthModal]);
+
   // Wizard Step (1: Account Credentials, 2: Learning Goals)
   const [step, setStep] = useState<1 | 2>(1);
   const googleBtnContainerRef = useRef<HTMLDivElement>(null);

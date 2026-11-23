@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ShieldCheck, FileText, X, MessageCircle, Mail, SlidersHorizontal } from 'lucide-react';
 import { useCookieConsent } from '../context/CookieConsentContext';
 import { useTranslation } from '../modules/i18n/languageStore';
@@ -11,6 +11,15 @@ export const LegalModal: React.FC = () => {
 
   const isOpen = activeLegalModal !== null;
   useScrollLock(isOpen);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLegalModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, closeLegalModal]);
 
   if (!isOpen) return null;
 
@@ -65,10 +74,10 @@ export const LegalModal: React.FC = () => {
             id="close-legal-modal-btn"
             type="button"
             onClick={closeLegalModal}
-            className="w-9 h-9 rounded-full bg-[#1A3153]/10 dark:bg-[#091326] hover:bg-[#E09B30] hover:text-[#091326] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 rounded-full bg-[#1A3153]/10 dark:bg-[#091326] hover:bg-[#E09B30] hover:text-[#091326] flex items-center justify-center transition-colors cursor-pointer shrink-0"
             aria-label={isEs ? 'Cerrar' : 'Close'}
           >
-            <X size={18} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 

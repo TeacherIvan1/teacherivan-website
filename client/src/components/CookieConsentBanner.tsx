@@ -30,6 +30,15 @@ export const CookieConsentBanner: React.FC = () => {
 
   useScrollLock(isPreferencesModalOpen);
 
+  useEffect(() => {
+    if (!isPreferencesModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeCookiePreferences();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPreferencesModalOpen, closeCookiePreferences]);
+
   if (!isBannerVisible && !isPreferencesModalOpen) {
     return null;
   }
@@ -114,7 +123,7 @@ export const CookieConsentBanner: React.FC = () => {
                 id="cookie-manage-btn"
                 type="button"
                 onClick={openCookiePreferences}
-                className="min-h-[42px] px-4 py-2 rounded-full text-xs font-montserrat font-bold text-[#A7C7E7] hover:text-[#FAFAFA] border border-[#A7C7E7]/40 hover:border-[#A7C7E7] transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="min-h-[44px] px-4 py-2 rounded-full text-xs font-montserrat font-bold text-[#FAFAFA] hover:text-[#E09B30] border border-[#A7C7E7]/45 hover:border-[#E09B30] transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <SlidersHorizontal size={13} />
                 <span>{isEs ? 'Configurar' : 'Manage Preferences'}</span>

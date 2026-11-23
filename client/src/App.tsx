@@ -32,7 +32,7 @@ import { useNavigationStore } from './modules/navigation/navigationStore';
 import { useAuthStore, purgeLegacyAuthTokens } from './modules/auth/authStore';
 
 export const App: React.FC = () => {
-  const { t, isEs } = useTranslation();
+  const { t, lang, isEs } = useTranslation();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
   const { activeView } = useNavigationStore();
   const { user, isAuthenticated, syncWithServer } = useAuthStore();
@@ -40,6 +40,11 @@ export const App: React.FC = () => {
 
   const isAdmin = user?.role === 'admin';
   const showDevMode = isAdmin && isDeveloperMode;
+
+  // Keep <html lang="..."> synchronized with active bilingual locale (WCAG 3.1.1)
+  useEffect(() => {
+    document.documentElement.lang = lang === 'en' ? 'en' : 'es';
+  }, [lang]);
 
   useEffect(() => {
     // 0. Scrub any legacy auth/JWT tokens from localStorage/sessionStorage immediately on boot
@@ -79,6 +84,11 @@ export const App: React.FC = () => {
   return (
     <CookieConsentProvider>
       <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col font-inter transition-colors duration-200">
+        {/* WCAG 2.4.1 Bypass Blocks: Visible-on-focus skip link */}
+        <a href="#main-content" className="skip-to-main-link">
+          {isEs ? 'Saltar al contenido principal' : 'Skip to main content'}
+        </a>
+
         {/* Forced Client-Side Auto-Update for Returning Devices */}
         <VersionWatcher />
 
@@ -97,7 +107,7 @@ export const App: React.FC = () => {
         {/* Authenticated Student Workspace Header */}
         {isAuthenticated && <Header />}
 
-        <main className="flex-1 flex flex-col">
+        <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col focus:outline-none">
           {/* ========================================================================= */}
           {/* NON-REGISTERED (GUEST) VIEW: AURAGATE-INSPIRED PORTAL ZOOM LANDING PAGE   */}
           {/* ========================================================================= */}
