@@ -6,14 +6,11 @@ on:
       - main
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: 'pages'
   cancel-in-progress: false
@@ -29,7 +26,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -45,9 +42,7 @@ jobs:
         run: npm run build -w client
         env:
           VITE_API_URL: https://teacherivan-website.onrender.com
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || '454494230896-b0s8djtejacphfblmiik31nj6roajhch.apps.googleusercontent.com' }}
-          VITE_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL }}
-          VITE_GA4_MEASUREMENT_ID: ${{ secrets.VITE_GA4_MEASUREMENT_ID }}
+          VITE_GOOGLE_CLIENT_ID: 454494230896-b0s8djtejacphfblmiik31nj6roajhch.apps.googleusercontent.com
 
       - name: Verify build artifacts security scan (dist)
         run: npm run security:scan

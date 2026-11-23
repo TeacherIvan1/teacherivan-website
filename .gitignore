@@ -95,4 +95,7 @@ output/
 *.wav
 image_*.png
 image_*.jpg
-WhatsApp*
+WhatsApp*.mp4
+WhatsApp*.jpg
+WhatsApp*.jpeg
+WhatsApp*.png

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Users, RefreshCw, Mail, Calendar, Globe, Award, Download, CheckCircle2, Phone, Sparkles, FileSpreadsheet } from 'lucide-react';
 import { getApiUrl } from '../config/api';
-import { UserProfile, StudentPlan } from '../modules/auth/types';
+import { UserProfile, StudentPlan, AuthState } from '../modules/auth/types';
 import { useAuthStore } from '../modules/auth/authStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { syncAndHealAdminData, saveAdminRosterVault } from '../modules/auth/vaultSync';
@@ -23,8 +23,8 @@ export const RegisteredStudentsTable: React.FC = () => {
   const [isSyncingSheets, setIsSyncingSheets] = useState(false);
   const [sheetsNotice, setSheetsNotice] = useState<string | null>(null);
   const { isEs } = useTranslation();
-  const updateUserPlan = useAuthStore((s) => s.updateUserPlan);
-  const currentUser = useAuthStore((s) => s.user);
+  const updateUserPlan = useAuthStore((s: AuthState) => s.updateUserPlan);
+  const currentUser = useAuthStore((s: AuthState) => s.user);
 
   const fetchSheetsStatus = async () => {
     try {
