@@ -1,14 +1,14 @@
 import { AudioStreamConfig, AudioManagerState, AudioStats } from './types';
 import { QueuedAudioPlayer } from './queuedAudioPlayer';
-import { createAudioWorkletBlobUrl, arrayBufferToBase64 } from './audioWorkletProcessorCode';
+import { PCM_WORKLET_PROCESSOR_NAME, arrayBufferToBase64 } from './audioWorkletProcessorCode';
 import { debugLog, useDebugStore } from '../debug/debugLogger';
 
 /**
  * AudioManager
  * -------------------------------------------------------------
  * Manages full bidirectional audio streaming for Gemini Live API:
- * 1. Captures microphone audio using an AudioWorkletNode.
- * 2. Emits raw 16kHz 16-bit linear PCM little-endian mono base64 chunks.
+ * 1. Captures microphone audio using a static same-origin AudioWorkletNode (/worklets/pcm-processor.js).
+ * 2. Emits raw 16kHz 16-bit linear PCM little-endian mono base64 chunks every 20ms (320 samples).
  * 3. Plays model audio responses (24kHz PCM) using the QueuedAudioPlayer.
  * 4. Provides real-time microphone RMS volume monitoring and barge-in cutoff.
  */
@@ -18,7 +18,7 @@ export class AudioManager {
     inputSampleRate: 16000,
     outputSampleRate: 24000,
     channels: 1,
-    chunkSize: 2048,
+    chunkSize: 320, // 20ms low-latency frame at 16kHz
   };
 
   private inputContext: AudioContext | null = null;
@@ -32,10 +32,9 @@ export class AudioManager {
   private currentMicLevel: number = 0;
   private isMuted: boolean = false;
   private statsListeners: Set<(stats: AudioStats) => void> = new Set();
-  private workletUrl: string | null = null;
 
   constructor() {
-    this.queuedPlayer.onPlaybackStateChange = (isPlaying) => {
+    this.queuedPlayer.onPlaybackStateChange = () => {
       this.notifyStats();
     };
   }
@@ -72,7 +71,7 @@ export class AudioManager {
   }
 
   /**
-   * Initializes playback audio pipeline and prepares AudioWorklet module.
+   * Initializes playback audio pipeline.
    */
   public async initialize(): Promise<void> {
     if (this.state === 'initializing') return;
@@ -92,14 +91,13 @@ export class AudioManager {
   }
 
   /**
-   * Starts capturing microphone audio using AudioWorklet.
-   * Chunks are resampled to 16kHz linear PCM 16-bit mono and emitted as base64.
+   * Starts capturing microphone audio using the static same-origin AudioWorklet.
+   * Chunks are resampled to 16kHz linear PCM 16-bit mono (20ms / 320 samples) and emitted immediately.
    */
   public async startRecording(onAudioChunk?: (pcmBase64: string) => void): Promise<void> {
     try {
       await this.initialize();
 
-      // Check microphone permission if Permissions API is available
       if (navigator.permissions && navigator.permissions.query) {
         try {
           const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName });
@@ -111,7 +109,6 @@ export class AudioManager {
       }
 
       debugLog('audio', 'info', 'Requesting getUserMedia audio stream...');
-      // Request microphone access with acoustic echo cancellation
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
@@ -128,48 +125,52 @@ export class AudioManager {
       debugLog('audio', 'success', `Microphone stream acquired! Track: "${audioTrack?.label || 'Default'}"`, trackSettings);
 
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.inputContext = new AudioCtx({ sampleRate: 16000 });
+      const audioContext = new AudioCtx({ sampleRate: 16000 });
+      this.inputContext = audioContext;
 
-      useDebugStore.getState().setAudioInfo(this.inputContext.state, this.inputContext.sampleRate);
-      debugLog('audio', 'info', `Input AudioContext created: state=${this.inputContext.state}, sampleRate=${this.inputContext.sampleRate}Hz`);
+      useDebugStore.getState().setAudioInfo(audioContext.state, audioContext.sampleRate);
+      debugLog('audio', 'info', `Input AudioContext created: state=${audioContext.state}, sampleRate=${audioContext.sampleRate}Hz`);
 
-      if (this.inputContext.state === 'suspended') {
+      if (audioContext.state === 'suspended') {
         debugLog('audio', 'info', 'Resuming suspended AudioContext...');
-        await this.inputContext.resume();
-        useDebugStore.getState().setAudioInfo(this.inputContext.state, this.inputContext.sampleRate);
-        debugLog('audio', 'info', `Input AudioContext resumed: state=${this.inputContext.state}`);
+        await audioContext.resume();
+        useDebugStore.getState().setAudioInfo(audioContext.state, audioContext.sampleRate);
+        debugLog('audio', 'info', `Input AudioContext resumed: state=${audioContext.state}`);
       }
 
-      // Load AudioWorklet module from Blob URL
-      if (!this.workletUrl) {
-        this.workletUrl = createAudioWorkletBlobUrl();
-      }
-      debugLog('audio', 'info', 'Loading AudioWorklet module (gemini-audio-processor)...');
-      await this.inputContext.audioWorklet.addModule(this.workletUrl);
-      debugLog('audio', 'success', 'AudioWorklet module loaded successfully!');
+      // Load static same-origin AudioWorklet module (zero blob: URL usage)
+      const workletUrl = `${import.meta.env.BASE_URL}worklets/pcm-processor.js`;
+      debugLog('audio', 'info', `Loading static AudioWorklet module (${workletUrl})...`);
+      await audioContext.audioWorklet.addModule(workletUrl);
+      debugLog('audio', 'success', 'Static AudioWorklet module loaded successfully!');
 
-      // Create audio graph
-      this.sourceNode = this.inputContext.createMediaStreamSource(this.mediaStream);
-      this.workletNode = new AudioWorkletNode(this.inputContext, 'gemini-audio-processor');
+      this.sourceNode = audioContext.createMediaStreamSource(this.mediaStream);
+      this.workletNode = new AudioWorkletNode(audioContext, PCM_WORKLET_PROCESSOR_NAME);
 
       this.workletNode.port.onmessage = (event: MessageEvent) => {
-        const { pcm16, level } = event.data as { pcm16: ArrayBuffer; level: number };
+        const data = event.data as { pcm?: ArrayBuffer; pcm16?: ArrayBuffer; rms?: number; level?: number };
+        const pcmBuffer = data.pcm || data.pcm16;
+        const computedLevel =
+          typeof data.level === 'number'
+            ? data.level
+            : typeof data.rms === 'number'
+            ? Math.min(100, Math.round(data.rms * 140))
+            : 0;
 
-        this.currentMicLevel = this.isMuted ? 0 : (level || 0);
+        this.currentMicLevel = this.isMuted ? 0 : computedLevel;
         this.notifyStats();
 
-        if (this.isMuted || !onAudioChunk) return;
+        if (this.isMuted || !onAudioChunk || !pcmBuffer) return;
 
-        const base64Chunk = arrayBufferToBase64(pcm16);
+        // Stream each 20ms Int16 PCM frame immediately without client-side batch buffering
+        const base64Chunk = arrayBufferToBase64(pcmBuffer);
         this.chunksSent++;
         this.notifyStats();
         onAudioChunk(base64Chunk);
       };
 
       this.sourceNode.connect(this.workletNode);
-      debugLog('audio', 'success', 'Audio graph connected: MediaStream -> AudioWorkletNode. Streaming chunks.');
-      // Connect to destination through a zero gain or keep worklet active
-      // AudioWorkletNode is self-running in modern browsers, but connecting ensures clocking
+      debugLog('audio', 'success', 'Audio graph connected: MediaStream -> AudioWorkletNode (20ms low-latency frames).');
 
       this.state = this.isMuted ? 'muted' : 'recording';
       this.notifyStats();
@@ -219,7 +220,6 @@ export class AudioManager {
 
   /**
    * Plays a returned 24kHz PCM chunk through the queued player.
-   * If a turnId is passed and matches an old or interrupted turn, it is discarded.
    */
   public async playChunk(pcmBase64: string, turnId?: number): Promise<boolean> {
     this.chunksReceived++;
@@ -229,16 +229,12 @@ export class AudioManager {
 
   /**
    * Immediately stops playback and rejects future late chunks for the current turn.
-   * Invoked on barge-in / interruption.
    */
   public interrupt(): void {
     this.queuedPlayer.interrupt();
     this.notifyStats();
   }
 
-  /**
-   * Stops playback immediately.
-   */
   public stopPlayback(): void {
     this.queuedPlayer.stop();
     this.notifyStats();
@@ -252,9 +248,6 @@ export class AudioManager {
     this.queuedPlayer.onFirstChunkPlayed = cb;
   }
 
-  /**
-   * Toggles microphone mute.
-   */
   public setMute(muted: boolean): void {
     this.isMuted = muted;
     if (this.mediaStream) {
@@ -304,12 +297,6 @@ export class AudioManager {
   public close(): void {
     this.stopRecording();
     this.queuedPlayer.close();
-    if (this.workletUrl) {
-      try {
-        URL.revokeObjectURL(this.workletUrl);
-      } catch {}
-      this.workletUrl = null;
-    }
     this.chunksSent = 0;
     this.chunksReceived = 0;
     this.currentMicLevel = 0;
@@ -319,5 +306,4 @@ export class AudioManager {
   }
 }
 
-// Singleton audio manager instance ready for export
 export const audioManager = new AudioManager();

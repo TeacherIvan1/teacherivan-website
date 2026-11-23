@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Lock,
   Phone,
-  KeyRound,
   ArrowRight,
   ArrowLeft,
   Award,
@@ -24,10 +23,12 @@ import { SUPPORTED_COUNTRIES, SupportedCountry, LearningGoals } from '../modules
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
-import { getEnvVar, getApiUrl } from '../config/api';
+import { getApiUrl } from '../config/api';
 import { GOOGLE_CLIENT_ID } from '../config/auth';
 import { useTheme } from '../modules/theme/ThemeContext';
-import { Button, Badge, Card, TextInput, Field, FormWizard } from '../design-system/astryx';
+import { useScrollLock } from '../hooks/useScrollLock';
+import { useCookieConsent } from '../context/CookieConsentContext';
+import { buildWhatsAppUrl, handleWhatsAppClick } from '../utils/whatsapp';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1 / IELTS'] as const;
 
@@ -65,8 +66,12 @@ export const StudentAuthModal: React.FC = () => {
 
   const { t, isEs } = useTranslation();
   const { isDark } = useTheme();
+  const { openLegalModal } = useCookieConsent();
   const setPersonalizedSprint = useSprintStore((s) => s.setPersonalizedSprint);
   const setActiveView = useNavigationStore((s) => s.setActiveView);
+
+  // Lock background page scroll (DOM + Lenis) whenever AuthModal is open
+  useScrollLock(isAuthModalOpen);
 
   // Wizard Step (1: Account Credentials, 2: Learning Goals)
   const [step, setStep] = useState<1 | 2>(1);
@@ -80,6 +85,9 @@ export const StudentAuthModal: React.FC = () => {
   const [password, setPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [country, setCountry] = useState<SupportedCountry | ''>('Bolivia');
+
+  // Mandatory Legal Consent Checkbox (starts unchecked)
+  const [legalAccepted, setLegalAccepted] = useState<boolean>(false);
 
   // Recover Password fields
   const [recoverUsername, setRecoverUsername] = useState('');
@@ -101,6 +109,7 @@ export const StudentAuthModal: React.FC = () => {
       setStep(1);
       setValidationError(null);
       setRecoverSuccess(null);
+      setLegalAccepted(false);
     }
   }, [isAuthModalOpen, authModalMode]);
 
@@ -174,6 +183,14 @@ export const StudentAuthModal: React.FC = () => {
       setValidationError(isEs ? 'Por favor selecciona tu país de residencia.' : 'Please select your country of residence.');
       return;
     }
+    if (!legalAccepted) {
+      setValidationError(
+        isEs
+          ? 'Debes aceptar la Política de Privacidad y la Política de Cookies para continuar.'
+          : 'You must agree to the Privacy Policy and Cookie Policy to continue.'
+      );
+      return;
+    }
 
     setStep(2);
   };
@@ -205,6 +222,15 @@ export const StudentAuthModal: React.FC = () => {
       return;
     }
 
+    if (!legalAccepted) {
+      setValidationError(
+        isEs
+          ? 'Debes aceptar la Política de Privacidad y la Política de Cookies para completar tu registro.'
+          : 'You must agree to the Privacy Policy and Cookie Policy to complete registration.'
+      );
+      return;
+    }
+
     const learningGoals: LearningGoals = {
       targetLevel,
       primaryGoal,
@@ -218,8 +244,8 @@ export const StudentAuthModal: React.FC = () => {
           email: trimmedEmail,
           fullName: trimmedName,
           phoneNumber: trimmedPhone,
-          dateOfBirth,
-          country,
+          dateOfBirth: dateOfBirth || '2000-01-01',
+          country: country || 'Bolivia',
           learningGoals,
           profileCompleted: true,
         });
@@ -241,6 +267,7 @@ export const StudentAuthModal: React.FC = () => {
       try {
         const res = await fetch(getApiUrl('/api/curriculum/generate-sprint'), {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ learningGoals }),
         });
@@ -255,7 +282,6 @@ export const StudentAuthModal: React.FC = () => {
         console.warn('[StudentAuthModal] Sprint generator warning:', genErr);
       }
 
-      // Automatically navigate to My Path tab
       setActiveView('path' as any);
     } catch {
       // Error handled in store
@@ -382,7 +408,7 @@ export const StudentAuthModal: React.FC = () => {
     if (!isAuthModalOpen || step !== 1 || isRecoverMode) return;
 
     let retryCount = 0;
-    const maxRetries = 20; // 20 * 250ms = 5s
+    const maxRetries = 20;
     let intervalId: any = null;
 
     const renderGis = () => {
@@ -425,10 +451,94 @@ export const StudentAuthModal: React.FC = () => {
 
   if (!isAuthModalOpen) return null;
 
+  const renderLegalConsentCheckbox = (idSuffix: string) => (
+    <div className="pt-2">
+      <label
+        htmlFor={`auth-legal-consent-checkbox-${idSuffix}`}
+        className="flex items-start gap-2.5 cursor-pointer select-none text-xs font-inter text-[var(--text-secondary)] leading-relaxed"
+      >
+        <input
+          type="checkbox"
+          id={`auth-legal-consent-checkbox-${idSuffix}`}
+          data-testid="auth-legal-consent-checkbox"
+          checked={legalAccepted}
+          onChange={(e) => setLegalAccepted(e.target.checked)}
+          className="mt-0.5 w-4 h-4 rounded border border-[var(--border-hairline)] accent-[#E09B30] cursor-pointer shrink-0"
+        />
+        <span>
+          {isEs ? (
+            <>
+              Acepto la{' '}
+              <button
+                type="button"
+                id={`auth-open-privacy-link-${idSuffix}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openLegalModal('privacy');
+                }}
+                className="font-bold text-[#9A6515] dark:text-[#E09B30] underline hover:opacity-80 cursor-pointer"
+              >
+                Política de Privacidad
+              </button>{' '}
+              y la{' '}
+              <button
+                type="button"
+                id={`auth-open-cookies-link-${idSuffix}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openLegalModal('cookies');
+                }}
+                className="font-bold text-[#9A6515] dark:text-[#E09B30] underline hover:opacity-80 cursor-pointer"
+              >
+                Política de Cookies
+              </button>{' '}
+              de teacherivan.com.
+            </>
+          ) : (
+            <>
+              I agree to teacherivan.com&apos;s{' '}
+              <button
+                type="button"
+                id={`auth-open-privacy-link-${idSuffix}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openLegalModal('privacy');
+                }}
+                className="font-bold text-[#9A6515] dark:text-[#E09B30] underline hover:opacity-80 cursor-pointer"
+              >
+                Privacy Policy
+              </button>{' '}
+              and{' '}
+              <button
+                type="button"
+                id={`auth-open-cookies-link-${idSuffix}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openLegalModal('cookies');
+                }}
+                className="font-bold text-[#9A6515] dark:text-[#E09B30] underline hover:opacity-80 cursor-pointer"
+              >
+                Cookie Policy
+              </button>
+              .
+            </>
+          )}
+        </span>
+      </label>
+    </div>
+  );
+
   return (
     <div
       id="student-auth-modal-backdrop"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#091326]/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      data-lenis-prevent
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#091326]/80 backdrop-blur-md overflow-hidden overscroll-contain animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
@@ -440,7 +550,10 @@ export const StudentAuthModal: React.FC = () => {
     >
       <div
         id="student-auth-modal-card"
-        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[var(--radius-container)] p-4 sm:p-6 pb-6 sm:pb-8 box-border bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-hairline)] shadow-2xl flex flex-col my-auto transition-colors duration-200"
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto overscroll-contain rounded-[var(--radius-container)] p-5 sm:p-6 pb-6 sm:pb-8 box-border bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-hairline)] shadow-2xl flex flex-col my-auto transition-colors duration-200"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)] text-[var(--text-primary)]">
@@ -461,7 +574,7 @@ export const StudentAuthModal: React.FC = () => {
                   ? t.authModal.step1Title
                   : t.authModal.step2Title}
               </h2>
-              <p className="text-[11px] text-[var(--text-secondary)]">Teacher Ivan • English Classes</p>
+              <p className="text-[11px] font-inter text-[var(--text-secondary)]">Teacher Ivan • English Classes</p>
             </div>
           </div>
 
@@ -477,7 +590,11 @@ export const StudentAuthModal: React.FC = () => {
         </div>
 
         {/* Modal Body */}
-        <div className="pt-4 overflow-y-auto space-y-4">
+        <div
+          id="student-auth-modal-body"
+          data-lenis-prevent
+          className="pt-4 space-y-4"
+        >
           {/* Custom Banner if opened from locked feature */}
           {authModalBanner && (
             <div
@@ -489,7 +606,7 @@ export const StudentAuthModal: React.FC = () => {
             </div>
           )}
 
-          {/* Mode Switcher Tabs (Sign Up vs Sign In) - Hidden in Recover & Google Complete Profile */}
+          {/* Mode Switcher Tabs (Sign Up vs Sign In) */}
           {!isCompletingProfile && !isRecoverMode && (
             <div className="flex rounded-2xl bg-[var(--bg-sunken)] p-1 border border-[var(--border-hairline)]">
               <button
@@ -570,14 +687,14 @@ export const StudentAuthModal: React.FC = () => {
                       setRecoverSuccess(null);
                       openAuthModal('signin');
                     }}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#1A3153] text-[#FAFAFA] font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-[#12223a] cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#1A3153] text-[#FAFAFA] font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-[#091326] cursor-pointer"
                   >
                     {t.authModal.backToSignIn}
                   </button>
                 </div>
               ) : (
                 <>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  <p className="text-xs font-inter text-[var(--text-secondary)] leading-relaxed">
                     {t.authModal.subtitleRecover}
                   </p>
 
@@ -642,7 +759,7 @@ export const StudentAuthModal: React.FC = () => {
                     type="submit"
                     id="auth-recover-submit-btn"
                     disabled={isLoading}
-                    className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#ECAA41] transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isLoading ? (
                       <>
@@ -660,10 +777,15 @@ export const StudentAuthModal: React.FC = () => {
                   <div className="text-center pt-2">
                     <a
                       id="auth-recover-whatsapp-link"
-                      href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan,%20necesito%20ayuda%20para%20recuperar%20mi%20cuenta"
+                      href={buildWhatsAppUrl(
+                        isEs
+                          ? '¡Hola Teacher Ivan! Necesito ayuda para recuperar mi cuenta en teacherivan.com.'
+                          : 'Hi Teacher Ivan! I need help recovering my account on teacherivan.com.'
+                      )}
+                      onClick={() => handleWhatsAppClick('auth')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-[#10b981] hover:underline font-semibold block"
+                      className="text-xs text-[#9A6515] dark:text-[#E09B30] hover:underline font-semibold block"
                     >
                       {t.authModal.whatsappHelp}
                     </a>
@@ -687,7 +809,7 @@ export const StudentAuthModal: React.FC = () => {
             </form>
           ) : isSignInMode ? (
             /* ========================================================================= */
-            /* SIGN IN FORM (ONLY Username and Password)                                 */
+            /* SIGN IN FORM                                                              */
             /* ========================================================================= */
             <form onSubmit={handleSignInSubmit} className="space-y-4">
               <div>
@@ -732,7 +854,7 @@ export const StudentAuthModal: React.FC = () => {
                 type="submit"
                 id="auth-signin-submit-btn"
                 disabled={isLoading}
-                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#ECAA41] transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -747,7 +869,6 @@ export const StudentAuthModal: React.FC = () => {
                 )}
               </button>
 
-              {/* Forgot password link directly underneath */}
               <div className="text-center pt-1">
                 <button
                   type="button"
@@ -776,10 +897,10 @@ export const StudentAuthModal: React.FC = () => {
             </form>
           ) : step === 1 ? (
             /* ========================================================================= */
-            /* STEP 1: ACCOUNT CREDENTIALS WITH OFFICIAL GOOGLE IDENTITY SERVICES        */
+            /* STEP 1: ACCOUNT CREDENTIALS + MANDATORY PRIVACY/COOKIE CONSENT            */
             /* ========================================================================= */
             <form onSubmit={handleProceedToStep2} className="space-y-3.5">
-              {/* Google Identity Services Real GIS Button */}
+              {/* Google Identity Services Button */}
               <div className="space-y-3 mb-2">
                 <div
                   ref={googleBtnContainerRef}
@@ -795,7 +916,7 @@ export const StudentAuthModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Username & Password (2-column on sm) */}
+              {/* Username & Password */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
@@ -894,7 +1015,7 @@ export const StudentAuthModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Date of Birth & Country (2-column on sm) */}
+              {/* Date of Birth & Country */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
@@ -929,15 +1050,23 @@ export const StudentAuthModal: React.FC = () => {
                     >
                       {SUPPORTED_COUNTRIES.map((c) => (
                         <option key={c} value={c}>
-                          {c === 'Bolivia' ? 'Bolivia (BO)' :
-                           c === 'Mexico' ? 'Mexico (MX)' :
-                           c === 'Colombia' ? 'Colombia (CO)' :
-                           c === 'Peru' ? 'Peru (PE)' :
-                           c === 'Argentina' ? 'Argentina (AR)' :
-                           c === 'Chile' ? 'Chile (CL)' :
-                           c === 'Spain' ? 'Spain (ES)' :
-                           c === 'USA' ? 'United States (US)' :
-                           'Other (Global)'}
+                          {c === 'Bolivia'
+                            ? 'Bolivia (BO)'
+                            : c === 'Mexico'
+                            ? 'Mexico (MX)'
+                            : c === 'Colombia'
+                            ? 'Colombia (CO)'
+                            : c === 'Peru'
+                            ? 'Peru (PE)'
+                            : c === 'Argentina'
+                            ? 'Argentina (AR)'
+                            : c === 'Chile'
+                            ? 'Chile (CL)'
+                            : c === 'Spain'
+                            ? 'Spain (ES)'
+                            : c === 'USA'
+                            ? 'United States (US)'
+                            : 'Other (Global)'}
                         </option>
                       ))}
                     </select>
@@ -945,11 +1074,15 @@ export const StudentAuthModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Button: Next: Set Your English Goal → */}
+              {/* Mandatory Privacy & Cookie Policy Consent Checkbox */}
+              {renderLegalConsentCheckbox('step1')}
+
+              {/* Next Button: Disabled until consent checkbox is checked */}
               <button
                 type="submit"
                 id="auth-next-step-btn"
-                className="w-full mt-3 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer"
+                disabled={!legalAccepted}
+                className="w-full mt-3 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#ECAA41] transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span>{t.authModal.nextGoalsBtn}</span>
                 <ArrowRight size={15} />
@@ -970,16 +1103,50 @@ export const StudentAuthModal: React.FC = () => {
             /* STEP 2: LEARNING GOALS & CEFR TARGET WIZARD                               */
             /* ========================================================================= */
             <form onSubmit={handleFinalRegisterSubmit} className="space-y-4">
-              {/* Back to Step 1 Button */}
-              <button
-                type="button"
-                id="auth-back-step1-btn"
-                onClick={() => setStep(1)}
-                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-montserrat font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <ArrowLeft size={14} />
-                <span>{t.authModal.backBtn}</span>
-              </button>
+              {!isCompletingProfile && (
+                <button
+                  type="button"
+                  id="auth-back-step1-btn"
+                  onClick={() => setStep(1)}
+                  className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-montserrat font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <ArrowLeft size={14} />
+                  <span>{t.authModal.backBtn}</span>
+                </button>
+              )}
+
+              {/* If Google First-Time Profile Completion, also allow phone/country input */}
+              {(isCompletingProfile || pendingGoogleProfile) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
+                      {t.authModal.phoneLabel} <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      id="auth-google-phone-input"
+                      required
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder={t.authModal.phonePlaceholder}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1">
+                      {t.authModal.dobLabel} <span className="text-[#E09B30]">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="auth-google-dob-input"
+                      required
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-inter focus:outline-none focus:border-[#E09B30]"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* 1. Current / Target CEFR Level */}
               <div>
@@ -1064,7 +1231,7 @@ export const StudentAuthModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* 4. Specific Personal Goal (Required Input) */}
+              {/* 4. Specific Personal Goal */}
               <div>
                 <label className="block text-xs font-montserrat font-bold uppercase tracking-wider text-[var(--text-primary)] mb-1 flex items-center gap-1.5">
                   <Target size={14} className="text-[#E09B30]" />
@@ -1086,12 +1253,15 @@ export const StudentAuthModal: React.FC = () => {
                 />
               </div>
 
+              {/* Mandatory Privacy & Cookie Policy Consent Checkbox */}
+              {renderLegalConsentCheckbox('step2')}
+
               {/* Complete Registration Button */}
               <button
                 type="submit"
                 id="submit-auth-form-btn"
-                disabled={isLoading || !personalObjective.trim()}
-                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#c88624] hover:text-[#FAFAFA] transition-all duration-200 shadow-md shadow-[#E09B30]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isLoading || !personalObjective.trim() || !legalAccepted}
+                className="w-full mt-2 py-3.5 px-6 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider bg-[#E09B30] text-[#1A3153] hover:bg-[#ECAA41] transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -1107,10 +1277,6 @@ export const StudentAuthModal: React.FC = () => {
               </button>
             </form>
           )}
-
-          <p className="text-[11px] text-center text-[var(--text-secondary)]/80 pt-1">
-            {t.authModal.termsNote}
-          </p>
         </div>
       </div>
     </div>

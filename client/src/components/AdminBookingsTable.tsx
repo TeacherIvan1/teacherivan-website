@@ -22,7 +22,7 @@ export const AdminBookingsTable: React.FC = () => {
 
   const fetchSheetsStatus = async () => {
     try {
-      const res = await fetch(getApiUrl('/api/sheets/status'));
+      const res = await fetch(getApiUrl('/api/sheets/status'), { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setSheetsStatus(data);
@@ -35,7 +35,7 @@ export const AdminBookingsTable: React.FC = () => {
     setError(null);
     try {
       if (force) {
-        await fetch(getApiUrl('/api/bookings?force=true')).catch(() => {});
+        await fetch(getApiUrl('/api/bookings?force=true'), { credentials: 'include' }).catch(() => {});
       }
       // Additive Union Sync: reads local vault, merges with server, self-heals server if needed
       const { bookings: merged } = await syncAndHealAdminData();
@@ -81,12 +81,9 @@ export const AdminBookingsTable: React.FC = () => {
   const handleCancel = async (id: string) => {
     if (!window.confirm('Cancel this class booking from database?')) return;
     try {
-      const token = useAuthStore.getState().token;
       const res = await fetch(getApiUrl(`/api/bookings/${id}`), {
         method: 'DELETE',
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        credentials: 'include',
       });
       if (res.ok) {
         const updated = bookings.filter((b) => b.id !== id);

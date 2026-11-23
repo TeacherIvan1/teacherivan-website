@@ -17,6 +17,7 @@ import { useSprintStore } from '../modules/sprint/sprintStore';
 import { useReportStore } from '../modules/report/reportStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { TEACHER_PHONE, getWhatsAppUrl } from '../config/contact';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const WeeklyReportModal: React.FC = () => {
   const { t, isEs } = useTranslation();
@@ -31,6 +32,7 @@ export const WeeklyReportModal: React.FC = () => {
     isReportModalOpen,
     closeReportModal,
   } = useSprintStore();
+  useScrollLock(isReportModalOpen);
 
   const currentSessionReport = useReportStore((s) => s.currentReport);
   const [copied, setCopied] = useState(false);
@@ -86,7 +88,12 @@ export const WeeklyReportModal: React.FC = () => {
       aria-modal="true"
       aria-label="Weekly Pedagogical Progress Report"
     >
-      <div className="relative w-full max-w-2xl max-h-[88dvh] overflow-y-auto rounded-2xl p-4 sm:p-5 box-border bg-[#12223a] border-2 border-[#E09B30]/50 shadow-2xl text-[#FAFAFA] flex flex-col gap-6 my-auto">
+      <div
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl max-h-[88dvh] overflow-y-auto overscroll-contain rounded-2xl p-4 sm:p-5 box-border bg-[#132642] border-2 border-[#E09B30]/50 shadow-2xl text-[#FAFAFA] flex flex-col gap-6 my-auto"
+      >
         {/* Header Bar */}
         <div className="flex items-start justify-between gap-4 border-b border-[#A7C7E7]/20 pb-4">
           <div className="flex items-center gap-3">
@@ -202,7 +209,7 @@ export const WeeklyReportModal: React.FC = () => {
             </div>
 
             <div className="p-3.5 rounded-2xl bg-[#1A3153]/50 border border-[#A7C7E7]/20 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#c084fc]/15 flex items-center justify-center text-[#c084fc]">
+              <div className="w-9 h-9 rounded-xl bg-[#E09B30]/15 flex items-center justify-center text-[#E09B30]">
                 <PenTool size={18} />
               </div>
               <div>

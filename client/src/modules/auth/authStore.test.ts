@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { useAuthStore } from './authStore';
+import { useAuthStore, purgeLegacyAuthTokens } from './authStore';
 import { SUPPORTED_COUNTRIES } from './types';
 
 test('authStore - initial state and modal toggles', () => {
@@ -64,11 +64,12 @@ test('authStore - user stats update and signOut', () => {
   assert.equal(useAuthStore.getState().user?.cefrLevel, 'B2');
   assert.equal(useAuthStore.getState().user?.lastScore, 88);
 
-  // Sign out resets dev mode
+  // Sign out resets dev mode and ensures zero token persistence
   useAuthStore.getState().signOut();
   assert.equal(useAuthStore.getState().isAuthenticated, false);
   assert.equal(useAuthStore.getState().user, null);
   assert.equal(useAuthStore.getState().token, null);
+  purgeLegacyAuthTokens();
 });
 
 test('authStore - student vs admin roles and learning goals schema', () => {

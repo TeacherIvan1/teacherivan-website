@@ -4,14 +4,21 @@ import { userStore, ADMIN_EMAIL } from '../services/userStore.js';
 import { bookingStore } from '../services/bookingStore.js';
 import { sheetsService } from '../services/sheetsService.js';
 import { googleDbService } from '../services/googleDbService.js';
-import { requireAuth, requireAdmin, optionalAuth, AuthenticatedRequest } from '../middleware/auth.js';
+import {
+  requireAuth,
+  requireAdmin,
+  optionalAuth,
+  AuthenticatedRequest,
+  setAuthCookie,
+  clearAuthCookie,
+} from '../middleware/auth.js';
 
 const router = Router();
 const googleOAuthClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 
 /**
  * POST /api/auth/register
- * Body: { username: string, password: string, fullName: string, email: string, phoneNumber: string, dateOfBirth: string, country: string, learningGoals: object }
+ * Sets HttpOnly `ti_session` cookie and returns `{ status: 'ok', user }` (never raw JWT for localStorage).
  */
 router.post('/register', (req: Request, res: Response) => {
   try {
@@ -73,7 +80,6 @@ router.post('/register', (req: Request, res: Response) => {
       });
     }
 
-    // Check duplicate username
     const existingByUsername = userStore.findByUsername(username);
     if (existingByUsername) {
       return res.status(409).json({
@@ -83,7 +89,6 @@ router.post('/register', (req: Request, res: Response) => {
       });
     }
 
-    // Check duplicate email
     const existingByEmail = userStore.findByEmail(email);
     if (existingByEmail) {
       return res.status(409).json({
@@ -107,14 +112,13 @@ router.post('/register', (req: Request, res: Response) => {
       cefrLevel: learningGoals?.targetLevel,
     });
 
-    const token = userStore.createSessionToken(user.id, user.role || 'student');
+    const jwtToken = userStore.createSessionToken(user.id, user.role || 'student');
+    setAuthCookie(res, jwtToken);
 
-    // Asynchronously upsert student to Google Database (Google Sheets API v4)
     googleDbService.upsertUserInGoogleDb(user).catch((dbErr) => {
       console.warn('[Google DB] Async upsert registration notice:', dbErr);
     });
 
-    // Asynchronously append student to Google Sheet (Legacy Webhook fallback)
     sheetsService.appendStudentRegistration(user).catch((sheetErr) => {
       console.warn('[Google Sheets] Async append registration notice:', sheetErr);
     });
@@ -122,7 +126,7 @@ router.post('/register', (req: Request, res: Response) => {
     return res.status(200).json({
       status: 'ok',
       user,
-      token,
+      needsProfileCompletion: !user.profileCompleted,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -133,8 +137,7 @@ router.post('/register', (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/login
- * Body: { username: string, password: string }
- * Authenticates users using strictly username and password (also accepts admin email or 'ivan' for admin).
+ * Sets HttpOnly `ti_session` cookie and returns `{ status: 'ok', user }`.
  */
 router.post('/login', (req: Request, res: Response) => {
   try {
@@ -167,11 +170,13 @@ router.post('/login', (req: Request, res: Response) => {
     }
 
     const user = authResult.user;
-    const token = userStore.createSessionToken(user.id, user.role || 'student');
+    const jwtToken = userStore.createSessionToken(user.id, user.role || 'student');
+    setAuthCookie(res, jwtToken);
+
     return res.status(200).json({
       status: 'ok',
       user,
-      token,
+      needsProfileCompletion: false,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -181,9 +186,16 @@ router.post('/login', (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/auth/logout
+ * Clears the HttpOnly `ti_session` cookie.
+ */
+router.post('/logout', (_req: Request, res: Response) => {
+  clearAuthCookie(res);
+  return res.status(200).json({ ok: true, status: 'ok' });
+});
+
+/**
  * POST /api/auth/recover-password
- * Body: { username: string, verificationContact: string, newPassword: string }
- * Verifies that username matches email or phoneNumber, updates password, and returns success.
  */
 router.post('/recover-password', (req: Request, res: Response) => {
   try {
@@ -239,15 +251,12 @@ router.post('/recover-password', (req: Request, res: Response) => {
 
 /**
  * PUT /api/auth/profile
- * Body: { id?: string, email?: string, learningGoals: LearningGoals, cefrLevel?: string, fullName?: string, country?: string, dateOfBirth?: string }
- * Completes mandatory onboarding profile and goals.
  */
 router.put('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id, email, learningGoals, cefrLevel, fullName, phoneNumber, country, dateOfBirth } = req.body || {};
 
     const targetId = id || (email ? userStore.findByEmail(email)?.id : undefined);
-    // Student can only update their own profile unless they are an admin
     if (req.user && req.user.role !== 'admin' && targetId && targetId !== req.user.id) {
       return res.status(403).json({
         error: 'Forbidden: You cannot modify another student profile.',
@@ -296,22 +305,25 @@ router.put('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) =
 
 /**
  * POST /api/auth/google
- * Body: { email: string, fullName: string, phoneNumber?: string, googleId?: string, dateOfBirth?: string, country?: string, credential?: string, idToken?: string }
+ * Sets HttpOnly `ti_session` cookie and returns `{ status: 'ok', user, needsProfileCompletion }`.
  */
 router.post('/google', async (req: Request, res: Response) => {
   try {
     let { email, fullName, phoneNumber, dateOfBirth, country, learningGoals, profileCompleted, credential, idToken } = req.body || {};
 
-    // 1. Verify Google ID token cryptographically if client library provided a token
     const tokenToVerify = credential || idToken;
-    const clientId = process.env.GOOGLE_CLIENT_ID || '116786083172-q1m93t06euvdsa4tdd6gs9klddhc86i9.apps.googleusercontent.com';
+    const clientId = process.env.GOOGLE_CLIENT_ID || '454494230896-b0s8djtejacphfblmiik31nj6roajhch.apps.googleusercontent.com';
 
     if (tokenToVerify) {
       try {
         const client = googleOAuthClient || new OAuth2Client(clientId);
         const ticket = await client.verifyIdToken({
           idToken: tokenToVerify,
-          audience: clientId,
+          audience: [
+            clientId,
+            '454494230896-b0s8djtejacphfblmiik31nj6roajhch.apps.googleusercontent.com',
+            '116786083172-q1m93t06euvdsa4tdd6gs9klddhc86i9.apps.googleusercontent.com',
+          ],
         });
         const gPayload = ticket.getPayload();
         if (!gPayload || !gPayload.email) {
@@ -334,7 +346,6 @@ router.post('/google', async (req: Request, res: Response) => {
 
     const existing = userStore.findByEmail(email);
 
-    // If student already has completed profile
     if (existing && existing.profileCompleted && !learningGoals) {
       if (phoneNumber && phoneNumber.trim()) {
         userStore.updateUserProfile({ email }, { phoneNumber: phoneNumber.trim() });
@@ -343,16 +354,16 @@ router.post('/google', async (req: Request, res: Response) => {
       googleDbService.upsertUserInGoogleDb(updatedUser).catch((dbErr) => {
         console.warn('[Google DB] Async user upsert notice:', dbErr);
       });
-      const token = userStore.createSessionToken(updatedUser.id, updatedUser.role || 'student');
+      const jwtToken = userStore.createSessionToken(updatedUser.id, updatedUser.role || 'student');
+      setAuthCookie(res, jwtToken);
+
       return res.status(200).json({
         status: 'ok',
         user: updatedUser,
-        token,
         needsProfileCompletion: false,
       });
     }
 
-    // If dateOfBirth and country were provided in this call, complete registration
     if (dateOfBirth && country) {
       const user = userStore.upsertUser({
         fullName: fullName || existing?.fullName || 'Google Student',
@@ -368,16 +379,16 @@ router.post('/google', async (req: Request, res: Response) => {
       googleDbService.upsertUserInGoogleDb(user).catch((dbErr) => {
         console.warn('[Google DB] Async user upsert notice:', dbErr);
       });
-      const token = userStore.createSessionToken(user.id, user.role || 'student');
+      const jwtToken = userStore.createSessionToken(user.id, user.role || 'student');
+      setAuthCookie(res, jwtToken);
+
       return res.status(200).json({
         status: 'ok',
         user,
-        token,
         needsProfileCompletion: false,
       });
     }
 
-    // First-time Google user: profile incomplete, needs dateOfBirth + country
     const tempUser = userStore.upsertUser({
       fullName: fullName || existing?.fullName || 'Google Student',
       email,
@@ -387,12 +398,12 @@ router.post('/google', async (req: Request, res: Response) => {
     googleDbService.upsertUserInGoogleDb(tempUser).catch((dbErr) => {
       console.warn('[Google DB] Async user upsert notice:', dbErr);
     });
-    const token = userStore.createSessionToken(tempUser.id, tempUser.role || 'student');
+    const jwtToken = userStore.createSessionToken(tempUser.id, tempUser.role || 'student');
+    setAuthCookie(res, jwtToken);
 
     return res.status(200).json({
       status: 'ok',
       user: tempUser,
-      token,
       needsProfileCompletion: true,
     });
   } catch (err: unknown) {
@@ -404,8 +415,7 @@ router.post('/google', async (req: Request, res: Response) => {
 
 /**
  * GET /api/auth/me
- * Headers: Authorization: Bearer <token>
- * Query: ?userId=...
+ * Reads authenticated session strictly from `ti_session` HttpOnly cookie (or test Bearer header).
  */
 router.get('/me', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -435,7 +445,6 @@ router.get('/me', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
 
 /**
  * POST /api/auth/ack-plan-notification
- * Body: { userId?: string, email?: string }
  */
 router.post('/ack-plan-notification', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -464,7 +473,6 @@ router.post('/ack-plan-notification', optionalAuth, (req: AuthenticatedRequest, 
 
 /**
  * POST /api/auth/sync
- * Body: { user: User, bookings?: Booking[] }
  */
 router.post('/sync', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -475,17 +483,15 @@ router.post('/sync', optionalAuth, (req: AuthenticatedRequest, res: Response) =>
       return res.status(400).json({ error: 'Valid user profile required for sync' });
     }
 
-    // Defensive Object Property Level Authorization:
-    // Strip client role spoofing: role can only be 'admin' if email strictly matches ADMIN_EMAIL
     const safePayload = { ...userPayload };
     if (safePayload.role === 'admin' && userStore.normalizeEmail(safePayload.email) !== userStore.normalizeEmail(ADMIN_EMAIL)) {
       safePayload.role = 'student';
     }
 
     const user = userStore.syncClientUser(safePayload);
-    const token = userStore.createSessionToken(user.id, user.role || 'student');
+    const jwtToken = userStore.createSessionToken(user.id, user.role || 'student');
+    setAuthCookie(res, jwtToken);
 
-    // Self-healing student bookings from client cache
     if (Array.isArray(incomingBookings) && incomingBookings.length > 0) {
       const studentBookings = incomingBookings.filter(
         (b) => b && (b.studentId === user.id || userStore.normalizeEmail(b.studentEmail) === userStore.normalizeEmail(user.email))
@@ -500,7 +506,6 @@ router.post('/sync', optionalAuth, (req: AuthenticatedRequest, res: Response) =>
     return res.status(200).json({
       status: 'ok',
       user,
-      token,
       bookings: userBookings,
     });
   } catch (err: unknown) {
@@ -512,7 +517,6 @@ router.post('/sync', optionalAuth, (req: AuthenticatedRequest, res: Response) =>
 
 /**
  * PUT /api/auth/:id/plan
- * Manual Plan Assignment by Admin
  */
 router.put('/:id/plan', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -542,7 +546,6 @@ router.put('/:id/plan', requireAdmin, (req: AuthenticatedRequest, res: Response)
 
 /**
  * GET /api/auth/export
- * Admin Student Roster Export
  */
 router.get('/export', requireAdmin, (_req: AuthenticatedRequest, res: Response) => {
   try {

@@ -25,11 +25,13 @@ import { useAuthStore } from '../modules/auth/authStore';
 import { LanguageToggle } from './LanguageToggle';
 import { BrandLockup } from './BrandLockup';
 import { useTheme } from '../modules/theme/ThemeContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const [keyConfigured, setKeyConfigured] = useState<boolean | null>(null);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
+  useScrollLock(isMobileDrawerOpen);
   const { theme, isDark, toggleTheme } = useTheme();
   const status = useConversationStore((s) => s.status);
   const { t, isEs } = useTranslation();
@@ -465,10 +467,13 @@ export const Header: React.FC = () => {
           {/* Drawer Panel */}
           <div
             id="mobile-navigation-drawer"
-            className="fixed top-0 right-0 w-[84vw] max-w-sm h-full bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-2xl z-50 p-6 flex flex-col justify-between border-l border-[var(--border-hairline)] overflow-y-auto lg:hidden animate-in slide-in-from-right duration-250"
+            data-lenis-prevent
+            className="fixed top-0 right-0 w-[84vw] max-w-sm h-full bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-2xl z-50 p-6 flex flex-col justify-between border-l border-[var(--border-hairline)] overflow-y-auto overscroll-contain lg:hidden animate-in slide-in-from-right duration-250"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Drawer"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
           >
             {/* Top Bar: Brand + Close button */}
             <div className="flex items-center justify-between pb-4 border-b border-[var(--border-hairline)]">

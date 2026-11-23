@@ -5,9 +5,11 @@ import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { StudentPlan } from '../modules/auth/types';
 import { Badge, Button } from '../design-system/astryx';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const PlanApprovedModal: React.FC = () => {
   const { user, pendingPlanModal, ackPlanNotification, dismissPlanModal } = useAuthStore();
+  useScrollLock(Boolean(pendingPlanModal && user));
   const { setActiveView } = useNavigationStore();
   const { isEs } = useTranslation();
 
@@ -111,7 +113,10 @@ export const PlanApprovedModal: React.FC = () => {
     >
       <div
         id="plan-approved-modal-card"
-        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto bg-[#1A3153] border border-[#A7C7E7]/40 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center gap-5 my-auto animate-in zoom-in-95 duration-200"
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto overscroll-contain bg-[#1A3153] border border-[#A7C7E7]/40 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center gap-5 my-auto animate-in zoom-in-95 duration-200"
         style={{
           boxShadow: '0 25px 50px -12px rgba(224, 155, 48, 0.25)',
         }}

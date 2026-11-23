@@ -5,9 +5,11 @@ import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useConversationStore } from '../modules/conversation/conversationStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useTranslation } from '../modules/i18n/languageStore';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const SpokenAssessmentModal: React.FC = () => {
   const { isAssessmentModalOpen, closeAssessmentModal } = useAssessmentStore();
+  useScrollLock(isAssessmentModalOpen);
   const selectScenario = useTeachingStore((s) => s.selectScenario);
   const { startSession, status } = useConversationStore();
   const setActiveView = useNavigationStore((s) => s.setActiveView);
@@ -60,7 +62,10 @@ export const SpokenAssessmentModal: React.FC = () => {
       {/* Sleek, Single-Card Welcome Sheet */}
       <div
         id="spoken-assessment-modal-card"
-        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-2xl p-5 box-border bg-[#12223a] text-[#FAFAFA] border-2 border-[#E09B30]/50 shadow-2xl flex flex-col items-center text-center my-auto"
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto overscroll-contain rounded-2xl p-5 box-border bg-[#132642] text-[#FAFAFA] border-2 border-[#E09B30]/50 shadow-2xl flex flex-col items-center text-center my-auto"
       >
         {/* Top Close Button */}
         <button

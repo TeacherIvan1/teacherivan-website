@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "name": "Teacher Ivan",
+    "domain": "teacherivan.com",
+    "colors": {
+      "deepNavy": "#1A3153",
+      "warmAmber": "#E09B30",
+      "amberAccessibleLight": "#9A6515",
+      "softDenim": "#A7C7E7",
+      "neutralSlate": "#4A5568",
+      "offWhite": "#FAFAFA"
+    },
+    "fonts": ["Montserrat", "Inter"]
+  },
+  "ignoreValues": [
+    { "rule": "overused-font", "value": "Inter", "reason": "user confirmed bilingual UI body font in Design.md" },
+    { "rule": "overused-font", "value": "Montserrat", "reason": "user confirmed display heading font in Design.md" }
+  ]
+}

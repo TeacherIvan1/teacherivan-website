@@ -95,6 +95,7 @@ export async function requestReportGeneration(
     const url = getApiUrl('/api/report');
     const response = await fetch(url, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },

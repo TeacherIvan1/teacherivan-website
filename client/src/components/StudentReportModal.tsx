@@ -23,6 +23,7 @@ import { useAuthStore } from '../modules/auth/authStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { getWhatsAppUrl } from '../config/contact';
 import { Badge, Button, Card } from '../design-system/astryx';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const StudentReportModal: React.FC = () => {
   const {
@@ -35,6 +36,7 @@ export const StudentReportModal: React.FC = () => {
     retryGeneration,
     dismissReport,
   } = useReportStore();
+  useScrollLock(isModalOpen);
 
   const startSession = useConversationStore((s) => s.startSession);
   const setCustomExerciseScenario = useTeachingStore((s) => s.setCustomExerciseScenario);
@@ -120,7 +122,10 @@ export const StudentReportModal: React.FC = () => {
     >
       <div
         id="student-report-modal-card"
-        className="relative w-full max-w-2xl max-h-[88dvh] overflow-y-auto rounded-[var(--radius-container)] p-4 sm:p-5 box-border bg-[#FAFAFA] text-[#1A3153] border border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl max-h-[88dvh] overflow-y-auto overscroll-contain rounded-[var(--radius-container)] p-4 sm:p-5 box-border bg-[#FAFAFA] text-[#1A3153] border border-[#A7C7E7] shadow-2xl flex flex-col my-auto"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30">

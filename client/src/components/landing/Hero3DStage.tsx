@@ -1,20 +1,84 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Mic, ArrowRight, CheckCircle2, MessageCircle } from 'lucide-react';
 import gsap from 'gsap';
 import { ChibiAvatar } from '../ChibiAvatar';
 import { useTranslation } from '../../modules/i18n/languageStore';
+import { getGeneralWhatsAppUrl, handleWhatsAppClick } from '../../utils/whatsapp';
+
+// Desktop-only lazy-loaded Three.js / img2threejs 3D AI Voice Waveform Slab
+const LazyHeroVoiceSlab3D = React.lazy(() => import('../HeroVoiceSlab3D'));
 
 interface Hero3DStageProps {
   onStartVoiceTest: () => void;
 }
 
+/**
+ * Pure CSS + SVG static/mobile/reduced-motion fallback slab (0 KB of Three.js downloaded on mobile)
+ */
+export const HeroVoiceSlabStaticFallback: React.FC = () => {
+  const heights = [26, 42, 64, 52, 78, 92, 68, 86, 94, 72, 84, 60, 76, 48, 36, 24];
+  return (
+    <div
+      id="hero-voice-slab-static-fallback"
+      data-testid="hero-voice-slab-static-fallback"
+      className="w-full h-[92px] rounded-xl bg-[#091326] border border-[#A7C7E7]/30 px-3 py-2 flex items-center justify-between gap-1 shadow-inner"
+      aria-hidden="true"
+    >
+      {heights.map((h, idx) => {
+        const isAmber = idx % 3 !== 2;
+        return (
+          <span
+            key={idx}
+            className="flex-1 rounded-full transition-transform duration-300"
+            style={{
+              height: `${Math.max(18, Math.round((h / 100) * 64))}px`,
+              backgroundColor: isAmber ? '#E09B30' : '#A7C7E7',
+              opacity: isAmber ? 0.95 : 0.78,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
 export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) => {
   const { isEs } = useTranslation();
   const slabRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // 1. GSAP quickTo 3D cursor tilt (±6deg) strictly guarded on Desktop (>= 1024px)
+  // Strict Desktop (>= 1024px) & No-Reduced-Motion Gate for lazy 3D chunk
+  const [canMountDesktop3D, setCanMountDesktop3D] = useState<boolean>(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return false;
+    }
+    return (
+      window.matchMedia('(min-width: 1024px)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+
+    const desktopMq = window.matchMedia('(min-width: 1024px)');
+    const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const evaluateGate = () => {
+      setCanMountDesktop3D(desktopMq.matches && !reducedMq.matches);
+    };
+
+    evaluateGate();
+    desktopMq.addEventListener('change', evaluateGate);
+    reducedMq.addEventListener('change', evaluateGate);
+
+    return () => {
+      desktopMq.removeEventListener('change', evaluateGate);
+      reducedMq.removeEventListener('change', evaluateGate);
+    };
+  }, []);
+
+  // GSAP quickTo 3D cursor tilt (±6deg) strictly guarded on Desktop (>= 1024px)
   useEffect(() => {
     const slab = slabRef.current;
     const container = containerRef.current;
@@ -28,8 +92,8 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
 
       const handleMouseMove = (e: MouseEvent) => {
         const rect = container.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
-        const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
 
         setRotateX(-y * 12); // ±6 deg
         setRotateY(x * 12);  // ±6 deg
@@ -54,56 +118,6 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
     };
   }, []);
 
-  // 2. 24-Bar Reactive Waveform Canvas (responding gently to idle breath)
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let rafId: number;
-    let t = 0;
-
-    const renderWaveform = () => {
-      t += 0.04;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const numBars = 24;
-      const barWidth = 4;
-      const gap = (canvas.width - numBars * barWidth) / (numBars - 1);
-
-      for (let i = 0; i < numBars; i++) {
-        // Multi-frequency sine superposition for organic acoustic pulse
-        const wave =
-          Math.sin(t * 1.5 + i * 0.35) * 0.4 +
-          Math.cos(t * 2.2 + i * 0.2) * 0.3 +
-          Math.sin(t * 0.8 + i * 0.5) * 0.3;
-
-        const normalizedHeight = Math.max(0.12, Math.abs(wave));
-        const barHeight = normalizedHeight * (canvas.height * 0.75);
-        const x = i * (barWidth + gap);
-        const y = (canvas.height - barHeight) / 2;
-
-        const isAmber = i % 2 === 0;
-        ctx.fillStyle = isAmber ? '#E09B30' : '#A7C7E7';
-        ctx.shadowColor = isAmber ? 'rgba(224, 155, 48, 0.45)' : 'rgba(167, 199, 231, 0.35)';
-        ctx.shadowBlur = 6;
-
-        ctx.beginPath();
-        ctx.roundRect(x, y, barWidth, barHeight, 3);
-        ctx.fill();
-      }
-
-      rafId = requestAnimationFrame(renderWaveform);
-    };
-
-    rafId = requestAnimationFrame(renderWaveform);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
-
   return (
     <section
       id="chapter-0-hero"
@@ -115,7 +129,9 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-montserrat font-bold tracking-[0.15em] text-[#9A6515] dark:text-[#E09B30] uppercase whitespace-nowrap">
             <span className="w-8 h-[1px] bg-[#9A6515]/50 dark:bg-[#E09B30]/50 inline-block" />
-            <span className="whitespace-nowrap">{isEs ? 'MÉTODO BICRÓNICO • COACHING 1-A-1 + IA 24/7' : 'BICHRONOUS METHOD • 1-ON-1 COACHING + 24/7 AI'}</span>
+            <span className="whitespace-nowrap">
+              {isEs ? 'MÉTODO BICRÓNICO • COACHING 1-A-1 + IA 24/7' : 'BICHRONOUS METHOD • 1-ON-1 COACHING + 24/7 AI'}
+            </span>
           </div>
 
           {/* Two-Tone H1 */}
@@ -149,12 +165,13 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
 
             <a
               id="hero-direct-whatsapp-btn"
-              href="https://wa.me/59172878330"
+              href={getGeneralWhatsAppUrl(isEs ? 'es' : 'en')}
+              onClick={() => handleWhatsAppClick('hero')}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-montserrat font-bold text-[#1A3153] dark:text-[#FAFAFA] bg-white dark:bg-[#132642] hover:bg-slate-50 dark:hover:bg-[#1E3A5F] border border-[var(--border-hairline)] transition-all cursor-pointer shadow-sm whitespace-nowrap h-12"
             >
-              <MessageCircle size={17} className="text-[#10B981]" />
+              <MessageCircle size={17} className="text-[#E09B30]" />
               <span>WhatsApp +591 72878330</span>
             </a>
           </div>
@@ -205,7 +222,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
               </span>
             </div>
 
-            {/* Center Dual Stage: Ivan & Emma flanking 24-Bar Waveform */}
+            {/* Center Dual Stage: Ivan & Emma flanking 16-Bar 3D Acoustic Waveform Slab */}
             <div className="py-6 flex items-center justify-between gap-4">
               {/* Ivan */}
               <div className="flex flex-col items-center gap-1.5 shrink-0">
@@ -213,18 +230,21 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
                   <ChibiAvatar character="ivan" state="speaking" className="w-24 h-24" />
                 </div>
                 <span className="text-[11px] font-montserrat font-bold text-[#FAFAFA]">Teacher Ivan</span>
-                <span className="text-[9px] text-amber-brand font-mono uppercase">{isEs ? 'Coach 1-a-1' : '1-on-1 Coach'}</span>
+                <span className="text-[9px] text-amber-brand font-inter font-semibold uppercase">
+                  {isEs ? 'Coach 1-a-1' : '1-on-1 Coach'}
+                </span>
               </div>
 
-              {/* 24-Bar Canvas Waveform */}
-              <div className="flex-1 flex flex-col items-center justify-center px-2">
-                <canvas
-                  ref={canvasRef}
-                  width={220}
-                  height={80}
-                  className="w-full max-w-[220px] h-[80px]"
-                />
-                <span className="text-xs text-[#A7C7E7] font-mono tracking-widest uppercase mt-1">
+              {/* Desktop Lazy 3D img2threejs Waveform Slab vs Mobile/Reduced-Motion Static Fallback */}
+              <div className="flex-1 flex flex-col items-center justify-center px-2 min-w-0">
+                {canMountDesktop3D ? (
+                  <Suspense fallback={<HeroVoiceSlabStaticFallback />}>
+                    <LazyHeroVoiceSlab3D />
+                  </Suspense>
+                ) : (
+                  <HeroVoiceSlabStaticFallback />
+                )}
+                <span className="text-xs text-[#A7C7E7] font-inter font-semibold tracking-widest uppercase mt-1.5">
                   {isEs ? 'AUDIO EN VIVO' : 'LIVE VOICE'}
                 </span>
               </div>
@@ -235,7 +255,9 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
                   <ChibiAvatar character="emma" state="listening" className="w-24 h-24" />
                 </div>
                 <span className="text-[11px] font-montserrat font-bold text-[#FAFAFA]">Emma IA</span>
-                <span className="text-[9px] text-[#A7C7E7] font-mono uppercase">{isEs ? 'Tutora IA 24/7' : '24/7 AI Tutor'}</span>
+                <span className="text-[9px] text-[#A7C7E7] font-inter font-semibold uppercase">
+                  {isEs ? 'Tutora IA 24/7' : '24/7 AI Tutor'}
+                </span>
               </div>
             </div>
 
@@ -247,14 +269,16 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({ onStartVoiceTest }) =>
               }}
             >
               <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 text-center sm:text-left">
-                <span className="text-xs sm:text-sm font-bold text-red-300 line-through">&ldquo;I have 25 years&rdquo;</span>
+                <span className="text-xs sm:text-sm font-bold text-red-300 line-through">
+                  &ldquo;I have 25 years&rdquo;
+                </span>
                 <ArrowRight size={12} className="text-amber-brand hidden sm:inline" />
                 <span className="text-xs sm:text-sm font-bold text-amber-brand inline-flex items-center gap-1">
                   <span>&ldquo;I am 25 years old&rdquo;</span>
                   <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
                 </span>
               </div>
-              <span className="px-2.5 py-1 rounded-full bg-amber-brand/20 text-amber-brand text-[10px] font-montserrat font-extrabold uppercase tracking-wider whitespace-nowrap">
+              <span className="px-2.5 py-1 rounded-full bg-amber-brand/20 text-amber-brand text-[10px] font-montserrat font-extrabold uppercase tracking-wider whitespace-nowrap tabular-nums">
                 &gt;75% HABLA ACTIVA
               </span>
             </div>

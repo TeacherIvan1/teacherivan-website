@@ -12,7 +12,8 @@ describe('Contact Configuration & WhatsApp Links', () => {
 
   it('generates well-formed WhatsApp click-to-chat URLs with encoded messages', () => {
     const defaultUrl = getWhatsAppUrl();
-    assert.strictEqual(defaultUrl, 'https://wa.me/59172878330');
+    assert.ok(defaultUrl.startsWith('https://wa.me/59172878330?text='));
+    assert.ok(defaultUrl.includes('teacherivan.com'));
 
     const msg = 'Hola Teacher Ivan! Me gustaría consultar por clases.';
     const customUrl = getWhatsAppUrl(msg);

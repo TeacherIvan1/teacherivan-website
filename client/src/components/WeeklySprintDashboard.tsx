@@ -693,7 +693,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                     )}
                   </div>
 
-                  <div className="w-8 h-8 rounded-xl bg-[var(--bg-sunken)] dark:bg-[#FAFAFA]/10 flex items-center justify-center text-[#E09B30] mb-2">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--bg-sunken)] dark:bg-[#FAFAFA]/10 flex items-center justify-center text-[#9A6515] dark:text-[#E09B30] mb-2">
                     <Icon size={16} />
                   </div>
 
@@ -782,7 +782,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                       className="p-1.5 rounded-lg bg-[#1A3153]/10 dark:bg-[#A7C7E7]/15 text-[#1A3153] dark:text-[#E09B30] hover:bg-[#E09B30] hover:text-[#1A3153] transition-colors cursor-pointer shrink-0"
                       title="Pronounce with native audio"
                     >
-                      <Volume2 size={14} className={playingCollocation === colloc ? 'animate-bounce' : ''} />
+                      <Volume2 size={14} className={playingCollocation === colloc ? 'animate-pulse' : ''} />
                     </button>
                   </div>
                 ))}

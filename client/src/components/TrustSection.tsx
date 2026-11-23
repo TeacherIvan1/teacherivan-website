@@ -95,7 +95,7 @@ export const TrustSection: React.FC = () => {
               </div>
 
               {/* 1-Line Philosophy Quote */}
-              <blockquote className="p-4 rounded-xl bg-[#1A3153]/60 border-l-4 border-[#E09B30] text-xs sm:text-sm text-[#A7C7E7] italic">
+              <blockquote className="p-4 rounded-xl bg-[#1A3153]/60 border border-[#E09B30]/40 text-xs sm:text-sm text-[#A7C7E7] italic">
                 {t.trustSection.philosophy}
                 <footer className="mt-1 text-[11px] font-montserrat font-bold text-[#E09B30] not-italic">
                   — {t.trustSection.philosophyAuthor}

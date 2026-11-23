@@ -47,6 +47,7 @@ jobs:
           VITE_API_URL: https://teacherivan-website.onrender.com
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || '454494230896-b0s8djtejacphfblmiik31nj6roajhch.apps.googleusercontent.com' }}
           VITE_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL }}
+          VITE_GA4_MEASUREMENT_ID: ${{ secrets.VITE_GA4_MEASUREMENT_ID }}
 
       - name: Verify build artifacts security scan (dist)
         run: npm run security:scan

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -12,11 +13,11 @@ import authRouter from './routes/auth.js';
 import bookingRouter from './routes/bookings.js';
 import curriculumRouter from './routes/curriculum.js';
 import sheetsRouter from './routes/sheets.js';
-import { userStore, ADMIN_EMAIL } from './services/userStore.js';
+import { userStore } from './services/userStore.js';
 import { bookingStore } from './services/bookingStore.js';
 import { googleDbService } from './services/googleDbService.js';
 import { initRemoteBackup } from './services/remoteBackup.js';
-import { requireAdmin, requireAuth, optionalAuth, AuthenticatedRequest } from './middleware/auth.js';
+import { requireAdmin, optionalAuth, AuthenticatedRequest } from './middleware/auth.js';
 
 // Resolve directory paths for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -36,6 +37,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const app = express();
+app.set('trust proxy', 1); // Required behind Render's TLS reverse proxy for Secure cookies
 const port = parseInt(process.env.PORT || '3001', 10);
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -46,6 +48,9 @@ app.use(
     crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   })
 );
+
+// Mount cookie-parser for HttpOnly session cookies
+app.use(cookieParser());
 
 // Strict CORS Origins
 const allowedOrigins = [
@@ -73,40 +78,77 @@ if (process.env.ALLOWED_ORIGINS) {
   });
 }
 
-// CORS Middleware with strict validation (no blanket reflection)
+// CORS Middleware with strict validation & credentials: true
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile native apps, curl, server-to-server, Render health checks)
       if (!origin) {
         return callback(null, true);
       }
 
-      // Check strictly allowed origins
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // Allow github preview origins if in dev
       if (!isProd && (origin.endsWith('.github.io') || origin.endsWith('.onrender.com'))) {
         return callback(null, true);
       }
 
-      // Deny untrusted origins
       return callback(new Error(`CORS Error: Origin ${origin} not permitted.`));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   })
 );
+
+// CSRF Origin Validation Middleware on all state-changing routes under /api/
+app.use('/api', (req, res, next) => {
+  const statefulMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+  if (!statefulMethods.includes(req.method.toUpperCase())) {
+    return next();
+  }
+
+  let requestOrigin = req.headers.origin;
+  if (!requestOrigin && req.headers.referer) {
+    try {
+      const refUrl = new URL(req.headers.referer);
+      requestOrigin = refUrl.origin;
+    } catch {
+      requestOrigin = undefined;
+    }
+  }
+
+  if (requestOrigin) {
+    const isAllowed =
+      allowedOrigins.includes(requestOrigin) ||
+      (!isProd &&
+        (requestOrigin.startsWith('http://localhost:') ||
+          requestOrigin.startsWith('http://127.0.0.1:') ||
+          requestOrigin.endsWith('.github.io') ||
+          requestOrigin.endsWith('.onrender.com')));
+
+    if (!isAllowed) {
+      return res.status(403).json({
+        error: `CSRF Origin Validation Failed: Origin ${requestOrigin} is not permitted.`,
+      });
+    }
+  } else if (isProd) {
+    // In production, require valid Origin or Referer on browser state-changing requests
+    return res.status(403).json({
+      error: 'CSRF Origin Validation Failed: Missing Origin or Referer header.',
+    });
+  }
+
+  next();
+});
 
 app.use(express.json({ limit: '1mb' }));
 
 // Rate Limiters (API Security & Throttling)
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 attempts per window
+  windowMs: 15 * 60 * 1000,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -127,8 +169,8 @@ const bookingLimiter = rateLimit({
 });
 
 const aiGenLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 30, // 30 AI requests per 10 min
+  windowMs: 10 * 60 * 1000,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -167,13 +209,11 @@ app.get('/api/users/export', requireAdmin, async (req: AuthenticatedRequest, res
 });
 
 // POST /api/users/rehydrate-roster
-// Protected: Only Admin can rehydrate full roster; logged in students can only rehydrate their own bookings
 app.post('/api/users/rehydrate-roster', optionalAuth, (req: AuthenticatedRequest, res) => {
   try {
     const { users, bookings } = req.body || {};
     const callingUser = req.user;
 
-    // If attempting to restore users array, require admin
     if (Array.isArray(users) && users.length > 0) {
       if (!callingUser || callingUser.role !== 'admin') {
         return res.status(403).json({
@@ -182,7 +222,6 @@ app.post('/api/users/rehydrate-roster', optionalAuth, (req: AuthenticatedRequest
       }
     }
 
-    // If student is rehydrating bookings, verify ownership of all items
     let safeBookings = bookings || [];
     if (callingUser && callingUser.role !== 'admin') {
       safeBookings = safeBookings.filter(
@@ -192,7 +231,6 @@ app.post('/api/users/rehydrate-roster', optionalAuth, (req: AuthenticatedRequest
             userStore.normalizeEmail(b.studentEmail) === userStore.normalizeEmail(callingUser.email))
       );
     } else if (!callingUser) {
-      // Unauthenticated request cannot inject arbitrary bookings
       safeBookings = [];
     }
 
@@ -288,12 +326,10 @@ app.listen(port, () => {
   }
   console.log(`======================================================\n`);
 
-  // Initialize Cloud Backup persistence (Gist / KV / Self-Healing)
   initRemoteBackup().catch((err) => {
     console.warn('[Remote Backup] Initialization notice:', err);
   });
 
-  // Automatically sync authoritative Google Database on startup
   googleDbService.syncFromGoogleDb().catch((err) => {
     console.warn('[Google Database] Startup sync notice:', err);
   });

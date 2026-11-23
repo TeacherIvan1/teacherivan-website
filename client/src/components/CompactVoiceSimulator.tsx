@@ -26,6 +26,8 @@ import { LearnerLevel } from '../modules/teaching/types';
 import { Badge, Button, Card } from '../design-system/astryx';
 
 import { useAuthStore } from '../modules/auth/authStore';
+import { trackEvent } from '../utils/analytics';
+import { buildWhatsAppUrl, handleWhatsAppClick } from '../utils/whatsapp';
 
 export const CompactVoiceSimulator: React.FC = () => {
   const { t, isEs } = useTranslation();
@@ -84,6 +86,10 @@ export const CompactVoiceSimulator: React.FC = () => {
       setQuotaError(errorText);
       return;
     }
+    trackEvent('voice_tutor_launch', {
+      tutor: persona === 'emma' ? 'emma' : 'ivan',
+      level,
+    });
     startSession();
   };
 
@@ -591,10 +597,15 @@ export const CompactVoiceSimulator: React.FC = () => {
             <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
               <a
                 id="quota-upgrade-whatsapp-btn"
-                href="https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20He%20alcanzado%20mi%20l%C3%ADmite%20diario%20del%20simulador%20y%20deseo%20sesiones%20ilimitadas."
+                href={buildWhatsAppUrl(
+                  isEs
+                    ? '¡Hola Teacher Ivan! He alcanzado mi límite diario del Laboratorio de Voz en teacherivan.com y deseo activar un plan con sesiones ilimitadas.'
+                    : 'Hi Teacher Ivan! I reached my daily Voice Lab limit on teacherivan.com and would like to activate an unlimited plan.'
+                )}
+                onClick={() => handleWhatsAppClick('portal')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-md transition-all"
+                className="px-4 py-2 rounded-full bg-[#E09B30] hover:bg-[#ECAA41] text-[#091326] font-montserrat font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-md transition-all"
               >
                 <span>{isEs ? 'Desbloquear en WhatsApp' : 'Upgrade on WhatsApp'}</span>
               </a>

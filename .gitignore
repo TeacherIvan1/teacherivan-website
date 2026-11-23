@@ -57,6 +57,9 @@ coverage/
 # Local agent skills cache
 .agent/
 **/.agent/
+.gemini/
+**/.gemini/
+server/data/sheets_sync_log.json
 
 # OS and Editor metadata
 .DS_Store

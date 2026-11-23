@@ -3,9 +3,18 @@ import { AuthState, UserProfile, LearningGoals, StudentPlan } from './types';
 import { getApiUrl } from '../../config/api';
 import { useDevModeStore } from '../dev/devModeStore';
 import { getStudentBookingsCache, saveStudentBookingsCache } from './vaultSync';
+import { trackEvent } from '../../utils/analytics';
 
 const USER_STORAGE_KEY = 'teacherivan_auth_user';
-const TOKEN_STORAGE_KEY = 'teacherivan_auth_token';
+
+const LEGACY_TOKEN_KEYS = [
+  'teacherivan_auth_token',
+  'ti_token',
+  'auth_token',
+  'token',
+  'jwt',
+  'access_token',
+];
 
 function safeGetItem(key: string): string | null {
   try {
@@ -29,11 +38,25 @@ function safeRemoveItem(key: string): void {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(key);
     }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(key);
+    }
   } catch {}
+}
+
+/**
+ * Proactively purges any legacy JWT/auth token keys from localStorage and sessionStorage
+ * so returning browsers are 100% free of client-side token persistence.
+ */
+export function purgeLegacyAuthTokens(): void {
+  for (const key of LEGACY_TOKEN_KEYS) {
+    safeRemoveItem(key);
+  }
 }
 
 function getStoredUser(): UserProfile | null {
   try {
+    purgeLegacyAuthTokens();
     const raw = safeGetItem(USER_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
@@ -43,18 +66,13 @@ function getStoredUser(): UserProfile | null {
   }
 }
 
-function getStoredToken(): string | null {
-  return safeGetItem(TOKEN_STORAGE_KEY);
-}
-
 export const useAuthStore = create<AuthState>((set, get) => {
   const initialUser = getStoredUser();
-  const initialToken = getStoredToken();
 
   return {
     user: initialUser,
-    token: initialToken,
-    isAuthenticated: Boolean(initialUser && initialToken),
+    token: null, // Strictly null: session is managed via HttpOnly `ti_session` cookie
+    isAuthenticated: Boolean(initialUser),
     isAuthModalOpen: false,
     authModalMode: 'signup',
     authModalBanner: null,
@@ -85,8 +103,10 @@ export const useAuthStore = create<AuthState>((set, get) => {
     registerWithEmail: async (data) => {
       set({ isLoading: true, error: null });
       try {
+        purgeLegacyAuthTokens();
         const res = await fetch(getApiUrl('/api/auth/register'), {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
@@ -96,13 +116,13 @@ export const useAuthStore = create<AuthState>((set, get) => {
           throw new Error(json.error || 'Failed to complete registration');
         }
 
-        const { user, token } = json;
+        const { user } = json;
         safeSetItem(USER_STORAGE_KEY, JSON.stringify(user));
-        safeSetItem(TOKEN_STORAGE_KEY, token);
+        trackEvent('sign_up', { method: 'email' });
 
         set({
           user,
-          token,
+          token: null,
           isAuthenticated: true,
           isAuthModalOpen: false,
           isLoading: false,
@@ -118,8 +138,10 @@ export const useAuthStore = create<AuthState>((set, get) => {
     authenticateWithGoogle: async (data) => {
       set({ isLoading: true, error: null });
       try {
+        purgeLegacyAuthTokens();
         const res = await fetch(getApiUrl('/api/auth/google'), {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
@@ -139,23 +161,23 @@ export const useAuthStore = create<AuthState>((set, get) => {
             },
             error: null,
           });
-          return { needsProfileCompletion: true, user: json.user, token: json.token };
+          return { needsProfileCompletion: true, user: json.user };
         }
 
-        const { user, token } = json;
+        const { user } = json;
         safeSetItem(USER_STORAGE_KEY, JSON.stringify(user));
-        safeSetItem(TOKEN_STORAGE_KEY, token);
+        trackEvent('sign_up', { method: 'google' });
 
         set({
           user,
-          token,
+          token: null,
           isAuthenticated: true,
           isAuthModalOpen: false,
           isLoading: false,
           pendingGoogleProfile: null,
           error: null,
         });
-        return { needsProfileCompletion: false, user, token };
+        return { needsProfileCompletion: false, user };
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         set({ isLoading: false, error: msg });
@@ -171,6 +193,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     }) => {
       set({ isLoading: true, error: null });
       try {
+        purgeLegacyAuthTokens();
         const payload = {
           username: data.username || data.email,
           email: data.email,
@@ -179,6 +202,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         };
         const res = await fetch(getApiUrl('/api/auth/login'), {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
@@ -188,13 +212,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
           throw new Error(json.error || 'Login failed. Please check credentials.');
         }
 
-        const { user, token } = json;
+        const { user } = json;
         safeSetItem(USER_STORAGE_KEY, JSON.stringify(user));
-        safeSetItem(TOKEN_STORAGE_KEY, token);
 
         set({
           user,
-          token,
+          token: null,
           isAuthenticated: true,
           isAuthModalOpen: false,
           isLoading: false,
@@ -218,6 +241,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       try {
         const res = await fetch(getApiUrl('/api/auth/recover-password'), {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
@@ -243,6 +267,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       try {
         const res = await fetch(getApiUrl('/api/auth/profile'), {
           method: 'PUT',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: user.id,
@@ -280,13 +305,18 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     syncWithServer: async () => {
-      const { user, token } = get();
-      if (!user || !user.email) return;
+      purgeLegacyAuthTokens();
+      const { user } = get();
 
       try {
         let serverUser: UserProfile | null = null;
-        const resMe = await fetch(getApiUrl(`/api/auth/me?userId=${encodeURIComponent(user.id || user.email)}`), {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const meUrl = user?.id || user?.email
+          ? getApiUrl(`/api/auth/me?userId=${encodeURIComponent(user.id || user.email)}`)
+          : getApiUrl('/api/auth/me');
+
+        const resMe = await fetch(meUrl, {
+          method: 'GET',
+          credentials: 'include',
         });
         if (resMe.ok) {
           const jsonMe = await resMe.json();
@@ -294,9 +324,10 @@ export const useAuthStore = create<AuthState>((set, get) => {
         }
 
         const cachedBookings = getStudentBookingsCache();
-        if (!serverUser) {
+        if (!serverUser && user && user.email) {
           const resSync = await fetch(getApiUrl('/api/auth/sync'), {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user, bookings: cachedBookings }),
           });
@@ -307,17 +338,20 @@ export const useAuthStore = create<AuthState>((set, get) => {
               saveStudentBookingsCache(jsonSync.bookings);
             }
           }
-        } else if (cachedBookings.length > 0) {
+        } else if (serverUser && cachedBookings.length > 0) {
           fetch(getApiUrl('/api/auth/sync'), {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user: serverUser, bookings: cachedBookings }),
-          }).then(async (r) => {
-            if (r.ok) {
-              const j = await r.json();
-              if (Array.isArray(j.bookings)) saveStudentBookingsCache(j.bookings);
-            }
-          }).catch(() => {});
+          })
+            .then(async (r) => {
+              if (r.ok) {
+                const j = await r.json();
+                if (Array.isArray(j.bookings)) saveStudentBookingsCache(j.bookings);
+              }
+            })
+            .catch(() => {});
         }
 
         if (serverUser) {
@@ -327,7 +361,11 @@ export const useAuthStore = create<AuthState>((set, get) => {
           const isAcked = safeGetItem(ackKey) === planVersion;
 
           safeSetItem(USER_STORAGE_KEY, JSON.stringify(serverUser));
-          set({ user: serverUser });
+          set({
+            user: serverUser,
+            token: null,
+            isAuthenticated: true,
+          });
 
           if (currentPlan !== 'free' && (serverUser.planNotificationPending === true || !isAcked)) {
             set({
@@ -338,13 +376,13 @@ export const useAuthStore = create<AuthState>((set, get) => {
             });
           }
         }
-      } catch (err) {
+      } catch {
         // Non-blocking sync failure on offline / sleep
       }
     },
 
     ackPlanNotification: async () => {
-      const { user, token } = get();
+      const { user } = get();
       if (!user) return;
       const currentPlan = user.plan || 'free';
       const ackKey = `ti_ack_plan_${user.id}`;
@@ -358,9 +396,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
       try {
         await fetch(getApiUrl('/api/auth/ack-plan-notification'), {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({ userId: user.id, email: user.email }),
         });
@@ -391,13 +429,13 @@ export const useAuthStore = create<AuthState>((set, get) => {
       safeSetItem(USER_STORAGE_KEY, JSON.stringify(updated));
       set({ user: updated });
 
-      // Background sync with server
       get().syncWithServer().catch(() => {});
     },
 
     updateUserPlan: async (userId: string, plan: StudentPlan) => {
       const res = await fetch(getApiUrl(`/api/users/${userId}/plan`), {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan }),
       });
@@ -419,7 +457,6 @@ export const useAuthStore = create<AuthState>((set, get) => {
       const { user } = get();
       const todayIso = new Date().toISOString().split('T')[0];
 
-      // If unregistered / guest: track in localStorage
       if (!user) {
         const guestDateKey = 'teacherivan_guest_session_date';
         const guestUsedKey = 'teacherivan_guest_session_used';
@@ -440,7 +477,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       const plan = user.plan || (user.role === 'admin' ? 'executive' : 'free');
       let max = user.maxDailySessions !== undefined ? user.maxDailySessions : (plan === 'free' ? 5 : -1);
       if (user.role === 'admin' || plan === 'essential' || plan === 'pro' || plan === 'executive') {
-        max = -1; // unlimited
+        max = -1;
       }
 
       let used = user.dailySessionsUsed || 0;
@@ -472,8 +509,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
     signOut: () => {
       safeRemoveItem(USER_STORAGE_KEY);
-      safeRemoveItem(TOKEN_STORAGE_KEY);
-      // Strictly disable dev mode on sign out
+      purgeLegacyAuthTokens();
       useDevModeStore.getState().setDeveloperMode(false);
       set({
         user: null,
@@ -483,6 +519,15 @@ export const useAuthStore = create<AuthState>((set, get) => {
         pendingGoogleProfile: null,
         pendingPlanModal: null,
       });
+
+      try {
+        if (typeof fetch === 'function') {
+          fetch(getApiUrl('/api/auth/logout'), {
+            method: 'POST',
+            credentials: 'include',
+          }).catch(() => {});
+        }
+      } catch {}
     },
   };
 });

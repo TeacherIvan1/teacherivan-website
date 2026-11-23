@@ -71,7 +71,7 @@ export function formatIsoDate(d: Date): string {
 }
 
 export const ClassSchedulerView: React.FC = () => {
-  const { user, token, isAuthenticated, openAuthModal } = useAuthStore();
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
   const { t, isEs } = useTranslation();
 
   const [weekOffset, setWeekOffset] = useState<number>(0); // 0 = current, 1 = next
@@ -105,7 +105,9 @@ export const ClassSchedulerView: React.FC = () => {
     setIsLoading(true);
     setActionError(null);
     try {
-      const res = await fetch(getApiUrl(`/api/bookings?weekStart=${mondayIso}`));
+      const res = await fetch(getApiUrl(`/api/bookings?weekStart=${mondayIso}`), {
+        credentials: 'include',
+      });
       const data = res.ok ? await res.json() : { bookings: [] };
       const serverBookings: Booking[] = data.bookings || [];
 
@@ -129,9 +131,9 @@ export const ClassSchedulerView: React.FC = () => {
         console.log(`[ClassSchedulerView] Rehydrating ${missingOnServer.length} student bookings to server...`);
         fetch(getApiUrl('/api/users/rehydrate-roster'), {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({ bookings: missingOnServer }),
         }).catch(() => {});
@@ -243,9 +245,9 @@ export const ClassSchedulerView: React.FC = () => {
       setIsLoading(true);
       const res = await fetch(getApiUrl('/api/bookings'), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           studentId: user.id,
@@ -292,9 +294,9 @@ export const ClassSchedulerView: React.FC = () => {
       setIsLoading(true);
       const res = await fetch(getApiUrl(`/api/bookings/${bookingId}`), {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           studentId: user.id,
@@ -436,12 +438,12 @@ export const ClassSchedulerView: React.FC = () => {
             id="scheduler-activate-whatsapp-btn"
             href={
               userPlan === 'essential'
-                ? 'https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Tengo%20el%20Plan%20Essential%20y%20quiero%20hacer%20upgrade%20para%20clases%20en%20vivo%201%20a%201.'
-                : 'https://wa.me/59172878330?text=Hola%20Teacher%20Ivan!%20Deseo%20activar%20mi%20plan%20de%20clases%20en%20vivo%201%20a%201.'
+                ? 'https://wa.me/59172878330?text=%C2%A1Hola%20Teacher%20Ivan!%20Tengo%20el%20Plan%20Essential%20en%20teacherivan.com%20y%20quiero%20hacer%20upgrade%20al%20Plan%20Pro%20(580%20BOB%2Fmes)%20o%20Executive%20(850%20BOB%2Fmes)%20para%20clases%201-a-1%20en%20vivo.'
+                : 'https://wa.me/59172878330?text=%C2%A1Hola%20Teacher%20Ivan!%20Vi%20teacherivan.com%20y%20deseo%20activar%20mi%20plan%20de%20clases%201-a-1%20en%20vivo.'
             }
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-white font-montserrat font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shrink-0 cursor-pointer"
+            className="px-5 py-2.5 rounded-full bg-[#E09B30] hover:bg-[#ECAA41] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shrink-0 cursor-pointer"
           >
             <MessageCircle size={15} />
             <span>

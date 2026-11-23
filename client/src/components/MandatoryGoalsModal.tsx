@@ -5,6 +5,7 @@ import { useSprintStore } from '../modules/sprint/sprintStore';
 import { LearningGoals } from '../modules/auth/types';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { getApiUrl } from '../config/api';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1 / IELTS'] as const;
 
@@ -33,6 +34,7 @@ export const MandatoryGoalsModal: React.FC<GoalsModalProps> = ({
   onClose,
 }) => {
   const { user, isAuthenticated, saveProfileGoals } = useAuthStore();
+  useScrollLock(Boolean(isOpen && isAuthenticated));
   const setPersonalizedSprint = useSprintStore((s) => s.setPersonalizedSprint);
   const { t, isEs } = useTranslation();
 
@@ -101,6 +103,7 @@ export const MandatoryGoalsModal: React.FC<GoalsModalProps> = ({
       try {
         const res = await fetch(getApiUrl('/api/curriculum/generate-sprint'), {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ learningGoals: goals }),
         });
@@ -139,7 +142,10 @@ export const MandatoryGoalsModal: React.FC<GoalsModalProps> = ({
     >
       <div
         id="mandatory-goals-modal-card"
-        className="relative w-full max-w-2xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#E09B30] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]"
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl bg-[#FAFAFA] text-[#1A3153] border-2 border-[#E09B30] rounded-3xl shadow-2xl overflow-y-auto overscroll-contain flex flex-col my-auto max-h-[88dvh]"
       >
         {/* Header Bar */}
         <div className="px-6 py-4 bg-gradient-to-r from-[#1A3153] to-[#12223a] text-[#FAFAFA] border-b border-[#A7C7E7]/30 flex items-center justify-between gap-3">

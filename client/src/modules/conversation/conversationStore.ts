@@ -151,14 +151,14 @@ async function attemptAutoReconnect(
 
         onOutputTranscription: (text: string) => {
           cancelTurnEndWatchdog();
-          set({ isUserSpeaking: false });
+          set({ isUserSpeaking: false, isThinking: false });
           get().finalizeTurn('user');
           get().appendInterimText('assistant', text);
         },
 
         onAudioChunk: (pcmBase64: string, turnId?: number) => {
           cancelTurnEndWatchdog();
-          set({ isUserSpeaking: false });
+          set({ isUserSpeaking: false, isThinking: false });
           get().finalizeTurn('user');
           audioManager.playChunk(pcmBase64, turnId).catch((err) => {
             console.warn('[Audio Playback Warning]:', err);
@@ -224,6 +224,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
     micLevel: 0,
     isTutorSpeaking: false,
     isUserSpeaking: false,
+    isThinking: false,
     isMuted: false,
     isReconnecting: false,
     latencyStats: latencyTracker.getStats(),
@@ -335,10 +336,14 @@ export const useConversationStore = create<ConversationState>((set, get) => {
                   micLevel: stats.micLevel,
                   isTutorSpeaking: stats.isPlaying,
                   isMuted: stats.isMuted,
+                  ...(stats.isPlaying ? { isThinking: false } : {}),
                 });
 
                 // Turn-End Watchdog: If user is actively speaking and voice energy continues above threshold, keep resetting watchdog
-                if (get().isUserSpeaking && !stats.isMuted && stats.micLevel > 15 && !stats.isPlaying) {
+                if (!stats.isMuted && stats.micLevel > 8 && !stats.isPlaying) {
+                  if (!get().isUserSpeaking) {
+                    set({ isUserSpeaking: true, isThinking: false });
+                  }
                   resetTurnEndWatchdog(() => {
                     debugLog('general', 'info', 'Turn-End Watchdog (1.2s silence) triggered automatic turn completion.');
                     get().forceTurnComplete();
@@ -353,14 +358,14 @@ export const useConversationStore = create<ConversationState>((set, get) => {
 
             onOutputTranscription: (text: string) => {
               cancelTurnEndWatchdog();
-              set({ isUserSpeaking: false });
+              set({ isUserSpeaking: false, isThinking: false });
               get().finalizeTurn('user');
               get().appendInterimText('assistant', text);
             },
 
             onAudioChunk: (pcmBase64: string, turnId?: number) => {
               cancelTurnEndWatchdog();
-              set({ isUserSpeaking: false });
+              set({ isUserSpeaking: false, isThinking: false });
               get().finalizeTurn('user');
               audioManager.playChunk(pcmBase64, turnId).catch((err) => {
                 console.warn('[Audio Playback Warning]:', err);
@@ -606,7 +611,7 @@ export const useConversationStore = create<ConversationState>((set, get) => {
         'forceTurnComplete triggered (watchdog or manual Done Speaking button). Sending 400ms digital silence via realtimeInput.'
       );
       get().finalizeTurn('user');
-      set({ isUserSpeaking: false });
+      set({ isUserSpeaking: false, isThinking: true });
       // Send 400ms of pure digital silence via realtimeInput to complete turn safely without clientContent frame conflicts
       geminiLiveClient.sendDigitalSilence(400);
     },

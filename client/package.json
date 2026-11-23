@@ -19,12 +19,14 @@
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "three": "^0.187.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@astryxdesign/cli": "^0.7.16",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@types/three": "^0.187.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.6.1",
     "playwright": "^1.64.1",

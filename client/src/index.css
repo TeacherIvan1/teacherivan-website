@@ -651,7 +651,8 @@ body {
 }
 
 .feed-item.system {
-  border-left: 3px solid #E09B30;
+  border-color: rgba(224, 155, 48, 0.45);
+  background: rgba(224, 155, 48, 0.08);
   color: #FAFAFA;
 }
 

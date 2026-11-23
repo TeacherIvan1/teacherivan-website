@@ -28,7 +28,7 @@ export const RegisteredStudentsTable: React.FC = () => {
 
   const fetchSheetsStatus = async () => {
     try {
-      const res = await fetch(getApiUrl('/api/sheets/status'));
+      const res = await fetch(getApiUrl('/api/sheets/status'), { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setSheetsStatus(data);
@@ -42,6 +42,7 @@ export const RegisteredStudentsTable: React.FC = () => {
     try {
       const res = await fetch(getApiUrl('/api/sheets/sync'), {
         method: 'POST',
+        credentials: 'include',
       });
       if (res.ok) {
         const data = await res.json();
@@ -69,9 +70,8 @@ export const RegisteredStudentsTable: React.FC = () => {
     setError(null);
     try {
       if (force) {
-        const token = useAuthStore.getState().token;
         await fetch(getApiUrl('/api/users/export?force=true'), {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: 'include',
         }).catch(() => {});
       }
       // Additive Union Sync: reads local vault, merges with server, self-heals server if needed

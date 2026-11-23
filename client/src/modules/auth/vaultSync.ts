@@ -224,14 +224,12 @@ export async function syncAndHealAdminData(): Promise<{
 
   let serverUsers: UserProfile[] = [];
   let serverBookings: BookingRecord[] = [];
-  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('teacherivan_auth_token') : null;
-  const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // Step 2: Fetch current server data in parallel
+  // Step 2: Fetch current server data in parallel using HttpOnly session cookie
   try {
     const [usersRes, bookingsRes] = await Promise.all([
-      fetch(getApiUrl('/api/users/export'), { headers: authHeaders }),
-      fetch(getApiUrl('/api/bookings/export'), { headers: authHeaders }),
+      fetch(getApiUrl('/api/users/export'), { credentials: 'include' }),
+      fetch(getApiUrl('/api/bookings/export'), { credentials: 'include' }),
     ]);
 
     if (usersRes.ok) {
@@ -265,9 +263,9 @@ export async function syncAndHealAdminData(): Promise<{
     try {
       await fetch(getApiUrl('/api/users/rehydrate-roster'), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...authHeaders,
         },
         body: JSON.stringify({
           users: mergedUsers,

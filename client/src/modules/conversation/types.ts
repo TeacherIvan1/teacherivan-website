@@ -27,6 +27,7 @@ export interface ConversationState {
   micLevel: number; // 0 - 100 RMS volume
   isTutorSpeaking: boolean;
   isUserSpeaking: boolean;
+  isThinking?: boolean;
   isMuted: boolean;
   isReconnecting: boolean;
   latencyStats: LatencyStats;

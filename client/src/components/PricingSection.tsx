@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
-import { Check, ArrowRight, ShieldCheck, MessageCircle } from 'lucide-react';
+import { Check, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useAuthStore } from '../modules/auth/authStore';
-import { getWhatsAppUrl } from '../config/contact';
+import { getPlanWhatsAppUrl, handleWhatsAppClick, PlanTierId } from '../utils/whatsapp';
+import { trackEvent } from '../utils/analytics';
 
 export const PricingSection: React.FC = () => {
   const { isEs } = useTranslation();
   const { openAuthModal } = useAuthStore();
   const [currency, setCurrency] = useState<'BOB' | 'USD'>('BOB');
-  const [selectedTier, setSelectedTier] = useState<'essential' | 'pro' | 'executive'>('pro');
+  const [selectedTier, setSelectedTier] = useState<PlanTierId>('pro');
 
-  const getWhatsAppPlanLink = (tier: string, priceStr: string) => {
-    const text = isEs
-      ? `Hola Teacher Ivan! Me interesa inscribirme al Plan ${tier} (${priceStr}). ¿Podrías confirmarme disponibilidad?`
-      : `Hi Teacher Ivan! I'm interested in enrolling in the ${tier} Plan (${priceStr}). Could you confirm availability?`;
-    return getWhatsAppUrl(text);
+  const lang = isEs ? 'es' : 'en';
+
+  const onSelectPlanClick = (plan: PlanTierId, priceBob: 300 | 580 | 850) => {
+    trackEvent('select_plan', { plan, price_bob: priceBob });
+    handleWhatsAppClick('pricing', plan);
   };
 
   return (
     <section
       id="chapter-3-plans"
-      className="py-16 md:py-24 px-4 sm:px-6 lg:px-12 bg-[var(--bg-canvas)] text-[var(--text-primary)] border-b border-[var(--border-hairline)] select-none transition-colors duration-200"
+      className="py-20 lg:py-28 px-4 sm:px-6 lg:px-12 bg-[var(--bg-canvas)] text-[var(--text-primary)] border-b border-[var(--border-hairline)] select-none transition-colors duration-200"
     >
       <div className="max-w-[1280px] mx-auto space-y-12">
         {/* Header Controls: Two-tone H2 + Currency Toggle */}
@@ -35,7 +36,7 @@ export const PricingSection: React.FC = () => {
                 {isEs ? 'Sin contratos ocultos.' : 'No hidden contracts.'}
               </span>
             </h2>
-            <p className="text-sm sm:text-base text-[var(--text-secondary)] font-sans mt-1">
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] font-inter mt-1">
               {isEs
                 ? 'Cancelá o cambiá de plan en cualquier momento. Cupos limitados a 10 alumnos por franja horaria.'
                 : 'Cancel or switch tiers anytime. Strictly capped at 10 students per time window.'}
@@ -45,6 +46,7 @@ export const PricingSection: React.FC = () => {
           {/* BOB | USD Currency Toggle */}
           <div className="flex items-center gap-1.5 p-1 rounded-full bg-[var(--bg-sunken)] border border-[var(--border-hairline)] shadow-inner shrink-0">
             <button
+              type="button"
               onClick={() => setCurrency('BOB')}
               className={`px-4 py-1.5 rounded-full text-xs font-montserrat font-bold tracking-wider transition-all cursor-pointer ${
                 currency === 'BOB'
@@ -55,6 +57,7 @@ export const PricingSection: React.FC = () => {
               BOB (Bs)
             </button>
             <button
+              type="button"
               onClick={() => setCurrency('USD')}
               className={`px-4 py-1.5 rounded-full text-xs font-montserrat font-bold tracking-wider transition-all cursor-pointer ${
                 currency === 'USD'
@@ -104,9 +107,9 @@ export const PricingSection: React.FC = () => {
           </button>
         </div>
 
-        {/* 3-Column Architectural Hairline Matrix */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {/* 1. Essential (Autonomous) */}
+        {/* 3-Column Architectural Hairline Matrix (Strict 3-Level Visual Hierarchy & 2-Font Limit) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          {/* 1. Essential (Autonomous — 300 BOB) */}
           <div
             id="plan-card-essential"
             className={`slab-3d-light p-6 sm:p-8 rounded-[24px] flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] dark:bg-[#132642] border border-[var(--border-hairline)] text-[#1A3153] dark:text-[#FAFAFA] shadow-sm ${
@@ -115,72 +118,77 @@ export const PricingSection: React.FC = () => {
           >
             <div className="space-y-4">
               {/* Badge */}
-              <div className="inline-block px-3 py-1 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] text-[#1A3153] dark:text-[#FAFAFA] text-[10px] font-montserrat font-extrabold uppercase tracking-[0.15em] border border-[var(--border-hairline)]">
+              <div className="inline-block px-3 py-1 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] text-[#1A3153] dark:text-[#FAFAFA] text-[11px] font-montserrat font-bold uppercase tracking-[0.15em] border border-[var(--border-hairline)]">
                 {isEs ? 'AUTÓNOMO 24/7' : '24/7 AUTONOMOUS'}
               </div>
 
+              {/* Level 1: Montserrat Bold Title */}
               <div>
                 <h3 className="font-montserrat font-bold text-2xl text-[#1A3153] dark:text-[#FAFAFA]">
                   Essential
                 </h3>
-                <p className="text-xs text-[#4A5568] dark:text-[#A7C7E7] mt-1 font-sans">
+                {/* Level 2: Scannable Inter Subtitle */}
+                <p className="text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] mt-1 font-inter leading-relaxed">
                   {isEs
-                    ? 'Inmersión autónoma con IA para profesionales que avanzan a su propio ritmo.'
-                    : 'Autonomous AI immersion for self-paced professionals.'}
+                    ? 'Inmersión autónoma 24/7 para profesionales que avanzan a su propio ritmo.'
+                    : 'Autonomous 24/7 voice immersion for self-paced professionals.'}
                 </p>
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-1 pt-2">
+              <div className="flex items-baseline gap-1.5 pt-2">
                 <span className="font-montserrat font-black text-3xl sm:text-4xl text-[#1A3153] dark:text-[#FAFAFA] tabular-nums">
                   {currency === 'BOB' ? '300 BOB' : '$45 USD'}
                 </span>
-                <span className="text-xs text-[#4A5568] dark:text-[#A7C7E7] font-sans">
+                <span className="text-xs text-[#4A5568] dark:text-[#A7C7E7] font-inter">
                   {isEs ? '/ mes' : '/ mo'}
                 </span>
               </div>
 
-              {/* Features List */}
-              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] font-sans">
+              {/* Level 2: Max 3–4 Concise Bullet Points */}
+              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] font-inter">
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
                     <strong>0 {isEs ? 'clases en vivo' : 'live classes'}</strong> ({isEs ? '100% autónomo' : '100% self-paced'})
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEs ? 'Ilimitado 24/7' : 'Unlimited 24/7'}</strong> {isEs ? 'Voice Lab (Ivan & Emma)' : 'Voice Lab (Ivan & Emma)'}
+                    <strong>{isEs ? 'Voice Lab 24/7 Ilimitado' : 'Unlimited 24/7 Voice Lab'}</strong> (Ivan &amp; Emma)
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEs ? 'Generador Ilimitado' : 'Unlimited'}</strong> {isEs ? 'de Recursos a Medida' : 'Custom Resource Generator'}
+                    <strong>{isEs ? 'Generador Ilimitado' : 'Unlimited Generator'}</strong> {isEs ? 'de Recursos y Fichas' : 'of Custom Resources'}
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    {isEs ? 'Ruta Autónoma de 5 Días + Fichas' : '5-Day Autonomous Route + Worksheets'}
+                    {isEs ? 'Ruta Autónoma de 5 Días (Mi Ruta)' : '5-Day Autonomous Sprint (My Path)'}
                   </span>
                 </li>
               </ul>
             </div>
 
+            {/* Level 3: Secondary #1A3153 Outline CTA */}
             <a
-              href={getWhatsAppPlanLink('Essential', currency === 'BOB' ? '300 BOB/mes' : '$45 USD/mo')}
+              id="plan-cta-essential"
+              href={getPlanWhatsAppUrl('essential', lang, currency)}
+              onClick={() => onSelectPlanClick('essential', 300)}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] dark:text-[#FAFAFA] bg-transparent hover:bg-[#1A3153] hover:text-[#FAFAFA] dark:hover:bg-[#E09B30] dark:hover:text-[#1A3153] border border-[var(--border-hairline)] transition-all cursor-pointer min-h-[48px]"
+              className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#1A3153] dark:text-[#FAFAFA] bg-transparent hover:bg-[#1A3153] hover:text-[#FAFAFA] dark:hover:bg-[#E09B30] dark:hover:text-[#091326] border border-[#1A3153]/30 dark:border-[#A7C7E7]/40 transition-all cursor-pointer min-h-[48px]"
             >
               <span>{isEs ? 'Elegir Essential' : 'Select Essential'}</span>
               <ArrowRight size={14} />
             </a>
           </div>
 
-          {/* 2. Pro (Flagship — Elevated 3D Dark Slab) */}
+          {/* 2. Pro (Flagship — Elevated 3D Dark Slab — 580 BOB) */}
           <div
             id="plan-card-pro"
             className={`slab-3d-dark p-6 sm:p-8 rounded-[24px] flex-col justify-between space-y-6 relative text-[#FAFAFA] bg-[#132642] border-2 border-[#E09B30] lg:-translate-y-3 z-10 ${
@@ -190,42 +198,40 @@ export const PricingSection: React.FC = () => {
               boxShadow: 'var(--shadow-slab-3d)',
             }}
           >
-            {/* Top Recommended Tag */}
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#E09B30] text-[#091326] text-[10px] font-montserrat font-black uppercase tracking-[0.15em] shadow-md border border-white/30 whitespace-nowrap">
-              {isEs ? 'MÁS ELEGIDO • HÍBRIDO' : 'MOST POPULAR • HYBRID'}
+            {/* Top Recommended Badge */}
+            <div className="inline-flex items-center justify-between">
+              <span className="px-3.5 py-1 rounded-full bg-[#E09B30] text-[#091326] text-[11px] font-montserrat font-extrabold uppercase tracking-[0.15em]">
+                {isEs ? 'MÁS ELEGIDO • HÍBRIDO' : 'MOST POPULAR • HYBRID'}
+              </span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
             </div>
 
-            <div className="space-y-4 pt-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono tracking-wider text-[#A7C7E7] uppercase">
-                  {isEs ? '[MÁS ELEGIDO • 3X EN VIVO]' : '[MOST POPULAR • 3X LIVE]'}
-                </span>
-                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
-              </div>
-
+            <div className="space-y-4">
+              {/* Level 1: Montserrat Bold Title */}
               <div>
-                <h3 className="font-montserrat font-extrabold text-2xl text-[#FAFAFA]">
+                <h3 className="font-montserrat font-bold text-2xl text-[#FAFAFA]">
                   Programa Pro
                 </h3>
-                <p className="text-xs text-[#A7C7E7] mt-1 font-sans">
+                {/* Level 2: Scannable Inter Subtitle */}
+                <p className="text-xs sm:text-sm text-[#A7C7E7] mt-1 font-inter leading-relaxed">
                   {isEs
-                    ? 'La fórmula bicrónica completa: práctica con IA 24/7 + 3 horas de mentoría humana semanal.'
-                    : 'The full bichronous formula: 24/7 AI practice + 3 hours of weekly human mentoring.'}
+                    ? 'La fórmula bicrónica completa: práctica de voz 24/7 + 3 clases 1-a-1 en vivo por semana.'
+                    : 'The complete bichronous formula: 24/7 voice practice + 3 live 1-on-1 classes per week.'}
                 </p>
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-1 pt-2">
+              <div className="flex items-baseline gap-1.5 pt-2">
                 <span className="font-montserrat font-black text-3xl sm:text-4xl text-[#E09B30] tabular-nums">
                   {currency === 'BOB' ? '580 BOB' : '$85 USD'}
                 </span>
-                <span className="text-xs text-[#A7C7E7] font-sans">
+                <span className="text-xs text-[#A7C7E7] font-inter">
                   {isEs ? '/ mes' : '/ mo'}
                 </span>
               </div>
 
-              {/* Features List */}
-              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[#FAFAFA] font-sans">
+              {/* Level 2: Max 3–4 Concise Bullet Points */}
+              <ul className="space-y-3 pt-4 border-t border-[#A7C7E7]/20 text-xs sm:text-sm text-[#FAFAFA] font-inter">
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
@@ -235,95 +241,97 @@ export const PricingSection: React.FC = () => {
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEs ? 'Ilimitado 24/7' : 'Unlimited 24/7'}</strong> {isEs ? 'Voice Lab (Ivan & Emma)' : 'Voice Lab (Ivan & Emma)'}
+                    <strong>{isEs ? 'Voice Lab 24/7 Ilimitado' : 'Unlimited 24/7 Voice Lab'}</strong> (Ivan &amp; Emma)
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEs ? 'Generador Ilimitado' : 'Unlimited'}</strong> {isEs ? 'de Recursos a Medida' : 'Custom Resource Generator'}
+                    <strong>{isEs ? 'Generador Ilimitado' : 'Unlimited Generator'}</strong> {isEs ? 'de Recursos a Medida' : 'of Custom Resources'}
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check size={16} className="text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
                     {isEs
-                      ? 'Ruta Sincronizada (Prep + 3x Vivo + Recast)'
+                      ? 'Ruta Sincronizada (Pre-Clase + 3x Vivo + Recast)'
                       : 'Synchronized Route (Prep + 3x Live + Recast)'}
                   </span>
                 </li>
               </ul>
             </div>
 
+            {/* Level 3: Primary #E09B30 CTA Button */}
             <a
-              href={getWhatsAppPlanLink('Pro', currency === 'BOB' ? '580 BOB/mes' : '$85 USD/mo')}
+              id="plan-cta-pro"
+              href={getPlanWhatsAppUrl('pro', lang, currency)}
+              onClick={() => onSelectPlanClick('pro', 580)}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-3d-amber w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-full font-montserrat font-extrabold text-xs uppercase tracking-wider cursor-pointer shadow-lg min-h-[50px]"
+              className="btn-3d-amber w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-full font-montserrat font-extrabold text-xs uppercase tracking-wider cursor-pointer shadow-lg min-h-[50px]"
             >
               <span>{isEs ? 'Empezar Plan Pro →' : 'Start Pro Plan →'}</span>
             </a>
           </div>
 
-          {/* 3. Executive (Maximum Immersion) */}
+          {/* 3. Executive (Maximum Immersion — 850 BOB) */}
           <div
             id="plan-card-executive"
             className={`slab-3d-light p-6 sm:p-8 rounded-[24px] flex-col justify-between space-y-6 relative bg-[var(--bg-surface)] dark:bg-[#132642] border border-[var(--border-hairline)] text-[#1A3153] dark:text-[#FAFAFA] shadow-sm ${
               selectedTier === 'executive' ? 'flex' : 'hidden lg:flex'
             }`}
           >
-            {/* Top Accent bar */}
-            <div className="absolute top-0 inset-x-8 h-1 bg-[#1A3153] dark:bg-[#E09B30] rounded-t-full" />
-
             <div className="space-y-4">
               {/* Badge */}
-              <div className="inline-block px-3 py-1 rounded-full bg-[#1A3153] dark:bg-[#1E3A5F] text-[#FAFAFA] text-[10px] font-montserrat font-extrabold uppercase tracking-[0.15em]">
+              <div className="inline-block px-3 py-1 rounded-full bg-[#1A3153] dark:bg-[#1E3A5F] text-[#FAFAFA] text-[11px] font-montserrat font-bold uppercase tracking-[0.15em]">
                 {isEs ? 'INMERSIÓN TOTAL VIP' : 'VIP MAXIMUM IMMERSION'}
               </div>
 
+              {/* Level 1: Montserrat Bold Title */}
               <div>
                 <h3 className="font-montserrat font-bold text-2xl text-[#1A3153] dark:text-[#FAFAFA]">
                   Executive VIP
                 </h3>
-                <p className="text-xs text-[#4A5568] dark:text-[#A7C7E7] mt-1 font-sans">
+                {/* Level 2: Scannable Inter Subtitle */}
+                <p className="text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] mt-1 font-inter leading-relaxed">
                   {isEs
-                    ? 'Inmersión diaria de lunes a viernes para entrevistas internacionales o roles remotos clave.'
-                    : 'Daily Mon–Fri immersion for international interviews and remote executive roles.'}
+                    ? 'Inmersión diaria de lunes a viernes para entrevistas internacionales y roles ejecutivos.'
+                    : 'Daily Mon–Fri immersion for international interviews and executive leadership roles.'}
                 </p>
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-1 pt-2">
+              <div className="flex items-baseline gap-1.5 pt-2">
                 <span className="font-montserrat font-black text-3xl sm:text-4xl text-[#1A3153] dark:text-[#FAFAFA] tabular-nums">
                   {currency === 'BOB' ? '850 BOB' : '$125 USD'}
                 </span>
-                <span className="text-xs text-[#4A5568] dark:text-[#A7C7E7] font-sans">
+                <span className="text-xs text-[#4A5568] dark:text-[#A7C7E7] font-inter">
                   {isEs ? '/ mes' : '/ mo'}
                 </span>
               </div>
 
-              {/* Features List */}
-              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] font-sans">
+              {/* Level 2: Max 3–4 Concise Bullet Points */}
+              <ul className="space-y-3 pt-4 border-t border-[var(--border-hairline)] text-xs sm:text-sm text-[#4A5568] dark:text-[#A7C7E7] font-inter">
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
                     <strong>5 {isEs ? 'clases 1-a-1 / semana' : '1-on-1 classes / week'}</strong> ({isEs ? 'Diario Lun–Vie 1h' : 'Daily Mon–Fri 1h'})
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEs ? 'Ilimitado 24/7' : 'Unlimited 24/7'}</strong> {isEs ? 'Voice Lab (Ivan & Emma)' : 'Voice Lab (Ivan & Emma)'}
+                    <strong>{isEs ? 'Voice Lab 24/7 Ilimitado' : 'Unlimited 24/7 Voice Lab'}</strong> (Ivan &amp; Emma)
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEs ? 'Prioridad Ejecutiva' : 'Executive Priority'}</strong> + {isEs ? 'Revisión de CV / PPT' : 'CV / Pitch Deck Reviews'}
+                    <strong>{isEs ? 'Prioridad Ejecutiva' : 'Executive Priority'}</strong> + {isEs ? 'Revisión de CV / Pitch' : 'CV / Pitch Deck Reviews'}
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="text-[#10B981] shrink-0 mt-0.5" />
+                  <Check size={16} className="text-[#9A6515] dark:text-[#E09B30] shrink-0 mt-0.5" />
                   <span>
                     {isEs ? 'Ruta Ejecutiva Diaria (5x Vivo + Entrevistas)' : 'Daily Executive Route (5x Live + Mock Interviews)'}
                   </span>
@@ -331,11 +339,14 @@ export const PricingSection: React.FC = () => {
               </ul>
             </div>
 
+            {/* Level 3: Secondary #1A3153 / #E09B30 CTA */}
             <a
-              href={getWhatsAppPlanLink('Executive VIP', currency === 'BOB' ? '850 BOB/mes' : '$125 USD/mo')}
+              id="plan-cta-executive"
+              href={getPlanWhatsAppUrl('executive', lang, currency)}
+              onClick={() => onSelectPlanClick('executive', 850)}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#FAFAFA] bg-[#1A3153] dark:bg-[#E09B30] dark:text-[#1A3153] hover:bg-[#091326] dark:hover:bg-[#c88624] transition-all cursor-pointer min-h-[48px]"
+              className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-full font-montserrat font-bold text-xs uppercase tracking-wider text-[#FAFAFA] bg-[#1A3153] dark:bg-[#E09B30] dark:text-[#091326] hover:bg-[#091326] dark:hover:bg-[#ECAA41] transition-all cursor-pointer min-h-[48px]"
             >
               <span>{isEs ? 'Aplicar a Executive' : 'Apply to Executive'}</span>
               <ArrowRight size={14} />
@@ -344,18 +355,19 @@ export const PricingSection: React.FC = () => {
         </div>
 
         {/* Quota & Trust Note */}
-        <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-xs text-[var(--text-secondary)] shadow-sm">
+        <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-xs font-inter text-[var(--text-secondary)] shadow-sm">
           <div className="flex items-center gap-2">
             <ShieldCheck size={16} className="text-[#10B981] shrink-0" />
             <span>
               {isEs
-                ? 'Los cupos de clases en vivo se reservan de Lunes a Viernes (14:00–20:00 BOT). Cupos limitados para garantizar >75% STT.'
-                : 'Live session slots are reserved Monday through Friday (14:00–20:00 BOT). Limited seats to guarantee >75% STT.'}
+                ? 'Los cupos de clases en vivo se reservan de Lunes a Viernes (14:00–20:00 BOT). Cupos limitados para garantizar >75% de habla activa.'
+                : 'Live session slots are reserved Monday through Friday (14:00–20:00 BOT). Limited seats to guarantee >75% active speaking time.'}
             </span>
           </div>
           <button
+            type="button"
             onClick={() => openAuthModal('signup')}
-            className="text-[#9A6515] dark:text-[#E09B30] font-bold hover:underline whitespace-nowrap cursor-pointer"
+            className="text-[#9A6515] dark:text-[#E09B30] font-montserrat font-bold hover:underline whitespace-nowrap cursor-pointer"
           >
             {isEs ? 'Crear Cuenta Gratis →' : 'Create Free Account →'}
           </button>

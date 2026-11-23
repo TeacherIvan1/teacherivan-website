@@ -2,21 +2,28 @@
  * Official Teacher Ivan Contact Configuration
  *
  * Centralized contact constants for WhatsApp, phone, and messaging across
- * the entire Teacher Ivan platform.
+ * the entire Teacher Ivan platform. Always returns a pre-filled `text=` query string.
  */
 
-export const TEACHER_PHONE = '+591 72878330';
-export const TEACHER_PHONE_CLEAN = '59172878330';
-export const WHATSAPP_BASE_URL = 'https://wa.me/59172878330';
+import {
+  OFFICIAL_WHATSAPP_NUMBER,
+  OFFICIAL_WHATSAPP_DISPLAY,
+  OFFICIAL_WHATSAPP_BASE,
+  buildWhatsAppUrl,
+  getGeneralWhatsAppUrl,
+} from '../utils/whatsapp';
+
+export const TEACHER_PHONE = OFFICIAL_WHATSAPP_DISPLAY;
+export const TEACHER_PHONE_CLEAN = OFFICIAL_WHATSAPP_NUMBER;
+export const WHATSAPP_BASE_URL = OFFICIAL_WHATSAPP_BASE;
 
 /**
- * Generates an official WhatsApp click-to-chat URL with an optional pre-filled message.
- * @param message Optional message to encode into the query string
- * @returns Fully qualified https://wa.me/59172878330?text=... URL
+ * Generates an official WhatsApp click-to-chat URL with a pre-filled message.
+ * If no custom message is passed, uses the official default inquiry message.
  */
-export function getWhatsAppUrl(message?: string): string {
+export function getWhatsAppUrl(message?: string, lang: 'es' | 'en' = 'es'): string {
   if (!message || !message.trim()) {
-    return WHATSAPP_BASE_URL;
+    return getGeneralWhatsAppUrl(lang);
   }
-  return `${WHATSAPP_BASE_URL}?text=${encodeURIComponent(message.trim())}`;
+  return buildWhatsAppUrl(message);
 }

@@ -164,6 +164,7 @@ export const EducationalResourcesView: React.FC = () => {
     try {
       const res = await fetch(getApiUrl('/api/curriculum/generate-custom-resource'), {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           topic: customTopic.trim(),
