@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
@@ -117,8 +118,25 @@ export class UserStore {
   private isLoaded: boolean = false;
 
   constructor(customPath?: string) {
+    const isTestEnv =
+      process.env.NODE_ENV === 'test' ||
+      Boolean(process.env.VITEST) ||
+      Boolean(process.env.JEST_WORKER_ID);
+
     if (customPath) {
       this.dataFilePath = customPath;
+    } else if (process.env.USER_DATA_DIR) {
+      const dataDir = path.resolve(process.env.USER_DATA_DIR);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      this.dataFilePath = path.join(dataDir, 'users.json');
+    } else if (isTestEnv) {
+      const testDir = path.join(os.tmpdir(), 'teacherivan-test-data');
+      if (!fs.existsSync(testDir)) {
+        fs.mkdirSync(testDir, { recursive: true });
+      }
+      this.dataFilePath = path.join(testDir, `users-${process.pid}.json`);
     } else {
       const dataDir = path.resolve(__dirname, '../../data');
       if (!fs.existsSync(dataDir)) {
@@ -127,7 +145,7 @@ export class UserStore {
       this.dataFilePath = path.join(dataDir, 'users.json');
     }
     this.loadFromDisk();
-    this.seedDefaultUsers(!customPath);
+    this.seedDefaultUsers(!customPath && !isTestEnv);
   }
 
   public normalizeEmail(email: string): string {

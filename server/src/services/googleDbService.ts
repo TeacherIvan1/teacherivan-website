@@ -20,6 +20,40 @@ import crypto from 'crypto';
 import { User, userStore, StudentPlan, LearningGoals } from './userStore.js';
 import { Booking, bookingStore, BookingStartTime, BookingEndTime } from './bookingStore.js';
 
+export function isGoogleSheetsSyncDisabled(): boolean {
+  return (
+    process.env.NODE_ENV === 'test' ||
+    Boolean(process.env.VITEST) ||
+    Boolean(process.env.JEST_WORKER_ID) ||
+    process.env.DISABLE_GOOGLE_SHEETS_SYNC === 'true'
+  );
+}
+
+export function isSyntheticTestUser(user: {
+  email?: string;
+  username?: string;
+  fullName?: string;
+}): boolean {
+  const email = (user.email || '').trim().toLowerCase();
+  const username = (user.username || '').trim().toLowerCase();
+  const fullName = (user.fullName || '').trim().toLowerCase();
+
+  if (/@example\.com$/i.test(email)) return true;
+  if (/^valeria_\d+/i.test(email) || /^valeria_\d+/i.test(username)) return true;
+  if (/^student_\d+/i.test(email) || /^student_\d+/i.test(username)) return true;
+  if (fullName === 'valeria mendoza') return true;
+  return false;
+}
+
+export function sanitizeSheetPhone(rawPhone: unknown): string {
+  if (rawPhone === undefined || rawPhone === null) return '';
+  const trimmed = String(rawPhone).trim();
+  if (!trimmed || /^#(ERROR|NAME|VALUE|REF|N\/A|DIV\/0)[!?]?$/i.test(trimmed)) {
+    return '';
+  }
+  return trimmed;
+}
+
 export function sanitizeSheetId(input: string | undefined): string | null {
   if (!input) return null;
   const trimmed = input.trim();
@@ -130,6 +164,12 @@ export class GoogleDbService {
   }
 
   private initClient(): boolean {
+    if (isGoogleSheetsSyncDisabled()) {
+      this.sheetsClient = null;
+      this.spreadsheetId = null;
+      return false;
+    }
+
     const rawSheetId = process.env.GOOGLE_SHEET_ID;
     const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
     const rawPrivateKey = process.env.GOOGLE_PRIVATE_KEY;
@@ -165,6 +205,11 @@ export class GoogleDbService {
   }
 
   public isConfigured(): boolean {
+    if (isGoogleSheetsSyncDisabled()) {
+      this.sheetsClient = null;
+      this.spreadsheetId = null;
+      return false;
+    }
     if (!this.sheetsClient || !this.spreadsheetId) {
       return this.initClient();
     }
@@ -285,7 +330,7 @@ export class GoogleDbService {
       u.username || '',
       u.fullName || '',
       u.email || '',
-      u.phoneNumber || '',
+      sanitizeSheetPhone(u.phoneNumber),
       u.dateOfBirth || '',
       u.country || '',
       u.authProvider || 'email',
@@ -316,7 +361,8 @@ export class GoogleDbService {
 
     if (!email || !email.includes('@')) return null;
 
-    const phoneNumber = row[4] ? String(row[4]).trim() : undefined;
+    const cleanPhone = sanitizeSheetPhone(row[4]);
+    const phoneNumber = cleanPhone || undefined;
     const dateOfBirth = row[5] ? String(row[5]).trim() : '';
     const country = row[6] ? String(row[6]).trim() : 'Bolivia';
     const authProvider = (row[7] === 'google' ? 'google' : 'email') as 'email' | 'google';
@@ -467,7 +513,7 @@ export class GoogleDbService {
       let importedUsers = 0;
       for (const row of userRows) {
         const parsed = this.rowToUser(row);
-        if (parsed && parsed.email) {
+        if (parsed && parsed.email && !isSyntheticTestUser(parsed)) {
           userStore.syncClientUser(parsed);
           importedUsers++;
         }
@@ -523,6 +569,13 @@ export class GoogleDbService {
    * Upsert a student record in Google Sheets 'Users' tab
    */
   public async upsertUserInGoogleDb(user: User): Promise<boolean> {
+    if (isGoogleSheetsSyncDisabled()) {
+      return false;
+    }
+    if (isSyntheticTestUser(user)) {
+      console.log(`[GoogleDbService] Skipping synthetic test user sync (${user.email}).`);
+      return false;
+    }
     if (!this.isConfigured() || !this.sheetsClient || !this.spreadsheetId) {
       return false;
     }
@@ -556,20 +609,20 @@ export class GoogleDbService {
       const rowValues = this.userToRow(user);
 
       if (targetRowIndex > 0) {
-        // Update existing row
+        // Update existing row using RAW so leading '+' in phone numbers never triggers formula parsing (#ERROR!)
         await this.sheetsClient.spreadsheets.values.update({
           spreadsheetId: this.spreadsheetId,
           range: `Users!A${targetRowIndex}:T${targetRowIndex}`,
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: 'RAW',
           requestBody: { values: [rowValues] },
         });
         console.log(`[GoogleDbService] ✓ Updated user row ${targetRowIndex} for ${user.email} in Google Sheet.`);
       } else {
-        // Append new row
+        // Append new row using RAW so leading '+' in phone numbers is stored verbatim as text
         await this.sheetsClient.spreadsheets.values.append({
           spreadsheetId: this.spreadsheetId,
           range: 'Users!A:T',
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: 'RAW',
           insertDataOption: 'INSERT_ROWS',
           requestBody: { values: [rowValues] },
         });
@@ -589,6 +642,13 @@ export class GoogleDbService {
    * Upsert a booking record in Google Sheets 'Bookings' tab
    */
   public async upsertBookingInGoogleDb(booking: Booking): Promise<boolean> {
+    if (isGoogleSheetsSyncDisabled()) {
+      return false;
+    }
+    if (isSyntheticTestUser({ email: booking.studentEmail, fullName: booking.studentName })) {
+      console.log(`[GoogleDbService] Skipping synthetic test booking sync (${booking.studentEmail}).`);
+      return false;
+    }
     if (!this.isConfigured() || !this.sheetsClient || !this.spreadsheetId) {
       return false;
     }
@@ -620,7 +680,7 @@ export class GoogleDbService {
         await this.sheetsClient.spreadsheets.values.update({
           spreadsheetId: this.spreadsheetId,
           range: `Bookings!A${targetRowIndex}:L${targetRowIndex}`,
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: 'RAW',
           requestBody: { values: [rowValues] },
         });
         console.log(`[GoogleDbService] ✓ Updated booking row ${targetRowIndex} for ${booking.id} in Google Sheet.`);
@@ -628,7 +688,7 @@ export class GoogleDbService {
         await this.sheetsClient.spreadsheets.values.append({
           spreadsheetId: this.spreadsheetId,
           range: 'Bookings!A:L',
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: 'RAW',
           insertDataOption: 'INSERT_ROWS',
           requestBody: { values: [rowValues] },
         });
@@ -648,6 +708,9 @@ export class GoogleDbService {
    * Mark a booking as CANCELLED in Google Sheets 'Bookings' tab
    */
   public async deleteBookingInGoogleDb(id: string): Promise<boolean> {
+    if (isGoogleSheetsSyncDisabled()) {
+      return false;
+    }
     if (!this.isConfigured() || !this.sheetsClient || !this.spreadsheetId) {
       return false;
     }
@@ -677,7 +740,7 @@ export class GoogleDbService {
         await this.sheetsClient.spreadsheets.values.update({
           spreadsheetId: this.spreadsheetId,
           range: `Bookings!K${targetRowIndex}`,
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: 'RAW',
           requestBody: { values: [['CANCELLED']] },
         });
         console.log(`[GoogleDbService] ✓ Marked booking ${id} as CANCELLED at row ${targetRowIndex} in Google Sheet.`);

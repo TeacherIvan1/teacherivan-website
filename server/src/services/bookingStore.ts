@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
@@ -38,8 +39,25 @@ export class BookingStore {
   private bookings: Map<string, Booking> = new Map(); // key = id
 
   constructor(customPath?: string) {
+    const isTestEnv =
+      process.env.NODE_ENV === 'test' ||
+      Boolean(process.env.VITEST) ||
+      Boolean(process.env.JEST_WORKER_ID);
+
     if (customPath) {
       this.dataFilePath = customPath;
+    } else if (process.env.USER_DATA_DIR) {
+      const dataDir = path.resolve(process.env.USER_DATA_DIR);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      this.dataFilePath = path.join(dataDir, 'bookings.json');
+    } else if (isTestEnv) {
+      const testDir = path.join(os.tmpdir(), 'teacherivan-test-data');
+      if (!fs.existsSync(testDir)) {
+        fs.mkdirSync(testDir, { recursive: true });
+      }
+      this.dataFilePath = path.join(testDir, `bookings-${process.pid}.json`);
     } else {
       const dataDir = path.resolve(__dirname, '../../data');
       if (!fs.existsSync(dataDir)) {

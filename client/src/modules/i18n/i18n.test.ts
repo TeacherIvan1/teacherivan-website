@@ -162,8 +162,8 @@ describe('i18n Language Module', () => {
     assert.strictEqual(translations.es.asyncSprint.microLearningTitle, 'Micro-Aprendizaje Adaptado a Tu Horario');
     assert.ok(translations.en.asyncSprint.microLearningDesc.includes('Fluency is not built'));
     assert.ok(translations.es.asyncSprint.microLearningDesc.includes('La fluidez no se construye'));
-    assert.strictEqual(translations.en.asyncSprint.badgeDailyRecasts, 'Daily Audio Recasts');
-    assert.strictEqual(translations.es.asyncSprint.badgeDailyRecasts, 'Recasting en Audio Diario');
+    assert.strictEqual(translations.en.asyncSprint.badgeDailyRecasts, 'Daily Audio Corrections');
+    assert.strictEqual(translations.es.asyncSprint.badgeDailyRecasts, 'Correcciones en Audio Diario');
     assert.strictEqual(translations.en.asyncSprint.badgeNeuroplastic, 'Neuroplastic Retention');
     assert.strictEqual(translations.es.asyncSprint.badgeNeuroplastic, 'Retención Neuroplástica');
     assert.strictEqual(translations.en.asyncSprint.badgeZeroCommute, 'Zero Commute Time');

@@ -171,7 +171,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
 
     const highlight = isEs
       ? pDay?.highlightEs || 'Recibe retroalimentación personalizada de Teacher Ivan.'
-      : pDay?.highlight || 'Receive personalized recast feedback from Teacher Ivan.';
+      : pDay?.highlight || 'Receive personalized natural correction feedback from Teacher Ivan.';
 
     return { title, description, collocations, preset, writingPrompt, highlight };
   };
@@ -550,12 +550,12 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                     <Headphones size={14} className="text-emerald-500 dark:text-emerald-400" />
                   </div>
                   <h4 className="font-montserrat font-bold text-sm text-[var(--text-primary)] dark:text-[#FAFAFA]">
-                    {isEs ? 'Fijación de Recasts en Voz 24/7' : 'Post-Class Recast Fixation'}
+                    {isEs ? 'Práctica de Correcciones en Voz 24/7' : 'Post-Class Correction Practice'}
                   </h4>
                   <p className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] leading-relaxed">
                     {isEs
                       ? 'Reformula en el Laboratorio de Voz los errores detectados durante tu clase en vivo para automatizar reflejos.'
-                      : 'Rehearse and recast errors flagged during your live session inside the 24/7 Voice Lab.'}
+                      : 'Rehearse and naturally correct errors flagged during your live session inside the 24/7 Voice Lab.'}
                   </p>
                 </div>
                 <button

@@ -137,7 +137,7 @@ export const OverviewCorePillars: React.FC = () => {
         </div>
         <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[#1A3153]/60 border border-[#A7C7E7]/20 text-xs text-[#FAFAFA]">
           <CheckCircle2 size={16} className="text-[#10b981] shrink-0" />
-          <span>{isEs ? 'Recasting de Audio Personalizado' : 'Personalized Audio Recasts'}</span>
+          <span>{isEs ? 'Correcciones de Audio Personalizadas' : 'Personalized Audio Corrections'}</span>
         </div>
       </div>
     </section>

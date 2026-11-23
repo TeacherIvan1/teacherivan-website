@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" width="320" height="64" role="img" aria-label="Teacher Ivan Editorial Script Logo">
-  <text x="12" y="39" font-family="Montserrat, Arial, sans-serif" font-weight="600" font-size="22" letter-spacing="0.22em" fill="currentColor">TEACHER</text>
-  <text x="166" y="43" font-family="'Mr Dafoe', Georgia, cursive" font-size="40" fill="#E09B30">Ivan</text>
-  <path d="M12 50 Q145 45 274 50" fill="none" stroke="#E09B30" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="278" cy="49.5" r="2.8" fill="#A7C7E7"/>
-</svg>

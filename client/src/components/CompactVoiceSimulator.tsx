@@ -387,7 +387,7 @@ export const CompactVoiceSimulator: React.FC = () => {
                   ? 'bg-[#E09B30] text-[#1A3153] shadow-sm'
                   : 'text-[var(--text-secondary)] dark:text-[#A7C7E7] hover:text-[var(--text-primary)] dark:hover:text-[#FAFAFA]'
               }`}
-              title="Coaching Mode: Systematic recast error modeling"
+              title="Coaching Mode: Instant natural corrections"
             >
               <span>{isEs ? 'Corrección Activa' : 'Coaching'}</span>
               {!isAuthenticated && <Lock size={11} className="text-[#E09B30]" />}

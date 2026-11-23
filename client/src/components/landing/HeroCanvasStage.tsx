@@ -189,7 +189,7 @@ export const HeroCanvasStage: React.FC<HeroCanvasStageProps> = ({ onStartVoiceTe
         }}
       >
         <Sparkles size={12} className="text-[#E09B30]" />
-        <span>{isEs ? 'RECASTING EN VIVO' : 'LIVE RECASTING'}</span>
+        <span>{isEs ? 'CORRECCIÓN AL INSTANTE' : 'INSTANT CORRECTIONS'}</span>
       </div>
 
       {/* Main 3D Tilt Stage Card */}
@@ -320,7 +320,7 @@ export const HeroCanvasStage: React.FC<HeroCanvasStageProps> = ({ onStartVoiceTe
           <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-300">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A7C7E7]/20 border border-[#A7C7E7]/40 text-[#A7C7E7] text-xs font-montserrat font-bold uppercase tracking-wider mb-4">
               <Activity size={13} className="text-[#E09B30]" />
-              <span>{isEs ? '2. Recast Asíncrono 24/7 con IA' : '2. 24/7 AI Recast Wave'}</span>
+              <span>{isEs ? '2. Corrección 24/7 con IA' : '2. 24/7 AI Correction Wave'}</span>
             </div>
 
             {/* Dual Chibi Avatars with Sound Bridge */}
@@ -374,7 +374,7 @@ export const HeroCanvasStage: React.FC<HeroCanvasStageProps> = ({ onStartVoiceTe
                 {isEs ? 'ALUMNO:' : 'LEARNER:'} <span className="text-[#FAFAFA]">"I am agree with your proposal..."</span>
               </div>
               <div className="text-[10px] font-mono text-[#E09B30]">
-                {isEs ? 'RECAST IA:' : 'AI RECAST:'} <span className="text-[#10b981]">"Exactly, you agree with the proposal! Tell me..."</span>
+                {isEs ? 'CORRECCIÓN IA:' : 'AI CORRECTION:'} <span className="text-[#10b981]">"Exactly, you agree with the proposal! Tell me..."</span>
               </div>
             </div>
 
@@ -436,7 +436,7 @@ export const HeroCanvasStage: React.FC<HeroCanvasStageProps> = ({ onStartVoiceTe
 
               <div>
                 <div className="flex justify-between text-[11px] font-inter text-[#A7C7E7] mb-1">
-                  <span>Grammar Range & Recasting</span>
+                  <span>Grammar Range & Natural Corrections</span>
                   <span className="font-mono text-[#FAFAFA] font-bold">78%</span>
                 </div>
                 <div className="h-1.5 w-full bg-[#1A3153] rounded-full overflow-hidden">

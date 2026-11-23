@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
 
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.resolve(ROOT_DIR, 'client/dist');
-const SCREENSHOT_DIR = path.resolve(ROOT_DIR, 'media-pipeline/output/qa-screenshots');
+const SCREENSHOT_DIR = path.resolve(ROOT_DIR, 'media-pipeline/output/qa-3d-planet');
 const SERVER_PORT = 3001;
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}`;
@@ -24,32 +25,37 @@ async function waitForHttp(url, timeoutMs = 20000) {
 }
 
 function scanDistForForbiddenTokens() {
-  console.log('\n[1/8] Scanning client/dist/ for static AudioWorklet, editorial SVG rigs, 4 logo options, motivation WebPs & zero secrets...');
+  console.log('\n[1/7] Scanning client/dist/ for 3D avatars, promoted editorial logo, static AudioWorklet, motivation WebPs & zero secrets...');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'worklets/pcm-processor.js')), 'client/dist/worklets/pcm-processor.js must exist');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'version.json')), 'client/dist/version.json must exist');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'sw.js')), 'client/dist/sw.js must exist');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'CNAME')), 'client/dist/CNAME must exist');
-  assert.ok(fs.existsSync(path.join(DIST_DIR, 'logo-preview.html')), 'client/dist/logo-preview.html must exist');
 
-  // Verify new Live2D hierarchical SVG rigging contract in both Emma & Teacher Ivan rigs
-  for (const rig of ['emma-rig.svg', 'teacher-ivan-rig.svg']) {
-    const rigPath = path.join(DIST_DIR, 'assets', rig);
-    assert.ok(fs.existsSync(rigPath), `${rig} must exist in client/dist/assets/`);
-    const content = fs.readFileSync(rigPath, 'utf8');
-    for (const id of ['#avatar-root', '#hair-back', '#torso-group', '#head-group', '#eye-left-iris', '#mouth-visemes', '#hair-front-bangs']) {
-      const cleanId = id.slice(1);
-      assert.ok(content.includes(`id="${cleanId}"`), `${rig} missing required Live2D rig layer id="${cleanId}"`);
-    }
-  }
-
-  // Verify 4 logo candidates (full + icon)
-  for (const logo of [
-    'logo-opt-1-portal.svg', 'logo-opt-1-portal-icon.svg',
-    'logo-opt-2-editorial.svg', 'logo-opt-2-editorial-icon.svg',
-    'logo-opt-3-bicronic.svg', 'logo-opt-3-bicronic-icon.svg',
-    'logo-opt-4-skyline.svg', 'logo-opt-4-skyline-icon.svg',
+  // Phase 4: Promoted editorial logo & PWA icons exist; temporary preview/candidates deleted
+  for (const brandFile of [
+    'favicon.svg',
+    'icon-192.png',
+    'icon-512.png',
+    'apple-touch-icon.png',
+    'assets/logo.svg',
+    'assets/logo-icon-mark.svg',
+    'assets/logo-horizontal-light.svg',
+    'assets/logo-horizontal-dark.svg',
+    'assets/logo-print-monochrome.svg',
   ]) {
-    assert.ok(fs.existsSync(path.join(DIST_DIR, 'assets/logo-candidates', logo)), `Missing logo candidate ${logo}`);
+    assert.ok(fs.existsSync(path.join(DIST_DIR, brandFile)), `Missing promoted brand asset: ${brandFile}`);
+  }
+  assert.equal(fs.existsSync(path.join(DIST_DIR, 'logo-preview.html')), false, 'Temporary logo-preview.html must be removed');
+  assert.equal(fs.existsSync(path.join(DIST_DIR, 'assets/logo-candidates')), false, 'Temporary logo-candidates/ must be removed');
+
+  // Phase 1: 3D Reference Avatar WebP + PNG cutouts (< 180 KB WebP)
+  for (const avatar of ['teacherivan-3d.webp', 'emma-3d.webp', 'teacherivan-3d.png', 'emma-3d.png']) {
+    const p = path.join(DIST_DIR, 'assets/avatars', avatar);
+    assert.ok(fs.existsSync(p), `Missing 3D avatar asset: assets/avatars/${avatar}`);
+    if (avatar.endsWith('.webp')) {
+      const size = fs.statSync(p).size;
+      assert.ok(size < 180 * 1024, `${avatar} must be < 180 KB, got ${size} B`);
+    }
   }
 
   // Verify 5 motivation WebP photos
@@ -72,17 +78,26 @@ function scanDistForForbiddenTokens() {
     assert.ok(!content.includes('BEGIN PRIVATE KEY'), `Bundle ${file} must not contain any private key`);
     assert.ok(!content.includes('GOCSPX'), `Bundle ${file} must not contain any OAuth client secret`);
   }
-  console.log('  ✔ Static worklet, Live2D SVG rigs, 4 logo candidates, logo-preview.html, 5 WebP photos, and 0 secrets verified.');
+  console.log('  ✔ 3D avatars (<180KB WebP), promoted editorial logo, static worklet, 5 motivation WebPs, and 0 secrets verified.');
 }
 
 async function runPlaywrightSuite() {
   scanDistForForbiddenTokens();
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
-  console.log('\nStarting compiled server and Vite preview...');
+  // Isolated temporary data dir + DISABLE_GOOGLE_SHEETS_SYNC=true so E2E NEVER touches live Sheets or server/data/users.json
+  const isolatedDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'teacherivan-e2e-'));
+
+  console.log('\nStarting compiled server (Google Sheets sync DISABLED) and Vite preview...');
   const serverProc = spawn('node', ['server/dist/index.js'], {
     cwd: ROOT_DIR,
-    env: { ...process.env, PORT: String(SERVER_PORT), NODE_ENV: 'development' },
+    env: {
+      ...process.env,
+      PORT: String(SERVER_PORT),
+      NODE_ENV: 'development',
+      DISABLE_GOOGLE_SHEETS_SYNC: 'true',
+      USER_DATA_DIR: isolatedDataDir,
+    },
     stdio: 'pipe',
   });
 
@@ -104,7 +119,11 @@ async function runPlaywrightSuite() {
   try {
     await waitForHttp(`http://localhost:${SERVER_PORT}/api/health`);
     await waitForHttp(PREVIEW_URL);
-    console.log('  ✔ Local server (3001) and Vite preview (4173) are live.');
+
+    // Confirm live server reports Google Sheets disabled during E2E
+    const healthJson = await (await fetch(`http://localhost:${SERVER_PORT}/api/health`)).json();
+    assert.equal(healthJson.googleDbStatus, 'not_configured', `Expected Google Sheets disabled during E2E, got ${healthJson.googleDbStatus}`);
+    console.log('  ✔ Local server (3001, Sheets isolated) and Vite preview (4173) are live.');
 
     browser = await chromium.launch({
       headless: true,
@@ -113,21 +132,6 @@ async function runPlaywrightSuite() {
         '--use-fake-device-for-media-stream',
       ],
     });
-
-    // Verify /logo-preview.html interactive gallery
-    {
-      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-      const page = await ctx.newPage();
-      await page.goto(`${PREVIEW_URL}/logo-preview.html`, { waitUntil: 'networkidle' });
-      const logoImgCount = await page.evaluate(() => {
-        const imgs = Array.from(document.querySelectorAll('#logo-grid img'));
-        return { total: imgs.length, loaded: imgs.filter((i) => i.complete && i.naturalWidth > 0).length };
-      });
-      assert.ok(logoImgCount.total >= 20 && logoImgCount.loaded === logoImgCount.total, `Expected all logo preview SVGs to load, got ${logoImgCount.loaded}/${logoImgCount.total}`);
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'logo-preview.png'), fullPage: false });
-      await ctx.close();
-      console.log(`  ✔ /logo-preview.html verified (${logoImgCount.loaded}/${logoImgCount.total} SVGs loaded + screenshot captured).`);
-    }
 
     const viewports = [
       { name: 'Desktop (1440×900)', slug: 'desktop', width: 1440, height: 900, isMobile: false, runFullAuth: true },
@@ -170,12 +174,7 @@ async function runPlaywrightSuite() {
         }, theme);
 
         await page.goto(PREVIEW_URL, { waitUntil: 'networkidle' });
-        await page.waitForTimeout(250);
-
-        // Capture landing screenshot
-        if (vp.slug === 'desktop' || vp.slug === 'mobile') {
-          await page.screenshot({ path: path.join(SCREENSHOT_DIR, `${theme}-${vp.slug}.png`), fullPage: false });
-        }
+        await page.waitForTimeout(350);
 
         // 1. Landmarks, Skip Link, 1x <h1>, and Zero Horizontal Overflow
         const layoutAudit = await page.evaluate(() => {
@@ -199,31 +198,122 @@ async function runPlaywrightSuite() {
         assert.equal(layoutAudit.hasMainLandmark, true, '<main id="main-content"> landmark must exist');
         assert.equal(layoutAudit.h1Count, 1, `Expected exactly 1 <h1> per view, got ${layoutAudit.h1Count}`);
 
-        // 2. Zero Argentine Voseo Check
-        const voseoMatches = await page.evaluate(() => {
+        // 2. Zero Argentine Voseo, Zero "Recasting" Jargon & Zero Forbidden Voice-Gender/Descriptor Pills
+        const copyAudit = await page.evaluate(() => {
           const text = document.body.innerText || '';
-          const re = /(?<![a-zA-ZáéíóúÁÉÍÓÚñÑ])(vos|sos|hablá|hablás|probá|probás|probalo|descubrí|descubrís|tenés|estudiás|bloqueás|congelás|agendá|agendás|podés|elegí|elegís|entrá|conocé|empezá|comenzá|practicá|practicás|deslizá|asegurá|reservá|escribime|escribile|decime|contame|querés|necesitás|sabés|dejá|aprendé|guardá|compartilo|hacelo|hacé|creá|recibí|recibís|combiná|activá|conversá|completá|generá|cancelá|cambiá)(?![a-zA-ZáéíóúÁÉÍÓÚñÑ])/gi;
-          return text.match(re) || [];
+          const voseoRe = /(?<![a-zA-ZáéíóúÁÉÍÓÚñÑ])(vos|sos|hablá|hablás|probá|probás|probalo|descubrí|descubrís|tenés|estudiás|bloqueás|congelás|agendá|agendás|podés|elegí|elegís|entrá|conocé|empezá|comenzá|practicá|practicás|deslizá|asegurá|reservá|escribime|escribile|decime|contame|querés|necesitás|sabés|dejá|aprendé|guardá|compartilo|hacelo|hacé|creá|recibí|recibís|combiná|activá|conversá|completá|generá|cancelá|cambiá)(?![a-zA-ZáéíóúÁÉÍÓÚñÑ])/gi;
+          const recastRe = /\brecast(ing|s)?\b/gi;
+          const forbiddenLabels = [
+            'Voz Masculina',
+            'Voz Femenina',
+            'Male Voice',
+            'Female Voice',
+            'Mentor Pedagógico Empático y Estructurado',
+          ].filter((lbl) => text.includes(lbl));
+          return {
+            voseo: text.match(voseoRe) || [],
+            recast: text.match(recastRe) || [],
+            forbiddenLabels,
+          };
         });
-        assert.equal(voseoMatches.length, 0, `Found Argentine voseo: ${voseoMatches.join(', ')}`);
+        assert.equal(copyAudit.voseo.length, 0, `Found Argentine voseo: ${copyAudit.voseo.join(', ')}`);
+        assert.equal(copyAudit.recast.length, 0, `Found student-facing "recast/recasting" jargon: ${copyAudit.recast.join(', ')}`);
+        assert.equal(copyAudit.forbiddenLabels.length, 0, `Found removed simulator labels: ${copyAudit.forbiddenLabels.join(', ')}`);
 
         // 3. Desktop vs Mobile Specific Architecture Checks
         if (!vp.isMobile) {
-          // Desktop: Luminous Metropolis Portal Zoom (1x -> 7.5x) & Motivational Showcase
+          // 3A. Hero Column 2 "T." Monogram Clearance Audit
           await page.evaluate(() => window.scrollTo(0, 0));
-          await page.waitForTimeout(100);
+          await page.waitForTimeout(150);
+
+          if (vp.slug === 'desktop' && theme === 'light') {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'planet-doorway-top.png'), fullPage: false });
+          }
+
+          const heroMonogramAudit = await page.evaluate(() => {
+            const tEl = document.getElementById('hero-monogram-t');
+            const copyEl = document.getElementById('hero-monogram-copy');
+            if (!tEl || !copyEl) return null;
+            const tBox = tEl.getBoundingClientRect();
+            const textBox = copyEl.getBoundingClientRect();
+            return {
+              tRight: tBox.right,
+              textLeft: textBox.left,
+              gapPx: textBox.left - tBox.right,
+            };
+          });
+          assert.ok(heroMonogramAudit, 'Hero Column 2 #hero-monogram-t and #hero-monogram-copy must exist');
+          assert.ok(
+            heroMonogramAudit.tRight + 10 <= heroMonogramAudit.textLeft,
+            `Hero "T." overlaps adjacent text! tBox.right=${heroMonogramAudit.tRight}, textBox.left=${heroMonogramAudit.textLeft}, gap=${heroMonogramAudit.gapPx}px`
+          );
+
+          // 3B. Discoverable Planet Portal Animation (0% -> 70% -> 100%)
+          const planetCheck = await page.evaluate(() => {
+            const stage = document.getElementById('portal-world-fixed-stage');
+            const themeAttr = stage?.getAttribute('data-world-theme');
+            const cityElems = document.querySelectorAll('.ti-city-beacon, [data-world-theme="metropolis"]').length;
+            return { themeAttr, cityElems };
+          });
+          assert.equal(planetCheck.themeAttr, 'discoverable-planet', `Expected data-world-theme="discoverable-planet", got ${planetCheck.themeAttr}`);
+          assert.equal(planetCheck.cityElems, 0, `Expected 0 legacy cityscape elements, got ${planetCheck.cityElems}`);
+
           const topTransform = await page.$eval('#portal-archway-zoom-layer', (el) => el.style.transform);
           assert.ok(topTransform.includes('scale(1)'), `Expected portal scale(1) at top, got ${topTransform}`);
+
+          // Scroll to 70% through portal intro track -> planet world revealed
+          await page.evaluate(() => {
+            const intro = document.getElementById('portal-intro-track');
+            const denom = intro ? Math.max(1, intro.offsetHeight - window.innerHeight) : window.innerHeight * 0.6;
+            window.scrollTo(0, Math.round(denom * 0.72));
+          });
+          await page.waitForTimeout(200);
+          if (vp.slug === 'desktop' && theme === 'dark') {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'planet-world-revealed.png'), fullPage: false });
+          }
 
           await page.evaluate(() => {
             const intro = document.getElementById('portal-intro-track');
             window.scrollTo(0, intro ? intro.offsetHeight : window.innerHeight * 1.6);
           });
-          await page.waitForTimeout(150);
+          await page.waitForTimeout(200);
           const endPortal = await page.$eval('#portal-archway-zoom-layer', (el) => el.style.transform);
           const endWorld = await page.$eval('#portal-world-parallax-layer', (el) => el.style.transform);
           assert.ok(endPortal.includes('scale(7.5)'), `Expected portal scale(7.5), got ${endPortal}`);
           assert.ok(endWorld.includes('scale(1.18)'), `Expected world scale(1.18), got ${endWorld}`);
+
+          // 3C. Desktop Voice Simulator + Animated 3D Avatars (Ivan & Emma)
+          await page.evaluate(() => {
+            const sim = document.getElementById('flagship-simulator-section');
+            if (sim) sim.scrollIntoView({ behavior: 'instant', block: 'start' });
+          });
+          await page.waitForTimeout(250);
+
+          const simAvatarAudit = await page.evaluate(() => {
+            const stage = document.getElementById('tutor-avatar-stage');
+            const imgs = stage ? Array.from(stage.querySelectorAll('img')) : [];
+            const avatar3d = stage ? stage.querySelector('[data-testid="tutor-avatar-3d"]') : null;
+            const svgRigImgs = imgs.filter((i) => (i.currentSrc || i.getAttribute('src') || '').includes('-rig.svg'));
+            return {
+              hasStage: Boolean(stage),
+              hasAvatar3D: Boolean(avatar3d),
+              persona: avatar3d?.getAttribute('data-character'),
+              loadedImgs: imgs.filter((i) => i.complete && i.naturalWidth > 0).map((i) => i.currentSrc || i.getAttribute('src')),
+              svgRigCount: svgRigImgs.length,
+              stageText: stage?.innerText || '',
+            };
+          });
+          assert.equal(simAvatarAudit.hasStage, true, 'Desktop Voice Simulator stage must render');
+          assert.equal(simAvatarAudit.hasAvatar3D, true, 'Desktop Voice Simulator must mount <TutorAvatar3D />');
+          assert.equal(simAvatarAudit.svgRigCount, 0, 'Voice Simulator must NOT mount legacy -rig.svg images');
+          assert.ok(
+            simAvatarAudit.loadedImgs.some((s) => s && (s.includes('teacherivan-3d.webp') || s.includes('emma-3d.webp'))),
+            `Expected loaded 3D WebP avatar in simulator, got ${JSON.stringify(simAvatarAudit.loadedImgs)}`
+          );
+
+          if (vp.slug === 'desktop') {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, `desktop-${theme}-simulator.png`), fullPage: false });
+          }
 
           // Verify 5 Motivational Showcase images & carousel (2 -> 3 -> 2)
           const showcaseImgs = await page.evaluate(async () => {
@@ -241,17 +331,38 @@ async function runPlaywrightSuite() {
           assert.equal(await page.getAttribute('#motivational-showcase-carousel', 'data-active-index'), '3');
           await page.click('#motivation-carousel-prev-btn');
           assert.equal(await page.getAttribute('#motivational-showcase-carousel', 'data-active-index'), '2');
-          console.log('  ✔ Desktop Luminous Metropolis Portal Zoom (1x -> 7.5x) & Motivational Showcase verified.');
+
+          console.log(`  ✔ Desktop Hero "T." gap (+${Math.round(heroMonogramAudit.gapPx)}px), Discoverable Planet Portal, 3D Avatar (${simAvatarAudit.persona}) & Showcase verified.`);
         } else {
-          // Mobile: Single-Screen 100dvh Zero-Scroll Landing + Mobile Voice Cockpit!
+          // Mobile: Single-Screen 100dvh Zero-Scroll Landing + 3D Avatar + Mobile Voice Cockpit
           assert.ok(
             layoutAudit.verticalOverflowPx <= 2,
             `Mobile landing must fit on 100dvh with zero vertical scroll, got +${layoutAudit.verticalOverflowPx}px`
           );
-          const hasRigLayers = await page.evaluate(() => {
-            return Boolean(document.querySelector('#mobile-hero-section #head-group') && document.querySelector('#mobile-hero-section #mouth-visemes'));
+
+          const mobileAvatarAudit = await page.evaluate(() => {
+            const hero = document.getElementById('mobile-hero-section');
+            const avatar3d = hero ? hero.querySelector('[data-testid="tutor-avatar-3d"]') : null;
+            const img = hero ? hero.querySelector('[data-testid="tutor-avatar-3d"] img') : null;
+            const planetStage = document.getElementById('mobile-planet-stage');
+            return {
+              hasAvatar3D: Boolean(avatar3d),
+              src: img?.currentSrc || img?.getAttribute('src') || '',
+              loaded: Boolean(img && img.complete && img.naturalWidth > 0),
+              worldTheme: planetStage?.getAttribute('data-world-theme') || '',
+            };
           });
-          assert.equal(hasRigLayers, true, 'Mobile Hero must render the new editorial Live2D SVG rig');
+          assert.equal(mobileAvatarAudit.hasAvatar3D, true, 'Mobile Hero must render <TutorAvatar3D />');
+          assert.equal(mobileAvatarAudit.loaded, true, `Mobile Hero 3D avatar failed to load: ${mobileAvatarAudit.src}`);
+          assert.ok(
+            mobileAvatarAudit.src.includes('emma-3d.webp') || mobileAvatarAudit.src.includes('teacherivan-3d.webp'),
+            `Expected 3D WebP avatar in mobile hero, got ${mobileAvatarAudit.src}`
+          );
+          assert.equal(mobileAvatarAudit.worldTheme, 'discoverable-planet', 'Mobile Hero backdrop must use discoverable-planet theme');
+
+          if (vp.slug === 'mobile') {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, `mobile-${theme}-landing.png`), fullPage: false });
+          }
 
           // Dismiss cookie banner if visible before clicking CTA
           const cookieBtn = await page.$('#cookie-essential-only-btn');
@@ -260,7 +371,7 @@ async function runPlaywrightSuite() {
           // Click primary CTA -> launches single-screen zero-scroll MobileVoiceCockpit
           await page.click('#hero-primary-cta-btn');
           await page.waitForSelector('#mobile-voice-cockpit', { state: 'visible' });
-          await page.waitForTimeout(200);
+          await page.waitForTimeout(250);
 
           const cockpitAudit = await page.evaluate(() => {
             const vOverflow = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
@@ -270,21 +381,33 @@ async function runPlaywrightSuite() {
             const hasTutor = Boolean(document.getElementById('mobile-pill-tutor'));
             const hasLevel = Boolean(document.getElementById('mobile-pill-level'));
             const hasScenario = Boolean(document.getElementById('mobile-pill-scenario'));
-            return { vOverflow, hOverflow, fabW: fabRect.width, fabH: fabRect.height, hasTutor, hasLevel, hasScenario };
+            const avatarImg = document.querySelector('#mobile-voice-cockpit [data-testid="tutor-avatar-3d"] img');
+            return {
+              vOverflow,
+              hOverflow,
+              fabW: fabRect.width,
+              fabH: fabRect.height,
+              hasTutor,
+              hasLevel,
+              hasScenario,
+              avatarLoaded: Boolean(avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0),
+              avatarSrc: avatarImg?.currentSrc || avatarImg?.getAttribute('src') || '',
+            };
           });
           assert.ok(cockpitAudit.vOverflow <= 2, `Mobile Voice Cockpit must fit 100dvh (0 scroll), got +${cockpitAudit.vOverflow}px`);
           assert.equal(cockpitAudit.hOverflow, 0, 'Mobile Voice Cockpit must have 0px horizontal overflow');
           assert.ok(cockpitAudit.fabW >= 56 && cockpitAudit.fabH >= 56, 'Mobile Mic FAB must be ~60x60px');
           assert.ok(cockpitAudit.hasTutor && cockpitAudit.hasLevel && cockpitAudit.hasScenario, 'Mobile Cockpit must render 3-pill config strip');
+          assert.equal(cockpitAudit.avatarLoaded, true, `Mobile Cockpit 3D avatar failed to load: ${cockpitAudit.avatarSrc}`);
 
-          if (vp.slug === 'mobile' && theme === 'dark') {
-            await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'mobile-cockpit-dark.png'), fullPage: false });
+          if (vp.slug === 'mobile') {
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, `mobile-${theme}-cockpit.png`), fullPage: false });
           }
 
           // Return to Mobile Home
           await page.click('#mobile-cockpit-back-btn');
           await page.waitForSelector('#mobile-hero-section', { state: 'visible' });
-          console.log(`  ✔ Mobile Single-Screen 100dvh Landing & Zero-Scroll Voice Cockpit verified (0px scroll, FAB ${Math.round(cockpitAudit.fabW)}x${Math.round(cockpitAudit.fabH)}px).`);
+          console.log(`  ✔ Mobile Single-Screen 100dvh Landing & 3D Voice Cockpit verified (0px scroll, FAB ${Math.round(cockpitAudit.fabW)}x${Math.round(cockpitAudit.fabH)}px).`);
         }
 
         // 4. AudioWorklet & Pre-Filled WhatsApp Links
@@ -313,7 +436,7 @@ async function runPlaywrightSuite() {
           assert.ok(href.startsWith('https://wa.me/59172878330?text='), `WhatsApp link must be pre-filled: ${href}`);
         }
 
-        // 5. AuthModal + HttpOnly Cookie Registration (Desktop 1440 & Mobile 390)
+        // 5. AuthModal + HttpOnly Cookie Registration (Isolated local temp store; ZERO Google Sheets writes)
         if (vp.runFullAuth) {
           const cookieBtn = await page.$('#cookie-essential-only-btn');
           if (cookieBtn) await cookieBtn.click();
@@ -323,6 +446,7 @@ async function runPlaywrightSuite() {
             await page.waitForSelector('#mobile-drawer-auth-btn', { state: 'visible' });
             await page.click('#mobile-drawer-auth-btn');
           } else {
+            await page.evaluate(() => window.scrollTo(0, 0));
             await page.click('#signin-nav-btn');
           }
           await page.waitForSelector('#student-auth-modal-card', { state: 'visible' });
@@ -353,9 +477,15 @@ async function runPlaywrightSuite() {
           const sessionCookie = cookies.find((c) => c.name === 'ti_session');
           assert.ok(sessionCookie && sessionCookie.httpOnly, 'HttpOnly ti_session cookie must be set');
 
+          // Ensure zero auth tokens stored in localStorage
+          const lsAuthLeak = await page.evaluate(() => {
+            return Object.keys(localStorage).filter((k) => /token|jwt|ti_session/i.test(k));
+          });
+          assert.equal(lsAuthLeak.length, 0, `Found auth token leak in localStorage: ${lsAuthLeak.join(', ')}`);
+
           await page.reload({ waitUntil: 'networkidle' });
           await page.waitForSelector('#student-microlearning-dashboard', { state: 'visible' });
-          console.log('  ✔ AuthModal & HttpOnly ti_session persistence verified.');
+          console.log('  ✔ AuthModal & HttpOnly ti_session persistence verified (0 Sheets writes, 0 localStorage tokens).');
         }
 
         assert.equal(consoleErrors.length, 0, `Console errors on ${vp.name} (${theme}): ${consoleErrors.join(' | ')}`);
@@ -365,13 +495,16 @@ async function runPlaywrightSuite() {
       }
     }
 
-    console.log('\n======================================================');
-    console.log(' ALL PHASE 1-5 PLAYWRIGHT VISUAL, RIG, MOBILE & A11Y CHECKS PASSED!');
-    console.log('======================================================\n');
+    console.log('\n==============================================================');
+    console.log(' ALL PHASE 1-6 PLAYWRIGHT 3D, PLANET, LOGO, MOBILE & AUTH CHECKS PASSED!');
+    console.log('==============================================================\n');
   } finally {
     if (browser) await browser.close().catch(() => {});
     serverProc.kill();
     previewProc.kill();
+    try {
+      fs.rmSync(isolatedDataDir, { recursive: true, force: true });
+    } catch {}
   }
 }
 

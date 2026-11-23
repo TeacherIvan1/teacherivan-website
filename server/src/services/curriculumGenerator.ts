@@ -81,7 +81,7 @@ export function getDeterministicSprint(goals: LearningGoals): GeneratedSprint {
             descriptionEs: 'Graba una nota de voz de 90 segundos explicando cómo resolviste un desacuerdo técnico crítico. Recibe corrección en audio de Teacher Ivan.',
             targetCollocations: ['differing technical perspectives', 'data-backed compromise', 'post-mortem takeaways'],
             simulatorScenarioPreset: 'Conflict & Collaboration Simulation',
-            highlight: 'Submit voice note on WhatsApp; receive acoustic and phonological recast within 24h.',
+            highlight: 'Submit voice note on WhatsApp; receive personalized pronunciation correction within 24h.',
             highlightEs: 'Envía tu nota de voz por WhatsApp; recibe corrección fonética en menos de 24h.',
           },
           {
@@ -159,8 +159,8 @@ export function getDeterministicSprint(goals: LearningGoals): GeneratedSprint {
             descriptionEs: 'Graba un discurso de 90 segundos explicando tu liderazgo y compromiso de retorno para tu país.',
             targetCollocations: ['committed to reinvesting knowledge', 'catalyzing grassroots reform', 'interdisciplinary approach'],
             simulatorScenarioPreset: 'Scholarship Interview Panel',
-            highlight: 'WhatsApp submission with personalized phonetic stress recast from Teacher Ivan.',
-            highlightEs: 'Envío por WhatsApp con recasting fonético personalizado de Teacher Ivan.',
+            highlight: 'WhatsApp submission with personalized pronunciation feedback from Teacher Ivan.',
+            highlightEs: 'Envío por WhatsApp con corrección natural de pronunciación personalizada de Teacher Ivan.',
           },
           {
             day: 'D4',
@@ -295,7 +295,7 @@ export function getDeterministicSprint(goals: LearningGoals): GeneratedSprint {
           {
             day: 'D2',
             type: 'Structural Processing',
-            title: 'Diplomatic Recasting & Persuasive Framing',
+            title: 'Diplomatic Rephrasing & Persuasive Framing',
             titleEs: 'Reformulación Diplomática y Enfoque Persuasivo',
             time: '12–15 min',
             description: 'Convert blunt Spanish-to-English literal expressions into polite, persuasive executive idiom.',
@@ -775,8 +775,8 @@ export function getDeterministicCustomResource(req: CustomResourceRequest): Cust
       topic,
       targetLevel: level,
       resourceType: type,
-      title: `Error-Correction & Recast Worksheet: ${topic}`,
-      titleEs: `Ficha de Corrección y Recast: ${topic}`,
+      title: `Natural Error-Correction Worksheet: ${topic}`,
+      titleEs: `Ficha de Corrección Natural: ${topic}`,
       content: `Printable and interactive diagnostic worksheet targeting common interference errors made by Spanish speakers when discussing "${topic}".`,
       collocations: [
         {
@@ -834,7 +834,7 @@ export function getDeterministicCustomResource(req: CustomResourceRequest): Cust
           explanation: 'Explain must be followed by "to [person]".',
         },
       ],
-      practiceTip: 'Print this low-ink sheet using the "Print Worksheet" button below or record yourself recasting each corrected sentence in the Voice Lab.',
+      practiceTip: 'Print this low-ink sheet using the "Print Worksheet" button below or record yourself practicing each corrected sentence in the Voice Lab.',
       practiceTipEs: 'Imprime esta ficha usando el botón "Imprimir Ficha" abajo o grábate reformulando cada oración corregida en el Laboratorio de Voz.',
       generatedBy: 'deterministic-fallback',
       createdAt: new Date().toISOString(),

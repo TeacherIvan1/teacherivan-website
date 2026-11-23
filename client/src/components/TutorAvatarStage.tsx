@@ -30,16 +30,9 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
         messages[messages.length - 1].role === 'user' &&
         messages[messages.length - 1].isInterim));
 
-  // 2. Select avatar metadata
+  // 2. Select avatar metadata (minimalist: no voice-gender or descriptor badges)
   const isIvan = persona === 'teacher-ivan';
   const tutorName = isIvan ? t.persona.teacherIvan.name : t.persona.emma.name;
-  const voiceBadge = isIvan
-    ? isEs
-      ? 'Voz Masculina'
-      : 'Puck (Male)'
-    : isEs
-    ? 'Voz Femenina'
-    : 'Aoede (Female)';
 
   // 3. Extract the current phrase preview for the speech bubble
   const lastAssistantMessage = [...messages]
@@ -73,9 +66,6 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
           <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
           <span className="font-montserrat font-bold uppercase tracking-[0.15em] text-[#FAFAFA] text-[11px] sm:text-xs whitespace-nowrap">
             {tutorName}
-          </span>
-          <span className="text-[10px] font-inter font-semibold text-[#E09B30] px-2 py-0.5 rounded bg-[#1A3153] border border-[#E09B30]/30 hidden sm:inline-block shrink-0">
-            {voiceBadge}
           </span>
         </div>
 
@@ -157,14 +147,15 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
           </div>
         )}
 
-        {/* The 2D Rigged Chibi Avatar with Live Dynamic Audio Visemes */}
-        <div className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 flex items-center justify-center transition-transform duration-300">
+        {/* Animated 3D Reference Avatar (Teacher Ivan / Emma) */}
+        <div className="relative z-10 w-44 h-56 sm:w-52 sm:h-64 md:w-56 md:h-68 flex items-end justify-center transition-transform duration-300">
           <RiggedCharacter
             key={persona}
             persona={persona === 'emma' ? 'emma' : 'teacher-ivan'}
-            state={isSpeaking ? 'speaking' : isListening ? 'listening' : 'idle'}
+            state={isSpeaking ? 'speaking' : isProcessing ? 'thinking' : isListening ? 'listening' : 'idle'}
+            audioLevel={isSpeaking ? Math.max(0.4, micLevel / 50) : Math.min(1, micLevel / 60)}
             className="w-full h-full"
-            alt={`${tutorName} Rigged Chibi Avatar`}
+            alt={`${tutorName} 3D Avatar`}
           />
         </div>
 
@@ -181,11 +172,11 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
         />
       </div>
 
-      {/* Stage Bottom Subtitle / Guidance */}
-      <div className="z-20 mt-1 text-center">
-        <p className="text-[11px] sm:text-xs text-[#A7C7E7] font-inter">
-          {isConnected
-            ? isSpeaking
+      {/* Stage Bottom Live Guidance (Only shown during an active session; no static descriptor clutter) */}
+      {isConnected && (
+        <div className="z-20 mt-1 text-center">
+          <p className="text-[11px] sm:text-xs text-[#A7C7E7] font-inter">
+            {isSpeaking
               ? isEs
                 ? `${tutorName} hablando • Puedes interrumpir en cualquier momento`
                 : `${tutorName} speaking • You can interrupt anytime`
@@ -199,16 +190,10 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
                 : 'Listening to your voice in real time...'
               : isEs
               ? 'Escuchando • Habla con naturalidad'
-              : 'Listening • Speak naturally'
-            : isIvan
-            ? isEs
-              ? 'Teacher Ivan • Mentor Pedagógico Empático y Estructurado'
-              : 'Teacher Ivan • Empathetic & Structured Pedagogical Mentor'
-            : isEs
-            ? 'Emma • Coach Conversacional de Inglés Cercana y Dinámica'
-            : 'Emma • Friendly Conversational English Coach'}
-        </p>
-      </div>
+              : 'Listening • Speak naturally'}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

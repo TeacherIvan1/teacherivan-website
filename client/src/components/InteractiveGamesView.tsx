@@ -416,7 +416,7 @@ export const InteractiveGamesView: React.FC = () => {
             }`}
         >
           <Zap size={14} />
-          <span>{isEs ? 'Reto de Recast' : 'Quick Recast Challenge'}</span>
+          <span>{isEs ? 'Corrección Rápida' : 'Quick Corrections Challenge'}</span>
         </button>
 
         <button
@@ -503,7 +503,7 @@ export const InteractiveGamesView: React.FC = () => {
               {/* Options */}
               <div className="space-y-3">
                 <span className="text-xs font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] uppercase tracking-wider block">
-                  {isEs ? 'Elige la reformulación nativa correcta:' : 'Select the natural native recast:'}
+                  {isEs ? 'Elige la reformulación nativa correcta:' : 'Select the most natural correction:'}
                 </span>
 
                 {recastQuestions[currentRecastIndex].options.map((opt, optIdx) => {
@@ -574,7 +574,7 @@ export const InteractiveGamesView: React.FC = () => {
               <p className="font-inter text-sm text-[#A7C7E7] max-w-md mx-auto">
                 {isEs
                   ? `Completaste todos los desafíos con ${recastCorrectCount} aciertos. ¡Tu cerebro acaba de reprogramar reflejos automáticos en inglés!`
-                  : `You solved all recast questions with ${recastCorrectCount} correct answers. Automatic fluency reflexes updated!`}
+                  : `You solved all quick correction questions with ${recastCorrectCount} correct answers. Automatic fluency reflexes updated!`}
               </p>
               <div className="inline-block px-4 py-2 rounded-full bg-[#E09B30]/20 text-[#E09B30] font-montserrat font-bold text-sm">
                 +75 XP • {isEs ? 'Día 2 del Sprint Completado' : 'Sprint Day 2 Stage Complete'}

@@ -137,7 +137,7 @@ export const LegalModal: React.FC = () => {
                 <li>
                   <strong>{isEs ? 'Procesamiento de Voz en Tiempo Real:' : 'Real-Time Voice Processing:'}</strong>{' '}
                   {isEs
-                    ? 'Durante las sesiones en el Laboratorio de Voz 24/7 con Teacher Ivan y Emma, tu audio se procesa en tiempo real para generar retroalimentación conversacional, recasting nativo y reportes de fluidez. No vendemos ni compartimos grabaciones de voz con terceros.'
+                    ? 'Durante las sesiones en el Laboratorio de Voz 24/7 con Teacher Ivan y Emma, tu audio se procesa en tiempo real para generar retroalimentación conversacional, corrección natural al instante y reportes de fluidez. No vendemos ni compartimos grabaciones de voz con terceros.'
                     : 'During 24/7 Voice Lab sessions with Teacher Ivan and Emma, your voice audio is processed in real time to generate conversational replies, native recasts, and fluency reports. We never sell or share voice recordings with third parties.'}
                 </li>
               </ul>

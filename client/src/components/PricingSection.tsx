@@ -281,8 +281,8 @@ export const PricingSection: React.FC = () => {
                   <Check size={17} className="text-[#E09B30] shrink-0 mt-0.5" aria-hidden="true" />
                   <span>
                     {isEs
-                      ? 'Recasting Nativo en Vivo (>75% habla activa)'
-                      : 'Live Native Recasting (>75% active speaking)'}
+                      ? 'Corrección natural al instante (>75% habla activa)'
+                      : 'Instant Natural Corrections (>75% active speaking)'}
                   </span>
                 </li>
               </ul>

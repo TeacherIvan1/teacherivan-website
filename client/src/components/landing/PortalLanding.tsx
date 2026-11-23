@@ -283,7 +283,7 @@ export const PortalLanding: React.FC = () => {
         : 'How does the free 90-second Spoken Diagnostic work?',
       a: isEs
         ? 'Haz clic en "Probar Simulador Gratis (90s)", activa tu micrófono y conversa en inglés con Teacher Ivan o Emma durante 90 segundos. Al finalizar recibes al instante tu nivel MCER (A1 a C1) y 3 mejoras nativas.'
-        : 'Click "Test Voice Lab Free (90s)", enable your microphone, and speak in English with Teacher Ivan or Emma for 90 seconds. You immediately receive your CEFR band (A1 to C1) and 3 native recasts.',
+        : 'Click "Test Voice Lab Free (90s)", enable your microphone, and speak in English with Teacher Ivan or Emma for 90 seconds. You immediately receive your CEFR band (A1 to C1) and 3 natural corrections.',
     },
   ];
 
@@ -776,8 +776,8 @@ export const PortalLanding: React.FC = () => {
                       </span>
                       <p className={`text-sm mt-1 ${isDark ? 'text-[#A7C7E7]' : 'text-[#334155]'}`}>
                         {isEs
-                          ? 'Sesiones privadas en vivo con Teacher Ivan (Lun–Vie 14:00–20:00 BOT) con recasting nativo.'
-                          : 'Private live sessions with Teacher Ivan (Mon–Fri 14:00–20:00 BOT) with native recasting.'}
+                          ? 'Sesiones privadas en vivo con Teacher Ivan (Lun–Vie 14:00–20:00 BOT) con corrección natural al instante.'
+                          : 'Private live sessions with Teacher Ivan (Mon–Fri 14:00–20:00 BOT) with instant natural corrections.'}
                       </p>
                     </div>
                   </div>
@@ -1068,24 +1068,29 @@ export const PortalLanding: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-row gap-3.5 items-end">
+              <div className="flex flex-row items-center" style={{ gap: '28px' }}>
                 <span
+                  id="hero-monogram-t"
                   aria-hidden="true"
                   style={{
+                    display: 'inline-block',
+                    flexShrink: 0,
+                    paddingRight: '14px',
                     fontFamily: "'Mr Dafoe', cursive",
                     fontSize: 64,
                     color: '#FAFAFA',
-                    lineHeight: 0.8,
+                    lineHeight: 0.9,
                   }}
                 >
                   T.
                 </span>
                 <p
+                  id="hero-monogram-copy"
                   style={{
                     fontFamily: "'Inter', sans-serif",
                     fontSize: 13,
                     color: '#FAFAFA',
-                    maxWidth: 185,
+                    maxWidth: 195,
                     lineHeight: 1.5,
                     margin: 0,
                   }}
@@ -1219,8 +1224,8 @@ export const PortalLanding: React.FC = () => {
                   </h3>
                   <p className={`font-inter text-base leading-relaxed ${isDark ? 'text-[#A7C7E7]' : 'text-[#334155]'}`}>
                     {isEs
-                      ? 'Sesiones privadas de 60 minutos (Lun–Vie 14:00–20:00 BOT) donde hablas más del 75% de la clase con corrección nativa.'
-                      : 'Private 60-minute sessions (Mon–Fri 14:00–20:00 BOT) where you speak over 75% of the class with native recasting.'}
+                      ? 'Sesiones privadas de 60 minutos (Lun–Vie 14:00–20:00 BOT) donde hablas más del 75% de la clase con corrección natural al instante.'
+                      : 'Private 60-minute sessions (Mon–Fri 14:00–20:00 BOT) where you speak over 75% of the class with instant natural corrections.'}
                   </p>
                 </div>
                 <div className={`pt-4 border-t flex items-baseline justify-between gap-2 ${isDark ? 'border-[#A7C7E7]/20' : 'border-[#1A3153]/15'}`}>

@@ -1,12 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   GoogleDbService,
   USER_SHEET_HEADERS,
   BOOKING_SHEET_HEADERS,
+  isGoogleSheetsSyncDisabled,
+  isSyntheticTestUser,
+  sanitizeSheetPhone,
 } from './googleDbService.js';
 import { User } from './userStore.js';
 import { Booking } from './bookingStore.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 test('GoogleDbService - headers and schema validation', () => {
   assert.equal(USER_SHEET_HEADERS.length, 20);
@@ -124,4 +134,77 @@ test('GoogleDbService - Status and unconfigured safety', () => {
   if (!status.configured) {
     assert.equal(status.status, 'not_configured');
   }
+});
+
+test('GoogleDbService - Test environment makes 0 Google Sheets API calls even with credentials set', async () => {
+  const prevSheetId = process.env.GOOGLE_SHEET_ID;
+  const prevEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const prevKey = process.env.GOOGLE_PRIVATE_KEY;
+  const prevDisable = process.env.DISABLE_GOOGLE_SHEETS_SYNC;
+
+  const { privateKey } = crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+  });
+
+  try {
+    process.env.GOOGLE_SHEET_ID = '1-fake-sheet-id-for-unit-test';
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = 'test@example.iam.gserviceaccount.com';
+    process.env.GOOGLE_PRIVATE_KEY = privateKey;
+    process.env.DISABLE_GOOGLE_SHEETS_SYNC = 'true';
+
+    assert.equal(isGoogleSheetsSyncDisabled(), true);
+
+    const service = new GoogleDbService();
+    assert.equal(service.isConfigured(), false);
+
+    const syncRes = await service.syncFromGoogleDb(true);
+    assert.equal(syncRes.synced, false);
+
+    const upsertRes = await service.upsertUserInGoogleDb({
+      id: 'usr_real_001',
+      username: 'laura',
+      fullName: 'Laura Raquel',
+      email: 'laura.raquel@gmail.com',
+      phoneNumber: '+591 72878330',
+      dateOfBirth: '1997-01-10',
+      country: 'Bolivia',
+      authProvider: 'email',
+      createdAt: new Date().toISOString(),
+    });
+    assert.equal(upsertRes, false);
+  } finally {
+    if (prevSheetId === undefined) delete process.env.GOOGLE_SHEET_ID;
+    else process.env.GOOGLE_SHEET_ID = prevSheetId;
+    if (prevEmail === undefined) delete process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    else process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = prevEmail;
+    if (prevKey === undefined) delete process.env.GOOGLE_PRIVATE_KEY;
+    else process.env.GOOGLE_PRIVATE_KEY = prevKey;
+    if (prevDisable === undefined) delete process.env.DISABLE_GOOGLE_SHEETS_SYNC;
+    else process.env.DISABLE_GOOGLE_SHEETS_SYNC = prevDisable;
+  }
+});
+
+test('GoogleDbService - Synthetic test user guard & RAW valueInputOption enforcement', () => {
+  // Synthetic / E2E accounts must NEVER sync to production Google Sheets
+  assert.equal(isSyntheticTestUser({ email: 'valeria_48291_1440_light@example.com', fullName: 'Valeria Mendoza' }), true);
+  assert.equal(isSyntheticTestUser({ username: 'student_99123', email: 'foo@gmail.com' }), true);
+  assert.equal(isSyntheticTestUser({ email: 'test@example.com' }), true);
+  assert.equal(isSyntheticTestUser({ fullName: 'Valeria Mendoza', email: 'custom@gmail.com' }), true);
+
+  // Legitimate real users must pass cleanly
+  assert.equal(isSyntheticTestUser({ email: 'laura.raquel@gmail.com', username: 'lauraraquel', fullName: 'Laura Raquel' }), false);
+  assert.equal(isSyntheticTestUser({ email: 'ivan@teacherivan.com', username: 'ivan', fullName: 'Teacher Ivan (Admin)' }), false);
+
+  // Phone sanitization handles +591 cleanly and ignores Google Sheets #ERROR! artifacts
+  assert.equal(sanitizeSheetPhone('+591 72878330'), '+591 72878330');
+  assert.equal(sanitizeSheetPhone('#ERROR!'), '');
+  assert.equal(sanitizeSheetPhone('#NAME?'), '');
+
+  // Source-level guarantee: 0 USER_ENTERED calls remain (prevents +591 formula #ERROR!)
+  const source = fs.readFileSync(path.resolve(__dirname, 'googleDbService.ts'), 'utf8');
+  assert.equal(source.includes("valueInputOption: 'USER_ENTERED'"), false);
+  assert.equal(source.includes('valueInputOption: "USER_ENTERED"'), false);
+  assert.ok(source.includes("valueInputOption: 'RAW'"));
 });
