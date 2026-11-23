@@ -1,250 +1,274 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%" role="img" aria-labelledby="emma-title">
-  <title id="emma-title">Chibi Coach Emma - Vivid Full-Body Rigged SVG</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="Emma AI Voice Coach Portrait">
   <defs>
-    <style>
-      .rig-layer {
-        transform-box: view-box;
-        transition: transform 0.25s ease-out, opacity 0.15s ease-in-out;
-      }
-      @keyframes auraPulseEmma {
-        0%, 100% { transform: scale(1); opacity: 0.95; }
-        50% { transform: scale(1.03); opacity: 1; }
-      }
-      #bg-aura {
-        animation: auraPulseEmma 3.5s ease-in-out infinite;
-      }
-    </style>
-
-    <!-- Vivid Woven Chambray Shirt Texture -->
-    <pattern id="chambray-weave-emma" width="8" height="8" patternUnits="userSpaceOnUse">
-      <rect width="8" height="8" fill="#8CC2F8" />
-      <path d="M 0 0 L 8 0 M 0 4 L 8 4 M 0 0 L 0 8 M 4 0 L 4 8" stroke="#FAFAFA" stroke-width="1.1" stroke-opacity="0.55" />
-      <path d="M 2 0 L 2 8 M 6 0 L 6 8 M 0 2 L 8 2 M 0 6 L 8 6" stroke="#285EA8" stroke-width="0.7" stroke-opacity="0.18" />
-    </pattern>
-
-    <!-- Subtle Warm Glow Gradient for Emma's Aura -->
-    <radialGradient id="emma-aura-grad" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FAFAFA" stop-opacity="1" />
-      <stop offset="75%" stop-color="#FFF7EB" stop-opacity="1" />
-      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.28" />
+    <!-- Soft Studio Backdrop Glow -->
+    <radialGradient id="emma-bg-glow" cx="50%" cy="46%" r="50%">
+      <stop offset="0%" stop-color="#2B4B7C" stop-opacity="0.52"/>
+      <stop offset="58%" stop-color="#1A3153" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#091326" stop-opacity="0"/>
     </radialGradient>
+
+    <!-- Warm Peach-Rose Cel-Shaded Skin -->
+    <linearGradient id="emma-skin" x1="35%" y1="12%" x2="68%" y2="95%">
+      <stop offset="0%" stop-color="#FDE9DC"/>
+      <stop offset="56%" stop-color="#F7D0BC"/>
+      <stop offset="100%" stop-color="#E8B19A"/>
+    </linearGradient>
+    <linearGradient id="emma-neck-grad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#DCA088"/>
+      <stop offset="45%" stop-color="#F1C3AE"/>
+      <stop offset="100%" stop-color="#F8D7C5"/>
+    </linearGradient>
+    <radialGradient id="emma-blush" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F08B82" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#F08B82" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Sleek Chestnut-Brown Hair -->
+    <linearGradient id="emma-hair-main" x1="25%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%" stop-color="#6B4439"/>
+      <stop offset="42%" stop-color="#4A2D27"/>
+      <stop offset="100%" stop-color="#2B1816"/>
+    </linearGradient>
+    <linearGradient id="emma-hair-back-grad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#3E231F"/>
+      <stop offset="100%" stop-color="#1E1010"/>
+    </linearGradient>
+    <linearGradient id="emma-hair-ribbon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B88267" stop-opacity="0"/>
+      <stop offset="35%" stop-color="#D49E80" stop-opacity="0.58"/>
+      <stop offset="68%" stop-color="#E6B89A" stop-opacity="0.48"/>
+      <stop offset="100%" stop-color="#B88267" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Deep Navy High-Neck Top -->
+    <linearGradient id="emma-top-grad" x1="25%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%" stop-color="#24426E"/>
+      <stop offset="48%" stop-color="#1A3153"/>
+      <stop offset="100%" stop-color="#0E1D36"/>
+    </linearGradient>
+
+    <!-- Layered Expressive Iris (#2E3A6B -> #5E6FA8 -> #A7C7E7 crescent) -->
+    <linearGradient id="emma-iris-grad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#1F274B"/>
+      <stop offset="48%" stop-color="#3B4B85"/>
+      <stop offset="82%" stop-color="#6980BE"/>
+      <stop offset="100%" stop-color="#A7C7E7"/>
+    </linearGradient>
+    <radialGradient id="emma-amber-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E09B30" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#E09B30" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Sclera ClipPaths for Safe Gaze Tracking -->
+    <clipPath id="emma-left-eye-clip">
+      <path d="M214 282 C226 266, 258 266, 272 282 C264 299, 228 300, 214 282 Z"/>
+    </clipPath>
+    <clipPath id="emma-right-eye-clip">
+      <path d="M328 282 C342 266, 374 266, 386 282 C372 300, 336 299, 328 282 Z"/>
+    </clipPath>
   </defs>
 
-  <!-- ======================================================== -->
-  <!-- 1. BACKGROUND AURA & GROUND SHADOW (#A7C7E7 / #E09B30)   -->
-  <!-- ======================================================== -->
-  <g id="bg-aura" class="rig-layer" transform-origin="300 320" style="transform-origin: 300px 320px;">
-    <circle cx="300" cy="300" r="245" fill="url(#emma-aura-grad)" stroke="#F59E0B" stroke-width="4" stroke-opacity="0.65" />
-    <circle cx="300" cy="300" r="220" fill="none" stroke="#68A8F0" stroke-width="3.5" stroke-dasharray="18 14" stroke-opacity="0.8" />
-    <!-- Ground Cast Shadow -->
-    <ellipse cx="300" cy="542" rx="92" ry="14" fill="#1A3153" fill-opacity="0.18" />
-  </g>
-
-  <!-- ======================================================== -->
-  <!-- 2. TORSO, CHAMBRAY BLOUSE, BELT, JEANS & LOAFERS         -->
-  <!-- ======================================================== -->
-  <g id="torso" class="rig-layer" transform-origin="300 430" style="transform-origin: 300px 430px;">
-
-    <!-- Rich Espresso Loafers (#4E3220) -->
-    <g id="shoes">
-      <path d="M 238 514 C 220 516 210 526 212 535 C 214 541 250 541 262 535 L 266 514 Z" fill="#4E3220" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-      <path d="M 218 526 Q 234 520 252 524" fill="none" stroke="#6E4730" stroke-width="3" stroke-linecap="round" />
-      <path d="M 330 514 L 332 536 C 342 543 374 542 378 534 C 382 524 372 515 356 514 Z" fill="#4E3220" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-      <path d="M 342 524 Q 360 520 372 526" fill="none" stroke="#6E4730" stroke-width="3" stroke-linecap="round" />
+  <g id="avatar-root">
+    <!-- Subtle Ambient Aura -->
+    <g id="bg-aura">
+      <circle cx="300" cy="296" r="245" fill="url(#emma-bg-glow)"/>
     </g>
 
-    <!-- Saturated Indigo Denim Trousers (#2B63AC) -->
-    <g id="jeans">
-      <path d="M 240 422 L 360 422 C 364 456 362 490 358 520 L 328 520 L 302 464 L 296 464 L 270 520 L 236 520 C 234 490 236 456 240 422 Z" fill="#2B63AC" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-      <path d="M 294 464 L 270 520 L 260 520 L 286 458 Z" fill="#1E4B85" />
-      <path d="M 304 464 L 328 520 L 338 520 L 312 458 Z" fill="#1E4B85" />
-      <path d="M 238 446 Q 256 448 260 432" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
-      <path d="M 362 446 Q 344 448 340 432" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
-      <line x1="298" y1="434" x2="298" y2="462" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+    <!-- 1. HAIR BACK (Inverse 2.5D Parallax Layer) -->
+    <g id="hair-back">
+      <path d="M168 232 C152 302, 148 392, 168 462 C190 486, 232 496, 300 496 C368 496, 410 486, 432 462 C452 392, 448 302, 432 232 C416 146, 368 106, 300 106 C232 106, 184 146, 168 232 Z" fill="url(#emma-hair-back-grad)"/>
+      <!-- Soft inner hair rim -->
+      <path d="M174 378 C184 424, 210 456, 242 466 L246 410 Z" fill="#2A1615" opacity="0.7"/>
+      <path d="M426 378 C416 424, 390 456, 358 466 L354 410 Z" fill="#2A1615" opacity="0.7"/>
     </g>
 
-    <!-- Neck Base (Vivid Warm Peach Skin #FFCC99) -->
-    <path d="M 278 310 L 322 310 L 318 348 L 282 348 Z" fill="#FFCC99" stroke="#1A3153" stroke-width="5" />
-    <path d="M 282 314 Q 300 326 318 314" fill="none" stroke="#F0A36A" stroke-width="4" />
+    <!-- 2. TORSO GROUP (Pivot 300, 560 — Breathing) -->
+    <g id="torso-group">
+      <!-- Neck -->
+      <path d="M262 396 L338 396 L346 476 C330 492, 270 492, 254 476 Z" fill="url(#emma-neck-grad)"/>
+      <!-- Chin / Neck Shadow Wedge -->
+      <g id="neck-shadow">
+        <path d="M263 402 C282 426, 318 426, 337 402 L339 426 C318 442, 282 442, 261 426 Z" fill="#C98872" opacity="0.52"/>
+        <!-- Subtle collarbone accents -->
+        <path d="M242 478 Q272 486 286 481" fill="none" stroke="#D99B84" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+        <path d="M358 478 Q328 486 314 481" fill="none" stroke="#D99B84" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+      </g>
 
-    <!-- Vivid Sky-Blue Chambray Blouse with Warm Amber Neckerchief -->
-    <g id="shirt-body">
-      <path d="M 252 318 C 236 326 234 372 238 420 Q 300 432 362 420 C 366 372 364 326 348 318 Z" fill="url(#chambray-weave-emma)" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-      <path d="M 242 340 C 238 368 238 396 241 418 L 254 420 C 250 394 250 366 252 340 Z" fill="#5B9BD5" fill-opacity="0.35" />
-      <path d="M 358 340 C 362 368 362 396 359 418 L 346 420 C 350 394 350 366 348 340 Z" fill="#5B9BD5" fill-opacity="0.35" />
+      <!-- Sleek Deep Navy High-Neck Top -->
+      <path d="M150 584 C162 508, 206 474, 256 462 L264 438 C286 446, 314 446, 336 438 L344 462 C394 474, 438 508, 450 584 L456 600 L144 600 Z" fill="url(#emma-top-grad)"/>
+      <!-- Shoulder shading planes -->
+      <path d="M168 532 C194 504, 224 490, 250 484 L224 600 L150 600 Z" fill="#132642" opacity="0.58"/>
+      <path d="M432 532 C406 504, 376 490, 350 484 L376 600 L450 600 Z" fill="#132642" opacity="0.58"/>
+      <!-- High-neck collar seam -->
+      <path d="M258 446 C284 456, 316 456, 342 446" fill="none" stroke="#A7C7E7" stroke-width="1.6" stroke-opacity="0.35"/>
 
-      <!-- Open V-Neck Skin Triangle -->
-      <polygon points="285,316 298,342 315,316" fill="#FFCC99" stroke="#1A3153" stroke-width="5" stroke-linejoin="round" />
-
-      <!-- Vivid Warm Amber Coach Neckerchief Knot (#F59E0B) -->
-      <polygon points="292,338 306,338 312,358 298,366 286,358" fill="#F59E0B" stroke="#1A3153" stroke-width="3.5" stroke-linejoin="round" />
-
-      <!-- Crisp Shirt Collar Flaps -->
-      <polygon points="274,315 268,339 292,331 285,316" fill="#FAFAFA" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
-      <polygon points="326,315 332,339 308,331 315,316" fill="#FAFAFA" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
-
-      <!-- Center Placket & Buttons -->
-      <path d="M 298 366 Q 296 392 296 422" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
-      <circle cx="301" cy="378" r="3" fill="#1A3153" />
-      <circle cx="300" cy="396" r="3" fill="#1A3153" />
-      <circle cx="300" cy="412" r="3" fill="#1A3153" />
+      <!-- Starlight Micro-Specks & Amber Accent -->
+      <g id="outfit-details">
+        <circle cx="222" cy="526" r="1.8" fill="#A7C7E7" opacity="0.65"/>
+        <circle cx="246" cy="552" r="1.3" fill="#FAFAFA" opacity="0.55"/>
+        <circle cx="372" cy="520" r="1.8" fill="#A7C7E7" opacity="0.65"/>
+        <circle cx="354" cy="558" r="1.4" fill="#FAFAFA" opacity="0.5"/>
+        <circle cx="300" cy="486" r="3" fill="#E09B30" opacity="0.85"/>
+        <path d="M294 486 L306 486 M300 480 L300 492" stroke="#FAFAFA" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+      </g>
     </g>
 
-    <!-- Vivid Warm Amber Belt & Buckle (#E09B30 / #F59E0B) -->
-    <g id="belt">
-      <path d="M 237 415 Q 300 429 363 415 L 362 427 Q 300 441 238 427 Z" fill="#E09B30" stroke="#1A3153" stroke-width="4.5" stroke-linejoin="round" />
-      <rect x="254" y="417" width="6" height="13" rx="2" fill="#1A3153" />
-      <rect x="340" y="417" width="6" height="13" rx="2" fill="#1A3153" />
-      <rect x="284" y="420" width="24" height="12" rx="3" fill="#FAFAFA" stroke="#1A3153" stroke-width="4" />
-      <rect x="290" y="423" width="12" height="6" rx="1.5" fill="#1A3153" />
-    </g>
-  </g>
+    <!-- 3. HEAD GROUP (Pivot 300, 320 — Smooth Tilt + Micro-Shift) -->
+    <g id="head-group">
+      <!-- Ears & Signature Warm Amber Star Micro-Earpiece -->
+      <g id="ears-accessories">
+        <!-- Left Ear -->
+        <ellipse cx="192" cy="306" rx="14" ry="22" fill="#F2C2AC"/>
+        <path d="M192 294 C187 302, 187 312, 194 318" fill="none" stroke="#D99A82" stroke-width="2" stroke-linecap="round"/>
+        <!-- Right Ear -->
+        <ellipse cx="408" cy="306" rx="14" ry="22" fill="#F2C2AC"/>
+        <path d="M408 294 C413 302, 413 312, 406 318" fill="none" stroke="#D99A82" stroke-width="2" stroke-linecap="round"/>
+        <!-- Emma's Warm Amber Star Earring / Micro-Earpiece Glow (Left & Right) -->
+        <circle cx="190" cy="326" r="11" fill="url(#emma-amber-glow)"/>
+        <polygon points="190,318 192.4,323.6 198,326 192.4,328.4 190,334 187.6,328.4 182,326 187.6,323.6" fill="#E09B30"/>
+        <circle cx="410" cy="326" r="11" fill="url(#emma-amber-glow)"/>
+        <polygon points="410,318 412.4,323.6 418,326 412.4,328.4 410,334 407.6,328.4 402,326 407.6,323.6" fill="#E09B30"/>
+      </g>
 
-  <!-- ======================================================== -->
-  <!-- 3. LEFT ARM & ROLLED CUFF + COMPACT CEFR PROP            -->
-  <!-- ======================================================== -->
-  <g id="left-arm-prop" class="rig-layer" transform-origin="242 332" style="transform-origin: 242px 332px;">
-    <path d="M 208 386 C 204 406 204 426 210 438 C 216 447 234 446 236 432 C 238 418 236 402 236 388 Z" fill="#FFCC99" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-    <path d="M 230 390 C 232 408 232 424 228 436" fill="none" stroke="#F59E6C" stroke-width="4" stroke-linecap="round" />
-    <path d="M 218 423 C 218 434 227 435 227 422" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+      <!-- Face Base (Lineless Cel-Shaded Portrait) -->
+      <g id="face-base">
+        <path d="M196 244 C194 176, 238 140, 300 140 C362 140, 406 176, 404 244 C403 314, 382 362, 344 394 C326 409, 312 414, 300 414 C288 414, 274 409, 256 394 C218 362, 197 314, 196 244 Z" fill="url(#emma-skin)"/>
+        <!-- Subtle side-plane cel shadow -->
+        <path d="M368 186 C394 218, 398 286, 384 334 C372 366, 342 396, 306 412 C340 404, 376 372, 392 332 C406 290, 405 224, 368 186 Z" fill="#DF9E86" opacity="0.34"/>
+        <!-- Soft Cheek Blush -->
+        <ellipse cx="232" cy="322" rx="28" ry="15" fill="url(#emma-blush)"/>
+        <ellipse cx="368" cy="322" rx="28" ry="15" fill="url(#emma-blush)"/>
+        <!-- Clean Nose-Tip Cel Shadow & Specular Highlight -->
+        <path d="M298 292 L294 316 C294 320, 302 321, 306 318" fill="none" stroke="#D89882" stroke-width="2" stroke-linecap="round" opacity="0.72"/>
+        <ellipse cx="300" cy="312" rx="2.4" ry="4" fill="#FFF7F2" opacity="0.65"/>
+      </g>
 
-    <!-- Left Short Sleeve & Rolled Cuff -->
-    <path d="M 250 320 C 226 328 212 352 208 380 L 240 384 L 244 348 Z" fill="url(#chambray-weave-emma)" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-    <path d="M 203 374 Q 222 371 241 379 L 239 392 Q 221 385 203 388 Z" fill="#74B3F0" stroke="#1A3153" stroke-width="5" stroke-linejoin="round" />
+      <!-- Expressive Eyes Group -->
+      <g id="eyes-group">
+        <!-- Sclerae -->
+        <g id="eye-left-sclera">
+          <path d="M214 282 C226 266, 258 266, 272 282 C264 299, 228 300, 214 282 Z" fill="#FFFFFF"/>
+          <!-- Upper sclera soft shadow -->
+          <path d="M216 279 C228 269, 256 269, 270 279 C256 275, 228 275, 216 279 Z" fill="#CBD5E1" opacity="0.55"/>
+        </g>
+        <g id="eye-right-sclera">
+          <path d="M328 282 C342 266, 374 266, 386 282 C372 300, 336 299, 328 282 Z" fill="#FFFFFF"/>
+          <path d="M330 279 C344 269, 372 269, 384 279 C372 275, 344 275, 330 279 Z" fill="#CBD5E1" opacity="0.55"/>
+        </g>
 
-    <!-- Mini IELTS / CEFR Recast Card Prop -->
-    <g transform="translate(116, 388) rotate(-6)">
-      <rect x="0" y="0" width="76" height="54" rx="10" fill="#FAFAFA" stroke="#1A3153" stroke-width="4" />
-      <rect x="6" y="6" width="64" height="18" rx="6" fill="#F59E0B" />
-      <text x="38" y="19" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="800" font-size="9.5" fill="#1A3153">IELTS / B2+</text>
-      <text x="12" y="38" font-family="Montserrat, sans-serif" font-weight="700" font-size="10" fill="#1A3153">Recast</text>
-      <path d="M 54 31 L 59 36 L 67 27" fill="none" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-    </g>
-  </g>
+        <!-- Left Iris (Clipped to Sclera for Smooth Gaze Tracking) -->
+        <g clip-path="url(#emma-left-eye-clip)">
+          <g id="eye-left-iris">
+            <ellipse cx="245" cy="283" rx="16.5" ry="17.5" fill="url(#emma-iris-grad)"/>
+            <ellipse cx="245" cy="282" rx="8.5" ry="9.5" fill="#151C36"/>
+            <!-- Lower crescent glow -->
+            <path d="M233 290 C239 298, 251 298, 257 290 C250 294, 240 294, 233 290 Z" fill="#A7C7E7" opacity="0.88"/>
+            <!-- Crisp catchlights -->
+            <circle cx="238" cy="276" r="4.2" fill="#FFFFFF"/>
+            <circle cx="252" cy="288" r="2.1" fill="#FFFFFF" opacity="0.9"/>
+          </g>
+        </g>
 
-  <!-- ======================================================== -->
-  <!-- 4. RIGHT ARM GESTURE (PIVOTS AT SHOULDER: 358, 332)      -->
-  <!-- ======================================================== -->
-  <g id="right-arm-gesture" class="rig-layer" transform-origin="358 332" style="transform-origin: 358px 332px;">
-    <path d="M 392 386 C 396 406 396 426 390 438 C 384 447 366 446 364 432 C 362 418 364 402 364 388 Z" fill="#FFCC99" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-    <path d="M 370 390 C 368 408 368 424 372 436" fill="none" stroke="#F59E6C" stroke-width="4" stroke-linecap="round" />
-    <path d="M 364 420 C 370 424 372 432 366 436" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
+        <!-- Right Iris (Clipped to Sclera) -->
+        <g clip-path="url(#emma-right-eye-clip)">
+          <g id="eye-right-iris">
+            <ellipse cx="355" cy="283" rx="16.5" ry="17.5" fill="url(#emma-iris-grad)"/>
+            <ellipse cx="355" cy="282" rx="8.5" ry="9.5" fill="#151C36"/>
+            <path d="M343 290 C349 298, 361 298, 367 290 C360 294, 350 294, 343 290 Z" fill="#A7C7E7" opacity="0.88"/>
+            <circle cx="348" cy="276" r="4.2" fill="#FFFFFF"/>
+            <circle cx="362" cy="288" r="2.1" fill="#FFFFFF" opacity="0.9"/>
+          </g>
+        </g>
 
-    <!-- Right Short Sleeve & Rolled Cuff -->
-    <path d="M 350 320 C 374 328 388 352 392 380 L 360 384 L 356 348 Z" fill="url(#chambray-weave-emma)" stroke="#1A3153" stroke-width="5.5" stroke-linejoin="round" />
-    <path d="M 359 379 Q 378 371 397 374 L 397 388 Q 379 385 361 392 Z" fill="#74B3F0" stroke="#1A3153" stroke-width="5" stroke-linejoin="round" />
-  </g>
+        <!-- Eyelids Open (Default Bright Alert — Pose 2 of showcase02.jpg) -->
+        <g id="eyelids-open" opacity="1">
+          <!-- Left upper lash & subtle crease -->
+          <path d="M210 282 C222 263, 259 262, 274 281 C260 270, 226 270, 210 282 Z" fill="#2B2129"/>
+          <path d="M218 261 C234 254, 255 255, 267 262" fill="none" stroke="#C88E7A" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+          <path d="M224 298 C238 302, 254 301, 264 297" fill="none" stroke="#4A343B" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+          <!-- Right upper lash & subtle crease -->
+          <path d="M390 282 C378 263, 341 262, 326 281 C340 270, 374 270, 390 282 Z" fill="#2B2129"/>
+          <path d="M382 261 C366 254, 345 255, 333 262" fill="none" stroke="#C88E7A" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+          <path d="M376 298 C362 302, 346 301, 336 297" fill="none" stroke="#4A343B" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+        </g>
 
-  <!-- ======================================================== -->
-  <!-- 5. HEAD GROUP (BOB HAIR, GLASSES, CHIBI EYES, HEADSET)   -->
-  <!-- ======================================================== -->
-  <g id="head-group" class="rig-layer" transform-origin="300 310" style="transform-origin: 300px 310px;">
+        <!-- Eyelids Relaxed (Focused Half-Lid — Thinking/Listening) -->
+        <g id="eyelids-relaxed" opacity="0">
+          <path d="M210 281 C224 270, 258 270, 274 281 L274 265 L210 265 Z" fill="#F6CEBA"/>
+          <path d="M210 281 C224 272, 258 272, 274 281" fill="none" stroke="#2B2129" stroke-width="4" stroke-linecap="round"/>
+          <path d="M326 281 C342 270, 376 270, 390 281 L390 265 L326 265 Z" fill="#F6CEBA"/>
+          <path d="M326 281 C342 272, 376 272, 390 281" fill="none" stroke="#2B2129" stroke-width="4" stroke-linecap="round"/>
+        </g>
 
-    <!-- Back Bob Hair Silhouette (Rich Warm Chestnut-Espresso #4E3426) -->
-    <path d="M 164 236 C 158 140 208 82 300 82 C 392 82 442 140 436 236 C 434 282 412 314 380 322 L 220 322 C 188 314 166 282 164 236 Z" fill="#4E3426" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
+        <!-- Eyelids Blink (Smooth Closed Lash Arc) -->
+        <g id="eyelids-blink" opacity="0">
+          <rect x="208" y="262" width="72" height="42" rx="16" fill="#F7D0BC"/>
+          <path d="M213 286 C228 294, 256 294, 272 285" fill="none" stroke="#2B2129" stroke-width="3.6" stroke-linecap="round"/>
+          <rect x="320" y="262" width="72" height="42" rx="16" fill="#F7D0BC"/>
+          <path d="M328 285 C344 294, 372 294, 387 286" fill="none" stroke="#2B2129" stroke-width="3.6" stroke-linecap="round"/>
+        </g>
+      </g>
 
-    <!-- Rounded Side Ears (Vivid Warm Peach #FFCC99) -->
-    <g id="ears">
-      <circle cx="188" cy="252" r="22" fill="#FFCC99" stroke="#1A3153" stroke-width="6" />
-      <circle cx="188" cy="252" r="11" fill="#F59E6C" fill-opacity="0.45" />
-      <circle cx="412" cy="252" r="22" fill="#FFCC99" stroke="#1A3153" stroke-width="6" />
-      <circle cx="412" cy="252" r="11" fill="#F59E6C" fill-opacity="0.45" />
-    </g>
+      <!-- Eyebrows (Left Pivot 242, 232 | Right Pivot 358, 232) -->
+      <g id="eyebrows-left">
+        <path d="M214 246 C228 236, 254 235, 270 242" fill="none" stroke="#4A2D27" stroke-width="4.2" stroke-linecap="round"/>
+      </g>
+      <g id="eyebrows-right">
+        <path d="M330 242 C346 235, 372 236, 386 246" fill="none" stroke="#4A2D27" stroke-width="4.2" stroke-linecap="round"/>
+      </g>
 
-    <!-- Wide Rounded-Square Chibi Head (Vivid Warm Peach #FFCC99) -->
-    <path d="M 192 170 C 188 232 190 278 214 300 C 238 318 268 322 300 322 C 332 322 362 318 386 300 C 410 278 412 232 408 170 C 404 130 360 116 300 116 C 240 116 196 130 192 170 Z" fill="#FFCC99" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
+      <!-- 6 Distinct Vector Mouth Visemes -->
+      <g id="mouth-visemes">
+        <!-- 1. Rest (Gentle Confident Closed Smile) -->
+        <g id="mouth-rest" opacity="1">
+          <path d="M276 355 C288 364, 312 364, 324 355" fill="none" stroke="#A65E58" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M288 363 C296 367, 304 367, 312 363" fill="none" stroke="#E5A296" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+        </g>
 
-    <!-- Chin Shading & Rosy Cheek Glow -->
-    <path d="M 218 296 Q 300 318 382 296" fill="none" stroke="#F59E6C" stroke-width="5" stroke-linecap="round" stroke-opacity="0.55" />
-    <ellipse cx="218" cy="268" rx="17" ry="9.5" fill="#F58258" fill-opacity="0.38" />
-    <ellipse cx="382" cy="268" rx="17" ry="9.5" fill="#F58258" fill-opacity="0.38" />
+        <!-- 2. Parted (Subtle Parted Lips with Tooth Highlight — showcase02.jpg) -->
+        <g id="mouth-parted" opacity="0">
+          <path d="M278 354 C290 349, 310 349, 322 354 C314 364, 286 364, 278 354 Z" fill="#C46B68"/>
+          <path d="M285 354 C294 352, 306 352, 315 354 C308 358, 292 358, 285 354 Z" fill="#FFFFFF"/>
+          <ellipse cx="300" cy="362" rx="7" ry="1.8" fill="#FFF0EC" opacity="0.55"/>
+        </g>
 
-    <!-- Swept Side-Part Bob Hair Crown & Bangs (#4E3426 + #684736 Highlight) -->
-    <g id="hair-front">
-      <path d="M 184 238
-               C 172 194 174 142 198 112
-               C 226 78 274 72 322 76
-               C 374 76 414 104 424 152
-               C 430 184 424 216 416 238
-               L 406 196
-               C 394 174 374 156 344 146
-               C 314 162 256 164 206 154
-               C 192 172 188 202 184 238 Z" fill="#4E3426" stroke="#1A3153" stroke-width="6" stroke-linejoin="round" />
-      <path d="M 222 104 C 258 84 338 84 382 110 C 360 126 254 128 222 104 Z" fill="#684736" />
-      <!-- Interior Hair Parting Lines & Vivid Amber Hair Clip -->
-      <path d="M 334 112 Q 340 132 344 146" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
-      <path d="M 254 124 Q 264 142 274 156" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
-      <rect x="366" y="146" width="24" height="9" rx="4.5" transform="rotate(16 378 150)" fill="#F59E0B" stroke="#1A3153" stroke-width="3" />
-    </g>
+        <!-- 3. Open Small (Soft Vowel e/i) -->
+        <g id="mouth-open-sm" opacity="0">
+          <path d="M276 353 C290 348, 310 348, 324 353 C316 368, 284 368, 276 353 Z" fill="#8E3B42"/>
+          <path d="M283 353 C294 351, 306 351, 317 353 L314 358 L286 358 Z" fill="#FFFFFF"/>
+          <path d="M288 364 C296 361, 304 361, 312 364" fill="#D97474" opacity="0.8"/>
+        </g>
 
-    <!-- Expressive Arched Eyebrows -->
-    <g id="eyebrows">
-      <path d="M 214 196 C 234 192 254 198 264 208 C 248 204 230 200 214 201 Z" fill="#23160F" stroke="#1A3153" stroke-width="2" stroke-linejoin="round" />
-      <path d="M 386 196 C 366 192 346 198 336 208 C 352 204 370 200 386 201 Z" fill="#23160F" stroke="#1A3153" stroke-width="2" stroke-linejoin="round" />
-    </g>
+        <!-- 4. Open Medium (Medium Speech a) -->
+        <g id="mouth-open-md" opacity="0">
+          <path d="M275 351 C290 346, 310 346, 325 351 C321 374, 279 374, 275 351 Z" fill="#7D2F38"/>
+          <path d="M282 351 C294 349, 306 349, 318 351 L315 357 L285 357 Z" fill="#FFFFFF"/>
+          <ellipse cx="300" cy="369" rx="13" ry="5" fill="#D66D70"/>
+        </g>
 
-    <!-- ======================================================== -->
-    <!-- 6A. EYES OPEN LAYER (Deep Oval Eyes + Eyelashes)         -->
-    <!-- ======================================================== -->
-    <g id="eyes-open" class="rig-layer" transform-origin="300 240" style="transform-origin: 300px 240px;" opacity="1">
-      <path d="M 218 227 Q 242 214 264 229" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
-      <path d="M 218 227 L 211 221" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
-      <ellipse cx="244" cy="242" rx="14" ry="18" fill="#1A2436" />
-      <circle cx="240" cy="235" r="3.5" fill="#FAFAFA" fill-opacity="0.85" />
+        <!-- 5. Open Large (Emphatic Syllable aa/oh) -->
+        <g id="mouth-open-lg" opacity="0">
+          <path d="M274 349 C290 343, 310 343, 326 349 C324 381, 276 381, 274 349 Z" fill="#6B2530"/>
+          <path d="M281 349 C294 347, 306 347, 319 349 L316 356 L284 356 Z" fill="#FFFFFF"/>
+          <ellipse cx="300" cy="373" rx="15" ry="6.5" fill="#D4666B"/>
+        </g>
 
-      <path d="M 336 229 Q 358 214 382 227" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
-      <path d="M 382 227 L 389 221" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
-      <ellipse cx="356" cy="242" rx="14" ry="18" fill="#1A2436" />
-      <circle cx="352" cy="235" r="3.5" fill="#FAFAFA" fill-opacity="0.85" />
-    </g>
+        <!-- 6. Smile (Warm Encouraging Smile) -->
+        <g id="mouth-smile" opacity="0">
+          <path d="M272 351 C286 370, 314 370, 328 351 C314 358, 286 358, 272 351 Z" fill="#FFFFFF"/>
+          <path d="M272 351 C286 371, 314 371, 328 351" fill="none" stroke="#A65E58" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M275 351 C290 356, 310 356, 325 351" fill="none" stroke="#C4726C" stroke-width="1.6" stroke-linecap="round"/>
+        </g>
+      </g>
 
-    <!-- ======================================================== -->
-    <!-- 6B. EYES BLINK LAYER (Toggle opacity: 1)                 -->
-    <!-- ======================================================== -->
-    <g id="eyes-blink" class="rig-layer" transform-origin="300 240" style="transform-origin: 300px 240px;" opacity="0">
-      <path d="M 222 244 Q 244 256 264 244" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
-      <path d="M 336 244 Q 356 256 378 244" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
-    </g>
-
-    <!-- Stylish Vivid Amber Glasses (#F59E0B / #E09B30 Rim) -->
-    <g id="emma-glasses">
-      <rect x="208" y="212" width="70" height="52" rx="18" fill="#FAFAFA" fill-opacity="0.14" stroke="#F59E0B" stroke-width="4.5" />
-      <rect x="322" y="212" width="70" height="52" rx="18" fill="#FAFAFA" fill-opacity="0.14" stroke="#F59E0B" stroke-width="4.5" />
-      <path d="M 278 234 Q 300 228 322 234" fill="none" stroke="#1A3153" stroke-width="4" stroke-linecap="round" />
-    </g>
-
-    <!-- Minimalist Curved Chibi Nose Tick -->
-    <path d="M 297 256 C 293 263 294 268 300 270" fill="none" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
-
-    <!-- ======================================================== -->
-    <!-- 7A. MOUTH VISEME: SMILE (Warm Asymmetric Smirk)          -->
-    <!-- ======================================================== -->
-    <g id="mouth-smile" class="rig-layer" transform-origin="300 280" style="transform-origin: 300px 280px;" opacity="1">
-      <path d="M 276 283 Q 304 288 325 274" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
-      <path d="M 322 269 Q 328 273 327 279" fill="none" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
-    </g>
-
-    <!-- ======================================================== -->
-    <!-- 7B. MOUTH VISEME: IDLE (Gentle Neutral Line)             -->
-    <!-- ======================================================== -->
-    <g id="mouth-idle" class="rig-layer" transform-origin="300 280" style="transform-origin: 300px 280px;" opacity="0">
-      <path d="M 284 283 Q 300 287 316 281" fill="none" stroke="#1A3153" stroke-width="4.5" stroke-linecap="round" />
-    </g>
-
-    <!-- ======================================================== -->
-    <!-- 7C. MOUTH VISEME: TALK OPEN (Active Speaking Sync)       -->
-    <!-- ======================================================== -->
-    <g id="mouth-talk-open" class="rig-layer" transform-origin="300 280" style="transform-origin: 300px 280px;" opacity="0">
-      <path d="M 281 278 Q 300 275 319 278 C 321 294 311 301 300 301 C 289 301 279 294 281 278 Z" fill="#1A3153" stroke="#1A3153" stroke-width="3.5" stroke-linejoin="round" />
-      <ellipse cx="300" cy="294" rx="9.5" ry="4.5" fill="#F06449" />
-    </g>
-
-    <!-- Sleek Low-Profile Coach Headset Microphone -->
-    <g id="headset-mic">
-      <rect x="166" y="236" width="14" height="32" rx="7" fill="#1A3153" stroke="#FAFAFA" stroke-width="2" />
-      <circle cx="173" cy="252" r="4" fill="#74B3F0" />
-      <path d="M 173 266 C 180 290 212 298 252 292" fill="none" stroke="#4A5568" stroke-width="4.5" stroke-linecap="round" />
-      <rect x="248" y="286" width="14" height="10" rx="5" fill="#F59E0B" stroke="#1A3153" stroke-width="3" />
+      <!-- 4. HAIR FRONT & PARTED BANGS (Forward 2.5D Parallax Layer) -->
+      <g id="hair-front-bangs">
+        <!-- Crown & sleek bob framing -->
+        <path d="M180 250 C176 164, 224 114, 300 114 C376 114, 424 164, 420 250 C422 320, 418 394, 394 434 C404 378, 404 316, 398 258 C392 214, 368 184, 334 176 C318 206, 296 226, 278 236 C288 212, 294 190, 296 174 C264 186, 238 214, 220 242 C226 212, 238 188, 254 174 C224 186, 206 216, 202 260 C196 318, 196 378, 206 434 C182 394, 178 320, 180 250 Z" fill="url(#emma-hair-main)"/>
+        <!-- Soft Hair-Highlight Ribbons -->
+        <path d="M214 196 C248 164, 352 164, 386 196 C352 178, 248 178, 214 196 Z" fill="url(#emma-hair-ribbon)"/>
+        <path d="M228 208 C258 186, 342 186, 372 208 C342 197, 258 197, 228 208 Z" fill="#F2C8AE" opacity="0.22"/>
+      </g>
     </g>
   </g>
 </svg>

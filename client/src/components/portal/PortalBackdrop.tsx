@@ -9,6 +9,8 @@ import {
 
 export interface WorldBackdropProps {
   worldRef?: React.RefObject<HTMLDivElement | null>;
+  scrollProgress?: number;
+  isEmbedded?: boolean;
 }
 
 export interface PortalGatewayProps {
@@ -17,18 +19,28 @@ export interface PortalGatewayProps {
 }
 
 /**
- * WORLD_BG (Fixed Background Layer, zIndex: 0)
- * Full-viewport luminous atmospheric sky & cloud horizon graded strictly in Teacher Ivan's palette:
- * #091326 upper zenith -> #1A3153 deep indigo mid-sky -> #2E527D soft twilight ->
- * #A7C7E7 illuminated cloud banks -> warm #E09B30 golden sunrise glow along the horizon.
+ * WORLD_BG — Luminous International Metropolis ("World of Opportunities")
+ * -----------------------------------------------------------------------
+ * Replaces any desert/cloud backdrop with a 3-layer parallax global cityscape:
+ *  - Zenith #091326 -> #1A3153 -> #2E527D -> #A7C7E7 mist -> #E09B30 sunrise core
+ *  - Far Skyline (skyscrapers + suspension bridge spans)
+ *  - Mid Skyline (modern glass towers + twinkling #E09B30 / #FAFAFA penthouse windows)
+ *  - Near Horizon Avenue (golden bokeh boulevard glow)
+ *  - GPU-accelerated sun-rays, ascending opportunity light streams & global connection arcs
  */
-export const WorldBackdrop: React.FC<WorldBackdropProps> = ({ worldRef }) => {
+export const WorldBackdrop: React.FC<WorldBackdropProps> = ({
+  worldRef,
+  scrollProgress = 0,
+  isEmbedded = false,
+}) => {
+  const beamIntensity = Math.min(1, Math.max(0.35, 0.35 + scrollProgress * 0.65));
+
   return (
     <div
-      id="portal-world-fixed-stage"
-      data-testid="portal-world-fixed-stage"
+      id={isEmbedded ? 'mobile-metropolis-stage' : 'portal-world-fixed-stage'}
+      data-testid={isEmbedded ? 'mobile-metropolis-stage' : 'portal-world-fixed-stage'}
       style={{
-        position: 'fixed',
+        position: isEmbedded ? 'absolute' : 'fixed',
         inset: 0,
         zIndex: 0,
         overflow: 'hidden',
@@ -36,19 +48,53 @@ export const WorldBackdrop: React.FC<WorldBackdropProps> = ({ worldRef }) => {
         background: '#091326',
       }}
     >
+      <style>{`
+        @keyframes tiMetropolisFloat {
+          0% { transform: translateY(18px); opacity: 0; }
+          25% { opacity: 0.85; }
+          80% { opacity: 0.6; }
+          100% { transform: translateY(-96px); opacity: 0; }
+        }
+        @keyframes tiWindowTwinkle {
+          0%, 100% { opacity: 0.35; }
+          50% { opacity: 0.95; }
+        }
+        @keyframes tiArcFlow {
+          0% { stroke-dashoffset: 64; }
+          100% { stroke-dashoffset: 0; }
+        }
+        .ti-opportunity-stream {
+          animation: tiMetropolisFloat 6.5s linear infinite;
+          will-change: transform, opacity;
+        }
+        .ti-window-twinkle {
+          animation: tiWindowTwinkle 3.8s ease-in-out infinite;
+        }
+        .ti-global-arc {
+          animation: tiArcFlow 7s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ti-opportunity-stream,
+          .ti-window-twinkle,
+          .ti-global-arc {
+            animation: none !important;
+          }
+        }
+      `}</style>
+
       <div
         ref={worldRef}
-        id="portal-world-parallax-layer"
-        data-testid="portal-world-parallax-layer"
+        id={isEmbedded ? 'mobile-metropolis-parallax' : 'portal-world-parallax-layer'}
+        data-testid={isEmbedded ? 'mobile-metropolis-parallax' : 'portal-world-parallax-layer'}
         style={{
           position: 'absolute',
-          inset: '-6%',
-          width: '112%',
-          height: '112%',
+          inset: isEmbedded ? 0 : '-6%',
+          width: isEmbedded ? '100%' : '112%',
+          height: isEmbedded ? '100%' : '112%',
           transformOrigin: WORLD_TRANSFORM_ORIGIN,
           willChange: 'transform',
           background:
-            'linear-gradient(180deg, #091326 0%, #132642 26%, #1A3153 50%, #2E527D 72%, #A7C7E7 89%, #E09B30 100%)',
+            'linear-gradient(180deg, #091326 0%, #132642 26%, #1A3153 50%, #2E527D 74%, #A7C7E7 91%, #E09B30 100%)',
         }}
       >
         {USE_RASTER_PORTAL_OVERRIDES && (
@@ -66,27 +112,19 @@ export const WorldBackdrop: React.FC<WorldBackdropProps> = ({ worldRef }) => {
           />
         )}
 
-        {/* Golden Sunrise Horizon & Soft Denim Atmospheric Mist */}
+        {/* Golden-Hour Opportunity Sun-Rays Expanding Behind Downtown Core */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
+            opacity: beamIntensity,
+            transition: 'opacity 0.25s ease-out',
             background:
-              'radial-gradient(ellipse 75% 48% at 52% 42%, rgba(224, 155, 48, 0.34) 0%, rgba(167, 199, 231, 0.24) 44%, rgba(26, 49, 83, 0) 78%)',
+              'radial-gradient(ellipse 68% 46% at 52% 44%, rgba(224, 155, 48, 0.50) 0%, rgba(167, 199, 231, 0.24) 42%, rgba(26, 49, 83, 0) 76%)',
           }}
         />
 
-        {/* Upper Zenith Starlight & Subtle Acoustic Aura */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'radial-gradient(circle at 52% 38%, rgba(250, 250, 250, 0.22) 0%, rgba(167, 199, 231, 0.14) 24%, transparent 56%)',
-          }}
-        />
-
-        {/* Layered Translucent Cloud Silhouettes & Acoustic Horizon Waves (Pure SVG) */}
+        {/* Luminous International Metropolis SVG (3-Layer Skyline + Global Connection Arcs + Ascending Streams) */}
         <svg
           viewBox="0 0 1920 1080"
           preserveAspectRatio="xMidYMid slice"
@@ -99,88 +137,120 @@ export const WorldBackdrop: React.FC<WorldBackdropProps> = ({ worldRef }) => {
           }}
         >
           <defs>
-            <linearGradient id="ti-cloud-bank-far" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#A7C7E7" stopOpacity="0.28" />
-              <stop offset="55%" stopColor="#1A3153" stopOpacity="0.48" />
-              <stop offset="100%" stopColor="#091326" stopOpacity="0.85" />
-            </linearGradient>
-            <linearGradient id="ti-cloud-bank-mid" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FAFAFA" stopOpacity="0.32" />
-              <stop offset="40%" stopColor="#A7C7E7" stopOpacity="0.26" />
-              <stop offset="100%" stopColor="#1A3153" stopOpacity="0.72" />
-            </linearGradient>
-            <linearGradient id="ti-sunrise-horizon" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#1A3153" stopOpacity="0.2" />
-              <stop offset="35%" stopColor="#A7C7E7" stopOpacity="0.38" />
-              <stop offset="52%" stopColor="#E09B30" stopOpacity="0.52" />
-              <stop offset="70%" stopColor="#A7C7E7" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#1A3153" stopOpacity="0.2" />
-            </linearGradient>
-            <radialGradient id="ti-portal-sun-core" cx="52%" cy="38%" r="36%">
-              <stop offset="0%" stopColor="#FAFAFA" stopOpacity="0.55" />
-              <stop offset="32%" stopColor="#E09B30" stopOpacity="0.38" />
+            <radialGradient id="ti-city-sunrise" cx="52%" cy="46%" r="36%">
+              <stop offset="0%" stopColor="#FAFAFA" stopOpacity="0.62" />
+              <stop offset="30%" stopColor="#E09B30" stopOpacity="0.46" />
               <stop offset="68%" stopColor="#A7C7E7" stopOpacity="0.16" />
-              <stop offset="100%" stopColor="#1A3153" stopOpacity="0" />
+              <stop offset="100%" stopColor="#091326" stopOpacity="0" />
             </radialGradient>
+            <linearGradient id="ti-tower-far" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#264572" stopOpacity="0.72" />
+              <stop offset="100%" stopColor="#0D1C35" stopOpacity="0.95" />
+            </linearGradient>
+            <linearGradient id="ti-tower-mid" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#1A3153" stopOpacity="0.94" />
+              <stop offset="100%" stopColor="#091326" stopOpacity="0.98" />
+            </linearGradient>
+            <linearGradient id="ti-avenue-glow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#E09B30" stopOpacity="0.48" />
+              <stop offset="45%" stopColor="#1A3153" stopOpacity="0.88" />
+              <stop offset="100%" stopColor="#091326" stopOpacity="0.98" />
+            </linearGradient>
+            <linearGradient id="ti-beam-grad" x1="50%" y1="100%" x2="50%" y2="0%">
+              <stop offset="0%" stopColor="#E09B30" stopOpacity="0.58" />
+              <stop offset="100%" stopColor="#FAFAFA" stopOpacity="0" />
+            </linearGradient>
           </defs>
 
-          {/* Luminous Core Aligned with Portal Archway Center (52% 38%) */}
-          <circle cx="998" cy="410" r="520" fill="url(#ti-portal-sun-core)" />
+          {/* Sunrise Core & Subtle Opportunity Sun-Beams */}
+          <circle cx="998" cy="490" r="420" fill="url(#ti-city-sunrise)" />
+          <g opacity="0.22">
+            <polygon points="998,520 620,0 760,0" fill="url(#ti-beam-grad)" />
+            <polygon points="998,520 930,0 1070,0" fill="url(#ti-beam-grad)" />
+            <polygon points="998,520 1240,0 1380,0" fill="url(#ti-beam-grad)" />
+          </g>
 
-          {/* Subtle Concentric Acoustic Resonance Rings in the Sky */}
-          <circle
-            cx="998"
-            cy="410"
-            r="190"
-            fill="none"
-            stroke="#FAFAFA"
-            strokeOpacity="0.18"
-            strokeWidth="1.2"
-            strokeDasharray="6 10"
-          />
-          <circle
-            cx="998"
-            cy="410"
-            r="280"
-            fill="none"
-            stroke="#E09B30"
-            strokeOpacity="0.22"
-            strokeWidth="1.2"
-          />
-          <circle
-            cx="998"
-            cy="410"
-            r="390"
-            fill="none"
-            stroke="#A7C7E7"
-            strokeOpacity="0.16"
-            strokeWidth="1"
-          />
+          {/* Global Connection Orbital Arcs (International Flight Paths / Remote Work Connectivity) */}
+          <g fill="none" stroke="#A7C7E7" strokeWidth="1.2" strokeOpacity="0.45" strokeDasharray="8 8">
+            <path className="ti-global-arc" d="M220 420 Q680 120 1180 350" />
+            <path className="ti-global-arc" d="M740 370 Q1240 110 1720 410" style={{ animationDelay: '2.2s' }} />
+            <path className="ti-global-arc" d="M440 460 Q998 190 1560 440" stroke="#E09B30" strokeOpacity="0.38" style={{ animationDelay: '1.1s' }} />
+          </g>
+          {/* Connection Node Dots */}
+          <circle cx="680" cy="240" r="3" fill="#E09B30" opacity="0.85" />
+          <circle cx="1180" cy="350" r="3" fill="#A7C7E7" opacity="0.85" />
+          <circle cx="1240" cy="235" r="3" fill="#E09B30" opacity="0.85" />
 
-          {/* Far Illuminated Cloud Bank */}
-          <path
-            d="M-120,740 C120,660 290,710 490,670 C690,630 820,560 1010,575 C1210,590 1350,670 1560,645 C1730,625 1860,665 2040,715 L2040,1120 L-120,1120 Z"
-            fill="url(#ti-cloud-bank-far)"
-          />
+          {/* LAYER 1: FAR SKYLINE & SUSPENSION BRIDGE SPANS */}
+          <g fill="url(#ti-tower-far)">
+            {/* Distant Suspension Bridge Left */}
+            <path d="M40 690 Q240 590 440 690" fill="none" stroke="#A7C7E7" strokeWidth="1.5" strokeOpacity="0.35" />
+            <rect x="234" y="540" width="12" height="170" />
+            <rect x="434" y="560" width="10" height="150" />
+            {/* Far Skyscrapers */}
+            <rect x="480" y="470" width="64" height="260" rx="2" />
+            <rect x="560" y="420" width="76" height="310" rx="2" />
+            <rect x="652" y="380" width="58" height="350" rx="2" />
+            <polygon points="732,330 762,278 792,330 792,730 732,730" />
+            <rect x="810" y="365" width="72" height="365" rx="2" />
+            <rect x="900" y="320" width="84" height="410" rx="2" />
+            <polygon points="996,260 1016,214 1036,260 1054,260 1054,730 996,730" />
+            <rect x="1072" y="340" width="78" height="390" rx="2" />
+            <rect x="1166" y="388" width="66" height="342" rx="2" />
+            <rect x="1248" y="432" width="82" height="298" rx="2" />
+            <rect x="1348" y="475" width="70" height="255" rx="2" />
+            {/* Distant Suspension Bridge Right */}
+            <path d="M1440 690 Q1640 590 1840 690" fill="none" stroke="#A7C7E7" strokeWidth="1.5" strokeOpacity="0.35" />
+            <rect x="1634" y="545" width="12" height="165" />
+          </g>
 
-          {/* Golden Sunrise Horizon Mist Band */}
-          <path
-            d="M-120,790 C220,700 540,755 980,715 C1360,680 1650,745 2040,770 L2040,980 L-120,980 Z"
-            fill="url(#ti-sunrise-horizon)"
-          />
+          {/* LAYER 2: MID SKYLINE MODERN GLASS TOWERS WITH ARCHITECTURAL EDGE LINES */}
+          <g fill="url(#ti-tower-mid)" stroke="#A7C7E7" strokeOpacity="0.22" strokeWidth="1">
+            <rect x="90" y="530" width="96" height="310" />
+            <rect x="210" y="460" width="108" height="380" />
+            <rect x="345" y="510" width="88" height="330" />
+            <rect x="520" y="455" width="92" height="385" />
+            <rect x="635" y="410" width="102" height="430" />
+            <rect x="760" y="380" width="98" height="460" />
+            <rect x="885" y="355" width="110" height="485" />
+            <rect x="1020" y="345" width="106" height="495" />
+            <rect x="1150" y="405" width="96" height="435" />
+            <rect x="1270" y="450" width="104" height="390" />
+            <rect x="1410" y="500" width="98" height="340" />
+            <rect x="1540" y="465" width="112" height="375" />
+            <rect x="1685" y="520" width="120" height="320" />
+          </g>
 
-          {/* Mid-Ground Soft Denim Cloud Billows */}
-          <path
-            d="M-120,850 C95,785 260,825 460,795 C670,762 840,705 1035,735 C1230,765 1420,830 1630,795 C1790,768 1920,805 2040,840 L2040,1120 L-120,1120 Z"
-            fill="url(#ti-cloud-bank-mid)"
-          />
+          {/* Animated Twinkling Office & Penthouse Window Clusters */}
+          <g>
+            <rect className="ti-window-twinkle" x="656" y="440" width="18" height="4" fill="#E09B30" />
+            <rect className="ti-window-twinkle" x="688" y="468" width="24" height="4" fill="#FAFAFA" style={{ animationDelay: '0.8s' }} />
+            <rect className="ti-window-twinkle" x="782" y="416" width="22" height="4" fill="#E09B30" style={{ animationDelay: '1.4s' }} />
+            <rect className="ti-window-twinkle" x="814" y="446" width="18" height="4" fill="#A7C7E7" style={{ animationDelay: '0.4s' }} />
+            <rect className="ti-window-twinkle" x="908" y="390" width="26" height="4" fill="#E09B30" style={{ animationDelay: '1.9s' }} />
+            <rect className="ti-window-twinkle" x="944" y="424" width="22" height="4" fill="#FAFAFA" style={{ animationDelay: '0.6s' }} />
+            <rect className="ti-window-twinkle" x="1042" y="382" width="24" height="4" fill="#E09B30" style={{ animationDelay: '1.2s' }} />
+            <rect className="ti-window-twinkle" x="1076" y="418" width="20" height="4" fill="#FAFAFA" style={{ animationDelay: '2.3s' }} />
+            <rect className="ti-window-twinkle" x="1172" y="442" width="20" height="4" fill="#E09B30" style={{ animationDelay: '0.9s' }} />
+            <rect className="ti-window-twinkle" x="1296" y="486" width="24" height="4" fill="#A7C7E7" style={{ animationDelay: '1.6s' }} />
+          </g>
 
-          {/* Deep Studio Horizon Base Vignette so Below-The-Fold Cards Read with AAA Contrast */}
-          <path
-            d="M-120,930 C340,875 720,915 1060,895 C1420,875 1740,905 2040,935 L2040,1120 L-120,1120 Z"
-            fill="#091326"
-            fillOpacity="0.72"
-          />
+          {/* Ascending Opportunity Light Streams & Glowing Vertical Energy Filaments */}
+          <g>
+            <rect className="ti-opportunity-stream" x="752" y="480" width="2.2" height="48" rx="1" fill="#E09B30" />
+            <rect className="ti-opportunity-stream" x="876" y="440" width="2.5" height="62" rx="1" fill="#FAFAFA" style={{ animationDelay: '1.5s' }} />
+            <rect className="ti-opportunity-stream" x="1008" y="420" width="2.8" height="68" rx="1" fill="#E09B30" style={{ animationDelay: '0.7s' }} />
+            <rect className="ti-opportunity-stream" x="1138" y="460" width="2.2" height="54" rx="1" fill="#A7C7E7" style={{ animationDelay: '2.4s' }} />
+            <rect className="ti-opportunity-stream" x="1258" y="500" width="2.2" height="44" rx="1" fill="#E09B30" style={{ animationDelay: '3.2s' }} />
+          </g>
+
+          {/* LAYER 3: NEAR HORIZON GOLDEN BOULEVARD & BOKEH GLOW */}
+          <rect x="0" y="720" width="1920" height="360" fill="url(#ti-avenue-glow)" />
+          <ellipse cx="998" cy="726" rx="580" ry="22" fill="#E09B30" opacity="0.34" />
+          {/* Subtle Boulevard Perspective Lines */}
+          <line x1="998" y1="720" x2="480" y2="1080" stroke="#E09B30" strokeOpacity="0.28" strokeWidth="1.5" />
+          <line x1="998" y1="720" x2="1520" y2="1080" stroke="#E09B30" strokeOpacity="0.28" strokeWidth="1.5" />
+          <line x1="998" y1="720" x2="998" y2="1080" stroke="#FAFAFA" strokeOpacity="0.18" strokeWidth="1" strokeDasharray="10 14" />
         </svg>
       </div>
     </div>
@@ -188,11 +258,11 @@ export const WorldBackdrop: React.FC<WorldBackdropProps> = ({ worldRef }) => {
 };
 
 /**
- * PORTAL_BG (Foreground Architectural Gateway Layer inside Sticky Intro, zIndex: 5)
- * Full-bleed dark #091326 / #1A3153 architectural studio wall pierced by a centered tall arched
- * acoustic portal (origin centered at 52% 38%) with a 1px #A7C7E7/30 inner bevel,
- * soft #E09B30 Warm Amber rim-light hugging the interior arch edge, and a 100% transparent opening
- * through which the glowing WORLD_BG sky shines.
+ * PORTAL_BG — Sleek Architectural Doorway Framing the Metropolis
+ * -----------------------------------------------------------------------
+ * Dark architectural #091326 / #1A3153 threshold with crisp 1px #A7C7E7/35 inner frame
+ * and warm #E09B30 golden city spill-light hugging the doorway edges.
+ * Zooms cleanly 1x -> 7.5x around '52% 38%'.
  */
 export const PortalGateway: React.FC<PortalGatewayProps> = ({ portalRef, opacity = 1 }) => {
   return (
@@ -220,6 +290,7 @@ export const PortalGateway: React.FC<PortalGatewayProps> = ({ portalRef, opacity
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            display: 'block',
           }}
         />
       ) : (
@@ -234,85 +305,73 @@ export const PortalGateway: React.FC<PortalGatewayProps> = ({ portalRef, opacity
           }}
         >
           <defs>
-            {/* Architectural Studio Wall Gradient */}
-            <radialGradient id="ti-wall-surface" cx="52%" cy="38%" r="72%">
-              <stop offset="0%" stopColor="#1A3153" />
-              <stop offset="48%" stopColor="#0F1F38" />
+            <linearGradient id="ti-door-wall" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#091326" />
+              <stop offset="48%" stopColor="#132642" />
               <stop offset="100%" stopColor="#091326" />
-            </radialGradient>
-
-            {/* Warm Amber Rim Glow along the Archway Cutout */}
-            <linearGradient id="ti-arch-amber-rim" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#E09B30" stopOpacity="0.95" />
-              <stop offset="50%" stopColor="#A7C7E7" stopOpacity="0.65" />
-              <stop offset="100%" stopColor="#E09B30" stopOpacity="0.85" />
             </linearGradient>
-
-            {/* Inner Depth Bevel Gradient */}
-            <linearGradient id="ti-arch-inner-bevel" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#1E3A5F" stopOpacity="0.9" />
-              <stop offset="50%" stopColor="#091326" stopOpacity="0.96" />
-              <stop offset="100%" stopColor="#1A3153" stopOpacity="0.9" />
+            <linearGradient id="ti-door-floor-spill" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stopColor="#E09B30" stopOpacity="0.46" />
+              <stop offset="32%" stopColor="#A7C7E7" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#091326" stopOpacity="0" />
             </linearGradient>
-
-            {/* Floor Reflection Gradient */}
-            <linearGradient id="ti-floor-reflection" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#E09B30" stopOpacity="0.22" />
-              <stop offset="45%" stopColor="#A7C7E7" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#091326" stopOpacity="0.92" />
+            <linearGradient id="ti-arch-rim" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#A7C7E7" stopOpacity="0.55" />
+              <stop offset="60%" stopColor="#E09B30" stopOpacity="0.88" />
+              <stop offset="100%" stopColor="#E09B30" stopOpacity="1" />
             </linearGradient>
+            <mask id="ti-doorway-cutout-mask">
+              <rect x="0" y="0" width="1920" height="1080" fill="white" />
+              <path
+                d="M 790 740 L 790 365 A 208 208 0 0 1 1206 365 L 1206 740 Z"
+                fill="black"
+              />
+            </mask>
           </defs>
 
-          {/* Outer Architectural Wall with Transparent Arched Portal Cutout (even-odd fill rule) */}
-          {/* Arch Center is at x = 998.4 (52% of 1920), y = 410.4 (38% of 1080) */}
-          {/* Arch width = 340px (x: 828 -> 1168, radius = 170), Arch height = 560px (top arc center at y=330, bottom at y=720) */}
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M -200 -200 H 2120 V 1280 H -200 Z M 828 720 L 828 330 A 170 170 0 0 1 1168 330 L 1168 720 Z"
-            fill="url(#ti-wall-surface)"
+          {/* Dark Architectural Studio Wall with Arched Doorway Opening */}
+          <rect
+            x="0"
+            y="0"
+            width="1920"
+            height="1080"
+            fill="url(#ti-door-wall)"
+            mask="url(#ti-doorway-cutout-mask)"
           />
 
-          {/* Inner Architectural 3D Archway Depth Recess (Surrounding the transparent opening) */}
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M 804 742 L 804 326 A 194 194 0 0 1 1192 326 L 1192 742 Z M 828 720 L 828 330 A 170 170 0 0 1 1168 330 L 1168 720 Z"
-            fill="url(#ti-arch-inner-bevel)"
-          />
+          {/* Subtle Architectural Paneling Lines */}
+          <g stroke="#A7C7E7" strokeOpacity="0.10" strokeWidth="1" mask="url(#ti-doorway-cutout-mask)">
+            <line x1="360" y1="0" x2="360" y2="740" />
+            <line x1="1560" y1="0" x2="1560" y2="740" />
+            <line x1="0" y1="740" x2="1920" y2="740" />
+          </g>
 
-          {/* Subtle Architectural Wall Grid Hairlines (1px #A7C7E7/15) */}
-          <line x1="0" y1="720" x2="804" y2="720" stroke="#A7C7E7" strokeOpacity="0.16" strokeWidth="1" />
-          <line x1="1192" y1="720" x2="1920" y2="720" stroke="#A7C7E7" strokeOpacity="0.16" strokeWidth="1" />
-          <line x1="480" y1="0" x2="480" y2="720" stroke="#A7C7E7" strokeOpacity="0.08" strokeWidth="1" />
-          <line x1="1480" y1="0" x2="1480" y2="720" stroke="#A7C7E7" strokeOpacity="0.08" strokeWidth="1" />
-
-          {/* Perspective Studio Floor Spill from the Portal */}
+          {/* Floor Threshold & Warm Golden City Spill-Light */}
           <polygon
-            points="828,720 1168,720 1560,1080 436,1080"
-            fill="url(#ti-floor-reflection)"
+            points="790,740 1206,740 1560,1080 436,1080"
+            fill="url(#ti-door-floor-spill)"
+            mask="url(#ti-doorway-cutout-mask)"
           />
-          <line x1="828" y1="720" x2="436" y2="1080" stroke="#E09B30" strokeOpacity="0.28" strokeWidth="1.2" />
-          <line x1="1168" y1="720" x2="1560" y2="1080" stroke="#E09B30" strokeOpacity="0.28" strokeWidth="1.2" />
 
-          {/* Outer 1px Soft Denim Architectural Arch Frame */}
+          {/* Crisp 1px Inner Architectural Frame + Golden Edge Highlight */}
           <path
-            d="M 804 742 L 804 326 A 194 194 0 0 1 1192 326 L 1192 742 Z"
+            d="M 790 740 L 790 365 A 208 208 0 0 1 1206 365 L 1206 740"
+            fill="none"
+            stroke="url(#ti-arch-rim)"
+            strokeWidth="3.5"
+          />
+          <path
+            d="M 768 740 L 768 365 A 230 230 0 0 1 1228 365 L 1228 740"
             fill="none"
             stroke="#A7C7E7"
-            strokeOpacity="0.30"
-            strokeWidth="1.5"
+            strokeOpacity="0.22"
+            strokeWidth="1.2"
           />
-
-          {/* Inner Warm Amber #E09B30 Rim-Light Hugging the Interior Arch Edge */}
-          <path
-            d="M 828 720 L 828 330 A 170 170 0 0 1 1168 330 L 1168 720 Z"
-            fill="none"
-            stroke="url(#ti-arch-amber-rim)"
-            strokeWidth="2.5"
-          />
+          <line x1="790" y1="740" x2="1206" y2="740" stroke="#E09B30" strokeWidth="3" strokeOpacity="0.85" />
         </svg>
       )}
     </div>
   );
 };
+
+export default PortalGateway;

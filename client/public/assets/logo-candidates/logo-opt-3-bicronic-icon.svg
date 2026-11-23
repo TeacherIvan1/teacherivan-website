@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Teacher Ivan Bicronic Twin-Orbit Icon">
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="#1A3153"/>
+  <!-- Left Orbit (24/7 AI Soft Denim) -->
+  <circle cx="26" cy="31" r="15" fill="none" stroke="#A7C7E7" stroke-width="3.6"/>
+  <!-- Right Orbit (Live 1-on-1 Warm Amber) -->
+  <circle cx="38" cy="31" r="15" fill="none" stroke="#E09B30" stroke-width="3.6"/>
+  <!-- Speech Tail + Abstract T -->
+  <path d="M24 25 H40 M32 25 V40" stroke="#FAFAFA" stroke-width="3.8" stroke-linecap="round"/>
+  <polygon points="28,46 32,53 36,46" fill="#E09B30"/>
+</svg>

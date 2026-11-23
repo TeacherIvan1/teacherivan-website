@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" width="320" height="64" role="img" aria-label="Teacher Ivan Acoustic Portal Logo">
+  <g>
+    <rect x="2" y="2" width="60" height="60" rx="16" fill="#1A3153"/>
+    <path d="M16 50 V28 C16 17.5 23.2 11 32 11 C40.8 11 48 17.5 48 28 V50 H41 V28.5 C41 21.8 37 17.5 32 17.5 C27 17.5 23 21.8 23 28.5 V50 Z" fill="#FAFAFA"/>
+    <rect x="21" y="23" width="22" height="4.5" rx="2.25" fill="#A7C7E7"/>
+    <rect x="29.75" y="27.5" width="4.5" height="22.5" rx="2.25" fill="#FAFAFA"/>
+    <circle cx="32" cy="18.5" r="3.2" fill="#E09B30"/>
+    <path d="M25 36 Q32 32 39 36" fill="none" stroke="#E09B30" stroke-width="2.4" stroke-linecap="round"/>
+  </g>
+  <text x="78" y="34" font-family="Montserrat, Arial, sans-serif" font-weight="700" font-size="22" letter-spacing="0.06em" fill="currentColor">TEACHER <tspan fill="#E09B30">IVAN</tspan></text>
+  <text x="79" y="50" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="10.5" letter-spacing="0.22em" fill="#9A6515">SPEAK INTO FLUENCY</text>
+</svg>

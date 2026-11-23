@@ -1,19 +1,15 @@
 /**
- * Brand-Native Portal & World Visual Assets Configuration
- * Path: client/src/config/portalAssets.ts
+ * Portal Zoom-In & Luminous Metropolis World Asset Constants
  * -------------------------------------------------------------
- * Zero third-party hotlinks. Provides optional local override paths
- * backed by the self-contained SVG/CSS atmospheric layers in PortalBackdrop.tsx.
+ * World backdrop: Animated Global Metropolis ("World of Opportunities")
+ * graded strictly in Teacher Ivan's palette (#091326, #1A3153, #2E527D, #A7C7E7, #E09B30).
+ * Foreground doorway: Sleek architectural portal zooming 1x -> 7.5x around '52% 38%'.
  */
 
-export const PORTAL_BG_URL = '/assets/portal/portal-bg.webp';
-export const WORLD_BG_URL = '/assets/portal/world-bg.webp';
+export const PORTAL_BG_URL = '/assets/portal/doorway-threshold.svg';
+export const WORLD_BG_URL = '/assets/portal/metropolis-horizon.svg';
 
-/**
- * Set to true only if external raster .webp overrides are placed in /public/assets/portal/.
- * Defaults to false so the razor-sharp, zero-network-failure brand-native SVG/CSS
- * atmospheric sky (`WORLD_BG`) and arched acoustic portal (`PORTAL_BG`) render immediately.
- */
+/** When false, PortalBackdrop renders self-contained GPU-accelerated vector/CSS metropolis + doorway layers. */
 export const USE_RASTER_PORTAL_OVERRIDES = false;
 
 export const PORTAL_TRANSFORM_ORIGIN = '52% 38%';

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { LandingPageView } from './components/LandingPageView';
 import { CompactVoiceSimulator } from './components/CompactVoiceSimulator';
+import { MobileVoiceCockpit } from './components/MobileVoiceCockpit';
 import { SessionReportPanel } from './components/SessionReportPanel';
 import { TeachingCard } from './components/TeachingCard';
 import { TokenInspector } from './components/TokenInspector';
@@ -24,7 +25,7 @@ import { Footer } from './components/Footer';
 import { CookieConsentProvider } from './context/CookieConsentContext';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { LegalModal } from './components/LegalModal';
-import { Terminal } from 'lucide-react';
+import { Terminal, Headphones, Target, BookOpen, Calendar } from 'lucide-react';
 import { API_BASE_URL } from './config/api';
 import { useTranslation } from './modules/i18n/languageStore';
 import { useDevModeStore } from './modules/dev/devModeStore';
@@ -34,7 +35,7 @@ import { useAuthStore, purgeLegacyAuthTokens } from './modules/auth/authStore';
 export const App: React.FC = () => {
   const { t, lang, isEs } = useTranslation();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
-  const { activeView } = useNavigationStore();
+  const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, syncWithServer } = useAuthStore();
   const [resourcesTab, setResourcesTab] = useState<'generator' | 'games'>('generator');
 
@@ -117,7 +118,7 @@ export const App: React.FC = () => {
             /* ========================================================================= */
             /* REGISTERED USERS VIEW: ROUTED STUDENT WORKSPACE                          */
             /* ========================================================================= */
-            <div className="flex-1 flex flex-col animate-in fade-in duration-200">
+            <div className="flex-1 flex flex-col animate-in fade-in duration-200 pb-16 md:pb-0">
               {/* VIEW 1: MI RUTA (MICRO-LEARNING 5-DAY SPRINT DASHBOARD) */}
               {activeView === 'path' ? (
                 <div id="view-path" className="flex flex-col animate-in fade-in duration-200">
@@ -168,8 +169,15 @@ export const App: React.FC = () => {
                   <ClassSchedulerView />
                 </div>
               ) : (
-                /* VIEW 4: SIMULADOR IA (Full Unlocked Simulator Model) */
-                <div id="view-simulator" className="py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6 animate-in fade-in duration-200">
+                /* VIEW 4: SIMULADOR IA (Mobile: 100dvh Zero-Scroll Cockpit | Desktop: Full Simulator) */
+                <div id="view-simulator" className="flex-1 flex flex-col animate-in fade-in duration-200">
+                  {/* Mobile Single-Screen Zero-Scroll Cockpit (< 768px) */}
+                  <div className="md:hidden h-[calc(100dvh-112px)] overflow-hidden">
+                    <MobileVoiceCockpit />
+                  </div>
+
+                  {/* Desktop Full Simulator (>= 768px) */}
+                  <div className="hidden md:flex py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex-col gap-6">
                   {showDevMode && (
                     <div
                       id="dev-mode-active-banner"
@@ -218,11 +226,49 @@ export const App: React.FC = () => {
                       </div>
                     </div>
                   )}
+                  </div>
                 </div>
               )}
             </div>
           )}
         </main>
+
+        {/* Authenticated Mobile Bottom App Tab Bar (56px, >= 44px touch targets) */}
+        {isAuthenticated && (
+          <nav
+            id="mobile-portal-bottom-tabs"
+            aria-label={isEs ? 'Navegación del portal' : 'Portal Navigation'}
+            className="md:hidden fixed bottom-0 inset-x-0 z-50 h-14 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] grid grid-cols-4 items-center px-1 shadow-lg"
+          >
+            {(
+              [
+                { id: 'simulator', labelEs: 'Simulador', labelEn: 'Voice Lab', icon: Headphones },
+                { id: 'path', labelEs: 'Mi Ruta', labelEn: 'My Path', icon: Target },
+                { id: 'resources', labelEs: 'Recursos', labelEn: 'Resources', icon: BookOpen },
+                { id: 'schedule', labelEs: 'Clases', labelEn: 'Classes', icon: Calendar },
+              ] as const
+            ).map((tab) => {
+              const Icon = tab.icon;
+              const active = activeView === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveView(tab.id)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`min-h-[44px] flex flex-col items-center justify-center gap-0.5 rounded-xl font-montserrat font-bold text-[10px] cursor-pointer transition-colors ${
+                    active
+                      ? 'text-[#9A6515] dark:text-[#E09B30]'
+                      : 'text-[var(--text-secondary)]'
+                  }`}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  <span>{isEs ? tab.labelEs : tab.labelEn}</span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
 
         {/* Automatic End-of-Session Student Report Pop-Up Modal */}
         <StudentReportModal />
