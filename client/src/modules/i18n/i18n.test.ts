@@ -267,7 +267,7 @@ describe('i18n Language Module', () => {
 
     // 1. Hero 5 elements
     assert.strictEqual(enLp.heroHeadline, 'Speak English fluently without freezing in real conversations.');
-    assert.strictEqual(esLp.heroHeadline, 'Hablá inglés con fluidez y sin bloqueos al conversar.');
+    assert.strictEqual(esLp.heroHeadline, 'Habla inglés con fluidez y sin bloqueos al conversar.');
     assert.ok(enLp.heroSubhead.includes('Teacher Ivan'));
     assert.ok(esLp.heroSubhead.includes('Teacher Ivan'));
     assert.ok(enLp.heroPrimaryCta);
