@@ -159,6 +159,20 @@ html.dark,
   padding: 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+  scroll-behavior: auto;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #091326;
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
 html, body, #root {
   width: 100%;
   max-width: 100vw;
@@ -173,19 +187,22 @@ html, body, #root {
   font-variant-numeric: tabular-nums;
 }
 
-@media (min-width: 1024px) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
 body {
-  font-family: var(--font-body);
-  background-color: var(--bg-canvas);
+  font-family: 'Inter', sans-serif;
+  background-color: #091326;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@keyframes bobUp {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 /* App Container */

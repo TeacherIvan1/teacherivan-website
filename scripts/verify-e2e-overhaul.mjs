@@ -133,7 +133,7 @@ async function runPlaywrightSuite() {
 
         await page.goto(PREVIEW_URL, { waitUntil: 'networkidle' });
 
-        // 1. Check horizontal overflow (0px drift) & 2-Font compliance on Landing Page
+        // 1. Check horizontal overflow (0px drift) & 4-Column Auragate Footer on Landing Page
         const layoutAudit = await page.evaluate(() => {
           const docWidth = document.documentElement.clientWidth;
           const scrollWidth = document.documentElement.scrollWidth;
@@ -152,9 +152,71 @@ async function runPlaywrightSuite() {
         if (!vp.isMobile) {
           assert.equal(layoutAudit.footerCols, 4, 'Desktop footer must have 4 columns at 1440×900');
         } else {
-          assert.equal(layoutAudit.footerCols, 1, 'Mobile footer must stack cleanly in 1 column at 390×844');
+          assert.equal(layoutAudit.footerCols, 2, 'Mobile footer must have 2 columns at 390×844');
         }
-        console.log(`  ✔ Layout & 4-Column Footer verified (${layoutAudit.footerCols} cols, 0px overflow).`);
+        console.log(`  ✔ Layout & Auragate Footer verified (${layoutAudit.footerCols} cols, 0px overflow).`);
+
+        // 1.5 Verify Portal Zoom-In (1x -> 7.5x), World Zoom (1x -> 1.18x), Opacity Choreography & ArcCardCarousel
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(100);
+        const portalAtTop = await page.evaluate(() => {
+          const portalEl = document.getElementById('portal-archway-zoom-layer');
+          const worldEl = document.getElementById('portal-world-parallax-layer');
+          const scene1El = document.getElementById('portal-scene1-hero-copy');
+          return {
+            portalTransform: portalEl ? portalEl.style.transform : '',
+            portalOpacity: portalEl ? Number(window.getComputedStyle(portalEl).opacity) : -1,
+            worldTransform: worldEl ? worldEl.style.transform : '',
+            scene1Opacity: scene1El ? Number(window.getComputedStyle(scene1El).opacity) : -1,
+          };
+        });
+        assert.ok(
+          portalAtTop.portalTransform.includes('scale(1)'),
+          `Expected portal scale(1) at scrollY=0, got: ${portalAtTop.portalTransform}`
+        );
+        assert.equal(portalAtTop.portalOpacity, 1, 'Portal opacity must be 1 at scrollY=0');
+        assert.equal(portalAtTop.scene1Opacity, 1, 'Scene 1 hero copy opacity must be 1 at scrollY=0');
+
+        // Scroll past the 160vh intro track (progress = 1)
+        await page.evaluate(() => {
+          const intro = document.getElementById('portal-intro-track');
+          const targetY = intro ? intro.offsetHeight : window.innerHeight * 1.6;
+          window.scrollTo(0, targetY);
+        });
+        await page.waitForTimeout(120);
+
+        const portalAtEnd = await page.evaluate(() => {
+          const portalEl = document.getElementById('portal-archway-zoom-layer');
+          const worldEl = document.getElementById('portal-world-parallax-layer');
+          const scene1El = document.getElementById('portal-scene1-hero-copy');
+          return {
+            portalTransform: portalEl ? portalEl.style.transform : '',
+            portalOpacity: portalEl ? Number(window.getComputedStyle(portalEl).opacity) : -1,
+            worldTransform: worldEl ? worldEl.style.transform : '',
+            scene1Opacity: scene1El ? Number(window.getComputedStyle(scene1El).opacity) : -1,
+          };
+        });
+        assert.ok(
+          portalAtEnd.portalTransform.includes('scale(7.5)'),
+          `Expected portal scale(7.5) at end of intro track, got: ${portalAtEnd.portalTransform}`
+        );
+        assert.ok(
+          portalAtEnd.worldTransform.includes('scale(1.18)'),
+          `Expected world scale(1.18) at end of intro track, got: ${portalAtEnd.worldTransform}`
+        );
+        assert.equal(portalAtEnd.portalOpacity, 0, 'Portal opacity must fade to 0 at end of intro track');
+        assert.equal(portalAtEnd.scene1Opacity, 0, 'Scene 1 hero copy opacity must fade to 0');
+
+        // Verify ArcCardCarousel starts at active index 3 and cycles cleanly with Next / Prev buttons
+        const initialArcActive = await page.getAttribute('#arc-card-carousel', 'data-active-index');
+        assert.equal(initialArcActive, '3', 'ArcCardCarousel must start at active index 3');
+        await page.click('#arc-carousel-next-btn');
+        const nextArcActive = await page.getAttribute('#arc-card-carousel', 'data-active-index');
+        assert.equal(nextArcActive, '4', 'ArcCardCarousel must advance to index 4 on Next click');
+        await page.click('#arc-carousel-prev-btn');
+        const prevArcActive = await page.getAttribute('#arc-card-carousel', 'data-active-index');
+        assert.equal(prevArcActive, '3', 'ArcCardCarousel must return to index 3 on Prev click');
+        console.log('  ✔ Portal Zoom (1x -> 7.5x), World Zoom (1x -> 1.18x), Opacity fade, and ArcCardCarousel (3 -> 4 -> 3) verified.');
 
         // 2. AudioWorklet & Microphone Smoke Check
         const workletCheck = await page.evaluate(async () => {

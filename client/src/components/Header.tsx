@@ -23,7 +23,7 @@ import { useTeachingStore } from '../modules/teaching/teachingStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useAuthStore } from '../modules/auth/authStore';
 import { LanguageToggle } from './LanguageToggle';
-import { BrandLockup } from './BrandLockup';
+import { BrandWordmark } from './BrandWordmark';
 import { useTheme } from '../modules/theme/ThemeContext';
 import { useScrollLock } from '../hooks/useScrollLock';
 
@@ -111,8 +111,9 @@ export const Header: React.FC = () => {
         {/* MOBILE & TABLET HEADER (< 1024px): Guaranteed 56px height & 0px overflow */}
         {/* ===================================================================== */}
         <div className="lg:hidden w-full h-14 px-3 flex items-center justify-between gap-2 overflow-hidden">
-          {/* Left: Compact TI icon mark (32x32px) + single-line Teacher Ivan */}
-          <button
+          {/* Left: BrandWordmark (Teacher in Montserrat + Ivan in Mr Dafoe) */}
+          <BrandWordmark
+            isMobile={true}
             onClick={() => {
               if (isAuthenticated) {
                 setActiveView('path');
@@ -120,20 +121,7 @@ export const Header: React.FC = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}
-            className="flex items-center gap-2 focus:outline-none cursor-pointer shrink-0"
-            title="Teacher Ivan - Official English Classes"
-          >
-            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-[#1A3153] dark:bg-[#132642] p-1 border border-[#E09B30]/40 shadow-sm">
-              <img
-                src="/assets/logo.svg"
-                alt="TI Logo"
-                className="w-full h-full object-contain filter drop-shadow-sm"
-              />
-            </div>
-            <span className="font-montserrat font-bold text-base tracking-tight whitespace-nowrap text-[#1A3153] dark:text-[#FAFAFA]">
-              Teacher <span className="text-[#9A6515] dark:text-[#E09B30]">I</span>van
-            </span>
-          </button>
+          />
 
           {/* Right: Three clean min-w-[44px] min-h-[44px] touch targets */}
           <div className="flex items-center gap-1 shrink-0">
@@ -192,8 +180,9 @@ export const Header: React.FC = () => {
         {/* DESKTOP HEADER (>= 1024px): 68px Full Navigation Matrix (Preserved) */}
         {/* ===================================================================== */}
         <div className="hidden lg:flex w-full max-w-[1440px] mx-auto px-6 items-center justify-between gap-4 overflow-hidden">
-          {/* Left: Brand Lockup with Chibi Mascot */}
-          <button
+          {/* Left: BrandWordmark (Teacher in Montserrat + Ivan in Mr Dafoe) */}
+          <BrandWordmark
+            isMobile={false}
             onClick={() => {
               if (isAuthenticated) {
                 setActiveView('path');
@@ -201,11 +190,7 @@ export const Header: React.FC = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}
-            className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E09B30] rounded-lg transition-transform hover:scale-[1.01] cursor-pointer"
-            title="Teacher Ivan - English Classes"
-          >
-            <BrandLockup size="md" />
-          </button>
+          />
 
           {/* Center: Desktop Navigation Tabs (Authenticated) or Chapter Links (Guests) */}
           {isAuthenticated ? (

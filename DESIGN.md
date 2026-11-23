@@ -1,7 +1,7 @@
 # DESIGN.md — Teacher Ivan (`teacherivan.com`)
 
-**Version:** 3.0 (Production Design & Motion System)  
-**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + GSAP (`ScrollTrigger`) + Lenis + Three.js / Remotion + Rigged SVG (`teacher-ivan-rig.svg`, `emma-rig.svg`)  
+**Version:** 3.1 (Auragate Portal Zoom + Editorial Script Accent & Production Design System)  
+**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + Portal Zoom & Mouse Parallax Engine + ArcCardCarousel + Rigged SVG (`teacher-ivan-rig.svg`, `emma-rig.svg`)  
 **Deployment:** GitHub Pages (`https://teacherivan.com`) + Render Backend (`https://teacherivan-website.onrender.com`)  
 **Languages:** 100% Bilingual (`ES` primary LATAM/Bolivia | `EN` global)  
 **Official Contact:** WhatsApp `+591 72878330` (`https://wa.me/59172878330`)  
@@ -12,6 +12,7 @@
 
 ### 1.1 Brand Essence & Copy Tone
 - **Identity:** Institutional linguistic rigor meets modern, real-time spoken fluency technology. Teacher Ivan is not a passive grammar academy and not a generic gamified flashcard app—it is a **Bichronous Coaching Ecosystem** combining **24/7 Asynchronous Voice Immersion** with **High-Frequency 1-on-1 Live Human Coaching** (`>75%` Student Talking Time).
+- **Portal Zoom & Atmospheric World Aesthetic:** The public guest landing experience opens on an iconic dark architectural studio gateway (`PORTAL_BG` on `#091326` / `#1A3153`) framing a luminous twilight sky and golden sunrise horizon (`WORLD_BG` graded strictly in `#091326` → `#1A3153` → `#A7C7E7` → `#E09B30`). As the user scrolls through the `160vh` pinned intro track, the arched acoustic portal zooms from `1× → 7.5×` around origin `52% 38%` (paired with smooth desktop mouse parallax), flying the user through the archway into the luminous world where the **ArcCardCarousel** and frosted-navy platform modules float harmoniously.
 - **Copy Voice:** Honest, direct, warm, and concrete. Lead with real numbers (`>75%` habla activa, `90s` diagnóstico oral, `10 min/día`, `300 / 580 / 850 BOB`, `14:00–20:00 BOT`). Zero hype, zero walls of text, and **zero system emojis** anywhere in the UI chrome or marketing surfaces.
 - **Student-Facing Terminology Rule:** Never expose internal engineering jargon (`LLM`, `VAD`, `WebSocket`, `PCM`, `Speech-to-Text`, `AudioWorklet`) in student-facing UI copy. Always use crisp EdTech language: *24/7 Voice Lab / Laboratorio de Voz 24/7*, *Interactive Conversation Tutor / Tutor Conversacional*, *Live Native Recasting / Recasting Nativo en Vivo*, and *Live Transcription / Transcripción en Vivo*.
 
@@ -158,8 +159,9 @@ export default {
 ## 3. Typography & Bilingual (ES | EN) Scale
 
 ### 3.1 Font Pairing & Loading Strategy
-- **Display & Badges:** Montserrat (600 SemiBold, 700 Bold, 800 ExtraBold, 900 Black).
-- **Body, Controls & Transcripts:** Inter (400 Regular, 500 Medium, 600 SemiBold).
+- **Display & Badges:** `Montserrat` (`500 Medium`, `600 SemiBold`, `700 Bold`, `800 ExtraBold`).
+- **Body, Controls & Transcripts:** `Inter` (`400 Regular`, `500 Medium`, `600 SemiBold`, `700 Bold`).
+- **Editorial Script Accent (Restrained Usage Only):** `Mr Dafoe` (`400 Regular`, loaded from Google Fonts) — strictly reserved for the leading Hero script word (`"Hablá"` / `"Speak"` in `#E09B30`), the `"Ivan"` script flourish in `<BrandWordmark />`, and the decorative `64px` `"T."` monogram in Hero Column 2.
 - Load via `<link>` in `client/index.html` with `display=swap` and `font-variant-numeric: tabular-nums` on all timers (`01:30`), CEFR scores (`0–100`), prices (`300 / 580 / 850 BOB`), and class counters (`X / 3`, `X / 5`).
 
 ### 3.2 Fluid Type Hierarchy Table

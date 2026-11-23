@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, Mail, Clock, ShieldCheck, FileText, SlidersHorizontal, ArrowRight } from 'lucide-react';
-import { BrandLockup } from './BrandLockup';
+import { BrandWordmark } from './BrandWordmark';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useNavigationStore } from '../modules/navigation/navigationStore';
 import { useAuthStore } from '../modules/auth/authStore';
@@ -13,7 +13,23 @@ export const Footer: React.FC = () => {
   const { isAuthenticated, openAuthModal } = useAuthStore();
   const { openLegalModal, openCookiePreferences } = useCookieConsent();
 
-  const scrollToSection = (sectionId: string, portalView?: 'path' | 'simulator' | 'resources' | 'schedule') => {
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const scrollToSection = (
+    sectionId: string,
+    portalView?: 'path' | 'simulator' | 'resources' | 'schedule'
+  ) => {
     if (isAuthenticated && portalView) {
       setActiveView(portalView);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -28,72 +44,112 @@ export const Footer: React.FC = () => {
   return (
     <footer
       id="app-footer"
-      className="bg-[#091326] border-t border-[#A7C7E7]/20 text-[#FAFAFA] py-14 sm:py-16 px-4 sm:px-6 lg:px-12 select-none"
+      className="select-none text-[#FAFAFA]"
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        padding: isMobile ? '100px 22px 40px' : '140px 44px 52px',
+        background:
+          'linear-gradient(180deg, rgba(9,19,38,0) 0%, rgba(9,19,38,0.88) 40%, #091326 100%)',
+      }}
     >
-      <div className="max-w-[1280px] mx-auto">
-        {/* 4-Column Architectural Desktop Grid / Cleanly Stacked Mobile */}
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: '0 auto',
+          borderTop: '1px solid rgba(167,199,231,0.22)',
+          paddingTop: isMobile ? 36 : 48,
+        }}
+      >
+        {/* Exact Auragate CSS Grid: 1.4fr 1fr 1fr 1fr desktop / 1fr 1fr mobile */}
         <div
           id="footer-4col-grid"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12 border-b border-[#A7C7E7]/15"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr 1fr' : '1.4fr 1fr 1fr 1fr',
+            gap: isMobile ? '32px 20px' : '40px',
+            paddingBottom: 40,
+            borderBottom: '1px solid rgba(167,199,231,0.15)',
+          }}
         >
-          {/* COLUMN 1: Brand & Mission */}
-          <div className="flex flex-col items-start gap-4">
-            <BrandLockup
-              size="lg"
-              variant="dark"
-              forceDarkSurface={true}
-              altText="Teacher Ivan Official Platform"
+          {/* COLUMN 1: Brand & Mission (Full-width on mobile) */}
+          <div
+            style={{
+              gridColumn: isMobile ? '1 / -1' : undefined,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 14,
+            }}
+          >
+            <BrandWordmark
+              isMobile={isMobile}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             />
-            <p className="font-inter text-xs sm:text-sm text-[#A7C7E7] leading-relaxed max-w-xs">
+            <p
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13,
+                lineHeight: 1.6,
+                color: '#A7C7E7',
+                maxWidth: 320,
+              }}
+            >
               {isEs
                 ? 'Método Bicrónico: Inmersión IA 24/7 + Coaching 1-a-1 en vivo.'
                 : 'Bichronous Method: 24/7 AI Immersion + Live 1-on-1 Human Coaching.'}
             </p>
-            <p className="font-inter text-xs text-[#A7C7E7]/80 pt-1">
+            <p
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 12,
+                color: 'rgba(250,250,250,0.6)',
+              }}
+            >
               © 2026 Teacher Ivan. {isEs ? 'Todos los derechos reservados.' : 'All rights reserved.'}
             </p>
           </div>
 
-          {/* COLUMN 2: Platform & Plans */}
+          {/* COLUMN 2: Platform / Plataforma */}
           <div className="flex flex-col items-start gap-3">
             <h3 className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-              {isEs ? 'Plataforma y Planes' : 'Platform & Plans'}
+              {isEs ? 'Plataforma' : 'Platform'}
             </h3>
             <ul className="space-y-2.5 font-inter text-xs sm:text-sm text-[#A7C7E7]">
               <li>
                 <button
                   type="button"
                   onClick={() => scrollToSection('chapter-1-bicronic', 'path')}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer text-left"
                 >
-                  <span>{isEs ? 'Método Bicrónico' : 'Bichronous Method'}</span>
+                  {isEs ? 'Método Bicrónico' : 'Bichronous Method'}
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => scrollToSection('chapter-2-voicelab', 'simulator')}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer text-left"
                 >
-                  <span>Voice Lab 24/7</span>
+                  Voice Lab 24/7
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => scrollToSection('chapter-3-plans', 'schedule')}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer text-left"
                 >
-                  <span>{isEs ? 'Planes (300 / 580 / 850 BOB)' : 'Plans (300 / 580 / 850 BOB)'}</span>
+                  {isEs ? 'Planes (300–850 BOB)' : 'Plans (300–850 BOB)'}
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => scrollToSection('chapter-4-faq', 'resources')}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer text-left"
                 >
-                  <span>{isEs ? 'Preguntas Frecuentes' : 'Frequently Asked Questions'}</span>
+                  {isEs ? 'Preguntas' : 'Questions'}
                 </button>
               </li>
               {!isAuthenticated && (
@@ -111,10 +167,10 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* COLUMN 3: Legal & Privacy */}
+          {/* COLUMN 3: Legal */}
           <div className="flex flex-col items-start gap-3">
             <h3 className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-              {isEs ? 'Legal y Privacidad' : 'Legal & Privacy'}
+              Legal
             </h3>
             <ul className="space-y-2.5 font-inter text-xs sm:text-sm text-[#A7C7E7]">
               <li>
@@ -122,7 +178,7 @@ export const Footer: React.FC = () => {
                   id="footer-privacy-policy-btn"
                   type="button"
                   onClick={() => openLegalModal('privacy')}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-2 text-left"
                 >
                   <ShieldCheck size={14} className="text-[#E09B30] shrink-0" />
                   <span>{isEs ? 'Política de Privacidad' : 'Privacy Policy'}</span>
@@ -133,7 +189,7 @@ export const Footer: React.FC = () => {
                   id="footer-cookie-policy-btn"
                   type="button"
                   onClick={() => openLegalModal('cookies')}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-2 text-left"
                 >
                   <FileText size={14} className="text-[#E09B30] shrink-0" />
                   <span>{isEs ? 'Política de Cookies' : 'Cookie Policy'}</span>
@@ -144,7 +200,7 @@ export const Footer: React.FC = () => {
                   id="footer-cookie-settings-btn"
                   type="button"
                   onClick={openCookiePreferences}
-                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="hover:text-[#FAFAFA] transition-colors cursor-pointer inline-flex items-center gap-2 text-left"
                 >
                   <SlidersHorizontal size={14} className="text-[#E09B30] shrink-0" />
                   <span>{isEs ? 'Configurar Cookies' : 'Cookie Settings'}</span>
@@ -153,10 +209,15 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* COLUMN 4: Direct Contact & Socials */}
-          <div className="flex flex-col items-start gap-3">
+          {/* COLUMN 4: Contact / Contacto */}
+          <div
+            style={{
+              gridColumn: isMobile ? '1 / -1' : undefined,
+            }}
+            className="flex flex-col items-start gap-3"
+          >
             <h3 className="font-montserrat font-bold text-xs uppercase tracking-[0.15em] text-[#E09B30]">
-              {isEs ? 'Contacto Directo y Redes' : 'Direct Contact & Socials'}
+              {isEs ? 'Contacto' : 'Contact'}
             </h3>
 
             <a
@@ -187,7 +248,6 @@ export const Footer: React.FC = () => {
 
             {/* Clean Inline SVG Social Links (Zero Emojis) */}
             <div className="flex flex-wrap items-center gap-2 pt-2">
-              {/* Instagram */}
               <a
                 id="footer-social-instagram"
                 href="https://instagram.com/teacherivan_english.classes"
@@ -202,7 +262,6 @@ export const Footer: React.FC = () => {
                 </svg>
               </a>
 
-              {/* TikTok */}
               <a
                 id="footer-social-tiktok"
                 href="https://tiktok.com/@teacher_ivan_english_"
@@ -217,7 +276,6 @@ export const Footer: React.FC = () => {
                 </svg>
               </a>
 
-              {/* YouTube */}
               <a
                 id="footer-social-youtube"
                 href="https://youtube.com/@Teacher_Ivan"
@@ -232,7 +290,6 @@ export const Footer: React.FC = () => {
                 </svg>
               </a>
 
-              {/* Facebook */}
               <a
                 id="footer-social-facebook"
                 href="https://www.facebook.com/search/top?q=Teacher%20Ivan"
@@ -253,7 +310,11 @@ export const Footer: React.FC = () => {
         {/* Bottom Sub-Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-inter text-[#A7C7E7]/75">
           <span>Teacher Ivan • English Classes • Sucre, Bolivia • Online Worldwide</span>
-          <span>{isEs ? 'Inmersión Asincrónica 24/7 + Coaching Humano 1-a-1' : '24/7 Async Immersion + 1-on-1 Human Coaching'}</span>
+          <span>
+            {isEs
+              ? 'Inmersión Asincrónica 24/7 + Coaching Humano 1-a-1'
+              : '24/7 Async Immersion + 1-on-1 Human Coaching'}
+          </span>
         </div>
       </div>
     </footer>

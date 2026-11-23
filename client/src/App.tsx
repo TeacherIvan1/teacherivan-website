@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header';
-import { NovemberPromoBanner } from './components/NovemberPromoBanner';
 import { LandingPageView } from './components/LandingPageView';
 import { CompactVoiceSimulator } from './components/CompactVoiceSimulator';
 import { SessionReportPanel } from './components/SessionReportPanel';
@@ -95,15 +94,12 @@ export const App: React.FC = () => {
         {/* Bilingual Privacy Policy & Cookie Policy Modal (#privacy / #cookies) */}
         <LegalModal />
 
-        {/* Campaign Promotional Strip */}
-        <NovemberPromoBanner />
-
-        {/* Official Platform Header with Auth & View Navigation */}
-        <Header />
+        {/* Authenticated Student Workspace Header */}
+        {isAuthenticated && <Header />}
 
         <main className="flex-1 flex flex-col">
           {/* ========================================================================= */}
-          {/* NON-REGISTERED (GUEST) VIEW: HIGH-CONVERTING LANDING PAGE                */}
+          {/* NON-REGISTERED (GUEST) VIEW: AURAGATE-INSPIRED PORTAL ZOOM LANDING PAGE   */}
           {/* ========================================================================= */}
           {!isAuthenticated ? (
             <LandingPageView />
@@ -224,8 +220,8 @@ export const App: React.FC = () => {
         {/* End-of-Week Teacher Pedagogical Report Modal */}
         <WeeklyReportModal />
 
-        {/* 4-Column Architectural Footer */}
-        <Footer />
+        {/* 4-Column Architectural Footer (Rendered for Authenticated Portal; PortalLanding renders its own over WORLD_BG) */}
+        {isAuthenticated && <Footer />}
 
         {/* Brand-Aligned Cookie Consent Banner & Preferences Modal */}
         <CookieConsentBanner />
