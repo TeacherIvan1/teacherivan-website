@@ -147,15 +147,15 @@ export const TutorAvatarStage: React.FC<TutorAvatarStageProps> = ({ className = 
           </div>
         )}
 
-        {/* Animated 3D Reference Avatar (Teacher Ivan / Emma) */}
-        <div className="relative z-10 w-44 h-56 sm:w-52 sm:h-64 md:w-56 md:h-68 flex items-end justify-center transition-transform duration-300">
+        {/* Animated SVG Reference Mascot (Golden Retriever Ivan / Tabby Kitten Emma) */}
+        <div className="relative z-10 w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center transition-transform duration-300">
           <RiggedCharacter
             key={persona}
             persona={persona === 'emma' ? 'emma' : 'teacher-ivan'}
             state={isSpeaking ? 'speaking' : isProcessing ? 'thinking' : isListening ? 'listening' : 'idle'}
             audioLevel={isSpeaking ? Math.max(0.4, micLevel / 50) : Math.min(1, micLevel / 60)}
             className="w-full h-full"
-            alt={`${tutorName} 3D Avatar`}
+            alt={persona === 'emma' ? 'Emma — Fluffy Tabby Kitten Tutor' : 'Teacher Ivan — Golden Retriever Puppy Tutor'}
           />
         </div>
 

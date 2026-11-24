@@ -132,6 +132,7 @@ export const EducationalResourcesView: React.FC = () => {
   // Module A: Custom Resource Studio State
   const { user } = useAuthStore();
   const [customTopic, setCustomTopic] = useState('');
+  const [customLevel, setCustomLevel] = useState<string>(user?.learningGoals?.targetLevel || 'B2');
   const [customType, setCustomType] = useState<
     'article_collocations' | 'dialogue_script' | 'vocab_phrasal_deck' | 'worksheet'
   >('article_collocations');
@@ -168,7 +169,7 @@ export const EducationalResourcesView: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           topic: customTopic.trim(),
-          targetLevel: user?.learningGoals?.targetLevel || 'B2',
+          targetLevel: customLevel || user?.learningGoals?.targetLevel || 'B2',
           resourceType: customType,
           studentGoal: user?.learningGoals?.personalObjective || user?.learningGoals?.primaryGoal || 'Spoken English Mastery',
         }),
@@ -609,8 +610,219 @@ export const EducationalResourcesView: React.FC = () => {
     setActiveListening(null);
   };
 
+  const MOBILE_LEVELS = ['A2', 'B1', 'B2', 'C1'] as const;
+  const cycleMobileLevel = () => {
+    const idx = MOBILE_LEVELS.indexOf(customLevel as any);
+    setCustomLevel(MOBILE_LEVELS[(idx + 1) % MOBILE_LEVELS.length]);
+  };
+
   return (
-    <div id="educational-resources-view" className="py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-10 animate-in fade-in duration-200">
+    <div id="educational-resources-view" className="flex-1 min-h-0 flex flex-col md:block w-full overflow-hidden md:overflow-visible animate-in fade-in duration-200">
+      {/* ========================================================================= */}
+      {/* MOBILE ZERO-SCROLL 100dvh 'RECURSOS -> GENERADOR IA' (< 768px)            */}
+      {/* Zero promo card clutter, zero oversized header, >= 16px iOS-safe input    */}
+      {/* ========================================================================= */}
+      <div
+        id="mobile-resources-generator-view"
+        className="md:hidden flex-1 min-h-0 h-full flex flex-col justify-between gap-2.5 px-3.5 py-2 overflow-hidden"
+      >
+        <div className="flex-1 min-h-0 p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col justify-between gap-3 shadow-sm overflow-hidden">
+          {/* Top Row: Clean Title + Level Selector Pill */}
+          <div className="flex items-center justify-between gap-2 shrink-0">
+            <h1 className="font-montserrat font-extrabold text-base text-[var(--text-primary)] tracking-tight flex items-center gap-1.5">
+              <Sparkles size={16} className="text-[#9A6515] dark:text-[#E09B30]" aria-hidden="true" />
+              <span>{isEs ? 'Generador IA' : 'AI Studio'}</span>
+            </h1>
+            <button
+              id="mobile-generator-level-btn"
+              type="button"
+              onClick={cycleMobileLevel}
+              className="min-h-[36px] px-3 rounded-full bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-xs font-montserrat font-extrabold text-[#1A3153] dark:text-[#E09B30] cursor-pointer shrink-0"
+            >
+              {isEs ? `Nivel: ${customLevel}` : `Level: ${customLevel}`}
+            </button>
+          </div>
+
+          {/* Topic Input (>= 16px font so iOS Safari never auto-zooms) */}
+          <div className="space-y-2 shrink-0">
+            <label htmlFor="mobile-custom-resource-input" className="text-xs font-montserrat font-bold text-[var(--text-secondary)] block">
+              {isEs ? '¿Qué tema necesitas practicar hoy?' : 'What topic do you want to master today?'}
+            </label>
+            <input
+              id="mobile-custom-resource-input"
+              type="text"
+              value={customTopic}
+              onChange={(e) => setCustomTopic(e.target.value)}
+              placeholder={isEs ? 'Ej: Negociación salarial, Entrevista Tech...' : 'E.g., Salary Negotiation, Tech Interview...'}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleGenerateCustomResource();
+              }}
+              className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] text-[16px] font-inter focus:outline-none focus:border-[#E09B30]"
+            />
+            {/* Compact Quick-Idea Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              {(isEs
+                ? ['Negociación Salarial', 'Entrevista Tech', 'Beca Internacional']
+                : ['Salary Negotiation', 'Tech Interview', 'Scholarship Panel']
+              ).map((idea) => (
+                <button
+                  key={idea}
+                  type="button"
+                  onClick={() => setCustomTopic(idea)}
+                  className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-[11px] font-inter font-semibold text-[var(--text-primary)] hover:border-[#E09B30] cursor-pointer"
+                >
+                  {idea}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 1-Row Resource Type Chips (Lectura | Vocabulario | Hoja Imprimible) */}
+          <div className="space-y-1.5 shrink-0">
+            <span className="text-[11px] font-montserrat font-bold uppercase tracking-wider text-[var(--text-secondary)] block">
+              {isEs ? 'Formato' : 'Format'}
+            </span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(
+                [
+                  { id: 'article_collocations', labelEs: 'Lectura', labelEn: 'Reading', icon: BookOpen },
+                  { id: 'vocab_phrasal_deck', labelEs: 'Vocabulario', labelEn: 'Vocab', icon: Layers },
+                  { id: 'worksheet', labelEs: 'Hoja Impr.', labelEn: 'Worksheet', icon: Printer },
+                ] as const
+              ).map((opt) => {
+                const Icon = opt.icon;
+                const active = customType === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setCustomType(opt.id)}
+                    className={`min-h-[46px] px-2 py-2 rounded-xl border font-montserrat font-bold text-[11px] flex flex-col items-center justify-center gap-1 cursor-pointer transition-all ${
+                      active
+                        ? 'bg-[#1A3153] text-[#FAFAFA] border-[#1A3153] dark:bg-[#E09B30] dark:text-[#091326] dark:border-[#E09B30] shadow-sm'
+                        : 'bg-[var(--bg-sunken)] text-[var(--text-secondary)] border-[var(--border-hairline)]'
+                    }`}
+                  >
+                    <Icon size={14} aria-hidden="true" />
+                    <span className="truncate">{isEs ? opt.labelEs : opt.labelEn}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {generateError && (
+            <p className="text-xs text-red-600 dark:text-red-400 font-inter truncate shrink-0">
+              {generateError}
+            </p>
+          )}
+
+          {/* Single Crisp Primary CTA Button */}
+          <button
+            id="mobile-generate-resource-btn"
+            type="button"
+            disabled={isGenerating || !customTopic.trim()}
+            onClick={handleGenerateCustomResource}
+            className="shrink-0 w-full min-h-[48px] px-4 rounded-xl bg-[#E09B30] hover:bg-[#ECAA41] disabled:opacity-50 text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-colors"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                <span>{isEs ? 'Generando...' : 'Generating...'}</span>
+              </>
+            ) : (
+              <>
+                <Sparkles size={16} aria-hidden="true" />
+                <span>{isEs ? 'Generar Recurso con IA →' : 'Generate AI Resource →'}</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Compact Single-Line Footer Bar: Open Latest Saved or Curated Reading Sheet */}
+        <button
+          type="button"
+          onClick={() => {
+            if (savedResources.length > 0) {
+              setActiveCustomResource(savedResources[0]);
+              setActiveCustomQuizAnswers({});
+            } else {
+              setActiveReading(readings[0]);
+              setSelectedCollocation(null);
+              setQuizAnswers({});
+            }
+          }}
+          className="shrink-0 min-h-[44px] px-3.5 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-center justify-between gap-2 text-xs cursor-pointer"
+        >
+          <span className="font-montserrat font-bold text-[var(--text-primary)] truncate">
+            {savedResources.length > 0
+              ? `${isEs ? 'Último recurso:' : 'Latest:'} ${savedResources[0].title}`
+              : `${isEs ? 'Lectura recomendada:' : 'Featured reading:'} ${readings[0].title}`}
+          </span>
+          <ArrowRight size={14} className="text-[#9A6515] dark:text-[#E09B30] shrink-0" aria-hidden="true" />
+        </button>
+      </div>
+
+      {/* MOBILE FULL-SCREEN GENERATED RESOURCE SHEET */}
+      {activeCustomResource && (
+        <div
+          id="mobile-custom-resource-sheet"
+          role="dialog"
+          aria-modal="true"
+          className="md:hidden fixed inset-0 z-[70] bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col animate-in fade-in duration-150"
+        >
+          <div className="shrink-0 h-[56px] px-4 border-b border-[var(--border-hairline)] bg-[var(--bg-surface)] flex items-center justify-between gap-2">
+            <h2 className="font-montserrat font-extrabold text-sm text-[var(--text-primary)] truncate">
+              {activeCustomResource.title}
+            </h2>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => handlePrintResource(activeCustomResource)}
+                aria-label={isEs ? 'Imprimir ficha' : 'Print worksheet'}
+                className="w-10 h-10 rounded-xl bg-[#1A3153] text-[#FAFAFA] flex items-center justify-center cursor-pointer"
+              >
+                <Printer size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCustomResource(null)}
+                aria-label="Close"
+                className="w-10 h-10 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] flex items-center justify-center cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+            <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-inter text-sm leading-relaxed whitespace-pre-wrap">
+              {activeCustomResource.content}
+            </div>
+            {activeCustomResource.collocations?.map((c, idx) => (
+              <div key={idx} className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-montserrat font-bold text-sm">{c.term}</span>
+                  <button
+                    type="button"
+                    onClick={() => handlePlayCustomAudio(c.term)}
+                    className="w-9 h-9 rounded-lg bg-[#E09B30]/20 text-[#9A6515] dark:text-[#E09B30] flex items-center justify-center cursor-pointer"
+                  >
+                    <Volume2 size={14} className={playingCustomTerm === c.term ? 'animate-pulse' : ''} />
+                  </button>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)]">{isEs ? c.definitionEs : c.definitionEn}</p>
+                <p className="text-xs italic">"{c.example}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* DESKTOP FULL RESOURCES VIEW (>= 768px — Preserved)                        */}
+      {/* ========================================================================= */}
+      <div className="hidden md:flex py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex-col gap-10">
       {/* Header Section */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-xs font-montserrat font-bold uppercase tracking-wider">
@@ -1502,6 +1714,7 @@ export const EducationalResourcesView: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

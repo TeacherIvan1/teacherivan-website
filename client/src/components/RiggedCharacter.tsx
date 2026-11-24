@@ -1,7 +1,7 @@
 import React from 'react';
-import { TutorAvatar3D, TutorMood3D } from './TutorAvatar3D';
+import { TutorAvatar, TutorMood } from './TutorAvatar';
 
-export type RigState = TutorMood3D;
+export type RigState = TutorMood;
 export type RigPersona = 'teacher-ivan' | 'emma';
 
 export interface RiggedCharacterProps {
@@ -11,12 +11,13 @@ export interface RiggedCharacterProps {
   animateBlink?: boolean;
   audioLevel?: number;
   alt?: string;
+  interactive?: boolean;
 }
 
 /**
  * Universal Tutor Avatar Wrapper
- * Routes all RiggedCharacter surfaces (TutorAvatarStage, CornerCoachWidget, Portal)
- * directly to the animated 3D reference models (<TutorAvatar3D />).
+ * Routes all RiggedCharacter surfaces directly to the spring-physics
+ * SVG mascot rigs (Golden Retriever Ivan & Tabby Kitten Emma).
  */
 export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
   persona,
@@ -24,14 +25,21 @@ export const RiggedCharacter: React.FC<RiggedCharacterProps> = ({
   className = '',
   audioLevel = 0,
   alt,
+  interactive = true,
 }) => {
   return (
-    <TutorAvatar3D
+    <TutorAvatar
       character={persona === 'emma' ? 'emma' : 'ivan'}
       mood={state}
       audioLevel={audioLevel}
       className={`rig-character-wrapper ${className}`}
-      alt={alt || (persona === 'teacher-ivan' ? 'Teacher Ivan 3D Avatar' : 'Emma 3D Avatar')}
+      alt={
+        alt ||
+        (persona === 'teacher-ivan'
+          ? 'Teacher Ivan — Golden Retriever Puppy Tutor'
+          : 'Emma — Fluffy Tabby Kitten Tutor')
+      }
+      interactive={interactive}
     />
   );
 };

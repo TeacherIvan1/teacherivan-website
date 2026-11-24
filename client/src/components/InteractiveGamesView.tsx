@@ -16,10 +16,12 @@ import {
   Volume2,
   Play,
   Radio,
+  X,
 } from 'lucide-react';
 import { useTranslation } from '../modules/i18n/languageStore';
 import { useSprintStore } from '../modules/sprint/sprintStore';
 import { useTeachingStore } from '../modules/teaching/teachingStore';
+import { TutorAvatar } from './TutorAvatar';
 
 type GameTab = 'recast' | 'matcher' | 'shadowing' | 'builder';
 
@@ -55,6 +57,7 @@ export const InteractiveGamesView: React.FC = () => {
   const tutorAvatarAlt = persona === 'emma' ? 'Emma' : 'Teacher Ivan';
 
   const [activeTab, setActiveTab] = useState<GameTab>('recast');
+  const [mobileGameSheet, setMobileGameSheet] = useState<null | 'recast' | 'matcher' | 'builder'>(null);
 
   // GAME 1: RECAST STATE
   const recastQuestions: RecastQuestion[] = [
@@ -389,8 +392,284 @@ export const InteractiveGamesView: React.FC = () => {
     }, 2500);
   };
 
+  const mobileGamesCatalog = [
+    {
+      id: 'recast' as const,
+      icon: Zap,
+      title: isEs ? 'Corrección Rápida' : 'Quick Corrections',
+      desc: isEs
+        ? 'Corrige errores frecuentes de hispanohablantes al instante.'
+        : 'Fix real Spanish-interference slips in seconds.',
+      xp: '+75 XP',
+    },
+    {
+      id: 'matcher' as const,
+      icon: Sparkles,
+      title: isEs ? 'Colocaciones' : 'Collocation Match',
+      desc: isEs
+        ? 'Empareja expresiones y phrasal verbs de alto impacto.'
+        : 'Connect high-impact idioms and phrasal verbs.',
+      xp: '+60 XP',
+    },
+    {
+      id: 'builder' as const,
+      icon: Trophy,
+      title: isEs ? 'Constructor de Frases' : 'Sentence Builder',
+      desc: isEs
+        ? 'Ordena cláusulas avanzadas para entrevistas e IELTS.'
+        : 'Assemble executive clauses for interviews and IELTS.',
+      xp: '+50 XP',
+    },
+  ];
+
   return (
-    <div id="interactive-games-view" className="py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex flex-col gap-8 animate-in fade-in duration-200">
+    <div id="interactive-games-view" className="flex-1 min-h-0 flex flex-col md:block w-full overflow-hidden md:overflow-visible animate-in fade-in duration-200">
+      {/* ========================================================================= */}
+      {/* MOBILE ZERO-SCROLL 100dvh 'RECURSOS -> MICRO-JUEGOS' (< 768px)            */}
+      {/* Clean 3-row stack of our 3 skill-gap games fitting 1 screen cleanly       */}
+      {/* ========================================================================= */}
+      <div
+        id="mobile-microgames-view"
+        className="md:hidden flex-1 min-h-0 h-full flex flex-col justify-between gap-2.5 px-3.5 py-2 overflow-hidden"
+      >
+        <div className="shrink-0 flex items-center justify-between px-0.5">
+          <h1 className="font-montserrat font-extrabold text-base text-[var(--text-primary)] tracking-tight flex items-center gap-1.5">
+            <Gamepad2 size={16} className="text-[#9A6515] dark:text-[#E09B30]" aria-hidden="true" />
+            <span>{isEs ? 'Micro-Juegos de Fluidez' : 'Fluency Micro-Games'}</span>
+          </h1>
+          <span className="text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30]">
+            {totalXp} XP
+          </span>
+        </div>
+
+        {/* 3 Compact Skill-Gap Game Cards Filling Available Calm Space */}
+        <div className="flex-1 min-h-0 flex flex-col justify-between gap-2.5">
+          {mobileGamesCatalog.map((game) => {
+            const Icon = game.icon;
+            return (
+              <div
+                key={game.id}
+                className="flex-1 min-h-0 p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm flex flex-col justify-between gap-2"
+              >
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#1A3153] text-[#E09B30] flex items-center justify-center shrink-0">
+                      <Icon size={18} aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="font-montserrat font-extrabold text-sm text-[var(--text-primary)] leading-tight">
+                        {game.title}
+                      </h2>
+                      <span className="text-[11px] font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30]">
+                        {game.xp}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    id={`mobile-play-game-${game.id}`}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(game.id);
+                      setMobileGameSheet(game.id);
+                    }}
+                    className="shrink-0 min-h-[44px] px-4 rounded-xl bg-[#E09B30] hover:bg-[#ECAA41] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider cursor-pointer transition-colors"
+                  >
+                    {isEs ? 'Jugar →' : 'Play →'}
+                  </button>
+                </div>
+
+                <p className="font-inter text-xs text-[#4A5568] dark:text-[#A7C7E7] line-clamp-2 leading-snug">
+                  {game.desc}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* MOBILE FULL-SCREEN INTERACTIVE GAME SHEET */}
+      {mobileGameSheet && (
+        <div
+          id="mobile-game-play-sheet"
+          role="dialog"
+          aria-modal="true"
+          className="md:hidden fixed inset-0 z-[70] bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col animate-in fade-in duration-150"
+        >
+          <div className="shrink-0 h-[56px] px-4 border-b border-[var(--border-hairline)] bg-[var(--bg-surface)] flex items-center justify-between gap-2">
+            <h2 className="font-montserrat font-extrabold text-sm text-[var(--text-primary)]">
+              {mobileGamesCatalog.find((g) => g.id === mobileGameSheet)?.title}
+            </h2>
+            <button
+              id="mobile-close-game-sheet-btn"
+              type="button"
+              onClick={() => setMobileGameSheet(null)}
+              aria-label="Close game"
+              className="w-11 h-11 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] flex items-center justify-center cursor-pointer"
+            >
+              <X size={19} aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+            {mobileGameSheet === 'recast' && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[#E09B30]/50 flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[#E9F2FB] dark:bg-[#132642] shrink-0 overflow-hidden">
+                    <TutorAvatar character={persona === 'emma' ? 'emma' : 'ivan'} mood={selectedRecastOption === recastQuestions[currentRecastIndex].correctIndex ? 'happy' : 'idle'} className="w-full h-full" />
+                  </div>
+                  <p className="font-montserrat font-bold text-sm text-[var(--text-primary)] italic">
+                    "{recastQuestions[currentRecastIndex].badSentence}"
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {recastQuestions[currentRecastIndex].options.map((opt, idx) => {
+                    const isCorrect = idx === recastQuestions[currentRecastIndex].correctIndex;
+                    const isSelected = selectedRecastOption === idx;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        disabled={selectedRecastOption !== null}
+                        onClick={() => handleSelectRecast(idx)}
+                        className={`w-full min-h-[48px] p-3.5 rounded-xl border text-left text-xs font-inter font-semibold cursor-pointer ${
+                          selectedRecastOption !== null
+                            ? isCorrect
+                              ? 'bg-[#E09B30] text-[#091326] border-[#E09B30] font-bold'
+                              : isSelected
+                              ? 'bg-red-500/20 border-red-500 text-[var(--text-primary)]'
+                              : 'opacity-50 border-[var(--border-hairline)]'
+                            : 'bg-[var(--bg-surface)] border-[var(--border-hairline)] text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedRecastOption !== null && (
+                  <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-3">
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      {recastQuestions[currentRecastIndex].explanation}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={isRecastFinished ? handleResetRecast : handleNextRecast}
+                      className="w-full min-h-[44px] rounded-xl bg-[#E09B30] text-[#091326] font-montserrat font-extrabold text-xs uppercase cursor-pointer"
+                    >
+                      {t.gamesView.nextQuestion} →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {mobileGameSheet === 'matcher' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs font-montserrat font-bold">
+                  <span>{matchedIds.length} / {matchPairs.length} {isEs ? 'Emparejados' : 'Matched'}</span>
+                  <button type="button" onClick={handleResetMatcher} className="text-[#9A6515] dark:text-[#E09B30] cursor-pointer">
+                    {isEs ? 'Reiniciar' : 'Reset'}
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    {matchPairs.map((pair) => (
+                      <button
+                        key={pair.id}
+                        type="button"
+                        disabled={matchedIds.includes(pair.id)}
+                        onClick={() => handleSelectTerm(pair.id)}
+                        className={`w-full min-h-[44px] p-2.5 rounded-xl border text-left text-xs font-mono font-bold cursor-pointer ${
+                          matchedIds.includes(pair.id)
+                            ? 'opacity-40 bg-[var(--bg-sunken)] border-[var(--border-hairline)]'
+                            : selectedTerm === pair.id
+                            ? 'bg-[#E09B30] text-[#091326] border-[#E09B30]'
+                            : 'bg-[var(--bg-surface)] border-[var(--border-hairline)] text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {pair.term}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    {matchPairs.map((pair) => (
+                      <button
+                        key={pair.id}
+                        type="button"
+                        disabled={matchedIds.includes(pair.id)}
+                        onClick={() => handleSelectDefinition(pair.id)}
+                        className={`w-full min-h-[44px] p-2.5 rounded-xl border text-left text-[11px] font-inter cursor-pointer ${
+                          matchedIds.includes(pair.id)
+                            ? 'opacity-40 bg-[var(--bg-sunken)] border-[var(--border-hairline)]'
+                            : selectedDefinition === pair.id
+                            ? 'bg-[#E09B30] text-[#091326] border-[#E09B30] font-bold'
+                            : 'bg-[var(--bg-surface)] border-[var(--border-hairline)] text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {pair.definition}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mobileGameSheet === 'builder' && (
+              <div className="space-y-3">
+                <p className="text-xs font-inter text-[var(--text-secondary)]">{currentChallenge.hint}</p>
+                <div className="min-h-[76px] p-3 rounded-xl bg-[var(--bg-surface)] border border-dashed border-[var(--border-hairline)] flex flex-wrap gap-1.5">
+                  {selectedWords.map((w, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleRemoveWord(i)}
+                      className="px-2.5 py-1.5 rounded-lg bg-[#E09B30] text-[#091326] font-montserrat font-bold text-xs cursor-pointer"
+                    >
+                      {w}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {currentChallenge.shuffledWords.map((w, i) => {
+                    const countInShuffled = currentChallenge.shuffledWords.filter((x) => x === w).length;
+                    const countInSelected = selectedWords.filter((x) => x === w).length;
+                    const isUsed = countInSelected >= countInShuffled;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        disabled={isUsed}
+                        onClick={() => handleAddWord(w, i)}
+                        className={`min-h-[40px] px-3 rounded-xl text-xs font-montserrat font-bold border cursor-pointer ${
+                          isUsed
+                            ? 'opacity-30 border-transparent'
+                            : 'bg-[var(--bg-surface)] border-[var(--border-hairline)] text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {w}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  onClick={builderStatus === 'CORRECT' ? handleNextBuilder : handleCheckSentence}
+                  disabled={builderStatus !== 'CORRECT' && selectedWords.length !== currentChallenge.targetSentence.length}
+                  className="w-full min-h-[46px] rounded-xl bg-[#E09B30] disabled:opacity-50 text-[#091326] font-montserrat font-extrabold text-xs uppercase cursor-pointer"
+                >
+                  {builderStatus === 'CORRECT' ? (isEs ? 'Siguiente →' : 'Next →') : t.gamesView.checkSentence}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* DESKTOP RICH INTERACTIVE GAMES VIEW (>= 768px — Preserved)                */}
+      {/* ========================================================================= */}
+      <div className="hidden md:flex py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full flex-1 flex-col gap-8">
       {/* Header Bar */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E09B30]/15 border border-[#E09B30]/30 text-[#E09B30] text-xs font-montserrat font-bold uppercase tracking-wider">
@@ -938,6 +1217,7 @@ export const InteractiveGamesView: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import React from 'react';
-import { TutorAvatar3D, TutorMood3D } from './TutorAvatar3D';
+import { TutorAvatar, TutorMood } from './TutorAvatar';
 
 export type ChibiCharacter = 'ivan' | 'emma' | 'teacher-ivan';
 export type ChibiState = 'idle' | 'listening' | 'speaking';
-export type AvatarMood = TutorMood3D;
+export type AvatarMood = TutorMood;
 
 export interface ChibiAvatarProps {
   character: ChibiCharacter;
@@ -15,11 +15,12 @@ export interface ChibiAvatarProps {
   size?: number;
   alt?: string;
   style?: React.CSSProperties;
+  interactive?: boolean;
 }
 
 /**
- * Backward-compatible wrapper routing all site avatar mounts to the new
- * animated 3D reference avatars (<TutorAvatar3D /> using teacherivan-3d.webp & emma-3d.webp).
+ * Backward-compatible wrapper routing all ChibiAvatar mounts to the
+ * animated Golden Retriever Ivan & Tabby Kitten Emma SVG rig (<TutorAvatar />).
  */
 export const ChibiAvatar: React.FC<ChibiAvatarProps> = ({
   character,
@@ -31,12 +32,13 @@ export const ChibiAvatar: React.FC<ChibiAvatarProps> = ({
   size,
   alt,
   style,
+  interactive = true,
 }) => {
-  const effectiveMood: TutorMood3D = mood || state;
+  const effectiveMood: TutorMood = mood || state;
   const effectiveAudio = audioLevel ?? rmsLevel ?? 0;
 
   return (
-    <TutorAvatar3D
+    <TutorAvatar
       character={character === 'emma' ? 'emma' : 'ivan'}
       mood={effectiveMood}
       audioLevel={effectiveAudio}
@@ -44,6 +46,7 @@ export const ChibiAvatar: React.FC<ChibiAvatarProps> = ({
       className={className}
       alt={alt}
       style={style}
+      interactive={interactive}
     />
   );
 };

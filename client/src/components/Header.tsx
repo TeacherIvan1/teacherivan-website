@@ -26,6 +26,9 @@ import { LanguageToggle } from './LanguageToggle';
 import { BrandWordmark } from './BrandWordmark';
 import { useTheme } from '../modules/theme/ThemeContext';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { useCookieConsent } from '../context/CookieConsentContext';
+import { getGeneralWhatsAppUrl } from '../utils/whatsapp';
+import { ShieldCheck, SlidersHorizontal, MessageCircle } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const [serverOk, setServerOk] = useState<boolean | null>(null);
@@ -50,6 +53,7 @@ export const Header: React.FC = () => {
   const { activeView, setActiveView } = useNavigationStore();
   const { user, isAuthenticated, openAuthModal, signOut } = useAuthStore();
   const { isDeveloperMode, toggleDeveloperMode } = useDevModeStore();
+  const { openLegalModal, openCookiePreferences } = useCookieConsent();
 
   useEffect(() => {
     let mounted = true;
@@ -107,7 +111,7 @@ export const Header: React.FC = () => {
       <header
         id="app-navbar"
         data-theme={theme}
-        className={`sticky top-0 z-50 w-full select-none transition-colors duration-250 flex items-center backdrop-blur-md border-b border-[var(--border-hairline)] h-14 lg:h-[68px] ${
+        className={`sticky top-0 z-50 shrink-0 w-full select-none transition-colors duration-250 flex items-center backdrop-blur-md border-b border-[var(--border-hairline)] h-[52px] lg:h-[68px] ${
           isDark
             ? 'bg-[#091326]/90 text-[#FAFAFA]'
             : 'bg-[#FAFAFA]/90 text-[#1A3153]'
@@ -118,9 +122,9 @@ export const Header: React.FC = () => {
         }}
       >
         {/* ===================================================================== */}
-        {/* MOBILE & TABLET HEADER (< 1024px): Guaranteed 56px height & 0px overflow */}
+        {/* MOBILE & TABLET HEADER (< 1024px): Fixed 52px height & 0px overflow   */}
         {/* ===================================================================== */}
-        <div className="lg:hidden w-full h-14 px-3 flex items-center justify-between gap-2 overflow-hidden">
+        <div className="lg:hidden w-full h-[52px] px-3 flex items-center justify-between gap-2 overflow-hidden">
           {/* Left: BrandWordmark (Teacher in Montserrat + Ivan in Mr Dafoe) */}
           <BrandWordmark
             isMobile={true}
@@ -693,17 +697,65 @@ export const Header: React.FC = () => {
                   <span>{isEs ? 'Iniciar Sesión / Crear Cuenta' : 'Sign In / Register'}</span>
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileDrawerOpen(false);
-                    signOut();
-                  }}
-                  className="w-full min-h-[44px] py-2.5 px-4 rounded-full font-montserrat font-semibold text-xs border border-red-500/40 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <LogOut size={14} />
-                  <span>{isEs ? 'Cerrar Sesión' : 'Sign Out'}</span>
-                </button>
+                <div className="space-y-2">
+                  {/* Legal, Privacy & WhatsApp Links (Replaces public Footer inside mobile portal) */}
+                  <div className="pt-1 pb-2 space-y-1 border-b border-[var(--border-hairline)]">
+                    <a
+                      href={getGeneralWhatsAppUrl(isEs ? 'es' : 'en')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full min-h-[40px] px-3 py-2 rounded-xl text-xs font-inter font-semibold text-[var(--text-primary)] hover:bg-current/5 transition-colors flex items-center gap-2.5"
+                    >
+                      <MessageCircle size={14} className="text-[#9A6515] dark:text-[#E09B30]" />
+                      <span>WhatsApp +591 72878330</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileDrawerOpen(false);
+                        openLegalModal('privacy');
+                      }}
+                      className="w-full min-h-[40px] px-3 py-2 rounded-xl text-left text-xs font-inter text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-current/5 transition-colors flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <ShieldCheck size={14} className="text-[#9A6515] dark:text-[#E09B30]" />
+                      <span>{isEs ? 'Política de Privacidad' : 'Privacy Policy'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileDrawerOpen(false);
+                        openLegalModal('cookies');
+                      }}
+                      className="w-full min-h-[40px] px-3 py-2 rounded-xl text-left text-xs font-inter text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-current/5 transition-colors flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <ShieldCheck size={14} className="text-[#9A6515] dark:text-[#E09B30]" />
+                      <span>{isEs ? 'Política de Cookies' : 'Cookie Policy'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileDrawerOpen(false);
+                        openCookiePreferences();
+                      }}
+                      className="w-full min-h-[40px] px-3 py-2 rounded-xl text-left text-xs font-inter text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-current/5 transition-colors flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <SlidersHorizontal size={14} className="text-[#9A6515] dark:text-[#E09B30]" />
+                      <span>{isEs ? 'Configurar Cookies' : 'Cookie Settings'}</span>
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      signOut();
+                    }}
+                    className="w-full min-h-[44px] py-2.5 px-4 rounded-full font-montserrat font-semibold text-xs border border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <LogOut size={14} />
+                    <span>{isEs ? 'Cerrar Sesión' : 'Sign Out'}</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>

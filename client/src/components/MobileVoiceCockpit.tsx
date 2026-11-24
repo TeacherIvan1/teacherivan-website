@@ -263,37 +263,37 @@ export const MobileVoiceCockpit: React.FC<MobileVoiceCockpitProps> = ({ onBack }
         </button>
       </div>
 
-      {/* ZONE 2: Centered Editorial Avatar & Live Feedback Stage (flex-1 min-h-0) */}
-      <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-3 py-2">
-        {/* Reactive Circular Acoustic Halo + Editorial Vector Rig */}
+      {/* ZONE 2: Centered Animated SVG Animal Mascot & Live Feedback Stage (flex-1 min-h-0) */}
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2.5 py-1.5">
+        {/* Reactive Circular Acoustic Halo + Animated Golden Retriever Ivan / Tabby Kitten Emma */}
         <div className="relative flex items-center justify-center">
           <div
             aria-hidden="true"
             className="absolute rounded-full pointer-events-none transition-transform duration-150"
             style={{
-              width: 'clamp(196px, 31dvh, 266px)',
-              height: 'clamp(196px, 31dvh, 266px)',
+              width: 'clamp(210px, 35dvh, 282px)',
+              height: 'clamp(210px, 35dvh, 282px)',
               transform: `scale(${haloScale.toFixed(3)})`,
               background: isTutorSpeaking
                 ? 'radial-gradient(circle, rgba(224,155,48,0.34) 0%, rgba(224,155,48,0) 70%)'
                 : isConnected
                 ? 'radial-gradient(circle, rgba(167,199,231,0.30) 0%, rgba(26,49,83,0) 70%)'
-                : 'radial-gradient(circle, rgba(26,49,83,0.22) 0%, transparent 70%)',
+                : 'radial-gradient(circle, rgba(26,49,83,0.18) 0%, transparent 70%)',
             }}
           />
           <div
-            className={`relative rounded-full overflow-hidden border-2 shadow-2xl ${
+            className={`relative rounded-full overflow-hidden border-2 shadow-xl ${
               isTutorSpeaking
                 ? 'border-[#E09B30]'
                 : isConnected
                 ? 'border-[#A7C7E7]'
                 : isDark
                 ? 'border-[#A7C7E7]/30'
-                : 'border-[#1A3153]/25'
-            } bg-[#0F203D]`}
+                : 'border-[#1A3153]/20'
+            } ${isDark ? 'bg-[#0F203D]' : 'bg-[#E9F2FB]'}`}
             style={{
-              width: 'clamp(176px, 28dvh, 240px)',
-              height: 'clamp(176px, 28dvh, 240px)',
+              width: 'clamp(200px, 34dvh, 270px)',
+              height: 'clamp(200px, 34dvh, 270px)',
             }}
           >
             <ChibiAvatar

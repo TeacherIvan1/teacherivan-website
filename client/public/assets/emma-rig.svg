@@ -1,273 +1,447 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="Emma AI Voice Coach Portrait">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="Emma — Fluffy Tabby Kitten Tutor">
   <defs>
-    <!-- Soft Studio Backdrop Glow -->
-    <radialGradient id="emma-bg-glow" cx="50%" cy="46%" r="50%">
-      <stop offset="0%" stop-color="#2B4B7C" stop-opacity="0.52"/>
-      <stop offset="58%" stop-color="#1A3153" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#091326" stop-opacity="0"/>
+    <!-- Soft Fur & Uniform Gradients -->
+    <radialGradient id="emma-aura-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#A7C7E7" stop-opacity="0.34" />
+      <stop offset="68%" stop-color="#A7C7E7" stop-opacity="0.10" />
+      <stop offset="100%" stop-color="#A7C7E7" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Warm Peach-Rose Cel-Shaded Skin -->
-    <linearGradient id="emma-skin" x1="35%" y1="12%" x2="68%" y2="95%">
-      <stop offset="0%" stop-color="#FDE9DC"/>
-      <stop offset="56%" stop-color="#F7D0BC"/>
-      <stop offset="100%" stop-color="#E8B19A"/>
-    </linearGradient>
-    <linearGradient id="emma-neck-grad" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#DCA088"/>
-      <stop offset="45%" stop-color="#F1C3AE"/>
-      <stop offset="100%" stop-color="#F8D7C5"/>
-    </linearGradient>
-    <radialGradient id="emma-blush" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#F08B82" stop-opacity="0.34"/>
-      <stop offset="100%" stop-color="#F08B82" stop-opacity="0"/>
+    <radialGradient id="emma-aura-amber" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E09B30" stop-opacity="0.36" />
+      <stop offset="68%" stop-color="#E09B30" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#E09B30" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Sleek Chestnut-Brown Hair -->
-    <linearGradient id="emma-hair-main" x1="25%" y1="0%" x2="75%" y2="100%">
-      <stop offset="0%" stop-color="#6B4439"/>
-      <stop offset="42%" stop-color="#4A2D27"/>
-      <stop offset="100%" stop-color="#2B1816"/>
-    </linearGradient>
-    <linearGradient id="emma-hair-back-grad" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#3E231F"/>
-      <stop offset="100%" stop-color="#1E1010"/>
-    </linearGradient>
-    <linearGradient id="emma-hair-ribbon" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#B88267" stop-opacity="0"/>
-      <stop offset="35%" stop-color="#D49E80" stop-opacity="0.58"/>
-      <stop offset="68%" stop-color="#E6B89A" stop-opacity="0.48"/>
-      <stop offset="100%" stop-color="#B88267" stop-opacity="0"/>
+    <linearGradient id="emma-fur-grad" x1="25%" y1="10%" x2="75%" y2="95%">
+      <stop offset="0%" stop-color="#F7F0E7" />
+      <stop offset="48%" stop-color="#EDE2D5" />
+      <stop offset="100%" stop-color="#D4C3B0" />
     </linearGradient>
 
-    <!-- Deep Navy High-Neck Top -->
-    <linearGradient id="emma-top-grad" x1="25%" y1="0%" x2="75%" y2="100%">
-      <stop offset="0%" stop-color="#24426E"/>
-      <stop offset="48%" stop-color="#1A3153"/>
-      <stop offset="100%" stop-color="#0E1D36"/>
+    <linearGradient id="emma-tail-grad" x1="15%" y1="10%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#A89584" />
+      <stop offset="50%" stop-color="#D4C3B0" />
+      <stop offset="100%" stop-color="#EDE2D5" />
     </linearGradient>
 
-    <!-- Layered Expressive Iris (#2E3A6B -> #5E6FA8 -> #A7C7E7 crescent) -->
-    <linearGradient id="emma-iris-grad" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#1F274B"/>
-      <stop offset="48%" stop-color="#3B4B85"/>
-      <stop offset="82%" stop-color="#6980BE"/>
-      <stop offset="100%" stop-color="#A7C7E7"/>
+    <linearGradient id="emma-shirt-grad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#E4F1FE" />
+      <stop offset="55%" stop-color="#CBE2FA" />
+      <stop offset="100%" stop-color="#A7C7E7" />
     </linearGradient>
-    <radialGradient id="emma-amber-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#E09B30" stop-opacity="0.72"/>
-      <stop offset="100%" stop-color="#E09B30" stop-opacity="0"/>
-    </radialGradient>
 
-    <!-- Sclera ClipPaths for Safe Gaze Tracking -->
-    <clipPath id="emma-left-eye-clip">
-      <path d="M214 282 C226 266, 258 266, 272 282 C264 299, 228 300, 214 282 Z"/>
+    <linearGradient id="emma-jeans-grad" x1="20%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#3B6294" />
+      <stop offset="60%" stop-color="#2C4C78" />
+      <stop offset="100%" stop-color="#1E3659" />
+    </linearGradient>
+
+    <!-- Eye Clip Paths for Smooth Gaze Tracking -->
+    <clipPath id="emma-eye-left-clip">
+      <ellipse cx="250" cy="236" rx="21" ry="23" />
     </clipPath>
-    <clipPath id="emma-right-eye-clip">
-      <path d="M328 282 C342 266, 374 266, 386 282 C372 300, 336 299, 328 282 Z"/>
+    <clipPath id="emma-eye-right-clip">
+      <ellipse cx="332" cy="236" rx="21" ry="23" />
+    </clipPath>
+    <!-- Tail Clip Path for Crisp Tabby Stripes -->
+    <clipPath id="emma-tail-clip">
+      <path d="M 382 470 C 420 484, 474 468, 492 422 C 506 382, 490 330, 444 322 C 414 318, 396 340, 404 364 C 410 382, 434 388, 436 408 C 438 426, 418 442, 386 436 Z" />
     </clipPath>
   </defs>
 
-  <g id="avatar-root">
-    <!-- Subtle Ambient Aura -->
-    <g id="bg-aura">
-      <circle cx="300" cy="296" r="245" fill="url(#emma-bg-glow)"/>
+  <!-- 1. REACTIVE ACOUSTIC AURA (Pivot: 300, 320) -->
+  <g id="bg-aura" transform="translate(0, 0)">
+    <circle id="aura-ambient" cx="300" cy="320" r="236" fill="url(#emma-aura-grad)" opacity="0.65" />
+    <circle id="aura-speaking" cx="300" cy="320" r="244" fill="url(#emma-aura-amber)" opacity="0" />
+    <circle id="aura-ring-1" cx="300" cy="320" r="204" fill="none" stroke="#A7C7E7" stroke-width="2" stroke-opacity="0.24" stroke-dasharray="10 10" />
+    <circle id="aura-ring-2" cx="300" cy="320" r="234" fill="none" stroke="#E09B30" stroke-width="1.8" stroke-opacity="0" />
+  </g>
+
+  <!-- 2. GROUND SHADOW (cx=300, cy=518) -->
+  <g id="ground-shadow" transform="translate(0, 0)">
+    <ellipse cx="300" cy="518" rx="134" ry="20" fill="#1A3153" opacity="0.22" />
+  </g>
+
+  <!-- 3. FLUFFY STRIPED TABBY TAIL (Pivot: 398, 468) -->
+  <g id="tail-group" transform="rotate(0, 398, 468)">
+    <!-- Plush Curled Tail Fill -->
+    <path
+      d="M 382 470 C 420 484, 474 468, 492 422 C 506 382, 490 330, 444 322 C 414 318, 396 340, 404 364 C 410 382, 434 388, 436 408 C 438 426, 418 442, 386 436 Z"
+      fill="url(#emma-fur-grad)"
+    />
+    <!-- Tabby Tail Stripes Clipped Inside Silhouette -->
+    <g clip-path="url(#emma-tail-clip)">
+      <!-- Fluffy Taupe Tail Tip -->
+      <path d="M 394 314 C 446 312, 488 336, 492 374 C 460 384, 424 382, 398 370 Z" fill="#A89584" />
+      <!-- Mid Tabby Rings -->
+      <path d="M 434 394 C 464 384, 494 390, 502 406 C 484 416, 452 418, 432 412 Z" fill="#A89584" opacity="0.88" />
+      <path d="M 426 426 C 456 422, 484 432, 490 448 C 468 456, 442 454, 420 446 Z" fill="#A89584" opacity="0.82" />
+      <path d="M 392 452 C 420 454, 446 464, 456 476 C 430 486, 404 480, 384 470 Z" fill="#D4C3B0" />
+    </g>
+    <!-- Crisp Deep Navy Tail Outline -->
+    <path
+      d="M 382 470 C 420 484, 474 468, 492 422 C 506 382, 490 330, 444 322 C 414 318, 396 340, 404 364 C 410 382, 434 388, 436 408 C 438 426, 418 442, 386 436 Z"
+      fill="none"
+      stroke="#1A3153"
+      stroke-width="5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- 4. CHARACTER BODY ROOT (Breathing & Bounce Pivot: 300, 440) -->
+  <g id="character-body" transform="translate(0, 0)">
+    <!-- 4A. TORSO & COORDINATED TEACHER IVAN UNIFORM -->
+    <g id="torso-uniform">
+      <!-- Seated Dark Denim Jeans -->
+      <path
+        d="M 232 430 L 388 412 C 414 430, 424 466, 408 498 C 398 514, 372 518, 344 516 L 260 512 C 236 508, 224 482, 232 430 Z"
+        fill="url(#emma-jeans-grad)"
+        stroke="#1A3153"
+        stroke-width="5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path d="M 340 448 C 330 468, 336 496, 356 510" fill="none" stroke="#1A3153" stroke-width="4.2" stroke-linecap="round" />
+      <path d="M 358 446 C 374 442, 392 446, 404 456" fill="none" stroke="#1A3153" stroke-width="3.2" stroke-linecap="round" />
+      <path d="M 272 448 L 272 496" fill="none" stroke="#1A3153" stroke-width="3" stroke-linecap="round" />
+      <path d="M 280 448 L 280 474 C 280 480, 276 484, 272 484" fill="none" stroke="#1A3153" stroke-width="2.5" stroke-linecap="round" />
+
+      <!-- Back-Right Seated Cream Paw -->
+      <path
+        d="M 336 508 C 336 492, 354 486, 374 488 C 390 490, 400 498, 398 510 C 396 518, 378 520, 356 520 C 342 520, 336 516, 336 508 Z"
+        fill="#EDE2D5"
+        stroke="#1A3153"
+        stroke-width="4.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path d="M 358 518 C 357 510, 360 504, 363 502" fill="none" stroke="#1A3153" stroke-width="3.2" stroke-linecap="round" />
+      <path d="M 376 518 C 376 510, 378 505, 380 503" fill="none" stroke="#1A3153" stroke-width="3.2" stroke-linecap="round" />
+
+      <!-- Inner Left Rear Paw -->
+      <path
+        d="M 244 504 C 244 494, 256 490, 270 492 C 280 494, 286 500, 284 510 C 282 515, 258 516, 244 512 Z"
+        fill="#D4C3B0"
+        stroke="#1A3153"
+        stroke-width="4.2"
+        stroke-linejoin="round"
+      />
+
+      <!-- Brown Leather Belt + Square Metallic Buckle -->
+      <path
+        d="M 232 426 C 276 440, 344 436, 396 406 L 403 418 C 348 450, 276 454, 230 440 Z"
+        fill="#7C4F2B"
+        stroke="#1A3153"
+        stroke-width="4.2"
+        stroke-linejoin="round"
+      />
+      <rect x="242" y="427" width="8" height="17" rx="2" fill="#2C4C78" stroke="#1A3153" stroke-width="2.8" />
+      <rect x="372" y="414" width="8" height="17" rx="2" transform="rotate(-18 376 422)" fill="#2C4C78" stroke="#1A3153" stroke-width="2.8" />
+      <rect x="260" y="432" width="22" height="17" rx="3.5" fill="#A7C7E7" stroke="#1A3153" stroke-width="3.6" />
+      <rect x="266" y="436" width="10" height="9" rx="1.5" fill="#7C4F2B" stroke="#1A3153" stroke-width="2" />
+
+      <!-- Collared Light-Blue Button-Up Shirt -->
+      <path
+        d="M 222 318 C 202 338, 194 378, 198 418 C 214 432, 248 438, 288 438 C 334 438, 376 428, 400 404 C 394 366, 374 334, 348 310 Z"
+        fill="url(#emma-shirt-grad)"
+        stroke="#1A3153"
+        stroke-width="5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M 352 342 C 366 368, 372 396, 368 418 C 382 414, 392 408, 398 402 C 390 368, 372 336, 348 314 Z"
+        fill="#A7C7E7"
+        opacity="0.55"
+      />
+      <!-- Placket & 3 Subtle Buttons -->
+      <path d="M 264 342 C 258 374, 258 406, 264 436" fill="none" stroke="#1A3153" stroke-width="3.6" stroke-linecap="round" />
+      <circle cx="271" cy="368" r="3.4" fill="#8EB2D6" />
+      <circle cx="270" cy="392" r="3.4" fill="#8EB2D6" />
+      <circle cx="272" cy="416" r="3.4" fill="#8EB2D6" />
+
+      <!-- Shirt Collar Flaps -->
+      <path
+        d="M 222 316 C 232 330, 244 344, 254 352 C 258 344, 263 336, 266 334 C 254 322, 244 314, 232 308 Z"
+        fill="#DCECFD"
+        stroke="#1A3153"
+        stroke-width="4.6"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M 352 310 C 338 334, 314 348, 286 356 C 280 348, 274 340, 270 336 C 296 328, 326 318, 342 302 Z"
+        fill="#DCECFD"
+        stroke="#1A3153"
+        stroke-width="4.6"
+        stroke-linejoin="round"
+      />
     </g>
 
-    <!-- 1. HAIR BACK (Inverse 2.5D Parallax Layer) -->
-    <g id="hair-back">
-      <path d="M168 232 C152 302, 148 392, 168 462 C190 486, 232 496, 300 496 C368 496, 410 486, 432 462 C452 392, 448 302, 432 232 C416 146, 368 106, 300 106 C232 106, 184 146, 168 232 Z" fill="url(#emma-hair-back-grad)"/>
-      <!-- Soft inner hair rim -->
-      <path d="M174 378 C184 424, 210 456, 242 466 L246 410 Z" fill="#2A1615" opacity="0.7"/>
-      <path d="M426 378 C416 424, 390 456, 358 466 L354 410 Z" fill="#2A1615" opacity="0.7"/>
+    <!-- 4B. LEFT FRONT PAW & ROLLED SLEEVE CUFF (Pivot: 246, 468) -->
+    <g id="left-paw" transform="translate(0, 0)">
+      <path
+        d="M 210 426 C 210 456, 210 482, 200 498 C 194 508, 198 518, 212 520 L 242 520 C 254 518, 258 506, 254 494 C 250 474, 250 452, 250 428 Z"
+        fill="url(#emma-fur-grad)"
+        stroke="#1A3153"
+        stroke-width="5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path d="M 238 438 C 242 464, 244 492, 242 516" fill="none" stroke="#D4C3B0" stroke-width="5" stroke-linecap="round" opacity="0.8" />
+      <path d="M 213 518 C 213 508, 215 501, 218 498" fill="none" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+      <path d="M 231 518 C 231 508, 232 502, 234 499" fill="none" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Rolled Left Sleeve Cuff -->
+      <path
+        d="M 196 410 C 212 414, 236 414, 252 418 C 254 426, 252 436, 246 438 C 228 434, 208 434, 196 428 C 192 422, 192 414, 196 410 Z"
+        fill="#DCECFD"
+        stroke="#1A3153"
+        stroke-width="4.6"
+        stroke-linejoin="round"
+      />
+      <path d="M 200 422 C 216 425, 234 426, 247 428" fill="none" stroke="#A7C7E7" stroke-width="3" stroke-linecap="round" />
     </g>
 
-    <!-- 2. TORSO GROUP (Pivot 300, 560 — Breathing) -->
-    <g id="torso-group">
-      <!-- Neck -->
-      <path d="M262 396 L338 396 L346 476 C330 492, 270 492, 254 476 Z" fill="url(#emma-neck-grad)"/>
-      <!-- Chin / Neck Shadow Wedge -->
-      <g id="neck-shadow">
-        <path d="M263 402 C282 426, 318 426, 337 402 L339 426 C318 442, 282 442, 261 426 Z" fill="#C98872" opacity="0.52"/>
-        <!-- Subtle collarbone accents -->
-        <path d="M242 478 Q272 486 286 481" fill="none" stroke="#D99B84" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-        <path d="M358 478 Q328 486 314 481" fill="none" stroke="#D99B84" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-      </g>
-
-      <!-- Sleek Deep Navy High-Neck Top -->
-      <path d="M150 584 C162 508, 206 474, 256 462 L264 438 C286 446, 314 446, 336 438 L344 462 C394 474, 438 508, 450 584 L456 600 L144 600 Z" fill="url(#emma-top-grad)"/>
-      <!-- Shoulder shading planes -->
-      <path d="M168 532 C194 504, 224 490, 250 484 L224 600 L150 600 Z" fill="#132642" opacity="0.58"/>
-      <path d="M432 532 C406 504, 376 490, 350 484 L376 600 L450 600 Z" fill="#132642" opacity="0.58"/>
-      <!-- High-neck collar seam -->
-      <path d="M258 446 C284 456, 316 456, 342 446" fill="none" stroke="#A7C7E7" stroke-width="1.6" stroke-opacity="0.35"/>
-
-      <!-- Starlight Micro-Specks & Amber Accent -->
-      <g id="outfit-details">
-        <circle cx="222" cy="526" r="1.8" fill="#A7C7E7" opacity="0.65"/>
-        <circle cx="246" cy="552" r="1.3" fill="#FAFAFA" opacity="0.55"/>
-        <circle cx="372" cy="520" r="1.8" fill="#A7C7E7" opacity="0.65"/>
-        <circle cx="354" cy="558" r="1.4" fill="#FAFAFA" opacity="0.5"/>
-        <circle cx="300" cy="486" r="3" fill="#E09B30" opacity="0.85"/>
-        <path d="M294 486 L306 486 M300 480 L300 492" stroke="#FAFAFA" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
-      </g>
+    <!-- 4C. RIGHT FRONT PAW & ROLLED SLEEVE CUFF (Pivot: 322, 468) -->
+    <g id="right-paw" transform="translate(0, 0)">
+      <path
+        d="M 294 366 C 288 386, 288 408, 290 422 L 348 424 C 352 404, 352 380, 344 360"
+        fill="url(#emma-shirt-grad)"
+        stroke="#1A3153"
+        stroke-width="4.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M 296 432 C 296 462, 294 486, 284 502 C 278 514, 284 524, 300 526 L 330 526 C 344 524, 348 512, 344 496 C 340 474, 340 454, 342 432 Z"
+        fill="url(#emma-fur-grad)"
+        stroke="#1A3153"
+        stroke-width="5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path d="M 330 442 C 334 468, 334 496, 332 520" fill="none" stroke="#D4C3B0" stroke-width="5.5" stroke-linecap="round" opacity="0.8" />
+      <path d="M 300 524 C 300 513, 302 505, 306 502" fill="none" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+      <path d="M 318 524 C 318 513, 319 506, 322 503" fill="none" stroke="#1A3153" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Rolled Right Sleeve Cuff -->
+      <path
+        d="M 288 416 C 308 410, 336 412, 354 420 C 356 430, 354 440, 346 442 C 328 436, 306 436, 288 438 C 284 432, 284 422, 288 416 Z"
+        fill="#DCECFD"
+        stroke="#1A3153"
+        stroke-width="4.6"
+        stroke-linejoin="round"
+      />
+      <path d="M 294 428 C 312 424, 332 426, 348 431" fill="none" stroke="#A7C7E7" stroke-width="3" stroke-linecap="round" />
     </g>
 
-    <!-- 3. HEAD GROUP (Pivot 300, 320 — Smooth Tilt + Micro-Shift) -->
-    <g id="head-group">
-      <!-- Ears & Signature Warm Amber Star Micro-Earpiece -->
-      <g id="ears-accessories">
-        <!-- Left Ear -->
-        <ellipse cx="192" cy="306" rx="14" ry="22" fill="#F2C2AC"/>
-        <path d="M192 294 C187 302, 187 312, 194 318" fill="none" stroke="#D99A82" stroke-width="2" stroke-linecap="round"/>
-        <!-- Right Ear -->
-        <ellipse cx="408" cy="306" rx="14" ry="22" fill="#F2C2AC"/>
-        <path d="M408 294 C413 302, 413 312, 406 318" fill="none" stroke="#D99A82" stroke-width="2" stroke-linecap="round"/>
-        <!-- Emma's Warm Amber Star Earring / Micro-Earpiece Glow (Left & Right) -->
-        <circle cx="190" cy="326" r="11" fill="url(#emma-amber-glow)"/>
-        <polygon points="190,318 192.4,323.6 198,326 192.4,328.4 190,334 187.6,328.4 182,326 187.6,323.6" fill="#E09B30"/>
-        <circle cx="410" cy="326" r="11" fill="url(#emma-amber-glow)"/>
-        <polygon points="410,318 412.4,323.6 418,326 412.4,328.4 410,334 407.6,328.4 402,326 407.6,323.6" fill="#E09B30"/>
+    <!-- 4D. HEAD GROUP (Pivot: 300, 328) -->
+    <g id="head-group" transform="rotate(0, 300, 328)">
+      <!-- Independent Pointed Left Ear (Pivot: 226, 178) -->
+      <g id="ear-left" transform="rotate(0, 226, 178)">
+        <!-- Outer Pointed Cat Ear + Tiny Ear-Tip Tuft -->
+        <path
+          d="M 206 196 C 198 164, 200 124, 208 98 C 210 92, 214 92, 220 96 C 242 108, 266 130, 274 156 L 250 198 Z"
+          fill="#A89584"
+          stroke="#1A3153"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <!-- Tiny Ear-Tip Lynx Tuft -->
+        <path d="M 209 99 L 204 88" stroke="#1A3153" stroke-width="3" stroke-linecap="round" />
+        <!-- Soft Pink Inner Ear Triangle -->
+        <path
+          d="M 213 178 C 209 156, 211 130, 216 112 C 232 122, 248 138, 254 158 Z"
+          fill="#F4C2C2"
+        />
+        <!-- Fluffy Cream Inner-Ear Fur Tufts -->
+        <path
+          d="M 214 176 L 228 164 L 220 158 L 236 152 L 228 144 L 244 144"
+          fill="#EDE2D5"
+          stroke="#1A3153"
+          stroke-width="2.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </g>
 
-      <!-- Face Base (Lineless Cel-Shaded Portrait) -->
-      <g id="face-base">
-        <path d="M196 244 C194 176, 238 140, 300 140 C362 140, 406 176, 404 244 C403 314, 382 362, 344 394 C326 409, 312 414, 300 414 C288 414, 274 409, 256 394 C218 362, 197 314, 196 244 Z" fill="url(#emma-skin)"/>
-        <!-- Subtle side-plane cel shadow -->
-        <path d="M368 186 C394 218, 398 286, 384 334 C372 366, 342 396, 306 412 C340 404, 376 372, 392 332 C406 290, 405 224, 368 186 Z" fill="#DF9E86" opacity="0.34"/>
-        <!-- Soft Cheek Blush -->
-        <ellipse cx="232" cy="322" rx="28" ry="15" fill="url(#emma-blush)"/>
-        <ellipse cx="368" cy="322" rx="28" ry="15" fill="url(#emma-blush)"/>
-        <!-- Clean Nose-Tip Cel Shadow & Specular Highlight -->
-        <path d="M298 292 L294 316 C294 320, 302 321, 306 318" fill="none" stroke="#D89882" stroke-width="2" stroke-linecap="round" opacity="0.72"/>
-        <ellipse cx="300" cy="312" rx="2.4" ry="4" fill="#FFF7F2" opacity="0.65"/>
+      <!-- Independent Pointed Right Ear (Pivot: 374, 178) -->
+      <g id="ear-right" transform="rotate(0, 374, 178)">
+        <path
+          d="M 386 196 C 396 164, 396 126, 388 100 C 386 94, 382 94, 376 98 C 354 110, 330 132, 322 158 L 346 198 Z"
+          fill="#A89584"
+          stroke="#1A3153"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path d="M 387 101 L 392 90" stroke="#1A3153" stroke-width="3" stroke-linecap="round" />
+        <path
+          d="M 380 178 C 384 156, 382 132, 378 114 C 362 124, 346 140, 340 160 Z"
+          fill="#F4C2C2"
+        />
+        <path
+          d="M 380 176 L 366 164 L 374 158 L 358 152 L 366 144 L 350 144"
+          fill="#EDE2D5"
+          stroke="#1A3153"
+          stroke-width="2.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </g>
 
-      <!-- Expressive Eyes Group -->
-      <g id="eyes-group">
-        <!-- Sclerae -->
-        <g id="eye-left-sclera">
-          <path d="M214 282 C226 266, 258 266, 272 282 C264 299, 228 300, 214 282 Z" fill="#FFFFFF"/>
-          <!-- Upper sclera soft shadow -->
-          <path d="M216 279 C228 269, 256 269, 270 279 C256 275, 228 275, 216 279 Z" fill="#CBD5E1" opacity="0.55"/>
-        </g>
-        <g id="eye-right-sclera">
-          <path d="M328 282 C342 266, 374 266, 386 282 C372 300, 336 299, 328 282 Z" fill="#FFFFFF"/>
-          <path d="M330 279 C344 269, 372 269, 384 279 C372 275, 344 275, 330 279 Z" fill="#CBD5E1" opacity="0.55"/>
-        </g>
+      <!-- Face Base: Fluffy Cream Tabby Head + Forehead "M" + Cheek Ruffs + Chest Fluff -->
+      <g id="face-base" transform="translate(0, 0)">
+        <path
+          d="M 284 142 C 282 132, 290 128, 296 138 C 318 140, 340 148, 358 162 C 378 176, 390 198, 392 220 C 402 224, 408 232, 402 240 C 410 248, 408 258, 398 264 C 404 274, 398 286, 386 292 C 378 302, 366 310, 352 316 C 334 324, 314 326, 294 334 C 284 344, 276 348, 272 338 C 266 330, 256 322, 244 316 C 228 310, 212 300, 202 288 C 190 282, 184 270, 190 262 C 180 254, 180 244, 188 236 C 184 226, 192 218, 202 214 C 206 192, 218 170, 238 156 C 252 146, 268 142, 284 142 Z"
+          fill="url(#emma-fur-grad)"
+          stroke="#1A3153"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
 
-        <!-- Left Iris (Clipped to Sclera for Smooth Gaze Tracking) -->
-        <g clip-path="url(#emma-left-eye-clip)">
-          <g id="eye-left-iris">
-            <ellipse cx="245" cy="283" rx="16.5" ry="17.5" fill="url(#emma-iris-grad)"/>
-            <ellipse cx="245" cy="282" rx="8.5" ry="9.5" fill="#151C36"/>
-            <!-- Lower crescent glow -->
-            <path d="M233 290 C239 298, 251 298, 257 290 C250 294, 240 294, 233 290 Z" fill="#A7C7E7" opacity="0.88"/>
-            <!-- Crisp catchlights -->
-            <circle cx="238" cy="276" r="4.2" fill="#FFFFFF"/>
-            <circle cx="252" cy="288" r="2.1" fill="#FFFFFF" opacity="0.9"/>
+        <!-- Classic Forehead "M" Tabby Stripes (#A89584) -->
+        <path d="M 286 146 C 284 166, 284 184, 288 198 C 294 186, 298 166, 298 146 Z" fill="#A89584" opacity="0.88" />
+        <path d="M 272 150 C 266 168, 264 186, 270 202 C 276 188, 278 168, 280 150 Z" fill="#A89584" opacity="0.80" />
+        <path d="M 306 150 C 314 166, 316 184, 310 198 C 304 186, 304 168, 302 150 Z" fill="#A89584" opacity="0.80" />
+
+        <!-- Cheek Tabby Stripes -->
+        <path d="M 366 254 C 378 256, 390 260, 396 266 C 386 268, 374 266, 362 262 Z" fill="#A89584" opacity="0.78" />
+        <path d="M 368 272 C 378 274, 388 278, 392 284 C 382 285, 372 282, 364 278 Z" fill="#A89584" opacity="0.65" />
+        <path d="M 220 254 C 208 256, 198 260, 192 266 C 202 268, 212 266, 224 262 Z" fill="#A89584" opacity="0.72" />
+
+        <!-- Fluffy Cream Chin & Cheek Highlight -->
+        <ellipse cx="290" cy="278" rx="54" ry="30" fill="#FAF5EE" opacity="0.85" />
+        <!-- Soft Chin Shadow -->
+        <path d="M 262 308 C 278 318, 302 318, 316 308 C 302 313, 278 313, 262 308 Z" fill="#D4C3B0" />
+
+        <!-- Subtle Cheek Blush (Enhanced in Happy State) -->
+        <ellipse id="cheek-blush-left" cx="232" cy="268" rx="14" ry="8" fill="#F4A8AE" opacity="0.28" />
+        <ellipse id="cheek-blush-right" cx="348" cy="268" rx="14" ry="8" fill="#F4A8AE" opacity="0.28" />
+
+        <!-- Cute Pink Triangle Kitten Nose (#E5989B) -->
+        <path
+          d="M 278 260 C 278 255, 302 255, 302 260 C 302 265, 294 271, 290 271 C 286 271, 278 265, 278 260 Z"
+          fill="#E5989B"
+          stroke="#1A3153"
+          stroke-width="3.6"
+          stroke-linejoin="round"
+        />
+        <ellipse cx="287" cy="259.5" rx="4.5" ry="1.8" fill="#FAFAFA" opacity="0.82" />
+        <!-- Nose Center Groove -->
+        <path d="M 290 271 L 290 282" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
+
+        <!-- Tiny Whisker-Pad Freckle Dots -->
+        <circle cx="262" cy="274" r="1.9" fill="#A89584" />
+        <circle cx="255" cy="279" r="1.9" fill="#A89584" />
+        <circle cx="264" cy="282" r="1.9" fill="#A89584" />
+        <circle cx="318" cy="274" r="1.9" fill="#A89584" />
+        <circle cx="325" cy="279" r="1.9" fill="#A89584" />
+        <circle cx="316" cy="282" r="1.9" fill="#A89584" />
+      </g>
+
+      <!-- Independent Delicate Whiskers (Left Pivot: 228, 286 | Right Pivot: 372, 286) -->
+      <g id="whiskers-left" transform="rotate(0, 228, 286)">
+        <path d="M 244 274 C 210 268, 174 270, 146 280" fill="none" stroke="#1A3153" stroke-width="2.4" stroke-linecap="round" opacity="0.85" />
+        <path d="M 242 282 C 208 282, 174 290, 148 304" fill="none" stroke="#1A3153" stroke-width="2.4" stroke-linecap="round" opacity="0.85" />
+        <path d="M 244 290 C 214 296, 186 308, 164 324" fill="none" stroke="#1A3153" stroke-width="2.2" stroke-linecap="round" opacity="0.78" />
+      </g>
+      <g id="whiskers-right" transform="rotate(0, 372, 286)">
+        <path d="M 336 274 C 370 268, 404 272, 434 282" fill="none" stroke="#1A3153" stroke-width="2.4" stroke-linecap="round" opacity="0.85" />
+        <path d="M 338 282 C 372 284, 406 292, 432 308" fill="none" stroke="#1A3153" stroke-width="2.4" stroke-linecap="round" opacity="0.85" />
+        <path d="M 336 290 C 366 298, 394 310, 416 326" fill="none" stroke="#1A3153" stroke-width="2.2" stroke-linecap="round" opacity="0.78" />
+      </g>
+
+      <!-- Gentle Curved Taupe Eyebrows -->
+      <g id="eyebrows-left" transform="translate(0, 0)">
+        <path d="M 238 202 C 246 196, 258 196, 266 201" fill="none" stroke="#A89584" stroke-width="5.5" stroke-linecap="round" />
+      </g>
+      <g id="eyebrows-right" transform="translate(0, 0)">
+        <path d="M 316 201 C 324 196, 336 196, 344 202" fill="none" stroke="#A89584" stroke-width="5.5" stroke-linecap="round" />
+      </g>
+
+      <!-- Expressive Kitten Eyes with Feminine Lash Flicks & Clipped Irises -->
+      <g id="eyes-open" opacity="1">
+        <!-- Left Eye + Upper-Outer Lash Flick -->
+        <path d="M 231 224 C 224 221, 220 218, 217 215" fill="none" stroke="#1A3153" stroke-width="5" stroke-linecap="round" />
+        <path d="M 229 231 C 223 230, 220 228, 218 226" fill="none" stroke="#1A3153" stroke-width="3.6" stroke-linecap="round" />
+        <ellipse cx="250" cy="236" rx="21" ry="23" fill="#1A3153" />
+        <g clip-path="url(#emma-eye-left-clip)">
+          <g id="eye-left-iris" transform="translate(0, 0)">
+            <ellipse cx="250" cy="250" rx="14" ry="10" fill="#394A7A" />
+            <circle cx="256" cy="227" r="7.2" fill="#FAFAFA" />
+            <circle cx="243" cy="244" r="3" fill="#FAFAFA" opacity="0.9" />
           </g>
         </g>
 
-        <!-- Right Iris (Clipped to Sclera) -->
-        <g clip-path="url(#emma-right-eye-clip)">
-          <g id="eye-right-iris">
-            <ellipse cx="355" cy="283" rx="16.5" ry="17.5" fill="url(#emma-iris-grad)"/>
-            <ellipse cx="355" cy="282" rx="8.5" ry="9.5" fill="#151C36"/>
-            <path d="M343 290 C349 298, 361 298, 367 290 C360 294, 350 294, 343 290 Z" fill="#A7C7E7" opacity="0.88"/>
-            <circle cx="348" cy="276" r="4.2" fill="#FFFFFF"/>
-            <circle cx="362" cy="288" r="2.1" fill="#FFFFFF" opacity="0.9"/>
+        <!-- Right Eye + Upper-Outer Lash Flick -->
+        <path d="M 351 224 C 358 221, 362 218, 365 215" fill="none" stroke="#1A3153" stroke-width="5" stroke-linecap="round" />
+        <path d="M 353 231 C 359 230, 362 228, 364 226" fill="none" stroke="#1A3153" stroke-width="3.6" stroke-linecap="round" />
+        <ellipse cx="332" cy="236" rx="21" ry="23" fill="#1A3153" />
+        <g clip-path="url(#emma-eye-right-clip)">
+          <g id="eye-right-iris" transform="translate(0, 0)">
+            <ellipse cx="332" cy="250" rx="14" ry="10" fill="#394A7A" />
+            <circle cx="338" cy="227" r="7.2" fill="#FAFAFA" />
+            <circle cx="325" cy="244" r="3" fill="#FAFAFA" opacity="0.9" />
           </g>
         </g>
-
-        <!-- Eyelids Open (Default Bright Alert — Pose 2 of showcase02.jpg) -->
-        <g id="eyelids-open" opacity="1">
-          <!-- Left upper lash & subtle crease -->
-          <path d="M210 282 C222 263, 259 262, 274 281 C260 270, 226 270, 210 282 Z" fill="#2B2129"/>
-          <path d="M218 261 C234 254, 255 255, 267 262" fill="none" stroke="#C88E7A" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
-          <path d="M224 298 C238 302, 254 301, 264 297" fill="none" stroke="#4A343B" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
-          <!-- Right upper lash & subtle crease -->
-          <path d="M390 282 C378 263, 341 262, 326 281 C340 270, 374 270, 390 282 Z" fill="#2B2129"/>
-          <path d="M382 261 C366 254, 345 255, 333 262" fill="none" stroke="#C88E7A" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
-          <path d="M376 298 C362 302, 346 301, 336 297" fill="none" stroke="#4A343B" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
-        </g>
-
-        <!-- Eyelids Relaxed (Focused Half-Lid — Thinking/Listening) -->
-        <g id="eyelids-relaxed" opacity="0">
-          <path d="M210 281 C224 270, 258 270, 274 281 L274 265 L210 265 Z" fill="#F6CEBA"/>
-          <path d="M210 281 C224 272, 258 272, 274 281" fill="none" stroke="#2B2129" stroke-width="4" stroke-linecap="round"/>
-          <path d="M326 281 C342 270, 376 270, 390 281 L390 265 L326 265 Z" fill="#F6CEBA"/>
-          <path d="M326 281 C342 272, 376 272, 390 281" fill="none" stroke="#2B2129" stroke-width="4" stroke-linecap="round"/>
-        </g>
-
-        <!-- Eyelids Blink (Smooth Closed Lash Arc) -->
-        <g id="eyelids-blink" opacity="0">
-          <rect x="208" y="262" width="72" height="42" rx="16" fill="#F7D0BC"/>
-          <path d="M213 286 C228 294, 256 294, 272 285" fill="none" stroke="#2B2129" stroke-width="3.6" stroke-linecap="round"/>
-          <rect x="320" y="262" width="72" height="42" rx="16" fill="#F7D0BC"/>
-          <path d="M328 285 C344 294, 372 294, 387 286" fill="none" stroke="#2B2129" stroke-width="3.6" stroke-linecap="round"/>
-        </g>
       </g>
 
-      <!-- Eyebrows (Left Pivot 242, 232 | Right Pivot 358, 232) -->
-      <g id="eyebrows-left">
-        <path d="M214 246 C228 236, 254 235, 270 242" fill="none" stroke="#4A2D27" stroke-width="4.2" stroke-linecap="round"/>
-      </g>
-      <g id="eyebrows-right">
-        <path d="M330 242 C346 235, 372 236, 386 246" fill="none" stroke="#4A2D27" stroke-width="4.2" stroke-linecap="round"/>
+      <!-- Natural Blink Eyelids -->
+      <g id="eyes-blink" opacity="0">
+        <path d="M 228 237 C 238 245, 260 245, 270 237" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
+        <path d="M 228 237 L 220 232" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
+        <path d="M 312 237 C 322 245, 344 245, 354 237" fill="none" stroke="#1A3153" stroke-width="5.5" stroke-linecap="round" />
+        <path d="M 354 237 L 362 232" stroke="#1A3153" stroke-width="3.8" stroke-linecap="round" />
       </g>
 
-      <!-- 6 Distinct Vector Mouth Visemes -->
+      <!-- Joyful Happy Smiling Eyes (^ ^) -->
+      <g id="eyes-happy" opacity="0">
+        <path d="M 230 241 C 240 224, 258 224, 268 241" fill="none" stroke="#1A3153" stroke-width="6" stroke-linecap="round" />
+        <path d="M 314 241 C 324 224, 342 224, 352 241" fill="none" stroke="#1A3153" stroke-width="6" stroke-linecap="round" />
+      </g>
+
+      <!-- 6 REAL-TIME AUDIO-DRIVEN MOUTH VISEMES -->
       <g id="mouth-visemes">
-        <!-- 1. Rest (Gentle Confident Closed Smile) -->
+        <!-- 1. Rest (:3 kitty smile) -->
         <g id="mouth-rest" opacity="1">
-          <path d="M276 355 C288 364, 312 364, 324 355" fill="none" stroke="#A65E58" stroke-width="2.6" stroke-linecap="round"/>
-          <path d="M288 363 C296 367, 304 367, 312 363" fill="none" stroke="#E5A296" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+          <path d="M 264 282 C 268 294, 284 294, 290 282 C 296 294, 312 294, 316 282" fill="none" stroke="#1A3153" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" />
         </g>
 
-        <!-- 2. Parted (Subtle Parted Lips with Tooth Highlight — showcase02.jpg) -->
+        <!-- 2. Parted -->
         <g id="mouth-parted" opacity="0">
-          <path d="M278 354 C290 349, 310 349, 322 354 C314 364, 286 364, 278 354 Z" fill="#C46B68"/>
-          <path d="M285 354 C294 352, 306 352, 315 354 C308 358, 292 358, 285 354 Z" fill="#FFFFFF"/>
-          <ellipse cx="300" cy="362" rx="7" ry="1.8" fill="#FFF0EC" opacity="0.55"/>
+          <ellipse cx="290" cy="291" rx="8" ry="4.8" fill="#3D1D2B" stroke="#1A3153" stroke-width="3" />
+          <path d="M 265 282 C 269 292, 284 292, 290 282 C 296 292, 311 292, 315 282" fill="none" stroke="#1A3153" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" />
         </g>
 
-        <!-- 3. Open Small (Soft Vowel e/i) -->
+        <!-- 3. Open Small -->
         <g id="mouth-open-sm" opacity="0">
-          <path d="M276 353 C290 348, 310 348, 324 353 C316 368, 284 368, 276 353 Z" fill="#8E3B42"/>
-          <path d="M283 353 C294 351, 306 351, 317 353 L314 358 L286 358 Z" fill="#FFFFFF"/>
-          <path d="M288 364 C296 361, 304 361, 312 364" fill="#D97474" opacity="0.8"/>
+          <path d="M 275 287 C 277 302, 303 302, 305 287 Z" fill="#3D1D2B" stroke="#1A3153" stroke-width="3.6" stroke-linejoin="round" />
+          <ellipse cx="290" cy="297" rx="8" ry="3.5" fill="#F29DA5" />
+          <path d="M 264 281 C 268 292, 284 292, 290 282 C 296 292, 312 292, 316 281" fill="none" stroke="#1A3153" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" />
         </g>
 
-        <!-- 4. Open Medium (Medium Speech a) -->
+        <!-- 4. Open Medium -->
         <g id="mouth-open-md" opacity="0">
-          <path d="M275 351 C290 346, 310 346, 325 351 C321 374, 279 374, 275 351 Z" fill="#7D2F38"/>
-          <path d="M282 351 C294 349, 306 349, 318 351 L315 357 L285 357 Z" fill="#FFFFFF"/>
-          <ellipse cx="300" cy="369" rx="13" ry="5" fill="#D66D70"/>
+          <path d="M 272 286 C 274 309, 306 309, 308 286 Z" fill="#3D1D2B" stroke="#1A3153" stroke-width="3.8" stroke-linejoin="round" />
+          <path d="M 279 301 C 284 296, 296 296, 301 301 C 296 306, 284 306, 279 301 Z" fill="#F29DA5" />
+          <path d="M 263 280 C 268 291, 284 291, 290 281 C 296 291, 312 291, 317 280" fill="none" stroke="#1A3153" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" />
         </g>
 
-        <!-- 5. Open Large (Emphatic Syllable aa/oh) -->
+        <!-- 5. Open Large -->
         <g id="mouth-open-lg" opacity="0">
-          <path d="M274 349 C290 343, 310 343, 326 349 C324 381, 276 381, 274 349 Z" fill="#6B2530"/>
-          <path d="M281 349 C294 347, 306 347, 319 349 L316 356 L284 356 Z" fill="#FFFFFF"/>
-          <ellipse cx="300" cy="373" rx="15" ry="6.5" fill="#D4666B"/>
+          <path d="M 269 285 C 271 314, 309 314, 311 285 Z" fill="#3D1D2B" stroke="#1A3153" stroke-width="4" stroke-linejoin="round" />
+          <path d="M 276 302 C 283 295, 297 295, 304 302 C 298 310, 282 310, 276 302 Z" fill="#F29DA5" />
+          <path d="M 261 279 C 267 290, 284 290, 290 280 C 296 290, 313 290, 319 279" fill="none" stroke="#1A3153" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" />
         </g>
 
-        <!-- 6. Smile (Warm Encouraging Smile) -->
+        <!-- 6. Broad Proud Happy Smile -->
         <g id="mouth-smile" opacity="0">
-          <path d="M272 351 C286 370, 314 370, 328 351 C314 358, 286 358, 272 351 Z" fill="#FFFFFF"/>
-          <path d="M272 351 C286 371, 314 371, 328 351" fill="none" stroke="#A65E58" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M275 351 C290 356, 310 356, 325 351" fill="none" stroke="#C4726C" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M 274 287 C 278 306, 302 306, 306 287 Z" fill="#F29DA5" stroke="#1A3153" stroke-width="3.8" stroke-linejoin="round" />
+          <path d="M 260 280 C 266 294, 284 294, 290 282 C 296 294, 314 294, 320 280" fill="none" stroke="#1A3153" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" />
         </g>
-      </g>
-
-      <!-- 4. HAIR FRONT & PARTED BANGS (Forward 2.5D Parallax Layer) -->
-      <g id="hair-front-bangs">
-        <!-- Crown & sleek bob framing -->
-        <path d="M180 250 C176 164, 224 114, 300 114 C376 114, 424 164, 420 250 C422 320, 418 394, 394 434 C404 378, 404 316, 398 258 C392 214, 368 184, 334 176 C318 206, 296 226, 278 236 C288 212, 294 190, 296 174 C264 186, 238 214, 220 242 C226 212, 238 188, 254 174 C224 186, 206 216, 202 260 C196 318, 196 378, 206 434 C182 394, 178 320, 180 250 Z" fill="url(#emma-hair-main)"/>
-        <!-- Soft Hair-Highlight Ribbons -->
-        <path d="M214 196 C248 164, 352 164, 386 196 C352 178, 248 178, 214 196 Z" fill="url(#emma-hair-ribbon)"/>
-        <path d="M228 208 C258 186, 342 186, 372 208 C342 197, 258 197, 228 208 Z" fill="#F2C8AE" opacity="0.22"/>
       </g>
     </g>
   </g>

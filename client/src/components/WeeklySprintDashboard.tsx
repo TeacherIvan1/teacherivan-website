@@ -26,6 +26,7 @@ import {
   Video,
   Check,
   Headphones,
+  X,
 } from 'lucide-react';
 import { useSprintStore, CEFRLevel } from '../modules/sprint/sprintStore';
 import { useAuthStore } from '../modules/auth/authStore';
@@ -65,6 +66,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
   // Active selected day for the Interactive Stage (0: D1, 1: D2, 2: D3, 3: D4, 4: D5)
   const [selectedDay, setSelectedDay] = useState<number>(0);
   const [isEditGoalsOpen, setIsEditGoalsOpen] = useState(false);
+  const [isMobileActivityOpen, setIsMobileActivityOpen] = useState(false);
   const [localWriting, setLocalWriting] = useState(day4Writing || '');
   const [writingStatus, setWritingStatus] = useState<string | null>(null);
 
@@ -251,6 +253,23 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
 
   const progressPercentage = Math.round((completedStages.length / 5) * 100);
 
+  const mobilePlanShortLabel =
+    userPlan === 'executive' || user?.role === 'admin'
+      ? isEs
+        ? 'Executive (5/sem)'
+        : 'Executive (5/wk)'
+      : userPlan === 'pro'
+      ? isEs
+        ? 'Pro (3/sem)'
+        : 'Pro (3/wk)'
+      : userPlan === 'essential'
+      ? isEs
+        ? 'Essential (24/7)'
+        : 'Essential (24/7)'
+      : isEs
+      ? 'Gratis (5/día)'
+      : 'Free (5/day)';
+
   // Compact Mode Render (used in Dev Mode or Simulator sidebar)
   if (compact) {
     return (
@@ -268,7 +287,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         </div>
         <div className="w-full h-2 rounded-full bg-[#1A3153] overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-[#E09B30] to-[#10b981] transition-all duration-500"
+            className="h-full bg-[#E09B30] transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
@@ -286,18 +305,396 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
     );
   }
 
+  const ActiveDayIcon = dayTabs[selectedDay]?.icon || BookOpen;
+
   // Full Rich Dashboard for 'Mi Ruta (Micro-Learning)'
   return (
-    <div id="student-microlearning-dashboard" className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-8 animate-in fade-in duration-200">
-      {/* Edit Goals Modal Modal Instance */}
+    <div id="student-microlearning-dashboard" className="flex-1 min-h-0 flex flex-col md:block w-full overflow-hidden md:overflow-visible animate-in fade-in duration-200">
+      {/* Edit Goals Modal Instance */}
       <MandatoryGoalsModal
         isOpen={isEditGoalsOpen}
         onClose={() => setIsEditGoalsOpen(false)}
       />
 
       {/* ========================================================================= */}
-      {/* 1. TOP COMMAND HEADER SLAB (.slab-3d-dark ARCHITECTURAL HERO)              */}
+      {/* MOBILE ZERO-SCROLL 100dvh 'MI RUTA' VIEW (< 768px)                        */}
+      {/* Strict 5-color discipline, WCAG AA Light & Night, zero stacked pills      */}
       {/* ========================================================================= */}
+      <div
+        id="mobile-path-view"
+        className="md:hidden flex-1 min-h-0 h-full flex flex-col justify-between gap-2.5 px-3.5 py-2.5 overflow-hidden"
+      >
+        {/* 1. Compact 72px Student Summary Strip */}
+        <div className="shrink-0 h-[72px] p-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-12 h-12 rounded-2xl bg-[#E9F2FB] dark:bg-[#132642] border border-[#1A3153]/20 dark:border-[#E09B30]/50 p-0.5 flex items-center justify-center shrink-0 overflow-hidden">
+              <RiggedCharacter
+                persona="teacher-ivan"
+                state="idle"
+                className="w-full h-full"
+                alt="Teacher Ivan Mascot"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="font-montserrat font-extrabold text-sm text-[var(--text-primary)] truncate leading-tight">
+                {studentName}
+              </h1>
+              <p className="font-inter text-xs text-[#4A5568] dark:text-[#A7C7E7] truncate mt-0.5">
+                {targetLevel} • {mobilePlanShortLabel}
+              </p>
+            </div>
+          </div>
+
+          <button
+            id="mobile-edit-goals-btn"
+            type="button"
+            onClick={() => setIsEditGoalsOpen(true)}
+            aria-label={t.microLearning.editGoals}
+            className="w-11 h-11 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-[#1A3153] dark:text-[#FAFAFA] hover:border-[#E09B30] flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+          >
+            <Edit3 size={17} className="text-[#9A6515] dark:text-[#E09B30]" aria-hidden="true" />
+          </button>
+        </div>
+
+        {/* 2. Compact Weekly Progress Strip (~48px) */}
+        <div className="shrink-0 px-3.5 py-2.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] space-y-1.5">
+          <div className="flex items-center justify-between text-xs font-montserrat font-bold">
+            <span className="text-[var(--text-primary)]">
+              {isEs ? 'Hábito Semanal' : 'Weekly Habit'}{' '}
+              <span className="text-[#9A6515] dark:text-[#E09B30]">
+                {completedStages.length}/5 ({progressPercentage}%)
+              </span>
+            </span>
+            <span className="text-[#4A5568] dark:text-[#A7C7E7] inline-flex items-center gap-1">
+              <Flame size={12} className="text-[#9A6515] dark:text-[#E09B30]" aria-hidden="true" />
+              <span>
+                {completedStages.length}d {isEs ? 'racha' : 'streak'} • {totalXp} XP
+              </span>
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-[var(--bg-sunken)] border border-[var(--border-hairline)] overflow-hidden">
+            <div
+              className="h-full rounded-full bg-[#E09B30] transition-all duration-500"
+              style={{ width: `${Math.max(4, progressPercentage)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* 3. Interactive 5-Day Journey Switcher + Single Focused Day Card */}
+        <div className="flex-1 min-h-0 flex flex-col justify-between gap-2.5">
+          {/* 5-Button Horizontal Day Switcher (D1 - D5) */}
+          <div
+            id="mobile-day-switcher"
+            className="shrink-0 grid grid-cols-5 gap-1.5"
+            role="tablist"
+            aria-label={isEs ? 'Días de la ruta semanal' : 'Weekly path days'}
+          >
+            {dayTabs.map((day) => {
+              const isSelected = selectedDay === day.id;
+              const isCompleted = completedStages.includes(day.id);
+              return (
+                <button
+                  key={day.id}
+                  id={`mobile-path-day-${day.id + 1}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => setSelectedDay(day.id)}
+                  className={`min-h-[44px] rounded-xl border font-montserrat font-extrabold text-xs flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#E09B30] text-[#091326] border-[#E09B30] shadow-sm'
+                      : isCompleted
+                      ? 'bg-[#1A3153]/10 dark:bg-[#1A3153] text-[#1A3153] dark:text-[#FAFAFA] border-[#1A3153]/30 dark:border-[#A7C7E7]/40'
+                      : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-hairline)]'
+                  }`}
+                >
+                  <span>{day.label}</span>
+                  {isCompleted && (
+                    <Check size={11} className={isSelected ? 'text-[#091326]' : 'text-[#9A6515] dark:text-[#E09B30]'} aria-hidden="true" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Focused Active Day Card Filling Remaining Calm Space */}
+          <div
+            id="mobile-active-day-card"
+            className="flex-1 min-h-0 p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex flex-col justify-between gap-3 shadow-sm overflow-hidden"
+          >
+            <div className="space-y-2.5 min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1A3153] text-[#FAFAFA] text-[11px] font-montserrat font-bold uppercase tracking-wider">
+                  <ActiveDayIcon size={12} className="text-[#E09B30]" aria-hidden="true" />
+                  <span>
+                    {dayTabs[selectedDay].label} • {dayTabs[selectedDay].type}
+                  </span>
+                </span>
+                <span className="text-xs font-montserrat font-bold text-[#9A6515] dark:text-[#E09B30] shrink-0">
+                  {completedStages.includes(selectedDay) ? (isEs ? 'Listo ✓' : 'Done ✓') : '+25 XP'}
+                </span>
+              </div>
+
+              <h2 className="font-montserrat font-extrabold text-base text-[var(--text-primary)] leading-snug line-clamp-2">
+                {activeDayData.title}
+              </h2>
+
+              <p className="font-inter text-xs text-[#4A5568] dark:text-[#A7C7E7] leading-relaxed line-clamp-3">
+                {activeDayData.description}
+              </p>
+
+              {/* Concise Goal Anchor Line */}
+              <div className="px-3 py-2 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] flex items-center gap-2 text-xs">
+                <Target size={13} className="text-[#9A6515] dark:text-[#E09B30] shrink-0" aria-hidden="true" />
+                <span className="font-inter text-[var(--text-secondary)] truncate">
+                  {primaryGoal}
+                </span>
+              </div>
+            </div>
+
+            <button
+              id="mobile-open-day-activity-btn"
+              type="button"
+              onClick={() => setIsMobileActivityOpen(true)}
+              className="shrink-0 w-full min-h-[46px] px-4 py-3 rounded-xl bg-[#E09B30] hover:bg-[#ECAA41] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-colors"
+            >
+              <span>{isEs ? 'Abrir Actividad del Día →' : 'Open Today’s Activity →'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* MOBILE FULL-HEIGHT DISMISSIBLE DAY ACTIVITY SHEET */}
+      {isMobileActivityOpen && (
+        <div
+          id="mobile-day-activity-sheet"
+          role="dialog"
+          aria-modal="true"
+          className="md:hidden fixed inset-0 z-[70] bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col animate-in fade-in duration-150"
+        >
+          <div className="shrink-0 h-[56px] px-4 border-b border-[var(--border-hairline)] bg-[var(--bg-surface)] flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#9A6515] dark:text-[#E09B30] block">
+                {dayTabs[selectedDay].label} • {dayTabs[selectedDay].type}
+              </span>
+              <h3 className="font-montserrat font-extrabold text-sm text-[var(--text-primary)] truncate">
+                {activeDayData.title}
+              </h3>
+            </div>
+            <button
+              id="mobile-close-day-activity-btn"
+              type="button"
+              onClick={() => setIsMobileActivityOpen(false)}
+              aria-label={isEs ? 'Cerrar actividad' : 'Close activity'}
+              className="w-11 h-11 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-primary)] shrink-0 cursor-pointer"
+            >
+              <X size={20} aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+            <p className="font-inter text-sm text-[var(--text-secondary)] leading-relaxed">
+              {activeDayData.description}
+            </p>
+
+            {selectedDay === 0 && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  {activeDayData.collocations.map((colloc, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-center justify-between gap-2"
+                    >
+                      <span className="font-mono text-xs font-bold text-[var(--text-primary)]">
+                        "{colloc}"
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handlePlayCollocation(colloc)}
+                        className="w-10 h-10 rounded-lg bg-[#1A3153] text-[#FAFAFA] flex items-center justify-center shrink-0 cursor-pointer"
+                        aria-label={`Pronounce ${colloc}`}
+                      >
+                        <Volume2 size={15} className={playingCollocation === colloc ? 'animate-pulse text-[#E09B30]' : ''} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    completeStage(0);
+                    setIsMobileActivityOpen(false);
+                  }}
+                  className="w-full min-h-[46px] rounded-xl bg-[#E09B30] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider cursor-pointer"
+                >
+                  {t.microLearning.d1MarkDone}
+                </button>
+              </div>
+            )}
+
+            {selectedDay === 1 && (
+              <div className="space-y-3">
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] font-inter text-sm text-[var(--text-primary)] leading-relaxed">
+                  "Our team encountered severe scalability bottlenecks; <strong>[ _____ ]</strong>, we spearheaded a modular migration that subsequently reduced latency by 40%."
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {['subsequently', 'nevertheless', 'whereas', 'on the other hand'].map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => {
+                        setD2SelectedOption(opt);
+                        setD2Feedback(
+                          opt === 'subsequently'
+                            ? isEs
+                              ? '¡Correcto! "Subsequently" expresa resultado cronológico formal.'
+                              : 'Correct! "Subsequently" expresses formal chronological outcome.'
+                            : isEs
+                            ? 'Intenta de nuevo: ese conector indica contraste.'
+                            : 'Try again: that connector expresses contrast.'
+                        );
+                      }}
+                      className={`min-h-[44px] px-3 py-2 rounded-xl border text-xs font-montserrat font-bold cursor-pointer ${
+                        d2SelectedOption === opt
+                          ? opt === 'subsequently'
+                            ? 'bg-[#E09B30] text-[#091326] border-[#E09B30]'
+                            : 'bg-[#1A3153] text-[#FAFAFA] border-[#1A3153]'
+                          : 'bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border-hairline)]'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                {d2Feedback && (
+                  <p className="p-3 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-xs font-medium text-[var(--text-primary)]">
+                    {d2Feedback}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    completeStage(1);
+                    setIsMobileActivityOpen(false);
+                  }}
+                  className="w-full min-h-[46px] rounded-xl bg-[#E09B30] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider cursor-pointer"
+                >
+                  {t.microLearning.d2MarkDone}
+                </button>
+              </div>
+            )}
+
+            {selectedDay === 2 && (
+              <div className="space-y-3">
+                <div className="p-4 rounded-xl bg-[#1A3153] text-[#FAFAFA] space-y-2">
+                  <span className="text-[11px] font-montserrat font-bold uppercase text-[#E09B30]">
+                    Preset: {activeDayData.preset}
+                  </span>
+                  <p className="text-xs text-[#A7C7E7] leading-relaxed">
+                    {isEs
+                      ? `Practica en voz alta aplicando estas colocaciones: ${activeDayData.collocations.join(', ')}.`
+                      : `Speak freely applying these target collocations: ${activeDayData.collocations.join(', ')}.`}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileActivityOpen(false);
+                    handleLaunchTargetSimulator();
+                  }}
+                  className="w-full min-h-[46px] rounded-xl bg-[#E09B30] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Mic size={16} />
+                  <span>{t.microLearning.d3LaunchBtn}</span>
+                </button>
+              </div>
+            )}
+
+            {selectedDay === 3 && (
+              <div className="space-y-3">
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs text-[var(--text-primary)] leading-relaxed">
+                  {activeDayData.writingPrompt}
+                </div>
+                <textarea
+                  rows={5}
+                  value={localWriting}
+                  onChange={(e) => setLocalWriting(e.target.value)}
+                  placeholder={t.microLearning.writingPlaceholder}
+                  className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-[16px] font-inter focus:outline-none focus:border-[#E09B30]"
+                />
+                <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+                  <span>{wordCount} {t.microLearning.wordCount}</span>
+                  <span>{t.microLearning.minWords}</span>
+                </div>
+                <button
+                  type="button"
+                  disabled={!localWriting.trim()}
+                  onClick={() => {
+                    handleSaveWriting();
+                  }}
+                  className="w-full min-h-[46px] rounded-xl bg-[#E09B30] disabled:opacity-50 text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider cursor-pointer"
+                >
+                  {t.microLearning.d4SubmitBtn}
+                </button>
+                {day4Feedback && (
+                  <p className="p-3 rounded-xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] text-xs text-[var(--text-primary)]">
+                    {day4Feedback}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {selectedDay === 4 && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center">
+                    <span className="text-[10px] font-montserrat font-bold uppercase text-[var(--text-secondary)] block">
+                      {isEs ? 'Hábito' : 'Habit'}
+                    </span>
+                    <span className="font-montserrat font-black text-lg text-[#9A6515] dark:text-[#E09B30]">
+                      {completedStages.length}/5
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-center">
+                    <span className="text-[10px] font-montserrat font-bold uppercase text-[var(--text-secondary)] block">
+                      XP Total
+                    </span>
+                    <span className="font-montserrat font-black text-lg text-[var(--text-primary)]">
+                      +{totalXp} XP
+                    </span>
+                  </div>
+                </div>
+                <a
+                  href={generateWhatsAppReportMessage()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => completeStage(4)}
+                  className="w-full min-h-[46px] px-4 rounded-xl bg-[#E09B30] text-[#091326] font-montserrat font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                >
+                  <MessageCircle size={16} />
+                  <span>{t.microLearning.d5WhatsAppBtn}</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileActivityOpen(false);
+                    openReportModal();
+                  }}
+                  className="w-full min-h-[44px] rounded-xl border border-[var(--border-hairline)] text-xs font-montserrat font-bold text-[var(--text-primary)] cursor-pointer"
+                >
+                  {t.sprintDashboard.viewWeeklyReport}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* DESKTOP RICH DASHBOARD (>= 768px — Preserved & Brand-Palette Cleaned)     */}
+      {/* ========================================================================= */}
+      <div className="hidden md:block w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-8">
+      {/* 1. TOP COMMAND HEADER SLAB */}
       <div
         id="personalized-goal-header-card"
         className="p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] dark:bg-gradient-to-r dark:from-[#091326] dark:via-[#12223a] dark:to-[#1A3153] text-[var(--text-primary)] dark:text-[#FAFAFA] border border-[var(--border-hairline)] dark:border-[#E09B30]/40 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden transition-colors"
@@ -308,10 +705,10 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
           style={{ background: 'radial-gradient(circle, #E09B30 0%, transparent 70%)', filter: 'blur(30px)' }}
         />
 
-        {/* Left: Chibi Mascot with Ambient Frame & Dynamic Reactive Status Pill */}
+        {/* Left: Animated Mascot with Ambient Frame */}
         <div className="flex items-center gap-4 sm:gap-5 w-full lg:w-auto relative z-10">
           <div className="relative shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[var(--bg-sunken)] dark:bg-[#1A3153] border-2 border-[#E09B30] p-1 flex items-center justify-center shadow-lg shadow-[#E09B30]/20 overflow-hidden">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#E9F2FB] dark:bg-[#1A3153] border-2 border-[#E09B30] p-1 flex items-center justify-center shadow-lg shadow-[#E09B30]/20 overflow-hidden">
               <RiggedCharacter
                 persona="teacher-ivan"
                 state="idle"
@@ -319,7 +716,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 alt="Teacher Ivan Mascot"
               />
             </div>
-            <div className="absolute -bottom-1 -right-1 bg-[#E09B30] text-[#1A3153] p-1 rounded-full shadow-sm">
+            <div className="absolute -bottom-1 -right-1 bg-[#E09B30] text-[#091326] p-1 rounded-full shadow-sm">
               <Sparkles size={14} fill="currentColor" />
             </div>
           </div>
@@ -330,38 +727,34 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
                 {studentName}
               </h2>
               <span className="px-2.5 py-0.5 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 text-xs font-montserrat font-bold text-[var(--text-secondary)] dark:text-[#A7C7E7] inline-flex items-center gap-1">
-                <Globe size={11} className="text-[#E09B30]" />
+                <Globe size={11} className="text-[#9A6515] dark:text-[#E09B30]" />
                 <span>{getCountryFlag(userCountry)}</span>
               </span>
               {/* CEFR Level Badge */}
-              <span className="px-3 py-0.5 rounded-full bg-[#E09B30] text-[#1A3153] text-xs font-montserrat font-black tracking-wider uppercase">
+              <span className="px-3 py-0.5 rounded-full bg-[#1A3153] text-[#FAFAFA] dark:bg-[#E09B30] dark:text-[#091326] text-xs font-montserrat font-black tracking-wider uppercase">
                 {targetLevel} • {targetLevel === 'C1' ? (isEs ? 'AVANZADO' : 'ADVANCED') : targetLevel.startsWith('B') ? (isEs ? 'INTERMEDIO' : 'INTERMEDIATE') : (isEs ? 'INICIAL' : 'FOUNDATION')}
               </span>
-              {/* Active Plan Badge */}
+              {/* Active Plan Badge (WCAG AA Strict Brand Palette — Zero Green Gradients) */}
               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-montserrat font-extrabold tracking-wider uppercase border ${
-                userPlan === 'executive'
-                  ? 'bg-gradient-to-r from-emerald-500 to-[#E09B30] text-[#1A3153] border-[#E09B30]'
-                  : userPlan === 'pro'
-                  ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30]'
-                  : userPlan === 'essential'
-                  ? 'bg-[#A7C7E7]/20 text-[#A7C7E7] border-[#A7C7E7]/40'
-                  : 'bg-[#E09B30]/20 text-[#E09B30] border-[#E09B30]/40'
+                userPlan === 'executive' || userPlan === 'pro'
+                  ? 'bg-[#E09B30] text-[#091326] border-[#E09B30]'
+                  : 'bg-[#1A3153]/10 dark:bg-[#A7C7E7]/20 text-[#1A3153] dark:text-[#A7C7E7] border-[#1A3153]/25 dark:border-[#A7C7E7]/40'
               }`}>
                 {userPlan === 'executive'
-                  ? 'EXECUTIVE • 5 CLASES/SEM VIP'
+                  ? 'EXECUTIVE • 5 CLASES/SEM'
                   : userPlan === 'pro'
-                  ? 'PRO • 3 CLASES/SEM + 24/7'
+                  ? 'PRO • 3 CLASES/SEM'
                   : userPlan === 'essential'
-                  ? 'ESSENTIAL • AUTÓNOMO 24/7'
+                  ? 'ESSENTIAL • 24/7'
                   : 'FREE • 5 SESIONES/DÍA'}
               </span>
             </div>
 
-            {/* Dynamic Reactive Status Pill */}
+            {/* Clean WCAG AA Status Line */}
             <div className="flex items-center gap-2 pt-0.5 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-[10px] font-mono text-emerald-300 font-bold flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{isEs ? 'Inmersión Asincrónica 24/7 Activa' : '24/7 Async Immersion Active'}</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#1A3153]/10 dark:bg-[#A7C7E7]/15 border border-[#1A3153]/25 dark:border-[#A7C7E7]/35 text-[10px] font-mono text-[#1A3153] dark:text-[#A7C7E7] font-bold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E09B30]" />
+                <span>{isEs ? 'Inmersión 24/7 Activa' : '24/7 Immersion Active'}</span>
               </span>
               <span className="text-xs text-[var(--text-secondary)] dark:text-[#A7C7E7] font-medium">
                 <strong className="text-[var(--text-primary)] dark:text-[#FAFAFA]">{primaryGoal}</strong> • "{personalObjective}"
@@ -379,13 +772,13 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             </div>
             <div className="w-full h-3 rounded-full bg-[var(--bg-sunken)] dark:bg-[#1A3153] border border-[var(--border-hairline)] dark:border-[#A7C7E7]/25 overflow-hidden p-0.5">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#E09B30] to-[#10b981] transition-all duration-700 shadow-sm"
+                className="h-full rounded-full bg-[#E09B30] transition-all duration-700 shadow-sm"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
             <div className="flex justify-between items-center text-[11px] text-[var(--text-secondary)] dark:text-[#A7C7E7]">
               <span className="font-semibold">+{totalXp} XP {isEs ? 'ganados' : 'earned'}</span>
-              <span className="font-bold text-[#10b981] inline-flex items-center gap-1">
+              <span className="font-bold text-[#9A6515] dark:text-[#E09B30] inline-flex items-center gap-1">
                 <Flame size={12} className="text-[#E09B30]" />
                 <span>{completedStages.length} {isEs ? 'días de racha' : 'day streak'}</span>
               </span>
@@ -399,7 +792,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               onClick={() => setIsEditGoalsOpen(true)}
               className="px-4 py-2 rounded-xl border border-[var(--border-hairline)] dark:border-[#A7C7E7]/30 bg-[var(--bg-sunken)] dark:bg-[#1A3153] hover:opacity-80 text-[var(--text-primary)] dark:text-[#FAFAFA] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
-              <Edit3 size={13} className="text-[#E09B30]" />
+              <Edit3 size={13} className="text-[#9A6515] dark:text-[#E09B30]" />
               <span>{t.microLearning.editGoals}</span>
             </button>
 
@@ -407,7 +800,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
               type="button"
               id="sprint-book-class-quick-btn"
               onClick={() => setActiveView('schedule')}
-              className="px-4 py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#1A3153] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#E09B30] hover:bg-[#c88624] text-[#091326] text-xs font-montserrat font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
               <Calendar size={13} />
               <span>{isEs ? 'Agendar Clase' : 'Book Class'}</span>
@@ -608,49 +1001,17 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#E09B30] animate-pulse" />
-            <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[#FAFAFA] tracking-tight">
+            <h3 className="font-montserrat font-extrabold text-base sm:text-lg text-[var(--text-primary)] tracking-tight">
               {isEs ? 'Ruta de Aprendizaje Semanal (D1 a D5)' : '5-Day Weekly Habit Journey (D1 to D5)'}
             </h3>
           </div>
-          <span className="text-xs text-[#A7C7E7] font-medium hidden sm:inline">
+          <span className="text-xs text-[var(--text-secondary)] font-medium hidden sm:inline">
             {isEs ? 'Haz clic en cada día para abrir su actividad inline ↓' : 'Click any day to launch its inline activity ↓'}
           </span>
         </div>
 
-        {/* Mobile Horizontal Stepper (< 768px): min-h-[44px] touch pills */}
-        <div className="md:hidden flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-1">
-          {dayTabs.map((day) => {
-            const Icon = day.icon;
-            const isSelected = selectedDay === day.id;
-            const isCompleted = completedStages.includes(day.id);
-
-            return (
-              <button
-                key={day.id}
-                type="button"
-                onClick={() => setSelectedDay(day.id)}
-                className={`min-h-[44px] px-3.5 py-2 rounded-xl border flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#E09B30] text-[#1A3153] border-[#E09B30] font-black shadow-md'
-                    : isCompleted
-                    ? 'bg-[#12223a]/90 text-[#10b981] border-[#10b981]/50'
-                    : 'bg-[#12223a]/70 text-[#A7C7E7] border-[#A7C7E7]/25 hover:border-[#A7C7E7]/50'
-                }`}
-              >
-                <Icon size={15} />
-                <span className="font-montserrat font-bold text-xs uppercase tracking-wider">{day.label}</span>
-                {isCompleted ? (
-                  <CheckCircle2 size={13} className="text-[#10b981]" />
-                ) : (
-                  <span className="text-[10px] opacity-70">10m</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Desktop 5-Day Stepper Cards (>= 768px) */}
-        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 lg:grid-cols-5 gap-3">
           {dayTabs.map((day) => {
             const Icon = day.icon;
             const isSelected = selectedDay === day.id;
@@ -1102,6 +1463,7 @@ export const WeeklySprintDashboard: React.FC<WeeklySprintDashboardProps> = ({
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

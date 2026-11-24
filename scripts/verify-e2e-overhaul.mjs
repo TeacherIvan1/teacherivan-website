@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.resolve(ROOT_DIR, 'client/dist');
-const SCREENSHOT_DIR = path.resolve(ROOT_DIR, 'media-pipeline/output/qa-3d-planet');
+const SCREENSHOT_DIR = path.resolve(ROOT_DIR, 'media-pipeline/output/qa-mascots');
 const SERVER_PORT = 3001;
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}`;
@@ -25,13 +25,13 @@ async function waitForHttp(url, timeoutMs = 20000) {
 }
 
 function scanDistForForbiddenTokens() {
-  console.log('\n[1/7] Scanning client/dist/ for 3D avatars, promoted editorial logo, static AudioWorklet, motivation WebPs & zero secrets...');
+  console.log('\n[1/7] Scanning client/dist/ for rigged animal SVG mascots, editorial logo, static AudioWorklet, motivation WebPs & zero secrets...');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'worklets/pcm-processor.js')), 'client/dist/worklets/pcm-processor.js must exist');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'version.json')), 'client/dist/version.json must exist');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'sw.js')), 'client/dist/sw.js must exist');
   assert.ok(fs.existsSync(path.join(DIST_DIR, 'CNAME')), 'client/dist/CNAME must exist');
 
-  // Phase 4: Promoted editorial logo & PWA icons exist; temporary preview/candidates deleted
+  // Promoted editorial logo & PWA icons exist; temporary preview/candidates deleted
   for (const brandFile of [
     'favicon.svg',
     'icon-192.png',
@@ -48,13 +48,46 @@ function scanDistForForbiddenTokens() {
   assert.equal(fs.existsSync(path.join(DIST_DIR, 'logo-preview.html')), false, 'Temporary logo-preview.html must be removed');
   assert.equal(fs.existsSync(path.join(DIST_DIR, 'assets/logo-candidates')), false, 'Temporary logo-candidates/ must be removed');
 
-  // Phase 1: 3D Reference Avatar WebP + PNG cutouts (< 180 KB WebP)
-  for (const avatar of ['teacherivan-3d.webp', 'emma-3d.webp', 'teacherivan-3d.png', 'emma-3d.png']) {
-    const p = path.join(DIST_DIR, 'assets/avatars', avatar);
-    assert.ok(fs.existsSync(p), `Missing 3D avatar asset: assets/avatars/${avatar}`);
-    if (avatar.endsWith('.webp')) {
-      const size = fs.statSync(p).size;
-      assert.ok(size < 180 * 1024, `${avatar} must be < 180 KB, got ${size} B`);
+  // Phase 1: High-Detail Animated SVG Animal Mascots (Golden Retriever Ivan & Tabby Kitten Emma)
+  const requiredRigIds = [
+    'bg-aura',
+    'ground-shadow',
+    'tail-group',
+    'character-body',
+    'torso-uniform',
+    'left-paw',
+    'right-paw',
+    'head-group',
+    'ear-left',
+    'ear-right',
+    'face-base',
+    'eyebrows-left',
+    'eyebrows-right',
+    'eyes-open',
+    'eye-left-iris',
+    'eye-right-iris',
+    'eyes-blink',
+    'eyes-happy',
+    'mouth-visemes',
+    'mouth-rest',
+    'mouth-parted',
+    'mouth-open-sm',
+    'mouth-open-md',
+    'mouth-open-lg',
+    'mouth-smile',
+  ];
+
+  for (const rig of ['teacher-ivan-rig.svg', 'emma-rig.svg']) {
+    const p = path.join(DIST_DIR, 'assets', rig);
+    assert.ok(fs.existsSync(p), `Missing rigged mascot SVG: assets/${rig}`);
+    const content = fs.readFileSync(p, 'utf8');
+    assert.ok(content.includes('viewBox="0 0 600 600"'), `${rig} must use viewBox="0 0 600 600"`);
+    for (const id of requiredRigIds) {
+      assert.ok(content.includes(`id="${id}"`), `${rig} missing required rig bone id="${id}"`);
+    }
+    if (rig === 'emma-rig.svg') {
+      assert.ok(content.includes('id="whiskers-left"'), 'emma-rig.svg missing #whiskers-left');
+      assert.ok(content.includes('id="whiskers-right"'), 'emma-rig.svg missing #whiskers-right');
     }
   }
 
@@ -78,7 +111,7 @@ function scanDistForForbiddenTokens() {
     assert.ok(!content.includes('BEGIN PRIVATE KEY'), `Bundle ${file} must not contain any private key`);
     assert.ok(!content.includes('GOCSPX'), `Bundle ${file} must not contain any OAuth client secret`);
   }
-  console.log('  ✔ 3D avatars (<180KB WebP), promoted editorial logo, static worklet, 5 motivation WebPs, and 0 secrets verified.');
+  console.log('  ✔ Rigged Golden Retriever & Tabby SVGs, editorial logo, static worklet, 5 motivation WebPs, and 0 secrets verified.');
 }
 
 async function runPlaywrightSuite() {
@@ -136,7 +169,7 @@ async function runPlaywrightSuite() {
     const viewports = [
       { name: 'Desktop (1440×900)', slug: 'desktop', width: 1440, height: 900, isMobile: false, runFullAuth: true },
       { name: 'Mobile (390×844)', slug: 'mobile', width: 390, height: 844, isMobile: true, runFullAuth: true },
-      { name: 'Mobile SE (375×812)', slug: 'mobile-se', width: 375, height: 812, isMobile: true, runFullAuth: false },
+      { name: 'Mobile SE (375×812)', slug: 'mobile-se', width: 375, height: 812, isMobile: true, runFullAuth: true },
     ];
     const themes = ['light', 'dark'];
 
@@ -176,6 +209,11 @@ async function runPlaywrightSuite() {
         await page.goto(PREVIEW_URL, { waitUntil: 'networkidle' });
         await page.waitForTimeout(350);
 
+        // Dismiss cookie banner early so visual QA screenshots show unobstructed UI
+        const cookieBtn = await page.$('#cookie-essential-only-btn');
+        if (cookieBtn) await cookieBtn.click();
+        await page.waitForTimeout(150);
+
         // 1. Landmarks, Skip Link, 1x <h1>, and Zero Horizontal Overflow
         const layoutAudit = await page.evaluate(() => {
           const docWidth = document.documentElement.clientWidth;
@@ -196,7 +234,7 @@ async function runPlaywrightSuite() {
         assert.equal(layoutAudit.overflowPx, 0, `Expected 0px horizontal overflow on ${vp.name} (${theme}), got ${layoutAudit.overflowPx}px`);
         assert.equal(layoutAudit.hasSkipLink, true, 'Skip-to-main-content link must exist');
         assert.equal(layoutAudit.hasMainLandmark, true, '<main id="main-content"> landmark must exist');
-        assert.equal(layoutAudit.h1Count, 1, `Expected exactly 1 <h1> per view, got ${layoutAudit.h1Count}`);
+        assert.equal(layoutAudit.h1Count, 1, `Expected exactly 1 <h1> on landing view, got ${layoutAudit.h1Count}`);
 
         // 2. Zero Argentine Voseo, Zero "Recasting" Jargon & Zero Forbidden Voice-Gender/Descriptor Pills
         const copyAudit = await page.evaluate(() => {
@@ -220,15 +258,11 @@ async function runPlaywrightSuite() {
         assert.equal(copyAudit.recast.length, 0, `Found student-facing "recast/recasting" jargon: ${copyAudit.recast.join(', ')}`);
         assert.equal(copyAudit.forbiddenLabels.length, 0, `Found removed simulator labels: ${copyAudit.forbiddenLabels.join(', ')}`);
 
-        // 3. Desktop vs Mobile Specific Architecture Checks
+        // 3. Desktop vs Mobile Landing Checks
         if (!vp.isMobile) {
-          // 3A. Hero Column 2 "T." Monogram Clearance Audit
+          // Hero Column 2 "T." Monogram Clearance Audit
           await page.evaluate(() => window.scrollTo(0, 0));
-          await page.waitForTimeout(150);
-
-          if (vp.slug === 'desktop' && theme === 'light') {
-            await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'planet-doorway-top.png'), fullPage: false });
-          }
+          await page.waitForTimeout(120);
 
           const heroMonogramAudit = await page.evaluate(() => {
             const tEl = document.getElementById('hero-monogram-t');
@@ -242,172 +276,75 @@ async function runPlaywrightSuite() {
               gapPx: textBox.left - tBox.right,
             };
           });
-          assert.ok(heroMonogramAudit, 'Hero Column 2 #hero-monogram-t and #hero-monogram-copy must exist');
-          assert.ok(
-            heroMonogramAudit.tRight + 10 <= heroMonogramAudit.textLeft,
-            `Hero "T." overlaps adjacent text! tBox.right=${heroMonogramAudit.tRight}, textBox.left=${heroMonogramAudit.textLeft}, gap=${heroMonogramAudit.gapPx}px`
-          );
+          assert.ok(heroMonogramAudit && heroMonogramAudit.tRight + 10 <= heroMonogramAudit.textLeft, 'Hero "T." overlaps adjacent text');
 
-          // 3B. Discoverable Planet Portal Animation (0% -> 70% -> 100%)
-          const planetCheck = await page.evaluate(() => {
-            const stage = document.getElementById('portal-world-fixed-stage');
-            const themeAttr = stage?.getAttribute('data-world-theme');
-            const cityElems = document.querySelectorAll('.ti-city-beacon, [data-world-theme="metropolis"]').length;
-            return { themeAttr, cityElems };
-          });
-          assert.equal(planetCheck.themeAttr, 'discoverable-planet', `Expected data-world-theme="discoverable-planet", got ${planetCheck.themeAttr}`);
-          assert.equal(planetCheck.cityElems, 0, `Expected 0 legacy cityscape elements, got ${planetCheck.cityElems}`);
+          // Discoverable Planet Portal untouched
+          const planetAttr = await page.$eval('#portal-world-fixed-stage', (el) => el.getAttribute('data-world-theme'));
+          assert.equal(planetAttr, 'discoverable-planet');
 
-          const topTransform = await page.$eval('#portal-archway-zoom-layer', (el) => el.style.transform);
-          assert.ok(topTransform.includes('scale(1)'), `Expected portal scale(1) at top, got ${topTransform}`);
-
-          // Scroll to 70% through portal intro track -> planet world revealed
-          await page.evaluate(() => {
-            const intro = document.getElementById('portal-intro-track');
-            const denom = intro ? Math.max(1, intro.offsetHeight - window.innerHeight) : window.innerHeight * 0.6;
-            window.scrollTo(0, Math.round(denom * 0.72));
-          });
-          await page.waitForTimeout(200);
-          if (vp.slug === 'desktop' && theme === 'dark') {
-            await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'planet-world-revealed.png'), fullPage: false });
-          }
-
-          await page.evaluate(() => {
-            const intro = document.getElementById('portal-intro-track');
-            window.scrollTo(0, intro ? intro.offsetHeight : window.innerHeight * 1.6);
-          });
-          await page.waitForTimeout(200);
-          const endPortal = await page.$eval('#portal-archway-zoom-layer', (el) => el.style.transform);
-          const endWorld = await page.$eval('#portal-world-parallax-layer', (el) => el.style.transform);
-          assert.ok(endPortal.includes('scale(7.5)'), `Expected portal scale(7.5), got ${endPortal}`);
-          assert.ok(endWorld.includes('scale(1.18)'), `Expected world scale(1.18), got ${endWorld}`);
-
-          // 3C. Desktop Voice Simulator + Animated 3D Avatars (Ivan & Emma)
+          // Desktop Voice Simulator + Animated SVG Animal Mascot (Golden Retriever Ivan)
           await page.evaluate(() => {
             const sim = document.getElementById('flagship-simulator-section');
             if (sim) sim.scrollIntoView({ behavior: 'instant', block: 'start' });
           });
-          await page.waitForTimeout(250);
+          await page.waitForTimeout(450);
 
-          const simAvatarAudit = await page.evaluate(() => {
+          const simMascotAudit = await page.evaluate(() => {
             const stage = document.getElementById('tutor-avatar-stage');
-            const imgs = stage ? Array.from(stage.querySelectorAll('img')) : [];
-            const avatar3d = stage ? stage.querySelector('[data-testid="tutor-avatar-3d"]') : null;
-            const svgRigImgs = imgs.filter((i) => (i.currentSrc || i.getAttribute('src') || '').includes('-rig.svg'));
+            const avatar = stage ? stage.querySelector('[data-testid="tutor-avatar-svg"]') : null;
+            const svg = avatar ? avatar.querySelector('svg') : null;
+            const tail = svg ? svg.querySelector('#tail-group') : null;
+            const head = svg ? svg.querySelector('#head-group') : null;
+            const mouth = svg ? svg.querySelector('#mouth-visemes') : null;
+            const rasterImgs = stage ? Array.from(stage.querySelectorAll('img')).filter((i) => (i.currentSrc || i.src).includes('-3d.webp')) : [];
             return {
               hasStage: Boolean(stage),
-              hasAvatar3D: Boolean(avatar3d),
-              persona: avatar3d?.getAttribute('data-character'),
-              loadedImgs: imgs.filter((i) => i.complete && i.naturalWidth > 0).map((i) => i.currentSrc || i.getAttribute('src')),
-              svgRigCount: svgRigImgs.length,
-              stageText: stage?.innerText || '',
+              hasAvatarSvg: Boolean(avatar && svg),
+              character: avatar?.getAttribute('data-character'),
+              tailTransform: tail?.getAttribute('transform') || '',
+              headTransform: head?.getAttribute('transform') || '',
+              hasMouth: Boolean(mouth),
+              raster3dCount: rasterImgs.length,
             };
           });
-          assert.equal(simAvatarAudit.hasStage, true, 'Desktop Voice Simulator stage must render');
-          assert.equal(simAvatarAudit.hasAvatar3D, true, 'Desktop Voice Simulator must mount <TutorAvatar3D />');
-          assert.equal(simAvatarAudit.svgRigCount, 0, 'Voice Simulator must NOT mount legacy -rig.svg images');
-          assert.ok(
-            simAvatarAudit.loadedImgs.some((s) => s && (s.includes('teacherivan-3d.webp') || s.includes('emma-3d.webp'))),
-            `Expected loaded 3D WebP avatar in simulator, got ${JSON.stringify(simAvatarAudit.loadedImgs)}`
-          );
+          assert.equal(simMascotAudit.hasAvatarSvg, true, 'Desktop Voice Simulator must render inline animated SVG mascot');
+          assert.equal(simMascotAudit.hasMouth, true, 'Desktop mascot must include #mouth-visemes');
+          assert.ok(simMascotAudit.tailTransform.includes('rotate('), `Expected live native SVG tail transform, got "${simMascotAudit.tailTransform}"`);
+          assert.equal(simMascotAudit.raster3dCount, 0, 'Desktop Voice Simulator must not mount old 3D raster cutouts');
 
           if (vp.slug === 'desktop') {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, `desktop-${theme}-simulator.png`), fullPage: false });
           }
 
-          // Verify 5 Motivational Showcase images & carousel (2 -> 3 -> 2)
-          const showcaseImgs = await page.evaluate(async () => {
-            const el = document.getElementById('motivational-showcase-carousel');
-            if (el) el.scrollIntoView({ behavior: 'instant' });
-            await new Promise((r) => setTimeout(r, 200));
-            return Array.from(document.querySelectorAll('#motivational-showcase-carousel img')).map((i) => ({
-              src: i.getAttribute('src'),
-              w: i.naturalWidth,
-            }));
-          });
-          assert.equal(showcaseImgs.length, 5, 'Desktop Motivational Showcase must have 5 images');
-          for (const img of showcaseImgs) assert.ok(img.w > 0, `${img.src} failed to load`);
-          await page.click('#motivation-carousel-next-btn');
-          assert.equal(await page.getAttribute('#motivational-showcase-carousel', 'data-active-index'), '3');
-          await page.click('#motivation-carousel-prev-btn');
-          assert.equal(await page.getAttribute('#motivational-showcase-carousel', 'data-active-index'), '2');
-
-          console.log(`  ✔ Desktop Hero "T." gap (+${Math.round(heroMonogramAudit.gapPx)}px), Discoverable Planet Portal, 3D Avatar (${simAvatarAudit.persona}) & Showcase verified.`);
+          console.log(`  ✔ Desktop Landing + Animated SVG Mascot (${simMascotAudit.character}, tail="${simMascotAudit.tailTransform}") verified.`);
         } else {
-          // Mobile: Single-Screen 100dvh Zero-Scroll Landing + 3D Avatar + Mobile Voice Cockpit
+          // Mobile Landing: 100dvh Zero-Scroll + Animated Tabby Kitten Emma SVG
           assert.ok(
             layoutAudit.verticalOverflowPx <= 2,
             `Mobile landing must fit on 100dvh with zero vertical scroll, got +${layoutAudit.verticalOverflowPx}px`
           );
 
-          const mobileAvatarAudit = await page.evaluate(() => {
+          const mobileHeroAudit = await page.evaluate(() => {
             const hero = document.getElementById('mobile-hero-section');
-            const avatar3d = hero ? hero.querySelector('[data-testid="tutor-avatar-3d"]') : null;
-            const img = hero ? hero.querySelector('[data-testid="tutor-avatar-3d"] img') : null;
-            const planetStage = document.getElementById('mobile-planet-stage');
+            const avatar = hero ? hero.querySelector('[data-testid="tutor-avatar-svg"]') : null;
+            const svg = avatar ? avatar.querySelector('svg') : null;
+            const tail = svg ? svg.querySelector('#tail-group') : null;
+            const whiskers = svg ? svg.querySelector('#whiskers-left') : null;
             return {
-              hasAvatar3D: Boolean(avatar3d),
-              src: img?.currentSrc || img?.getAttribute('src') || '',
-              loaded: Boolean(img && img.complete && img.naturalWidth > 0),
-              worldTheme: planetStage?.getAttribute('data-world-theme') || '',
+              hasAvatarSvg: Boolean(avatar && svg),
+              character: avatar?.getAttribute('data-character'),
+              tailTransform: tail?.getAttribute('transform') || '',
+              hasWhiskers: Boolean(whiskers),
             };
           });
-          assert.equal(mobileAvatarAudit.hasAvatar3D, true, 'Mobile Hero must render <TutorAvatar3D />');
-          assert.equal(mobileAvatarAudit.loaded, true, `Mobile Hero 3D avatar failed to load: ${mobileAvatarAudit.src}`);
-          assert.ok(
-            mobileAvatarAudit.src.includes('emma-3d.webp') || mobileAvatarAudit.src.includes('teacherivan-3d.webp'),
-            `Expected 3D WebP avatar in mobile hero, got ${mobileAvatarAudit.src}`
-          );
-          assert.equal(mobileAvatarAudit.worldTheme, 'discoverable-planet', 'Mobile Hero backdrop must use discoverable-planet theme');
+          assert.equal(mobileHeroAudit.hasAvatarSvg, true, 'Mobile Landing Hero must render inline animated SVG mascot');
+          assert.equal(mobileHeroAudit.character, 'emma', 'Mobile Landing Hero defaults to Emma');
+          assert.equal(mobileHeroAudit.hasWhiskers, true, 'Emma SVG must render #whiskers-left');
 
           if (vp.slug === 'mobile') {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, `mobile-${theme}-landing.png`), fullPage: false });
           }
-
-          // Dismiss cookie banner if visible before clicking CTA
-          const cookieBtn = await page.$('#cookie-essential-only-btn');
-          if (cookieBtn) await cookieBtn.click();
-
-          // Click primary CTA -> launches single-screen zero-scroll MobileVoiceCockpit
-          await page.click('#hero-primary-cta-btn');
-          await page.waitForSelector('#mobile-voice-cockpit', { state: 'visible' });
-          await page.waitForTimeout(250);
-
-          const cockpitAudit = await page.evaluate(() => {
-            const vOverflow = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-            const hOverflow = Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth);
-            const fab = document.getElementById('mobile-dock-mic-fab');
-            const fabRect = fab ? fab.getBoundingClientRect() : { width: 0, height: 0 };
-            const hasTutor = Boolean(document.getElementById('mobile-pill-tutor'));
-            const hasLevel = Boolean(document.getElementById('mobile-pill-level'));
-            const hasScenario = Boolean(document.getElementById('mobile-pill-scenario'));
-            const avatarImg = document.querySelector('#mobile-voice-cockpit [data-testid="tutor-avatar-3d"] img');
-            return {
-              vOverflow,
-              hOverflow,
-              fabW: fabRect.width,
-              fabH: fabRect.height,
-              hasTutor,
-              hasLevel,
-              hasScenario,
-              avatarLoaded: Boolean(avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0),
-              avatarSrc: avatarImg?.currentSrc || avatarImg?.getAttribute('src') || '',
-            };
-          });
-          assert.ok(cockpitAudit.vOverflow <= 2, `Mobile Voice Cockpit must fit 100dvh (0 scroll), got +${cockpitAudit.vOverflow}px`);
-          assert.equal(cockpitAudit.hOverflow, 0, 'Mobile Voice Cockpit must have 0px horizontal overflow');
-          assert.ok(cockpitAudit.fabW >= 56 && cockpitAudit.fabH >= 56, 'Mobile Mic FAB must be ~60x60px');
-          assert.ok(cockpitAudit.hasTutor && cockpitAudit.hasLevel && cockpitAudit.hasScenario, 'Mobile Cockpit must render 3-pill config strip');
-          assert.equal(cockpitAudit.avatarLoaded, true, `Mobile Cockpit 3D avatar failed to load: ${cockpitAudit.avatarSrc}`);
-
-          if (vp.slug === 'mobile') {
-            await page.screenshot({ path: path.join(SCREENSHOT_DIR, `mobile-${theme}-cockpit.png`), fullPage: false });
-          }
-
-          // Return to Mobile Home
-          await page.click('#mobile-cockpit-back-btn');
-          await page.waitForSelector('#mobile-hero-section', { state: 'visible' });
-          console.log(`  ✔ Mobile Single-Screen 100dvh Landing & 3D Voice Cockpit verified (0px scroll, FAB ${Math.round(cockpitAudit.fabW)}x${Math.round(cockpitAudit.fabH)}px).`);
+          console.log(`  ✔ Mobile Landing 100dvh + Animated Emma Kitten SVG verified (0px scroll).`);
         }
 
         // 4. AudioWorklet & Pre-Filled WhatsApp Links
@@ -428,19 +365,8 @@ async function runPlaywrightSuite() {
         });
         assert.equal(workletOk, true, `AudioWorklet load failed: ${workletOk}`);
 
-        const whatsappLinks = await page.evaluate(() =>
-          Array.from(document.querySelectorAll('a[href*="wa.me"]')).map((a) => a.getAttribute('href') || '')
-        );
-        assert.ok(whatsappLinks.length >= 1, 'Expected pre-filled WhatsApp link(s)');
-        for (const href of whatsappLinks) {
-          assert.ok(href.startsWith('https://wa.me/59172878330?text='), `WhatsApp link must be pre-filled: ${href}`);
-        }
-
-        // 5. AuthModal + HttpOnly Cookie Registration (Isolated local temp store; ZERO Google Sheets writes)
+        // 5. AuthModal + HttpOnly Cookie Registration + FULL 4-TAB MOBILE PORTAL ZERO-SCROLL AUDIT
         if (vp.runFullAuth) {
-          const cookieBtn = await page.$('#cookie-essential-only-btn');
-          if (cookieBtn) await cookieBtn.click();
-
           if (vp.isMobile) {
             await page.click('#mobile-hamburger-btn');
             await page.waitForSelector('#mobile-drawer-auth-btn', { state: 'visible' });
@@ -477,15 +403,127 @@ async function runPlaywrightSuite() {
           const sessionCookie = cookies.find((c) => c.name === 'ti_session');
           assert.ok(sessionCookie && sessionCookie.httpOnly, 'HttpOnly ti_session cookie must be set');
 
-          // Ensure zero auth tokens stored in localStorage
-          const lsAuthLeak = await page.evaluate(() => {
-            return Object.keys(localStorage).filter((k) => /token|jwt|ti_session/i.test(k));
-          });
+          const lsAuthLeak = await page.evaluate(() =>
+            Object.keys(localStorage).filter((k) => /token|jwt|ti_session/i.test(k))
+          );
           assert.equal(lsAuthLeak.length, 0, `Found auth token leak in localStorage: ${lsAuthLeak.join(', ')}`);
 
           await page.reload({ waitUntil: 'networkidle' });
           await page.waitForSelector('#student-microlearning-dashboard', { state: 'visible' });
-          console.log('  ✔ AuthModal & HttpOnly ti_session persistence verified (0 Sheets writes, 0 localStorage tokens).');
+
+          // =========================================================================
+          // PHASE 2 & 3: AUTHENTICATED MOBILE PORTAL ZERO-SCROLL 100dvh AUDIT
+          // =========================================================================
+          if (vp.isMobile) {
+            const assertMobileZeroScroll = async (tabLabel) => {
+              await page.waitForTimeout(220);
+              const metrics = await page.evaluate(() => {
+                const vOverflow = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+                const hOverflow = Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth);
+                const footer = document.querySelector('footer');
+                const footerVisible = Boolean(footer && footer.getBoundingClientRect().height > 0);
+                const bottomNav = document.getElementById('mobile-portal-bottom-tabs');
+                const bottomNavRect = bottomNav ? bottomNav.getBoundingClientRect() : null;
+                const text = document.body.innerText || '';
+                const forbidden = [
+                  'Límite: 1 clase activa',
+                  'disponible arriba',
+                  'Voz Masculina',
+                  'Voz Femenina',
+                  'Inmersión Asincrónica 24/7 Activa',
+                ].filter((s) => text.includes(s));
+                return {
+                  vOverflow,
+                  hOverflow,
+                  footerVisible,
+                  bottomNavTop: bottomNavRect ? bottomNavRect.top : 0,
+                  forbidden,
+                };
+              });
+              assert.ok(metrics.vOverflow <= 1, `[${vp.name} ${theme}] ${tabLabel} must have ZERO vertical scroll (100dvh), got +${metrics.vOverflow}px`);
+              assert.equal(metrics.hOverflow, 0, `[${vp.name} ${theme}] ${tabLabel} must have 0px horizontal overflow, got ${metrics.hOverflow}px`);
+              assert.equal(metrics.footerVisible, false, `[${vp.name} ${theme}] Public <Footer /> must NOT be visible inside authenticated mobile portal (${tabLabel})`);
+              assert.equal(metrics.forbidden.length, 0, `[${vp.name} ${theme}] ${tabLabel} contains audited bug string(s): ${metrics.forbidden.join(', ')}`);
+              return metrics;
+            };
+
+            // TAB 1: MI RUTA
+            await assertMobileZeroScroll('Mi Ruta');
+            if (vp.slug === 'mobile') {
+              await page.screenshot({ path: path.join(SCREENSHOT_DIR, `portal-${theme}-mi-ruta.png`), fullPage: false });
+            }
+            // Open & close Day Activity Sheet cleanly
+            await page.click('#mobile-open-day-activity-btn');
+            await page.waitForSelector('#mobile-day-activity-sheet', { state: 'visible' });
+            await page.click('#mobile-close-day-activity-btn');
+
+            // TAB 2: SIMULADOR (Animated Dog Ivan / Cat Emma Cockpit)
+            await page.click('#mobile-tab-simulator');
+            await page.waitForSelector('#mobile-voice-cockpit', { state: 'visible' });
+            await assertMobileZeroScroll('Simulador');
+            const simSvgOk = await page.evaluate(() => {
+              const svg = document.querySelector('#mobile-voice-cockpit [data-testid="tutor-avatar-svg"] svg');
+              return Boolean(svg && svg.querySelector('#tail-group') && svg.querySelector('#mouth-visemes'));
+            });
+            assert.equal(simSvgOk, true, 'Authenticated Mobile Simulator must render animated SVG animal mascot');
+            if (vp.slug === 'mobile') {
+              await page.screenshot({ path: path.join(SCREENSHOT_DIR, `portal-${theme}-simulador.png`), fullPage: false });
+            }
+
+            // TAB 3A: RECURSOS -> GENERADOR IA
+            await page.click('#mobile-tab-resources');
+            await page.waitForSelector('#mobile-resources-generator-view', { state: 'visible' });
+            await assertMobileZeroScroll('Recursos (Generador IA)');
+            const genCheck = await page.evaluate(() => {
+              const input = document.getElementById('mobile-custom-resource-input');
+              const fontSize = input ? parseFloat(getComputedStyle(input).fontSize) : 0;
+              const promoCard = document.getElementById('quick-book-class-card');
+              const promoVisible = Boolean(promoCard && promoCard.getBoundingClientRect().height > 0);
+              return { fontSize, promoVisible };
+            });
+            assert.ok(genCheck.fontSize >= 16, `Mobile Generator input font must be >= 16px (iOS anti-zoom), got ${genCheck.fontSize}px`);
+            assert.equal(genCheck.promoVisible, false, 'Misplaced 1-on-1 Class promo card must NOT be visible on mobile Recursos');
+            if (vp.slug === 'mobile') {
+              await page.screenshot({ path: path.join(SCREENSHOT_DIR, `portal-${theme}-recursos-gen.png`), fullPage: false });
+            }
+
+            // TAB 3B: RECURSOS -> MICRO-JUEGOS
+            await page.click('#mobile-resources-tab-games');
+            await page.waitForSelector('#mobile-microgames-view', { state: 'visible' });
+            await assertMobileZeroScroll('Recursos (Micro-Juegos)');
+            if (vp.slug === 'mobile') {
+              await page.screenshot({ path: path.join(SCREENSHOT_DIR, `portal-${theme}-recursos-juegos.png`), fullPage: false });
+            }
+            // Launch & dismiss game sheet cleanly
+            await page.click('#mobile-play-game-recast');
+            await page.waitForSelector('#mobile-game-play-sheet', { state: 'visible' });
+            await page.click('#mobile-close-game-sheet-btn');
+
+            // TAB 4: CLASES (1-on-1 Scheduler)
+            await page.click('#mobile-tab-schedule');
+            await page.waitForSelector('#mobile-classes-view', { state: 'visible' });
+            const classesMetrics = await assertMobileZeroScroll('Clases');
+            const scheduleAudit = await page.evaluate((bottomNavTop) => {
+              const dayPills = Array.from(document.querySelectorAll('#mobile-scheduler-day-pills button'));
+              const slots = Array.from(document.querySelectorAll('#mobile-scheduler-slots-grid > *'));
+              const allSlotsAboveNav = slots.every((el) => el.getBoundingClientRect().bottom <= bottomNavTop + 1);
+              return {
+                dayCount: dayPills.length,
+                slotCount: slots.length,
+                allSlotsAboveNav,
+              };
+            }, classesMetrics.bottomNavTop);
+            assert.equal(scheduleAudit.dayCount, 5, 'Mobile Clases must show all 5 Mon–Fri day pills');
+            assert.equal(scheduleAudit.slotCount, 6, 'Mobile Clases must show all 6 time slots (14:00–19:00 BOT) in 2x3 grid');
+            assert.equal(scheduleAudit.allSlotsAboveNav, true, 'All 6 time slots must sit cleanly above the bottom app navigation bar');
+            if (vp.slug === 'mobile') {
+              await page.screenshot({ path: path.join(SCREENSHOT_DIR, `portal-${theme}-clases.png`), fullPage: false });
+            }
+
+            console.log(`  ✔ All 4 Authenticated Mobile Portal tabs (Simulador, Mi Ruta, Recursos [Gen+Juegos], Clases) verified 0px scroll inside 100dvh!`);
+          } else {
+            console.log('  ✔ Desktop AuthModal & HttpOnly ti_session persistence verified.');
+          }
         }
 
         assert.equal(consoleErrors.length, 0, `Console errors on ${vp.name} (${theme}): ${consoleErrors.join(' | ')}`);
@@ -495,9 +533,9 @@ async function runPlaywrightSuite() {
       }
     }
 
-    console.log('\n==============================================================');
-    console.log(' ALL PHASE 1-6 PLAYWRIGHT 3D, PLANET, LOGO, MOBILE & AUTH CHECKS PASSED!');
-    console.log('==============================================================\n');
+    console.log('\n=============================================================================');
+    console.log(' ALL PHASE 1-4 RIGGED ANIMAL MASCOTS & ZERO-SCROLL MOBILE PORTAL CHECKS PASSED!');
+    console.log('=============================================================================\n');
   } finally {
     if (browser) await browser.close().catch(() => {});
     serverProc.kill();

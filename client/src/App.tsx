@@ -84,7 +84,13 @@ export const App: React.FC = () => {
 
   return (
     <CookieConsentProvider>
-      <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col font-inter transition-colors duration-200">
+      <div
+        className={`bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col font-inter transition-colors duration-200 ${
+          isAuthenticated
+            ? 'fixed inset-0 h-[100dvh] w-full overflow-hidden md:static md:inset-auto md:h-auto md:min-h-screen md:overflow-visible'
+            : 'min-h-screen'
+        }`}
+      >
         {/* WCAG 2.4.1 Bypass Blocks: Visible-on-focus skip link */}
         <a href="#main-content" className="skip-to-main-link">
           {isEs ? 'Saltar al contenido principal' : 'Skip to main content'}
@@ -105,10 +111,16 @@ export const App: React.FC = () => {
         {/* Bilingual Privacy Policy & Cookie Policy Modal (#privacy / #cookies) */}
         <LegalModal />
 
-        {/* Authenticated Student Workspace Header */}
+        {/* Authenticated Student Workspace Header (Fixed 52px mobile / 68px desktop) */}
         {isAuthenticated && <Header />}
 
-        <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col focus:outline-none">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className={`flex-1 flex flex-col focus:outline-none ${
+            isAuthenticated ? 'min-h-0 overflow-hidden md:overflow-visible' : ''
+          }`}
+        >
           {/* ========================================================================= */}
           {/* NON-REGISTERED (GUEST) VIEW: AURAGATE-INSPIRED PORTAL ZOOM LANDING PAGE   */}
           {/* ========================================================================= */}
@@ -117,36 +129,45 @@ export const App: React.FC = () => {
           ) : (
             /* ========================================================================= */
             /* REGISTERED USERS VIEW: ROUTED STUDENT WORKSPACE                          */
+            /* Mobile (< 768px): Zero-Scroll 100dvh App Shell | Desktop: Full Workspace */
             /* ========================================================================= */
-            <div className="flex-1 flex flex-col animate-in fade-in duration-200 pb-16 md:pb-0">
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden md:overflow-visible animate-in fade-in duration-200">
               {/* VIEW 1: MI RUTA (MICRO-LEARNING 5-DAY SPRINT DASHBOARD) */}
               {activeView === 'path' ? (
-                <div id="view-path" className="flex flex-col animate-in fade-in duration-200">
+                <div
+                  id="view-path"
+                  className="flex-1 min-h-0 flex flex-col overflow-hidden md:overflow-visible animate-in fade-in duration-200"
+                >
                   <WeeklySprintDashboard />
                 </div>
               ) : activeView === 'resources' ? (
                 /* VIEW 2: RECURSOS & JUEGOS */
-                <div id="view-resources" className="flex flex-col animate-in fade-in duration-200">
+                <div
+                  id="view-resources"
+                  className="flex-1 min-h-0 flex flex-col overflow-hidden md:overflow-visible animate-in fade-in duration-200"
+                >
                   {/* Mobile Sub-Tab Switcher (< 768px) */}
-                  <div className="md:hidden px-4 pt-4 pb-2">
+                  <div className="md:hidden shrink-0 px-3.5 pt-2 pb-1.5">
                     <div className="flex p-1 rounded-2xl bg-[var(--bg-sunken)] border border-[var(--border-hairline)] max-w-md mx-auto w-full gap-1">
                       <button
+                        id="mobile-resources-tab-generator"
                         type="button"
                         onClick={() => setResourcesTab('generator')}
-                        className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer text-center ${
+                        className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer text-center ${
                           resourcesTab === 'generator'
-                            ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-extrabold'
+                            ? 'bg-[#E09B30] text-[#091326] shadow-sm font-extrabold'
                             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                       >
                         {isEs ? 'Generador IA' : 'AI Generator'}
                       </button>
                       <button
+                        id="mobile-resources-tab-games"
                         type="button"
                         onClick={() => setResourcesTab('games')}
-                        className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer text-center ${
+                        className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl font-montserrat font-bold text-xs uppercase tracking-wider transition-all cursor-pointer text-center ${
                           resourcesTab === 'games'
-                            ? 'bg-[#E09B30] text-[#1A3153] shadow-md font-extrabold'
+                            ? 'bg-[#E09B30] text-[#091326] shadow-sm font-extrabold'
                             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                       >
@@ -155,24 +176,42 @@ export const App: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Desktop: Stacks both views. Mobile: Shows selected sub-tab */}
-                  <div className={resourcesTab === 'generator' ? 'block' : 'hidden md:block'}>
+                  {/* Desktop: Stacks both views. Mobile: Shows selected sub-tab in 100dvh frame */}
+                  <div
+                    className={
+                      resourcesTab === 'generator'
+                        ? 'flex-1 min-h-0 flex flex-col overflow-hidden md:block md:overflow-visible'
+                        : 'hidden md:block'
+                    }
+                  >
                     <EducationalResourcesView />
                   </div>
-                  <div className={resourcesTab === 'games' ? 'block' : 'hidden md:block'}>
+                  <div
+                    className={
+                      resourcesTab === 'games'
+                        ? 'flex-1 min-h-0 flex flex-col overflow-hidden md:block md:overflow-visible'
+                        : 'hidden md:block'
+                    }
+                  >
                     <InteractiveGamesView />
                   </div>
                 </div>
               ) : activeView === 'schedule' ? (
                 /* VIEW 3: AGENDAR CLASE (14:00 - 20:00 Bolivia Time) */
-                <div id="view-schedule" className="flex flex-col animate-in fade-in duration-200">
+                <div
+                  id="view-schedule"
+                  className="flex-1 min-h-0 flex flex-col overflow-hidden md:overflow-visible animate-in fade-in duration-200"
+                >
                   <ClassSchedulerView />
                 </div>
               ) : (
                 /* VIEW 4: SIMULADOR IA (Mobile: 100dvh Zero-Scroll Cockpit | Desktop: Full Simulator) */
-                <div id="view-simulator" className="flex-1 flex flex-col animate-in fade-in duration-200">
+                <div
+                  id="view-simulator"
+                  className="flex-1 min-h-0 flex flex-col overflow-hidden md:overflow-visible animate-in fade-in duration-200"
+                >
                   {/* Mobile Single-Screen Zero-Scroll Cockpit (< 768px) */}
-                  <div className="md:hidden h-[calc(100dvh-112px)] overflow-hidden">
+                  <div className="md:hidden flex-1 min-h-0 overflow-hidden">
                     <MobileVoiceCockpit />
                   </div>
 
@@ -233,12 +272,12 @@ export const App: React.FC = () => {
           )}
         </main>
 
-        {/* Authenticated Mobile Bottom App Tab Bar (56px, >= 44px touch targets) */}
+        {/* Authenticated Mobile Bottom App Tab Bar (60px fixed flex footer, >= 44px touch targets) */}
         {isAuthenticated && (
           <nav
             id="mobile-portal-bottom-tabs"
             aria-label={isEs ? 'Navegación del portal' : 'Portal Navigation'}
-            className="md:hidden fixed bottom-0 inset-x-0 z-50 h-14 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] grid grid-cols-4 items-center px-1 shadow-lg"
+            className="md:hidden shrink-0 z-40 h-[60px] pb-[env(safe-area-inset-bottom)] bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] grid grid-cols-4 items-center px-1.5 shadow-lg"
           >
             {(
               [
@@ -253,6 +292,7 @@ export const App: React.FC = () => {
               return (
                 <button
                   key={tab.id}
+                  id={`mobile-tab-${tab.id}`}
                   type="button"
                   onClick={() => setActiveView(tab.id)}
                   aria-current={active ? 'page' : undefined}
@@ -276,8 +316,12 @@ export const App: React.FC = () => {
         {/* End-of-Week Teacher Pedagogical Report Modal */}
         <WeeklyReportModal />
 
-        {/* 4-Column Architectural Footer (Rendered for Authenticated Portal; PortalLanding renders its own over WORLD_BG) */}
-        {isAuthenticated && <Footer />}
+        {/* 4-Column Architectural Footer: Desktop Authenticated Portal ONLY (Hidden on Mobile < 768px to guarantee 0-scroll 100dvh app shell) */}
+        {isAuthenticated && (
+          <div className="hidden md:block">
+            <Footer />
+          </div>
+        )}
 
         {/* Brand-Aligned Cookie Consent Banner & Preferences Modal */}
         <CookieConsentBanner />
