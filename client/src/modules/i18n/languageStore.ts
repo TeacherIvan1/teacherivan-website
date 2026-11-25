@@ -6,6 +6,17 @@ const STORAGE_KEY = 'teacherivan_lang';
 
 function getInitialLanguage(): Language {
   try {
+    if (typeof window !== 'undefined' && window.location?.search) {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get('lang')?.toLowerCase();
+      if (urlLang === 'en' || urlLang === 'es') {
+        return urlLang;
+      }
+    }
+  } catch {
+    // Ignore URL parsing errors in non-browser contexts
+  }
+  try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === 'en' || saved === 'es') {
       return saved;

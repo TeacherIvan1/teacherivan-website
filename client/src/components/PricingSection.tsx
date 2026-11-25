@@ -71,8 +71,8 @@ export const PricingSection: React.FC = () => {
               }`}
             >
               {isEs
-                ? 'Cancela o cambia de plan cuando quieras. Clases Lun–Vie (14:00–20:00 BOT).'
-                : 'Cancel or switch tiers anytime. Live classes Mon–Fri (14:00–20:00 BOT).'}
+                ? 'Planes mensuales claros en BOB (300 / 580 / 850) o USD ($45 / $85 / $125). Cancela cuando quieras. Clases en vivo Lun–Vie (14:00–20:00 BOT).'
+                : 'Clear monthly plans in USD ($45 / $85 / $125) or BOB (300 / 580 / 850). Cancel anytime. Live classes Mon–Fri (14:00–20:00 BOT).'}
             </p>
           </div>
 
@@ -207,7 +207,7 @@ export const PricingSection: React.FC = () => {
                 <li className="flex items-start gap-2.5">
                   <Check size={17} className="text-[#9A6515] shrink-0 mt-0.5" aria-hidden="true" />
                   <span>
-                    <strong className="text-[#1A3153]">{isEs ? 'Mi Ruta + Generador IA' : 'My Path + AI Resources'}</strong> {isEs ? 'ilimitado' : 'unlimited'}
+                    <strong className="text-[#1A3153]">{isEs ? 'Mi Ruta + Recursos & Juegos' : 'My Path + Resources & Games'}</strong> {isEs ? 'ilimitados' : 'unlimited'}
                   </span>
                 </li>
               </ul>
@@ -390,15 +390,29 @@ export const PricingSection: React.FC = () => {
                 : 'Guaranteed >75% active student speaking time per session (Mon–Fri 14:00–20:00 BOT).'}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => openAuthModal('signup')}
-            className={`min-h-[44px] px-3 font-montserrat font-bold hover:underline whitespace-nowrap cursor-pointer ${
-              isDark ? 'text-[#E09B30]' : 'text-[#9A6515]'
-            }`}
-          >
-            {isEs ? 'Crear Cuenta Gratis →' : 'Create Free Account →'}
-          </button>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const faqEl = document.getElementById('chapter-4-faq');
+                if (faqEl) faqEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className={`hidden md:inline-flex items-center min-h-[44px] px-3 font-montserrat font-semibold text-xs uppercase tracking-wider hover:underline whitespace-nowrap cursor-pointer ${
+                isDark ? 'text-[#A7C7E7] hover:text-[#FAFAFA]' : 'text-[#334155] hover:text-[#1A3153]'
+              }`}
+            >
+              {isEs ? 'Ver preguntas frecuentes ↓' : 'Read FAQs ↓'}
+            </button>
+            <button
+              type="button"
+              onClick={() => openAuthModal('signup')}
+              className={`min-h-[44px] px-3 font-montserrat font-bold hover:underline whitespace-nowrap cursor-pointer ${
+                isDark ? 'text-[#E09B30]' : 'text-[#9A6515]'
+              }`}
+            >
+              {isEs ? 'Crear Cuenta Gratis →' : 'Create Free Account →'}
+            </button>
+          </div>
         </div>
       </div>
     </section>

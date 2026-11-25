@@ -2,6 +2,14 @@ import { Language } from './types';
 
 export const translations = {
   en: {
+    seo: {
+      title: 'Teacher Ivan | 1-on-1 English Coaching & 24/7 Voice Lab',
+      description:
+        'Speak real English without freezing or translating in your head. Bicronic Method: 24/7 voice practice with Teacher Ivan & Emma plus live 1-on-1 coaching (>75% active speaking). Free 90s diagnostic & plans from $45 USD (300 BOB).',
+      ogTitle: 'Teacher Ivan | 1-on-1 English Coaching & 24/7 Voice Lab',
+      ogDescription:
+        'Overcome speaking hesitation with the Bicronic Method: 24/7 voice practice, My Path, Resources & Games, and live 1-on-1 coaching ($45–$125 USD / 300–850 BOB). Free 90s spoken test.',
+    },
     nav: {
       voiceTutor: 'Interactive Conversation Tutor',
       hybridMethod: 'The Hybrid Method',
@@ -1061,6 +1069,14 @@ export const translations = {
   },
 
   es: {
+    seo: {
+      title: 'Teacher Ivan | Clases de Inglés 1-a-1 y Práctica de Voz 24/7',
+      description:
+        'Habla inglés real sin bloquearte ni traducir en tu mente. Método Bicrónico: práctica de voz 24/7 con Teacher Ivan y Emma + clases 1-a-1 en vivo (>75% habla activa). Diagnóstico gratis de 90s y planes desde 300 BOB ($45 USD).',
+      ogTitle: 'Teacher Ivan | Clases de Inglés 1-a-1 y Práctica de Voz 24/7',
+      ogDescription:
+        'Supera el bloqueo al hablar inglés con el Método Bicrónico: práctica hablada 24/7, Mi Ruta, Recursos & Juegos y mentoría 1-a-1 en vivo (300–850 BOB / $45–$125 USD). Prueba gratis en 90s.',
+    },
     nav: {
       voiceTutor: 'Tutor de Conversación Interactiva',
       hybridMethod: 'El Método Híbrido',

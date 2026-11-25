@@ -369,5 +369,24 @@ describe('i18n Language Module', () => {
     assert.ok(enAuth.whatsappHelp.includes('+591 72878330'));
     assert.ok(esAuth.whatsappHelp.includes('+591 72878330'));
   });
+
+  it('contains 100% bilingual SEO metadata without internal engineering jargon', () => {
+    const jargonRegex = /\b(LLM|VAD|WebSocket|STT|PCM)\b|Gemini Live/i;
+
+    for (const locale of ['en', 'es'] as const) {
+      const seo = translations[locale].seo;
+      assert.ok(seo.title.length >= 25 && seo.title.length <= 75, `${locale} SEO title length should be SERP-friendly`);
+      assert.ok(seo.description.length >= 90, `${locale} SEO description should be informative`);
+      assert.ok(seo.ogTitle);
+      assert.ok(seo.ogDescription);
+
+      for (const value of Object.values(seo)) {
+        assert.strictEqual(jargonRegex.test(value), false, `${locale} SEO metadata must not expose jargon: ${value}`);
+      }
+      for (const value of Object.values(translations[locale].landingPage)) {
+        assert.strictEqual(jargonRegex.test(value), false, `${locale} landingPage copy must not expose jargon: ${value}`);
+      }
+    }
+  });
 });
 

@@ -42,10 +42,21 @@ export const App: React.FC = () => {
   const isAdmin = user?.role === 'admin';
   const showDevMode = isAdmin && isDeveloperMode;
 
-  // Keep <html lang="..."> synchronized with active bilingual locale (WCAG 3.1.1)
+  // Keep <html lang="...">, document.title & SEO/OG metadata synchronized with active bilingual locale
   useEffect(() => {
     document.documentElement.lang = lang === 'en' ? 'en' : 'es';
-  }, [lang]);
+    document.title = t.seo.title;
+
+    const setMeta = (selector: string, value: string) => {
+      const el = document.querySelector<HTMLMetaElement>(selector);
+      if (el) el.setAttribute('content', value);
+    };
+    setMeta('meta[name="description"]', t.seo.description);
+    setMeta('meta[property="og:title"]', t.seo.ogTitle);
+    setMeta('meta[property="og:description"]', t.seo.ogDescription);
+    setMeta('meta[name="twitter:title"]', t.seo.ogTitle);
+    setMeta('meta[name="twitter:description"]', t.seo.ogDescription);
+  }, [lang, t.seo]);
 
   useEffect(() => {
     // 0. Scrub any legacy auth/JWT tokens from localStorage/sessionStorage immediately on boot

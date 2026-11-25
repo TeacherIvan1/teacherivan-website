@@ -96,8 +96,8 @@ export const Footer: React.FC = () => {
               }}
             >
               {isEs
-                ? 'Método Bicrónico: Inmersión IA 24/7 + Coaching 1-a-1 en vivo.'
-                : 'Bichronous Method: 24/7 AI Immersion + Live 1-on-1 Coaching.'}
+                ? 'Método Bicrónico: Práctica de Voz 24/7 + Coaching 1-a-1 en vivo.'
+                : 'Bicronic Method: 24/7 Voice Practice + Live 1-on-1 Coaching.'}
             </p>
             <p
               style={{
@@ -122,7 +122,7 @@ export const Footer: React.FC = () => {
                   onClick={() => scrollToSection('chapter-1-bicronic', 'path')}
                   className="min-h-[44px] py-1.5 hover:text-[#FAFAFA] transition-colors cursor-pointer text-left inline-flex items-center"
                 >
-                  {isEs ? 'Método Bicrónico' : 'Bichronous Method'}
+                  {isEs ? 'Método Bicrónico' : 'Bicronic Method'}
                 </button>
               </li>
               <li>
@@ -132,6 +132,15 @@ export const Footer: React.FC = () => {
                   className="min-h-[44px] py-1.5 hover:text-[#FAFAFA] transition-colors cursor-pointer text-left inline-flex items-center"
                 >
                   Voice Lab 24/7
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('section-2-stories', 'path')}
+                  className="min-h-[44px] py-1.5 hover:text-[#FAFAFA] transition-colors cursor-pointer text-left inline-flex items-center"
+                >
+                  {isEs ? 'Oportunidades Reales' : 'Real Opportunities'}
                 </button>
               </li>
               <li>
@@ -149,7 +158,7 @@ export const Footer: React.FC = () => {
                   onClick={() => scrollToSection('chapter-4-faq', 'resources')}
                   className="min-h-[44px] py-1.5 hover:text-[#FAFAFA] transition-colors cursor-pointer text-left inline-flex items-center"
                 >
-                  {isEs ? 'Preguntas' : 'FAQ'}
+                  {isEs ? 'Preguntas frecuentes' : 'FAQ'}
                 </button>
               </li>
               {!isAuthenticated && (
@@ -308,8 +317,8 @@ export const Footer: React.FC = () => {
           <span>Teacher Ivan • English Classes • Sucre, Bolivia • Online Worldwide</span>
           <span>
             {isEs
-              ? 'Inmersión Asincrónica 24/7 + Coaching Humano 1-a-1'
-              : '24/7 Async Immersion + 1-on-1 Human Coaching'}
+              ? 'Práctica de Voz 24/7 + Coaching Humano 1-a-1'
+              : '24/7 Voice Practice + Live 1-on-1 Coaching'}
           </span>
         </div>
       </div>
